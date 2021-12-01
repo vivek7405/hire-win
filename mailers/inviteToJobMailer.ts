@@ -5,8 +5,7 @@
  * and use it straight away.
  */
 import previewEmail from "preview-email"
-import postmark from "postmark"
-import htmlToText from "html-to-text"
+import { convert } from "html-to-text"
 import db from "db"
 
 type InviteToJobInput = {
@@ -24,7 +23,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
 
   const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
   const webhookUrl = `${origin}/api/invitations/accept?token=${token}&jobId=${job?.id}`
-  const postmarkServerClient = process.env.POSTMARK_TOKEN || null
+  const postmarkServerClient = process.env.POSTMARK_TOKEN || ""
 
   const msg = {
     from: "noreply@hire.win",
@@ -44,6 +43,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
       if (process.env.NODE_ENV === "production" && postmarkServerClient) {
         // send the production email
         try {
+          const postmark = require("postmark")
           const client = new postmark.ServerClient(postmarkServerClient)
 
           client.sendEmail({
@@ -51,10 +51,10 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
             To: msg.to,
             Subject: msg.subject,
             HtmlBody: msg.html,
-            TextBody: htmlToText(msg.html),
+            TextBody: convert(msg.html),
             MessageStream: "invite-to-job",
           })
-        } catch {
+        } catch (e) {
           throw new Error(
             "Something went wrong with email implementation in mailers/inviteToJobMailer"
           )

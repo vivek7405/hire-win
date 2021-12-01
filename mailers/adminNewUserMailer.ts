@@ -5,8 +5,7 @@
  * and use it straight away.
  */
 import previewEmail from "preview-email"
-import postmark from "postmark"
-import htmlToText from "html-to-text"
+import { convert } from "html-to-text"
 
 type ResetPasswordMailer = {
   to: string
@@ -37,6 +36,7 @@ export function adminNewUserMailer({ to, token }: ResetPasswordMailer) {
       if (process.env.NODE_ENV === "production" && postmarkServerClient) {
         // send the production email
         try {
+          const postmark = require("postmark")
           const client = new postmark.ServerClient(postmarkServerClient)
 
           client.sendEmail({
@@ -44,7 +44,7 @@ export function adminNewUserMailer({ to, token }: ResetPasswordMailer) {
             To: msg.to,
             Subject: msg.subject,
             HtmlBody: msg.html,
-            TextBody: htmlToText(msg.html),
+            TextBody: convert(msg.html),
             MessageStream: "admin-new-user",
           })
         } catch {
