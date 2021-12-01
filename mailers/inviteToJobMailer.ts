@@ -27,7 +27,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
-    from: "TODO@example.com",
+    from: "noreply@hire.win",
     to,
     subject: "You have been invited to a job",
     html: `

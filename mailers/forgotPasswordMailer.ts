@@ -20,7 +20,7 @@ export function forgotPasswordMailer({ to, token }: ResetPasswordMailer) {
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
-    from: "TODO@example.com",
+    from: "noreply@hire.win",
     to,
     subject: "Your Password Reset Instructions",
     html: `
