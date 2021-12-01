@@ -2713,7 +2713,7 @@ axios@0.24.0:
   dependencies:
     follow-redirects "^1.14.4"
 
-axios@^0.21.1:
+axios@^0.21.1, axios@^0.21.4:
   version "0.21.4"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
@@ -5730,6 +5730,18 @@ html-to-text@8.0.0:
     minimist "^1.2.5"
     selderee "^0.6.0"
 
+html-to-text@8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/html-to-text/-/html-to-text-8.1.0.tgz#0c35fc452e6eccb275669adb8bcc61d93ec43ed5"
+  integrity sha512-Z9iYAqYK2c18GswSbnxJSeMs7lyJgwR2oIkDOyOHGBbYsPsG4HvT379jj3Lcbfko8A5ceyyMHAfkmp/BiXA9/Q==
+  dependencies:
+    "@selderee/plugin-htmlparser2" "^0.6.0"
+    deepmerge "^4.2.2"
+    he "^1.2.0"
+    htmlparser2 "^6.1.0"
+    minimist "^1.2.5"
+    selderee "^0.6.0"
+
 htmlparser2@^6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-6.1.0.tgz#c4d762b6c3371a05dbe65e94ae43a9f845fb8fb7"
@@ -8715,6 +8727,13 @@ postcss@8.4.0, postcss@^8.1.6, postcss@^8.2.1:
     nanoid "^3.1.30"
     picocolors "^1.0.0"
     source-map-js "^1.0.1"
+
+postmark@2.7.8:
+  version "2.7.8"
+  resolved "https://registry.yarnpkg.com/postmark/-/postmark-2.7.8.tgz#4f490e544bf441c3a2134a6f4b2d4114f984ff60"
+  integrity sha512-DvOLcgYSM5+NEKrdQsrpnkX9tAP/apZRMEL9Z0UjY2Fh9kBBhLMCAKm9hANSUeTugrmOiKe3DWu/tSSUIu2CIw==
+  dependencies:
+    axios "^0.21.4"
 
 prelude-ls@^1.2.1:
   version "1.2.1"

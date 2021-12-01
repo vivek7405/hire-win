@@ -5,6 +5,8 @@
  * and use it straight away.
  */
 import previewEmail from "preview-email"
+import postmark from "postmark"
+import htmlToText from "html-to-text"
 
 type ResetPasswordMailer = {
   to: string
@@ -15,6 +17,7 @@ export function forgotPasswordMailer({ to, token }: ResetPasswordMailer) {
   // In production, set NEXT_PUBLIC_APP_URL to your production server origin
   const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
   const resetUrl = `${origin}/reset-password?token=${token}`
+  const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
     from: "TODO@example.com",
@@ -32,10 +35,24 @@ export function forgotPasswordMailer({ to, token }: ResetPasswordMailer) {
 
   return {
     async send() {
-      if (process.env.NODE_ENV === "production") {
-        // TODO - send the production email, like this:
-        // await postmark.sendEmail(msg)
-        throw new Error("No production email implementation in mailers/forgotPasswordMailer")
+      if (process.env.NODE_ENV === "production" && postmarkServerClient) {
+        // send the production email
+        try {
+          const client = new postmark.ServerClient(postmarkServerClient)
+
+          client.sendEmail({
+            From: msg.from,
+            To: msg.to,
+            Subject: msg.subject,
+            HtmlBody: msg.html,
+            TextBody: htmlToText(msg.html),
+            MessageStream: "forgot-password",
+          })
+        } catch {
+          throw new Error(
+            "Something went wrong with email implementation in mailers/forgotPasswordMailer"
+          )
+        }
       } else {
         // Preview email in the browser
         await previewEmail(msg)

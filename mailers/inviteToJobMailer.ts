@@ -5,6 +5,8 @@
  * and use it straight away.
  */
 import previewEmail from "preview-email"
+import postmark from "postmark"
+import htmlToText from "html-to-text"
 import db from "db"
 
 type InviteToJobInput = {
@@ -22,6 +24,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
 
   const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
   const webhookUrl = `${origin}/api/invitations/accept?token=${token}&jobId=${job?.id}`
+  const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
     from: "TODO@example.com",
@@ -38,10 +41,24 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
 
   return {
     async send() {
-      if (process.env.NODE_ENV === "production") {
-        // TODO - send the production email, like this:
-        // await postmark.sendEmail(msg)
-        throw new Error("No production email implementation in mailers/inviteToJobMailer")
+      if (process.env.NODE_ENV === "production" && postmarkServerClient) {
+        // send the production email
+        try {
+          const client = new postmark.ServerClient(postmarkServerClient)
+
+          client.sendEmail({
+            From: msg.from,
+            To: msg.to,
+            Subject: msg.subject,
+            HtmlBody: msg.html,
+            TextBody: htmlToText(msg.html),
+            MessageStream: "invite-to-job",
+          })
+        } catch {
+          throw new Error(
+            "Something went wrong with email implementation in mailers/inviteToJobMailer"
+          )
+        }
       } else {
         // Preview email in the browser
         await previewEmail(msg)
