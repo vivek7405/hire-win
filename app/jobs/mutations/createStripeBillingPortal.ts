@@ -19,7 +19,7 @@ async function createStripeBillingPortal({ jobId }: CreateStripeBillingPortalInp
 
   const { url } = await stripe.billingPortal.sessions.create({
     customer: job.stripeCustomerId,
-    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job.slug}/settings`,
+    return_url: `${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job.slug}/settings/billing`,
   })
 
   return url

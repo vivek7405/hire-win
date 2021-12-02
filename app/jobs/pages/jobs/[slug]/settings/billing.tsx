@@ -7,6 +7,7 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  Routes,
 } from "blitz"
 import path from "path"
 import { CheckIcon } from "@heroicons/react/outline"
@@ -154,7 +155,7 @@ const JobSettingsBillingPage = ({
 
                             if (url) window.location.href = url
                           } catch (err) {
-                            toast.error(err)
+                            toast.error("Unable to open Manage Billing")
                           }
                         }}
                       >
