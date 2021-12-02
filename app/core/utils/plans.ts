@@ -9,7 +9,7 @@ export const plans = {
   },
   pro2: {
     title: "Pro 2",
-    price: 24,
+    price: 25,
     frequency: "/month",
     description: "The essentials to provide your best work for clients.",
     priceId: process.env.PRO2_PLAN,
