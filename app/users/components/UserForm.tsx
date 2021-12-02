@@ -21,7 +21,7 @@ export const UserForm = (props: UserFormProps) => {
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
       >
-        <SingleFileUploadField name="avatar" label="Avatar" handleSubmit={props.onSubmit} />
+        <SingleFileUploadField name="avatar" label="Avatar" onSubmit={props.onSubmit} />
       </Form>
     </>
   )

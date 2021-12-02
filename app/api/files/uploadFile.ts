@@ -11,31 +11,39 @@ export const config = {
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
-  let s3 = new AWS.S3({
-    accessKeyId: process.env.S3_ACCESS_KEY,
-    secretAccessKey: process.env.S3_SECRET_KEY,
-    endpoint: process.env.S3_ENDPOINT,
-    s3ForcePathStyle: true, // needed with minio?
-    signatureVersion: "v4",
-  })
+  // let s3 = new AWS.S3({
+  //   accessKeyId: process.env.S3_ACCESS_KEY,
+  //   secretAccessKey: process.env.S3_SECRET_KEY,
+  //   endpoint: process.env.S3_ENDPOINT,
+  //   s3ForcePathStyle: true, // needed with minio?
+  //   signatureVersion: "v4",
+  // })
+
+  const region = process.env.S3_BUCKET_REGION
+  const accessKeyId = process.env.S3_ACCESS_KEY
+  const secretAccessKey = process.env.S3_SECRET_KEY
+  const s3 = new AWS.S3({ region, accessKeyId, secretAccessKey })
 
   const form = new IncomingForm()
   form.uploadDir = "./"
   form.keepExtensions = true
   form.parse(req, async (err, fields, files) => {
-    const image = fs.readFileSync(files.file.path)
-
-    const params = {
-      Key: files.file.name,
-      ContentType: files.file.type,
-      Body: image,
-      Bucket: process.env.S3_BUCKET ? process.env.S3_BUCKET : "hire-win",
-    }
-
-    let put = s3.upload(params)
-
     try {
-      let response = await put.promise()
+      const fileBody = fs.readFileSync(files.file.filepath)
+
+      const splitArr = files.file.originalFilename.split(".")
+      const fileExt = splitArr && splitArr.length > 0 ? "." + splitArr[splitArr.length - 1] : ""
+
+      const params = {
+        Key: files.file.newFilename + fileExt,
+        ContentType: files.file.type,
+        Body: fileBody,
+        Bucket: process.env.S3_BUCKET ? process.env.S3_BUCKET : "hire.win",
+      }
+
+      const put = s3.upload(params)
+
+      const response = await put.promise()
 
       res.status(200).send({
         Location: response.Location,

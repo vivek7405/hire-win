@@ -49,9 +49,13 @@ const Navbar = ({ user }: NavbarProps) => {
     <nav className="bg-indigo-600 py-2">
       <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
         {/* <img className="h-12 w-auto" src="/logo.svg" alt="hire-win Logo" /> */}
-        <div className="h-12 w-auto">
-          <Image alt="hire.win" src={transparentLogoWhite} height="50" width="50" />
-        </div>
+        <a className="h-12 w-auto cursor-pointer">
+          <Link href={Routes.Home()}>
+            <span>
+              <Image alt="hire.win" src={transparentLogoWhite} height="50" width="50" />
+            </span>
+          </Link>
+        </a>
 
         <div className="lg:flex justify-between items-center w-full hidden">
           <div className="space-x-2 flex">

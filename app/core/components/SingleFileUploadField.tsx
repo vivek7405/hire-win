@@ -11,7 +11,7 @@ export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElem
   label: string
   /** Field type. Doesn't include radio buttons and checkboxes */
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
-  handleSubmit: () => void
+  onSubmit: () => void
 }
 
 export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFileUploadProps>(
@@ -56,8 +56,8 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
         },
       }
       await axios.post(url, file, config)
-      setValue(`${props.name}` as const, null, { shouldValidate: false })
-      handleSubmit(props.handleSubmit)()
+      setValue(`${props.name}` as const, {}, { shouldValidate: false })
+      handleSubmit(props.onSubmit)()
     }
 
     return (
@@ -67,7 +67,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
           defaultValue={defaultValue || { Key: "", Location: "" }}
           render={() => (
             <>
-              {file && file.Key !== "" ? (
+              {file && file.Key && file.Key !== "" ? (
                 <div className="w-full">
                   <label className="block text-sm text-center font-medium text-gray-700">
                     {label}

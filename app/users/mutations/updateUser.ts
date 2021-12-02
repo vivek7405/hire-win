@@ -10,6 +10,8 @@ async function updateUser({ where, data }: UpdateUserInput, ctx: Ctx) {
 
   const { avatar } = User.parse(data) as any
 
+  if (!avatar) return null
+
   const user = await db.user.update({
     where,
     data: {
