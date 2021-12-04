@@ -25,6 +25,7 @@ body {
 input,
 input[type="password"],
 input[type="text"],
+input[type="email"],
 input[type="number"] {
   @apply focus:outline-none focus:border-transparent focus-visible:ring-2 focus-visible:ring-indigo-500;
 }

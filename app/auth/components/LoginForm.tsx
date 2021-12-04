@@ -48,7 +48,13 @@ export const LoginForm = (props: LoginFormProps) => {
           }
         }}
       >
-        <LabeledTextField name="email" label="Email" placeholder="Email" testid="loginEmail" />
+        <LabeledTextField
+          type="email"
+          name="email"
+          label="Email"
+          placeholder="Email"
+          testid="loginEmail"
+        />
         <LabeledTextField
           name="password"
           label="Password"

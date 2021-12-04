@@ -23,7 +23,13 @@ export const JobForm = (props: JobFormProps) => {
         header={props.header}
         subHeader={props.subHeader}
       >
-        <LabeledTextField name="name" label="Name" placeholder="Job Name" testid="jobName" />
+        <LabeledTextField
+          type="text"
+          name="name"
+          label="Name"
+          placeholder="Job Name"
+          testid="jobName"
+        />
       </Form>
     </>
   )

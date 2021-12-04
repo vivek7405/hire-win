@@ -45,7 +45,7 @@ const ForgotPasswordPage: BlitzPage = () => {
                 }
               }}
             >
-              <LabeledTextField name="email" label="Email" placeholder="Email" />
+              <LabeledTextField type="email" name="email" label="Email" placeholder="Email" />
             </AuthForm>
           )}
         </div>
