@@ -78,7 +78,8 @@ model Job {
 
   name        String
   description Json?
-  slug        String @unique
+  category    String?
+  slug        String  @unique
 
   memberships Membership[]
 
