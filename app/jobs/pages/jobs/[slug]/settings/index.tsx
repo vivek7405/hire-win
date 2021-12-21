@@ -10,6 +10,7 @@ import {
   ErrorComponent,
   getSession,
 } from "blitz"
+import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import path from "path"
 
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -123,10 +124,14 @@ const JobSettingsPage = ({
           subHeader="Update your job details."
           initialValues={{
             name: job?.name,
+            description: job?.description
+              ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
+              : EditorState.createEmpty(),
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating Job</span>)
             try {
+              values.description = convertToRaw(values?.description?.getCurrentContent() || {})
               await updateJobMutation({
                 where: { id: job?.id },
                 data: { ...values },
