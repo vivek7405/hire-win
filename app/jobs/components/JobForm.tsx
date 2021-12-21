@@ -1,7 +1,7 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
-
 import { Job } from "app/jobs/validations"
+import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 
 type JobFormProps = {
   onSuccess?: () => void
@@ -29,6 +29,12 @@ export const JobForm = (props: JobFormProps) => {
           label="Name"
           placeholder="Job Name"
           testid="jobName"
+        />
+        <LabeledRichTextField
+          name="description"
+          label="Description"
+          placeholder="Description"
+          testid="jobDescription"
         />
       </Form>
     </>

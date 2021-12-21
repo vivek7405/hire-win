@@ -12,6 +12,7 @@ import toast from "react-hot-toast"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 import createJob from "app/jobs/mutations/createJob"
 import path from "path"
+import { convertToRaw } from "draft-js"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -52,6 +53,7 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Creating Job</span>)
             try {
+              values.description = convertToRaw(values?.description?.getCurrentContent())
               await createJobMutation(values)
               toast.success(() => <span>Job Created</span>, { id: toastId })
               router.push(Routes.Home())

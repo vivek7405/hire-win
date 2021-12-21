@@ -76,8 +76,9 @@ model Job {
   createdAt  DateTime @default(now())
   modifiedAt DateTime @default(now())
 
-  name String
-  slug String @unique
+  name        String
+  description Json?
+  slug        String @unique
 
   memberships Membership[]
 
