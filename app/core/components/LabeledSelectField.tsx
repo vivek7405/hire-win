@@ -1,20 +1,20 @@
 import { forwardRef, PropsWithoutRef, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
+import { z } from "zod"
 
-export interface LabeledInputSelectFieldProps
-  extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
+export interface LabeledSelectFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["select"]> {
   /** Field name. */
   name: string
   /** Field label. */
   label: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
-  options: string[]
+  options: { text: string; value?: string }[]
 }
 
-export const LabeledInputSelectField = forwardRef<HTMLInputElement, LabeledInputSelectFieldProps>(
-  ({ label, outerProps, name, options, ...props }, ref) => {
+export const LabeledSelectField = forwardRef<HTMLSelectElement, LabeledSelectFieldProps>(
+  ({ label, outerProps, name, options, defaultValue, ...props }, ref) => {
     const {
       register,
       formState: { isSubmitting, errors },
@@ -40,23 +40,25 @@ export const LabeledInputSelectField = forwardRef<HTMLInputElement, LabeledInput
           {label}
         </label>
         <div className="mt-1">
-          <input
+          <select
             disabled={isSubmitting}
             {...register(`${name}` as const)}
             {...props}
-            list={`data-list-${name}`}
             className="border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded"
             data-testid={`${props.testid && `${props.testid}-`}input`}
-          />
-          <datalist id={`data-list-${name}`}>
+          >
             {options?.map((op, index) => {
-              return <option key={index} value={op} />
+              return (
+                <option key={index} value={op.value}>
+                  {op.text}
+                </option>
+              )
             })}
-          </datalist>
+          </select>
         </div>
       </div>
     )
   }
 )
 
-export default LabeledInputSelectField
+export default LabeledSelectField

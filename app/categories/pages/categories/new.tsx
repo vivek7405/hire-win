@@ -6,11 +6,11 @@ import {
   useMutation,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
-import JobForm from "app/jobs/components/JobForm"
+import CategoryForm from "app/categories/components/CategoryForm"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import toast from "react-hot-toast"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import createJob from "app/jobs/mutations/createJob"
+import createCategory from "app/categories/mutations/createCategory"
 import path from "path"
 import { convertToRaw } from "draft-js"
 
@@ -36,28 +36,26 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const NewCategory = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [createJobMutation] = useMutation(createJob)
+  const [createCategoryMutation] = useMutation(createCategory)
 
   return (
-    <AuthLayout title="New Job" user={user}>
-      <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
+    <AuthLayout title="New Category" user={user}>
+      <Breadcrumbs ignore={[{ href: "/categories", breadcrumb: "Categories" }]} />
       <div className="mt-6">
-        <JobForm
-          user={user}
-          header="Create A New Job"
-          subHeader="Enter your job details."
+        <CategoryForm
+          header="Create A New Category"
+          subHeader="Enter your category details."
           initialValues={{
             name: "",
           }}
           onSubmit={async (values) => {
-            const toastId = toast.loading(() => <span>Creating Job</span>)
+            const toastId = toast.loading(() => <span>Creating Category</span>)
             try {
-              values.description = convertToRaw(values?.description?.getCurrentContent())
-              await createJobMutation(values)
-              toast.success(() => <span>Job Created</span>, { id: toastId })
-              router.push(Routes.Home())
+              await createCategoryMutation(values)
+              toast.success(() => <span>Category Created</span>, { id: toastId })
+              router.push(Routes.CategoriesHome())
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()
@@ -70,4 +68,4 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
   )
 }
 
-export default NewJob
+export default NewCategory
