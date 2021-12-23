@@ -2,6 +2,9 @@ import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
 import { Job } from "app/jobs/validations"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
+import LabeledSelectField from "app/core/components/LabeledSelectField"
+import { useQuery } from "blitz"
+import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
 
 type JobFormProps = {
   onSuccess?: () => void
@@ -9,9 +12,11 @@ type JobFormProps = {
   onSubmit: any
   header: string
   subHeader: string
+  user: any
 }
 
 export const JobForm = (props: JobFormProps) => {
+  const [categories] = useQuery(getCategoriesWOPagination, { where: { userId: props.user?.id } })
   return (
     <>
       <Form
@@ -29,6 +34,18 @@ export const JobForm = (props: JobFormProps) => {
           label="Name"
           placeholder="Job Name"
           testid="jobName"
+        />
+        <LabeledSelectField
+          name="category"
+          label="Category"
+          placeholder="Job Category"
+          testid="jobCategory"
+          options={[
+            { text: "Uncategorized", value: "" },
+            ...categories.map((c) => {
+              return { text: c.name, value: c.id }
+            }),
+          ]}
         />
         <LabeledRichTextField
           name="description"

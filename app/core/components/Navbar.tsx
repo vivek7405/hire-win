@@ -15,7 +15,10 @@ const Navbar = ({ user }: NavbarProps) => {
   const [profileOpen, setProfileOpen] = useState(false)
   const router = useRouter()
   const [logoutMutation] = useMutation(logout)
-  const nav = [{ name: "Jobs", href: "/", current: router.route === "/" }]
+  const nav = [
+    { name: "Jobs", href: "/", current: router.route === "/" },
+    { name: "Categories", href: "/categories", current: router.route === "/categories" },
+  ]
   let dropDownNav = [
     { name: "Settings", href: Routes.Settings().pathname, current: router.route === "/settings" },
     {

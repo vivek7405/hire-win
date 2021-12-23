@@ -1,14 +1,14 @@
 import { Ctx, AuthenticationError } from "blitz"
 import db from "db"
-import slugify from "slugify"
-import { Job, JobInputType } from "app/jobs/validations"
+import { Category, CategoryInputType } from "app/categories/validations"
 import Guard from "app/guard/ability"
+import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
-async function createJob(data: JobInputType, ctx: Ctx) {
+async function createCategory(data: CategoryInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, description, category } = Job.parse(data)
+  const { name } = Category.parse(data)
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 
@@ -18,26 +18,19 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     async (e) => await db.job.findFirst({ where: { slug: e } })
   )
 
-  const job = await db.job.create({
+  const category = await db.category.create({
     data: {
       name: name,
-      description: description!,
       slug: newSlug,
-      categoryId: category || null,
-      memberships: {
-        create: {
-          role: "OWNER",
-          user: {
-            connect: {
-              id: user.id,
-            },
-          },
+      user: {
+        connect: {
+          id: user.id,
         },
       },
     },
   })
 
-  return job
+  return category
 }
 
-export default Guard.authorize("create", "job", createJob)
+export default Guard.authorize("create", "category", createCategory)

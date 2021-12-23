@@ -15,7 +15,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
-import getJob from "app/jobs/queries/getJob"
+import getCategory from "app/categories/queries/getCategory"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -28,18 +28,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
     "update",
-    "job",
+    "category",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    { where: { slug: context?.params?.slug! } }
   )
 
   if (user) {
     try {
-      const job = await invokeWithMiddleware(
-        getJob,
-        {
-          where: { slug: context?.params?.slug as string },
-        },
+      const category = await invokeWithMiddleware(
+        getCategory,
+        { slug: context?.params?.slug! },
         { ...context }
       )
 
@@ -47,7 +45,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         props: {
           user: user,
           canUpdate: canUpdate,
-          job: job,
+          category: category,
         },
       }
     } catch (error) {
@@ -67,7 +65,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=/jobs/${context?.params?.slug}`,
+        destination: `/login?next=/categories/${context?.params?.slug}`,
         permanent: false,
       },
       props: {},
@@ -75,9 +73,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const SingleJobPage = ({
+const SingleCategoryPage = ({
   user,
-  job,
+  category,
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -87,15 +85,15 @@ const SingleJobPage = ({
 
   return (
     <AuthLayout user={user}>
-      <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
+      <Breadcrumbs />
       <br />
       {canUpdate && (
-        <Link href={Routes.JobSettingsPage({ slug: job?.slug as string })} passHref>
-          <a data-testid={`${job?.name && `${job?.name}-`}settingsLink`}>Settings</a>
+        <Link href={Routes.CategorySettingsPage({ slug: category?.slug! })} passHref>
+          <a data-testid={`${category?.name && `${category?.name}-`}settingsLink`}>Settings</a>
         </Link>
       )}
     </AuthLayout>
   )
 }
 
-export default SingleJobPage
+export default SingleCategoryPage

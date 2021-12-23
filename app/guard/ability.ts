@@ -1,7 +1,7 @@
 import db from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 
-type ExtendedResourceTypes = "job" | "user" | "tokens" | "membership"
+type ExtendedResourceTypes = "job" | "user" | "tokens" | "membership" | "category"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -122,6 +122,24 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return job?.memberships.some((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "category")
+      can("update", "category")
+      can("isOwner", "category")
+      can("read", "category", async (args) => {
+        const category = await db.category.findFirst({
+          where: args.where,
+        })
+
+        return category?.userId === ctx.session.userId
+      })
+      can("readAll", "category", async (args) => {
+        const category = await db.membership.findMany({
+          where: args.where,
+        })
+
+        return category.every((c) => c.userId === ctx.session.userId) === true
       })
     }
   }

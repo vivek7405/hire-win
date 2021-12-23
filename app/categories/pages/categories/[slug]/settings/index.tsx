@@ -10,7 +10,6 @@ import {
   ErrorComponent,
   getSession,
 } from "blitz"
-import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import path from "path"
 
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -18,12 +17,10 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "app/guard/ability"
 
-import JobForm from "app/jobs/components/JobForm"
+import CategoryForm from "app/categories/components/CategoryForm"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import updateJob from "app/jobs/mutations/updateJob"
-import { checkPlan } from "app/jobs/utils/checkPlan"
-import getJob from "app/jobs/queries/getJob"
-import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
+import updateCategory from "app/categories/mutations/updateCategory"
+import getCategory from "app/categories/queries/getCategory"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -36,34 +33,31 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
     "update",
-    "job",
+    "category",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    { where: { slug: context?.params?.slug! } }
   )
 
   const { can: isOwner } = await Guard.can(
     "isOwner",
-    "job",
+    "category",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    { where: { slug: context?.params?.slug! } }
   )
 
   if (user) {
     try {
       if (canUpdate) {
-        const job = await invokeWithMiddleware(
-          getJob,
-          {
-            where: { slug: context?.params?.slug as string },
-          },
+        const category = await invokeWithMiddleware(
+          getCategory,
+          { slug: context?.params?.slug! },
           { ...context }
         )
 
         return {
           props: {
             user: user,
-            job: job,
-            currentPlan: checkPlan(job),
+            category: category,
             canUpdate,
             isOwner,
           },
@@ -95,7 +89,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=/jobs/${context?.params?.slug}/settings`,
+        destination: `/login?next=/categories/${context?.params?.slug}/settings`,
         permanent: false,
       },
       props: {},
@@ -103,54 +97,47 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const JobSettingsPage = ({
+const CategorySettingsPage = ({
   user,
-  job,
+  category,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [updateJobMutation] = useMutation(updateJob)
+  const [updateCategoryMutation] = useMutation(updateCategory)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
   return (
     <AuthLayout user={user}>
-      <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
-      <JobSettingsLayout job={job!} isOwner={isOwner}>
-        <JobForm
-          user={user}
-          header="Job Details"
-          subHeader="Update your job details."
-          initialValues={{
-            name: job?.name,
-            description: job?.description
-              ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
-              : EditorState.createEmpty(),
-            category: job?.category?.id,
-          }}
-          onSubmit={async (values) => {
-            const toastId = toast.loading(() => <span>Updating Job</span>)
-            try {
-              values.description = convertToRaw(values?.description?.getCurrentContent() || {})
-              await updateJobMutation({
-                where: { id: job?.id },
-                data: { ...values },
-                initial: job!,
-              })
-              toast.success(() => <span>Job Updated</span>, { id: toastId })
-              router.push(Routes.Home())
-            } catch (error) {
-              toast.error(
-                "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-              )
-            }
-          }}
-        />
-      </JobSettingsLayout>
+      <Breadcrumbs />
+      <br />
+      <CategoryForm
+        header="Category Details"
+        subHeader="Update your category details."
+        initialValues={{
+          name: category?.name,
+        }}
+        onSubmit={async (values) => {
+          const toastId = toast.loading(() => <span>Updating Category</span>)
+          try {
+            await updateCategoryMutation({
+              where: { slug: category?.slug },
+              data: { ...values },
+              initial: category!,
+            })
+            toast.success(() => <span>Category Updated</span>, { id: toastId })
+            router.push(Routes.Home())
+          } catch (error) {
+            toast.error(
+              "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+            )
+          }
+        }}
+      />
     </AuthLayout>
   )
 }
 
-export default JobSettingsPage
+export default CategorySettingsPage
