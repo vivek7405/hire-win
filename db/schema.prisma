@@ -27,6 +27,7 @@ model User {
   memberships Membership[]
   categories  Category[]
   workflows   Workflow[]
+  stages      Stage[]
 }
 
 model Session {
@@ -116,11 +117,11 @@ model Workflow {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name   String
-  slug   String  @unique
-  stages Stage[]
+  name String
+  slug String @unique
 
-  jobs Job[]
+  stages Stage[]
+  jobs   Job[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
@@ -135,8 +136,11 @@ model Stage {
   order Int
   slug  String @unique
 
-  workflow   Workflow @relation(fields: [workflowId], references: [id])
-  workflowId String
+  Workflow   Workflow? @relation(fields: [workflowId], references: [id])
+  workflowId String?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
 
   @@unique([workflowId, name])
   @@unique([workflowId, order])
