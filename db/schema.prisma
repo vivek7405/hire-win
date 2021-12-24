@@ -13,17 +13,20 @@ generator client {
 // --------------------------------------
 
 model User {
-  id             Int          @id @default(autoincrement())
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  email          String       @unique
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email          String    @unique
   hashedPassword String?
-  role           String       @default("USER")
+  role           String    @default("USER")
   avatar         Json?
   tokens         Token[]
   sessions       Session[]
-  memberships    Membership[]
-  Category       Category[]
+
+  memberships Membership[]
+  categories  Category[]
+  workflows   Workflow[]
 }
 
 model Session {
@@ -47,8 +50,6 @@ model Token {
   updatedAt   DateTime  @updatedAt
   hashedToken String
   lastFour    String?
-  // type        String
-  // See note below about TokenType enum
   type        TokenType
   expiresAt   DateTime
   sentTo      String?
@@ -62,9 +63,6 @@ model Token {
   @@unique([hashedToken, type])
 }
 
-// NOTE: It's highly recommended to use an enum for the token type
-//       but enums only work in Postgres.
-//       See: https://blitzjs.com/docs/database-overview#switch-to-postgresql
 enum TokenType {
   RESET_PASSWORD
   INVITE_TOKEN
@@ -73,30 +71,34 @@ enum TokenType {
 }
 
 model Job {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   name        String
   description Json?
-  category    Category? @relation(fields: [categoryId], references: [id])
-  slug        String    @unique
-
-  memberships Membership[]
+  slug        String @unique
 
   stripeCustomerId       String?   @unique
   stripeSubscriptionId   String?   @unique
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
 
-  tokens     Token[]
+  tokens Token[]
+
+  memberships Membership[]
+
+  category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?
+
+  workflow   Workflow? @relation(fields: [workflowId], references: [id])
+  workflowId String?
 }
 
 model Category {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  modifiedAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   name String
   slug String @unique
@@ -107,6 +109,37 @@ model Category {
   jobs Job[]
 
   @@unique([userId, name])
+}
+
+model Workflow {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name   String
+  slug   String  @unique
+  stages Stage[]
+
+  jobs Job[]
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Stage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name  String
+  order Int
+  slug  String @unique
+
+  workflow   Workflow @relation(fields: [workflowId], references: [id])
+  workflowId String
+
+  @@unique([workflowId, name])
+  @@unique([workflowId, order])
 }
 
 enum MembershipRole {
