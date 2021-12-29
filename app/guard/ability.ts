@@ -1,7 +1,14 @@
 import db from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 
-type ExtendedResourceTypes = "job" | "user" | "tokens" | "membership" | "category"
+type ExtendedResourceTypes =
+  | "job"
+  | "user"
+  | "tokens"
+  | "membership"
+  | "category"
+  | "stage"
+  | "stagesOnWorkflows"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -140,6 +147,46 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return category.every((c) => c.userId === ctx.session.userId) === true
+      })
+
+      can("create", "stage")
+      can("read", "stage", async (args) => {
+        const stage = await db.stage.findFirst({
+          where: args.where,
+        })
+
+        return stage?.userId === ctx.session.userId
+      })
+      can("readAll", "stage", async (args) => {
+        const stages = await db.stage.findMany({
+          where: args.where,
+        })
+
+        return stages.every((p) => p.userId === ctx.session.userId) === true
+      })
+      can("update", "stage", async (args) => {
+        const stage = await db.stage.findFirst({
+          where: args.where,
+        })
+
+        return stage?.userId === ctx.session.userId
+      })
+
+      can("update", "stagesOnWorkflows", async (args) => {
+        const stageOnWorkflow = await db.stagesOnWorkflows.findFirst({
+          where: args.where,
+        })
+
+        const stage = await db.stage.findFirst({
+          where: {
+            id: stageOnWorkflow?.stageId,
+          },
+          include: {
+            workflows: true,
+          },
+        })
+
+        return stage?.workflows.every((p) => p.userId === ctx.session.userId) === true
       })
     }
   }

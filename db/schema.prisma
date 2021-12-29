@@ -26,8 +26,10 @@ model User {
 
   memberships Membership[]
   categories  Category[]
-  workflows   Workflow[]
-  stages      Stage[]
+
+  workflows         Workflow[]
+  stages            Stage[]
+  stagesOnWorkflows StagesOnWorkflows[]
 }
 
 model Session {
@@ -85,8 +87,7 @@ model Job {
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
 
-  tokens Token[]
-
+  tokens      Token[]
   memberships Membership[]
 
   category   Category? @relation(fields: [categoryId], references: [id])
@@ -120,11 +121,13 @@ model Workflow {
   name String
   slug String @unique
 
-  stages Stage[]
+  stages StagesOnWorkflows[]
   jobs   Job[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
+
+  @@unique([userId, name])
 }
 
 model Stage {
@@ -132,18 +135,36 @@ model Stage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name  String
-  order Int
-  slug  String @unique
+  name String
+  slug String @unique
 
-  Workflow   Workflow? @relation(fields: [workflowId], references: [id])
-  workflowId String?
+  workflows StagesOnWorkflows[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
-  @@unique([workflowId, name])
-  @@unique([workflowId, order])
+  @@unique([userId, name])
+}
+
+model StagesOnWorkflows {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Int
+
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
+
+  workflow   Workflow @relation(fields: [workflowId], references: [id])
+  workflowId String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@unique([userId, workflowId, stageId])
+  @@unique([workflowId, stageId])
+  @@unique([workflowId, stageId, order])
 }
 
 enum MembershipRole {

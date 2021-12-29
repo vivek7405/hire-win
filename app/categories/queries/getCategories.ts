@@ -1,10 +1,11 @@
+import Guard from "app/guard/ability"
 import { paginate, resolver } from "blitz"
 import db, { Prisma } from "db"
 
 interface GetCategoriesInput
   extends Pick<Prisma.CategoryFindManyArgs, "where" | "orderBy" | "skip" | "take"> {}
 
-export default resolver.pipe(
+const getCategories = resolver.pipe(
   resolver.authorize(),
   async ({ where, orderBy, skip = 0, take = 100 }: GetCategoriesInput) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant
@@ -28,3 +29,5 @@ export default resolver.pipe(
     }
   }
 )
+
+export default Guard.authorize("readAll", "category", getCategories)

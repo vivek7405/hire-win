@@ -6,11 +6,11 @@ import {
   useMutation,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
-import CategoryForm from "app/categories/components/CategoryForm"
+import StageForm from "app/stages/components/StageForm"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import toast from "react-hot-toast"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import createCategory from "app/categories/mutations/createCategory"
+import createStage from "app/stages/mutations/createStage"
 import path from "path"
 import { convertToRaw } from "draft-js"
 
@@ -36,26 +36,26 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const NewCategory = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const NewStage = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [createCategoryMutation] = useMutation(createCategory)
+  const [createStageMutation] = useMutation(createStage)
 
   return (
-    <AuthLayout title="New Category" user={user}>
+    <AuthLayout title="New Stage" user={user}>
       <Breadcrumbs />
       <div className="mt-6">
-        <CategoryForm
-          header="Create A New Category"
-          subHeader="Enter your category details."
+        <StageForm
+          header="Create A New Stage"
+          subHeader="Enter your stage details."
           initialValues={{
             name: "",
           }}
           onSubmit={async (values) => {
-            const toastId = toast.loading(() => <span>Creating Category</span>)
+            const toastId = toast.loading(() => <span>Creating Stage</span>)
             try {
-              await createCategoryMutation(values)
-              toast.success(() => <span>Category Created</span>, { id: toastId })
-              router.push(Routes.CategoriesHome())
+              await createStageMutation(values)
+              toast.success(() => <span>Stage Created</span>, { id: toastId })
+              router.push(Routes.StagesHome())
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()
@@ -68,4 +68,4 @@ const NewCategory = ({ user }: InferGetServerSidePropsType<typeof getServerSideP
   )
 }
 
-export default NewCategory
+export default NewStage

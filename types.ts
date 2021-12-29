@@ -22,6 +22,7 @@ declare module "blitz" {
 }
 
 export type ExtendedJob = Prisma.JobGetPayload<{ include: { memberships: true } }>
+export type ExtendedStage = Prisma.StageGetPayload<{ include: { workflows: true } }>
 export type ExtendedCategory = Prisma.CategoryGetPayload<{ include: { jobs: true } }>
 export type ExtendedUser = Prisma.UserGetPayload<{
   include: {
