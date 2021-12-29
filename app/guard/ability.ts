@@ -150,6 +150,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       })
 
       can("create", "stage")
+      can("update", "stage")
+      can("isOwner", "stage")
       can("read", "stage", async (args) => {
         const stage = await db.stage.findFirst({
           where: args.where,
@@ -163,13 +165,6 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return stages.every((p) => p.userId === ctx.session.userId) === true
-      })
-      can("update", "stage", async (args) => {
-        const stage = await db.stage.findFirst({
-          where: args.where,
-        })
-
-        return stage?.userId === ctx.session.userId
       })
 
       can("update", "stagesOnWorkflows", async (args) => {
