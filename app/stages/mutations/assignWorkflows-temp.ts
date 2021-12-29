@@ -32,7 +32,7 @@ async function assignWorkflows({ where, data, initial }: UpdateStageInput, ctx: 
       workflows: {
         create: [
           {
-            order: order,
+            order: order!,
             workflow: {
               connect: {
                 id: workflow,
