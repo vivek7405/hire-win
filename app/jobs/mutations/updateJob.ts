@@ -13,7 +13,7 @@ type UpdateJobInput = Pick<Prisma.JobUpdateArgs, "where" | "data"> & {
 async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, description, category } = Job.parse(data)
+  const { name, description, categoryId, workflowId } = Job.parse(data)
 
   const slug = slugify(name, { strict: true })
   const newSlug: string = await findFreeSlug(
@@ -26,7 +26,8 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     data: {
       name,
       description: description!,
-      categoryId: category || null,
+      categoryId: categoryId || null,
+      workflowId: workflowId || null,
       slug: initial.name !== name ? newSlug : initial.slug,
     },
   })

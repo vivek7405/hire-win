@@ -9,6 +9,7 @@ export interface FormProps<S extends z.ZodType<any, any>>
   children?: ReactNode
   /** Text to display in the submit button */
   submitText?: string
+  submitDisabled?: boolean
   schema?: S
   onSubmit: (values: z.infer<S>) => Promise<void | OnSubmitResult>
   initialValues?: UseFormProps<z.infer<S>>["defaultValues"]
@@ -24,6 +25,7 @@ interface OnSubmitResult {
 export function Form<S extends z.ZodType<any, any>>({
   children,
   submitText,
+  submitDisabled,
   schema,
   initialValues,
   onSubmit,
@@ -70,9 +72,11 @@ export function Form<S extends z.ZodType<any, any>>({
               {submitText && (
                 <button
                   type="submit"
-                  disabled={ctx.formState.isSubmitting}
+                  disabled={submitDisabled || ctx.formState.isSubmitting}
                   data-testid={`${props.testid && `${props.testid}-`}submitButton`}
-                  className="text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
+                  className={`${
+                    submitDisabled && "disabled:opacity-50 cursor-not-allowed"
+                  } text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700`}
                 >
                   {submitText}
                 </button>

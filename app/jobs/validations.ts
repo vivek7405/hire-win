@@ -10,7 +10,8 @@ import { z } from "zod"
 export const Job = z.object({
   name: z.string(),
   description: z.any(),
-  category: z.string().optional(),
+  categoryId: z.string().optional(),
+  workflowId: z.string().optional(),
   slug: z.string().optional(),
   stripeSubscriptionId: z.string().optional(),
 })

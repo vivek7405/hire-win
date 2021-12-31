@@ -38,19 +38,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { where: { slug: context?.params?.slug! } }
   )
 
-  const { can: isOwner } = await Guard.can(
-    "isOwner",
-    "category",
-    { session },
-    { where: { slug: context?.params?.slug! } }
-  )
-
   if (user) {
     try {
       if (canUpdate) {
         const category = await invokeWithMiddleware(
           getCategory,
-          { slug: context?.params?.slug! },
+          { where: { slug: context?.params?.slug! } },
           { ...context }
         )
 
@@ -59,7 +52,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             category: category,
             canUpdate,
-            isOwner,
           },
         }
       } else {
@@ -100,7 +92,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const CategorySettingsPage = ({
   user,
   category,
-  isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -128,7 +119,7 @@ const CategorySettingsPage = ({
               initial: category!,
             })
             toast.success(() => <span>Category Updated</span>, { id: toastId })
-            router.push(Routes.Home())
+            router.push(Routes.CategoriesHome())
           } catch (error) {
             toast.error(
               "Sorry, we had an unexpected error. Please try again. - " + error.toString()

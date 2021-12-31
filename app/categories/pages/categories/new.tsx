@@ -42,7 +42,7 @@ const NewCategory = ({ user }: InferGetServerSidePropsType<typeof getServerSideP
 
   return (
     <AuthLayout title="New Category" user={user}>
-      <Breadcrumbs ignore={[{ href: "/categories", breadcrumb: "Categories" }]} />
+      <Breadcrumbs />
       <div className="mt-6">
         <CategoryForm
           header="Create A New Category"

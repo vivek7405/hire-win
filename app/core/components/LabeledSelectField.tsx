@@ -11,10 +11,11 @@ export interface LabeledSelectFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   options: { text: string; value?: string }[]
+  disabled?: boolean
 }
 
 export const LabeledSelectField = forwardRef<HTMLSelectElement, LabeledSelectFieldProps>(
-  ({ label, outerProps, name, options, defaultValue, ...props }, ref) => {
+  ({ label, outerProps, name, options, defaultValue, disabled, ...props }, ref) => {
     const {
       register,
       formState: { isSubmitting, errors },
@@ -41,10 +42,12 @@ export const LabeledSelectField = forwardRef<HTMLSelectElement, LabeledSelectFie
         </label>
         <div className="mt-1">
           <select
-            disabled={isSubmitting}
+            disabled={disabled || isSubmitting}
             {...register(`${name}` as const)}
             {...props}
-            className="border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded"
+            className={`${
+              disabled && "disabled:opacity-50 cursor-not-allowed"
+            } border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded`}
             data-testid={`${props.testid && `${props.testid}-`}input`}
           >
             {options?.map((op, index) => {

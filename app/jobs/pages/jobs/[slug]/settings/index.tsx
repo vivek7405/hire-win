@@ -121,6 +121,8 @@ const JobSettingsPage = ({
       <JobSettingsLayout job={job!} isOwner={isOwner}>
         <JobForm
           user={user}
+          category={job?.category!}
+          workflow={job?.workflow!}
           header="Job Details"
           subHeader="Update your job details."
           initialValues={{
@@ -128,7 +130,8 @@ const JobSettingsPage = ({
             description: job?.description
               ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
               : EditorState.createEmpty(),
-            category: job?.category?.id,
+            categoryId: job?.category?.id,
+            workflowId: job?.workflow?.id,
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating Job</span>)

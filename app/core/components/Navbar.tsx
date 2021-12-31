@@ -18,6 +18,8 @@ const Navbar = ({ user }: NavbarProps) => {
   const nav = [
     { name: "Jobs", href: "/", current: router.route === "/" },
     { name: "Categories", href: "/categories", current: router.route === "/categories" },
+    { name: "Stages", href: "/stages", current: router.route === "/stages" },
+    { name: "Workflows", href: "/workflows", current: router.route === "/workflows" },
   ]
   let dropDownNav = [
     { name: "Settings", href: Routes.Settings().pathname, current: router.route === "/settings" },
