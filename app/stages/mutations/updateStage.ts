@@ -13,7 +13,7 @@ type UpdateStageInput = Pick<Prisma.StageUpdateArgs, "where" | "data"> & {
 async function updateStage({ where, data, initial }: UpdateStageInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, workflow } = Stage.parse(data)
+  const { name } = Stage.parse(data)
 
   const slug = slugify(name, { strict: true })
   const newSlug: string = await findFreeSlug(

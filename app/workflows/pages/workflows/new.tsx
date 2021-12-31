@@ -6,14 +6,13 @@ import {
   useMutation,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
-import JobForm from "app/jobs/components/JobForm"
+import WorkflowForm from "app/workflows/components/WorkflowForm"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import toast from "react-hot-toast"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import createJob from "app/jobs/mutations/createJob"
+import createWorkflow from "app/workflows/mutations/createWorkflow"
 import path from "path"
 import { convertToRaw } from "draft-js"
-import { Category } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -37,28 +36,26 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const NewWorkflow = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [createJobMutation] = useMutation(createJob)
+  const [createWorkflowMutation] = useMutation(createWorkflow)
 
   return (
-    <AuthLayout title="New Job" user={user}>
-      <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
+    <AuthLayout title="New Workflow" user={user}>
+      <Breadcrumbs />
       <div className="mt-6">
-        <JobForm
-          user={user}
-          header="Create A New Job"
-          subHeader="Enter your job details."
+        <WorkflowForm
+          header="Create A New Workflow"
+          subHeader="Enter your workflow details."
           initialValues={{
             name: "",
           }}
           onSubmit={async (values) => {
-            const toastId = toast.loading(() => <span>Creating Job</span>)
+            const toastId = toast.loading(() => <span>Creating Workflow</span>)
             try {
-              values.description = convertToRaw(values?.description?.getCurrentContent())
-              await createJobMutation(values)
-              toast.success(() => <span>Job Created</span>, { id: toastId })
-              router.push(Routes.Home())
+              await createWorkflowMutation(values)
+              toast.success(() => <span>Workflow Created</span>, { id: toastId })
+              router.push(Routes.WorkflowsHome())
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()
@@ -71,4 +68,4 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
   )
 }
 
-export default NewJob
+export default NewWorkflow

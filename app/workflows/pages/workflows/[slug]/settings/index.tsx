@@ -17,10 +17,10 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "app/guard/ability"
 
-import CategoryForm from "app/categories/components/CategoryForm"
+import WorkflowForm from "app/workflows/components/WorkflowForm"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import updateCategory from "app/categories/mutations/updateCategory"
-import getCategory from "app/categories/queries/getCategory"
+import updateWorkflow from "app/workflows/mutations/updateWorkflow"
+import getWorkflow from "app/workflows/queries/getWorkflow"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -33,7 +33,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
     "update",
-    "category",
+    "workflow",
     { session },
     { where: { slug: context?.params?.slug! } }
   )
@@ -41,16 +41,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user) {
     try {
       if (canUpdate) {
-        const category = await invokeWithMiddleware(
-          getCategory,
-          { where: { slug: context?.params?.slug! } },
+        const workflow = await invokeWithMiddleware(
+          getWorkflow,
+          { slug: context?.params?.slug! },
           { ...context }
         )
 
         return {
           props: {
             user: user,
-            category: category,
+            workflow: workflow,
             canUpdate,
           },
         }
@@ -81,7 +81,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=/categories/${context?.params?.slug}/settings`,
+        destination: `/login?next=/workflows/${context?.params?.slug}/settings`,
         permanent: false,
       },
       props: {},
@@ -89,13 +89,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const CategorySettingsPage = ({
+const WorkflowSettingsPage = ({
   user,
-  category,
+  workflow,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [updateCategoryMutation] = useMutation(updateCategory)
+  const [updateWorkflowMutation] = useMutation(updateWorkflow)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -104,22 +104,22 @@ const CategorySettingsPage = ({
     <AuthLayout user={user}>
       <Breadcrumbs />
       <br />
-      <CategoryForm
-        header="Category Details"
-        subHeader="Update your category details."
+      <WorkflowForm
+        header="Workflow Details"
+        subHeader="Update your workflow details."
         initialValues={{
-          name: category?.name,
+          name: workflow?.name,
         }}
         onSubmit={async (values) => {
-          const toastId = toast.loading(() => <span>Updating Category</span>)
+          const toastId = toast.loading(() => <span>Updating Workflow</span>)
           try {
-            await updateCategoryMutation({
-              where: { slug: category?.slug },
+            await updateWorkflowMutation({
+              where: { slug: workflow?.slug },
               data: { ...values },
-              initial: category!,
+              initial: workflow!,
             })
-            toast.success(() => <span>Category Updated</span>, { id: toastId })
-            router.push(Routes.CategoriesHome())
+            toast.success(() => <span>Workflow Updated</span>, { id: toastId })
+            router.push(Routes.WorkflowsHome())
           } catch (error) {
             toast.error(
               "Sorry, we had an unexpected error. Please try again. - " + error.toString()
@@ -131,4 +131,4 @@ const CategorySettingsPage = ({
   )
 }
 
-export default CategorySettingsPage
+export default WorkflowSettingsPage

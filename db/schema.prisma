@@ -27,9 +27,9 @@ model User {
   memberships Membership[]
   categories  Category[]
 
-  workflows         Workflow[]
-  stages            Stage[]
-  stagesOnWorkflows StagesOnWorkflows[]
+  workflows      Workflow[]
+  stages         Stage[]
+  workflowStages WorkflowStage[]
 }
 
 model Session {
@@ -121,7 +121,7 @@ model Workflow {
   name String
   slug String @unique
 
-  stages StagesOnWorkflows[]
+  stages WorkflowStage[]
   jobs   Job[]
 
   user   User @relation(fields: [userId], references: [id])
@@ -138,7 +138,7 @@ model Stage {
   name String
   slug String @unique
 
-  workflows StagesOnWorkflows[]
+  workflows WorkflowStage[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
@@ -146,7 +146,7 @@ model Stage {
   @@unique([userId, name])
 }
 
-model StagesOnWorkflows {
+model WorkflowStage {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

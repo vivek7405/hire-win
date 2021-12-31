@@ -8,7 +8,8 @@ type ExtendedResourceTypes =
   | "membership"
   | "category"
   | "stage"
-  | "stagesOnWorkflows"
+  | "workflowStage"
+  | "workflow"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -133,7 +134,6 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("create", "category")
       can("update", "category")
-      can("isOwner", "category")
       can("read", "category", async (args) => {
         const category = await db.category.findFirst({
           where: args.where,
@@ -151,7 +151,6 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("create", "stage")
       can("update", "stage")
-      can("isOwner", "stage")
       can("read", "stage", async (args) => {
         const stage = await db.stage.findFirst({
           where: args.where,
@@ -167,21 +166,50 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return stages.every((p) => p.userId === ctx.session.userId) === true
       })
 
-      can("update", "stagesOnWorkflows", async (args) => {
-        const stageOnWorkflow = await db.stagesOnWorkflows.findFirst({
+      can("create", "workflowStage")
+      can("read", "workflowStage", async (args) => {
+        const workflow = await db.workflow.findFirst({
+          where: args.where,
+          include: {
+            stages: true,
+          },
+        })
+
+        return workflow?.stages.some((p) => p.userId === ctx.session.userId) === true
+      })
+      can("readAll", "workflowStage", async (args) => {
+        const workflowStages = await db.workflowStage.findMany({
           where: args.where,
         })
 
-        const stage = await db.stage.findFirst({
-          where: {
-            id: stageOnWorkflow?.stageId,
-          },
+        return workflowStages.every((p) => p.userId === ctx.session.userId) === true
+      })
+      can("update", "workflowStage", async (args) => {
+        const workflow = await db.workflow.findFirst({
+          where: args.where,
           include: {
-            workflows: true,
+            stages: true,
           },
         })
 
-        return stage?.workflows.every((p) => p.userId === ctx.session.userId) === true
+        return workflow?.stages.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "workflow")
+      can("update", "workflow")
+      can("read", "workflow", async (args) => {
+        const workflow = await db.workflow.findFirst({
+          where: args.where,
+        })
+
+        return workflow?.userId === ctx.session.userId
+      })
+      can("readAll", "workflow", async (args) => {
+        const workflows = await db.workflow.findMany({
+          where: args.where,
+        })
+
+        return workflows.every((p) => p.userId === ctx.session.userId) === true
       })
     }
   }

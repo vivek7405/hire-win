@@ -7,10 +7,8 @@ interface GetStagesInput extends Pick<Prisma.StageFindManyArgs, "where"> {}
 const getStagesWOPagination = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetStagesInput) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const categories = await db.stage.findMany({ where })
-
-    return categories
+    const stages = await db.stage.findMany({ where })
+    return stages
   }
 )
 

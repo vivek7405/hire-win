@@ -10,7 +10,7 @@ import {
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
-import getStages from "app/stages/queries/getStages"
+import getWorkflows from "app/workflows/queries/getWorkflows"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 
@@ -37,7 +37,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const Stages = ({ user }) => {
+const Workflows = ({ user }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -59,7 +59,7 @@ export const Stages = ({ user }) => {
     setQuery(search)
   }, [router.query])
 
-  const [{ stages, hasMore, count }] = usePaginatedQuery(getStages, {
+  const [{ workflows, hasMore, count }] = usePaginatedQuery(getWorkflows, {
     where: {
       userId: user?.id,
       ...query,
@@ -80,18 +80,18 @@ export const Stages = ({ user }) => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await stages.forEach((stage) => {
+    await workflows.forEach((workflow) => {
       data = [
         ...data,
         {
-          ...stage,
-          canUpdate: stage.userId === user.id,
+          ...workflow,
+          canUpdate: workflow.userId === user.id,
         },
       ]
 
       setData(data)
     })
-  }, [stages, user.id])
+  }, [workflows, user.id])
 
   let columns = [
     {
@@ -103,8 +103,8 @@ export const Stages = ({ user }) => {
       accessor: "name",
       Cell: (props) => {
         return (
-          <Link href={Routes.SingleStagePage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`stagelink`} className="text-indigo-600 hover:text-indigo-900">
+          <Link href={Routes.SingleWorkflowPage({ slug: props.cell.row.original.slug })} passHref>
+            <a data-testid={`workflowlink`} className="text-indigo-600 hover:text-indigo-900">
               {props.cell.row.original.name}
             </a>
           </Link>
@@ -123,7 +123,7 @@ export const Stages = ({ user }) => {
           <>
             {props.cell.row.original.canUpdate && (
               <Link
-                href={Routes.StageSettingsPage({ slug: props.cell.row.original.slug })}
+                href={Routes.WorkflowSettingsPage({ slug: props.cell.row.original.slug })}
                 passHref
               >
                 <a className="text-indigo-600 hover:text-indigo-900">Settings</a>
@@ -151,24 +151,24 @@ export const Stages = ({ user }) => {
   )
 }
 
-const StagesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const WorkflowsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <AuthLayout title="StagesHome | hire-win" user={user}>
-      <Link href={Routes.NewStage()} passHref>
+    <AuthLayout title="WorkflowsHome | hire-win" user={user}>
+      <Link href={Routes.NewWorkflow()} passHref>
         <a className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700">
-          New Stage
+          New Workflow
         </a>
       </Link>
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Stages user={user} />
+        <Workflows user={user} />
       </Suspense>
     </AuthLayout>
   )
 }
 
-StagesHome.authenticate = true
+WorkflowsHome.authenticate = true
 
-export default StagesHome
+export default WorkflowsHome

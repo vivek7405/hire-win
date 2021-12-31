@@ -38,13 +38,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { where: { slug: context?.params?.slug! } }
   )
 
-  const { can: isOwner } = await Guard.can(
-    "isOwner",
-    "stage",
-    { session },
-    { where: { slug: context?.params?.slug! } }
-  )
-
   if (user) {
     try {
       if (canUpdate) {
@@ -59,7 +52,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             stage: stage,
             canUpdate,
-            isOwner,
           },
         }
       } else {
@@ -100,7 +92,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const StageSettingsPage = ({
   user,
   stage,
-  isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -128,7 +119,7 @@ const StageSettingsPage = ({
               initial: stage!,
             })
             toast.success(() => <span>Stage Updated</span>, { id: toastId })
-            router.push(Routes.Home())
+            router.push(Routes.StagesHome())
           } catch (error) {
             toast.error(
               "Sorry, we had an unexpected error. Please try again. - " + error.toString()

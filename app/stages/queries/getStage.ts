@@ -5,12 +5,12 @@ import { z } from "zod"
 
 const GetStage = z.object({
   // This accepts type of undefined, but is required at runtime
-  id: z.string().optional().refine(Boolean, "Required"),
+  slug: z.string().optional().refine(Boolean, "Required"),
 })
 
-const getStage = resolver.pipe(resolver.zod(GetStage), resolver.authorize(), async ({ id }) => {
+const getStage = resolver.pipe(resolver.zod(GetStage), resolver.authorize(), async ({ slug }) => {
   // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-  const stage = await db.stage.findFirst({ where: { id }, include: { workflows: true } })
+  const stage = await db.stage.findFirst({ where: { slug }, include: { workflows: true } })
 
   if (!stage) throw new NotFoundError()
 
