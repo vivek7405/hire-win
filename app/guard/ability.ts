@@ -168,31 +168,34 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("create", "workflowStage")
       can("read", "workflowStage", async (args) => {
-        const workflow = await db.workflow.findFirst({
+        const workflowStage = await db.workflowStage.findFirst({
           where: args.where,
           include: {
-            stages: true,
+            workflow: true,
           },
         })
 
-        return workflow?.stages.some((p) => p.userId === ctx.session.userId) === true
+        return workflowStage?.workflow.userId === ctx.session.userId
       })
       can("readAll", "workflowStage", async (args) => {
         const workflowStages = await db.workflowStage.findMany({
           where: args.where,
-        })
-
-        return workflowStages.every((p) => p.userId === ctx.session.userId) === true
-      })
-      can("update", "workflowStage", async (args) => {
-        const workflow = await db.workflow.findFirst({
-          where: args.where,
           include: {
-            stages: true,
+            workflow: true,
           },
         })
 
-        return workflow?.stages.every((p) => p.userId === ctx.session.userId) === true
+        return workflowStages.every((p) => p.workflow.userId === ctx.session.userId) === true
+      })
+      can("update", "workflowStage", async (args) => {
+        const workflowStage = await db.workflowStage.findFirst({
+          where: args.where,
+          include: {
+            workflow: true,
+          },
+        })
+
+        return workflowStage?.workflow.userId === ctx.session.userId
       })
 
       can("create", "workflow")
