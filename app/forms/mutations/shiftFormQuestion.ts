@@ -3,21 +3,21 @@ import db from "db"
 import Guard from "app/guard/ability"
 import { ShiftDirection } from "types"
 
-type ShiftWorkflowStageInput = {
-  workflowId: string
+type ShiftFormQuestionInput = {
+  formId: string
   order: number
   shiftDirection: ShiftDirection
 }
 
-async function shiftWorkflowStage(
-  { workflowId, order, shiftDirection }: ShiftWorkflowStageInput,
+async function shiftFormQuestion(
+  { formId, order, shiftDirection }: ShiftFormQuestionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const workflowStages = await db.workflowStage.findMany({
+  const formQuestions = await db.formQuestion.findMany({
     where: {
-      workflowId: workflowId,
+      formId: formId,
       order: {
         in: shiftDirection === ShiftDirection.UP ? [order, order - 1] : [order, order + 1],
       },
@@ -25,15 +25,15 @@ async function shiftWorkflowStage(
     orderBy: { order: "asc" },
   })
 
-  if (workflowStages?.length === 2) {
-    workflowStages[0]!.order += 1
-    workflowStages[1]!.order -= 1
+  if (formQuestions?.length === 2) {
+    formQuestions[0]!.order += 1
+    formQuestions[1]!.order -= 1
 
-    const updateWorkflowStages = await db.workflow.update({
-      where: { id: workflowId },
+    const updateFormQuestions = await db.form.update({
+      where: { id: formId },
       data: {
-        stages: {
-          updateMany: workflowStages?.map((ws) => {
+        questions: {
+          updateMany: formQuestions?.map((ws) => {
             return {
               where: {
                 id: ws.id,
@@ -46,10 +46,10 @@ async function shiftWorkflowStage(
         },
       },
     })
-    return updateWorkflowStages
+    return updateFormQuestions
   } else {
     throw new Error("Order incorrect")
   }
 }
 
-export default Guard.authorize("update", "workflow", shiftWorkflowStage)
+export default Guard.authorize("update", "form", shiftFormQuestion)

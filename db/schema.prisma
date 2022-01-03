@@ -211,12 +211,12 @@ model Question {
   updatedAt DateTime @updatedAt
 
   name        String
-  info        String
-  placeholder String
+  info        String           @default("")
+  placeholder String           @default("")
   type        QuestionType     @default(Single_line_text)
   options     QuestionOption[]
-  required    Boolean
-  hidden      Boolean
+  required    Boolean          @default(false)
+  hidden      Boolean          @default(false)
 
   slug String @unique
 

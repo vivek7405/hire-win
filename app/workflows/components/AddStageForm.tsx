@@ -15,7 +15,6 @@ type AddStageFormProps = {
 }
 
 export const AddStageForm = (props: AddStageFormProps) => {
-  debugger
   const [workflowStages] = useQuery(getWorkflowStagesWOPagination, {
     where: { workflowId: props.workflowId },
   })

@@ -21,10 +21,12 @@ declare module "blitz" {
   }
 }
 
+export enum ShiftDirection {
+  UP,
+  DOWN,
+}
+
 export type ExtendedJob = Prisma.JobGetPayload<{ include: { memberships: true } }>
-export type ExtendedStage = Prisma.StageGetPayload<{ include: { workflows: true } }>
-export type ExtendedWorkflow = Prisma.WorkflowGetPayload<{ include: { stages: true } }>
-export type ExtendedWorkflowStage = Prisma.WorkflowStageGetPayload<{ include: { stage: true } }>
 export type ExtendedCategory = Prisma.CategoryGetPayload<{ include: { jobs: true } }>
 export type ExtendedUser = Prisma.UserGetPayload<{
   include: {
@@ -35,3 +37,11 @@ export type ExtendedUser = Prisma.UserGetPayload<{
     }
   }
 }>
+
+export type ExtendedStage = Prisma.StageGetPayload<{ include: { workflows: true } }>
+export type ExtendedWorkflow = Prisma.WorkflowGetPayload<{ include: { stages: true } }>
+export type ExtendedWorkflowStage = Prisma.WorkflowStageGetPayload<{ include: { stage: true } }>
+
+export type ExtendedQuestion = Prisma.QuestionGetPayload<{ include: { forms: true } }>
+export type ExtendedForm = Prisma.FormGetPayload<{ include: { questions: true } }>
+export type ExtendedFormQuestion = Prisma.FormQuestionGetPayload<{ include: { question: true } }>

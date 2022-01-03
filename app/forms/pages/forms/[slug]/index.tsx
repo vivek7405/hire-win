@@ -18,21 +18,21 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
-import getWorkflow from "app/workflows/queries/getWorkflow"
+import getForm from "app/forms/queries/getForm"
 import Skeleton from "react-loading-skeleton"
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
-import getWorkflowStages from "app/workflows/queries/getWorkflowStages"
-import AddStageForm from "app/workflows/components/AddStageForm"
+import getFormQuestions from "app/forms/queries/getFormQuestions"
+import AddQuestionForm from "app/forms/components/AddQuestionForm"
 import toast from "react-hot-toast"
-import createWorkflowStage from "app/workflows/mutations/createWorkflowStage"
-import { WorkflowStage } from "app/workflows/validations"
+import createFormQuestion from "app/forms/mutations/createFormQuestion"
+import { FormQuestion } from "app/forms/validations"
 
 import { ArrowUpIcon, ArrowDownIcon, XCircleIcon } from "@heroicons/react/outline"
-import { ExtendedWorkflowStage, ShiftDirection } from "types"
-import shiftWorkflowStage from "app/workflows/mutations/shiftWorkflowStage"
+import { ExtendedFormQuestion, ShiftDirection } from "types"
+import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
-import removeStageFromWorkflow from "app/workflows/mutations/removeStageFromWorkflow"
+import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -45,15 +45,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
     "update",
-    "workflow",
+    "form",
     { session },
     { where: { slug: context?.params?.slug! } }
   )
 
   if (user) {
     try {
-      const workflow = await invokeWithMiddleware(
-        getWorkflow,
+      const form = await invokeWithMiddleware(
+        getForm,
         { slug: context?.params?.slug! },
         { ...context }
       )
@@ -62,7 +62,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         props: {
           user: user,
           canUpdate: canUpdate,
-          workflow: workflow,
+          form: form,
         },
       }
     } catch (error) {
@@ -82,7 +82,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=/workflows/${context?.params?.slug}`,
+        destination: `/login?next=/forms/${context?.params?.slug}`,
         permanent: false,
       },
       props: {},
@@ -90,24 +90,22 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const Stages = ({ user, workflow }) => {
+export const Questions = ({ user, form }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
-  const [shiftWorkflowStageMutation] = useMutation(shiftWorkflowStage)
-  const [removeStageFromWorkflowMutation] = useMutation(removeStageFromWorkflow)
+  const [shiftFormQuestionMutation] = useMutation(shiftFormQuestion)
+  const [removeQuestionFromFormMutation] = useMutation(removeQuestionFromForm)
   const [openConfirm, setOpenConfirm] = React.useState(false)
-  const [workflowStageToRemove, setWorkflowStageToRemove] = React.useState(
-    {} as ExtendedWorkflowStage
-  )
+  const [formQuestionToRemove, setFormQuestionToRemove] = React.useState({} as ExtendedFormQuestion)
 
   useEffect(() => {
     const search = router.query.search
       ? {
           AND: {
-            stage: {
+            question: {
               name: {
                 contains: JSON.parse(router.query.search as string),
                 mode: "insensitive",
@@ -120,9 +118,9 @@ export const Stages = ({ user, workflow }) => {
     setQuery(search)
   }, [router.query])
 
-  const [{ workflowStages, hasMore, count }] = usePaginatedQuery(getWorkflowStages, {
+  const [{ formQuestions, hasMore, count }] = usePaginatedQuery(getFormQuestions, {
     where: {
-      workflowId: workflow?.id,
+      formId: form?.id,
       ...query,
     },
     orderBy: { order: "asc" },
@@ -140,14 +138,14 @@ export const Stages = ({ user, workflow }) => {
   }
 
   useMemo(async () => {
-    let data: ExtendedWorkflowStage[] = []
+    let data: ExtendedFormQuestion[] = []
 
-    await workflowStages.forEach((workflowStage) => {
-      data = [...data, { ...workflowStage }]
+    await formQuestions.forEach((formQuestion) => {
+      data = [...data, { ...formQuestion }]
 
       setData(data)
     })
-  }, [workflowStages])
+  }, [formQuestions])
 
   let columns = [
     {
@@ -156,16 +154,16 @@ export const Stages = ({ user, workflow }) => {
     },
     {
       Header: "Id",
-      accessor: "stage.id",
+      accessor: "question.id",
     },
     {
       Header: "Name",
-      accessor: "stage.name",
+      accessor: "question.name",
       Cell: (props) => {
         return (
-          <Link href={Routes.SingleStagePage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`stagelink`} className="text-indigo-600 hover:text-indigo-900">
-              {props.cell.row.original.stage.name}
+          <Link href={Routes.SingleQuestionPage({ slug: props.cell.row.original.slug })} passHref>
+            <a data-testid={`questionlink`} className="text-indigo-600 hover:text-indigo-900">
+              {props.cell.row.original.question.name}
             </a>
           </Link>
         )
@@ -173,7 +171,7 @@ export const Stages = ({ user, workflow }) => {
     },
     {
       Header: "Slug",
-      accessor: "stage.slug",
+      accessor: "question.slug",
     },
     {
       Header: "",
@@ -185,21 +183,21 @@ export const Stages = ({ user, workflow }) => {
               open={openConfirm}
               setOpen={setOpenConfirm}
               header={
-                Object.entries(workflowStageToRemove).length
-                  ? `Remove Stage - ${workflowStageToRemove.stage.name}?`
-                  : "Remove Stage?"
+                Object.entries(formQuestionToRemove).length
+                  ? `Remove Question - ${formQuestionToRemove.question.name}?`
+                  : "Remove Question?"
               }
               onSuccess={async () => {
                 const toastId = toast.loading(() => (
-                  <span>Removing Stage {workflowStageToRemove.stage.name}</span>
+                  <span>Removing Question {formQuestionToRemove.question.name}</span>
                 ))
                 try {
-                  await removeStageFromWorkflowMutation({
-                    workflowId: workflowStageToRemove.workflowId,
-                    order: workflowStageToRemove.order,
+                  await removeQuestionFromFormMutation({
+                    formId: formQuestionToRemove.formId,
+                    order: formQuestionToRemove.order,
                   })
                   toast.success(
-                    () => <span>Stage removed - {workflowStageToRemove.stage.name}</span>,
+                    () => <span>Question removed - {formQuestionToRemove.question.name}</span>,
                     {
                       id: toastId,
                     }
@@ -213,16 +211,16 @@ export const Stages = ({ user, workflow }) => {
                 router.reload()
               }}
             >
-              Are you sure you want to remove this stage from the workflow?
+              Are you sure you want to remove this question from the form?
             </Confirm>
             <button
-              title="Remove Stage"
+              title="Remove Question"
               className="mr-16 align-middle bg-red-500 rounded-full"
               onClick={async (e) => {
                 e.preventDefault()
 
-                const workflowStage: ExtendedWorkflowStage = props.cell.row.original
-                setWorkflowStageToRemove(workflowStage)
+                const formQuestion: ExtendedFormQuestion = props.cell.row.original
+                setFormQuestionToRemove(formQuestion)
                 setOpenConfirm(true)
               }}
             >
@@ -234,22 +232,22 @@ export const Stages = ({ user, workflow }) => {
                 title="Move Up"
                 className="ml-2 align-middle"
                 onClick={async (e) => {
-                  const workflowStage: ExtendedWorkflowStage = props.cell.row.original
+                  const formQuestion: ExtendedFormQuestion = props.cell.row.original
 
                   const toastId = toast.loading(() => (
-                    <span>Changing stage order for {workflowStage.stage.name}</span>
+                    <span>Changing question order for {formQuestion.question.name}</span>
                   ))
                   try {
-                    await shiftWorkflowStageMutation({
-                      workflowId: workflowStage.workflowId,
-                      order: workflowStage.order,
+                    await shiftFormQuestionMutation({
+                      formId: formQuestion.formId,
+                      order: formQuestion.order,
                       shiftDirection: ShiftDirection.UP,
                     })
                     toast.success(
                       () => (
                         <span>
-                          Order changed from {workflowStage.order} to {workflowStage.order - 1} for
-                          Stage {workflowStage.stage.name}
+                          Order changed from {formQuestion.order} to {formQuestion.order - 1} for
+                          Question {formQuestion.question.name}
                         </span>
                       ),
                       { id: toastId }
@@ -267,27 +265,27 @@ export const Stages = ({ user, workflow }) => {
               </button>
             )}
 
-            {props.cell.row.original.order !== workflowStages.length && (
+            {props.cell.row.original.order !== formQuestions.length && (
               <button
                 title="Move Down"
                 className="ml-2 align-middle"
                 onClick={async (e) => {
-                  const workflowStage: ExtendedWorkflowStage = props.cell.row.original
+                  const formQuestion: ExtendedFormQuestion = props.cell.row.original
 
                   const toastId = toast.loading(() => (
-                    <span>Changing stage order for {workflowStage.stage.name}</span>
+                    <span>Changing question order for {formQuestion.question.name}</span>
                   ))
                   try {
-                    await shiftWorkflowStageMutation({
-                      workflowId: workflowStage.workflowId,
-                      order: workflowStage.order,
+                    await shiftFormQuestionMutation({
+                      formId: formQuestion.formId,
+                      order: formQuestion.order,
                       shiftDirection: ShiftDirection.DOWN,
                     })
                     toast.success(
                       () => (
                         <span>
-                          Order changed from {workflowStage.order} to {workflowStage.order + 1} for
-                          Stage {workflowStage.stage.name}
+                          Order changed from {formQuestion.order} to {formQuestion.order + 1} for
+                          Question {formQuestion.question.name}
                         </span>
                       ),
                       { id: toastId }
@@ -326,14 +324,14 @@ export const Stages = ({ user, workflow }) => {
   )
 }
 
-const SingleWorkflowPage = ({
+const SingleFormPage = ({
   user,
-  workflow,
+  form,
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [open, setOpen] = React.useState(false)
-  const [createWorkflowStageMutation] = useMutation(createWorkflowStage)
+  const [createFormQuestionMutation] = useMutation(createFormQuestion)
   const router = useRouter()
 
   if (error) {
@@ -346,24 +344,28 @@ const SingleWorkflowPage = ({
       <br />
       {canUpdate && (
         <>
-          <Link href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })} passHref>
-            <a data-testid={`${workflow?.name && `${workflow?.name}-`}settingsLink`}>Settings</a>
+          <Link href={Routes.FormSettingsPage({ slug: form?.slug! })} passHref>
+            <a data-testid={`${form?.name && `${form?.name}-`}settingsLink`}>Settings</a>
           </Link>
           <br />
           <br />
-          <Modal header="Add Stage" open={open} setOpen={setOpen}>
-            <AddStageForm
-              schema={WorkflowStage}
+          <Modal header="Add Question" open={open} setOpen={setOpen}>
+            <AddQuestionForm
+              schema={FormQuestion}
               user={user}
-              workflowId={workflow?.id!}
+              formId={form?.id!}
               onSubmit={async (values) => {
-                const toastId = toast.loading(() => <span>Adding Stage - {values.stage}</span>)
+                const toastId = toast.loading(() => (
+                  <span>Adding Question - {values.question}</span>
+                ))
                 try {
-                  await createWorkflowStageMutation({
-                    workflowId: workflow?.id as string,
-                    stageId: values.stageId,
+                  await createFormQuestionMutation({
+                    formId: form?.id as string,
+                    questionId: values.questionId,
                   })
-                  toast.success(() => <span>Stage added - {values.stage}</span>, { id: toastId })
+                  toast.success(() => <span>Question added - {values.question}</span>, {
+                    id: toastId,
+                  })
                   router.reload()
                 } catch (error) {
                   toast.error(
@@ -379,17 +381,17 @@ const SingleWorkflowPage = ({
               e.preventDefault()
               setOpen(true)
             }}
-            data-testid={`open-addStage-modal`}
+            data-testid={`open-addQuestion-modal`}
             className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
           >
-            Add Stage
+            Add Question
           </button>
           <Suspense
             fallback={
               <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
             }
           >
-            <Stages workflow={workflow} user={user} />
+            <Questions form={form} user={user} />
           </Suspense>
         </>
       )}
@@ -397,4 +399,4 @@ const SingleWorkflowPage = ({
   )
 }
 
-export default SingleWorkflowPage
+export default SingleFormPage

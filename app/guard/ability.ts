@@ -10,6 +10,9 @@ type ExtendedResourceTypes =
   | "stage"
   | "workflowStage"
   | "workflow"
+  | "question"
+  | "formQuestion"
+  | "form"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -213,6 +216,72 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return workflows.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "question")
+      can("update", "question")
+      can("read", "question", async (args) => {
+        const question = await db.question.findFirst({
+          where: args.where,
+        })
+
+        return question?.userId === ctx.session.userId
+      })
+      can("readAll", "question", async (args) => {
+        const questions = await db.question.findMany({
+          where: args.where,
+        })
+
+        return questions.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "formQuestion")
+      can("read", "formQuestion", async (args) => {
+        const formQuestion = await db.formQuestion.findFirst({
+          where: args.where,
+          include: {
+            form: true,
+          },
+        })
+
+        return formQuestion?.form.userId === ctx.session.userId
+      })
+      can("readAll", "formQuestion", async (args) => {
+        const formQuestions = await db.formQuestion.findMany({
+          where: args.where,
+          include: {
+            form: true,
+          },
+        })
+
+        return formQuestions.every((p) => p.form.userId === ctx.session.userId) === true
+      })
+      can("update", "formQuestion", async (args) => {
+        const formQuestion = await db.formQuestion.findFirst({
+          where: args.where,
+          include: {
+            form: true,
+          },
+        })
+
+        return formQuestion?.form.userId === ctx.session.userId
+      })
+
+      can("create", "form")
+      can("update", "form")
+      can("read", "form", async (args) => {
+        const form = await db.form.findFirst({
+          where: args.where,
+        })
+
+        return form?.userId === ctx.session.userId
+      })
+      can("readAll", "form", async (args) => {
+        const forms = await db.form.findMany({
+          where: args.where,
+        })
+
+        return forms.every((p) => p.userId === ctx.session.userId) === true
       })
     }
   }

@@ -33,6 +33,7 @@ export function Form<S extends z.ZodType<any, any>>({
   subHeader,
   ...props
 }: FormProps<S>) {
+  debugger
   const ctx = useForm<z.infer<S>>({
     mode: "onSubmit",
     resolver: schema ? zodResolver(schema) : undefined,

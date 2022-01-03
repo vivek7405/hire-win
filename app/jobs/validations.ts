@@ -8,7 +8,7 @@ import { z } from "zod"
 // )
 
 export const Job = z.object({
-  name: z.string(),
+  name: z.string().nonempty({ message: "Name can't be empty" }),
   description: z.any(),
   categoryId: z.string().optional(),
   workflowId: z.string().optional(),
