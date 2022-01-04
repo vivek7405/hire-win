@@ -49,10 +49,10 @@ export const AddQuestionForm = (props: AddQuestionFormProps) => {
             questions?.length
               ? [
                   ...questions.map((c) => {
-                    return { text: c.name, value: c.id }
+                    return { label: c.name, value: c.id }
                   }),
                 ]
-              : [{ text: "No more questions to add", value: "" }]
+              : [{ label: "No more questions to add", value: "" }]
           }
         />
       </Form>

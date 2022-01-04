@@ -7,16 +7,17 @@ import { useQuery } from "blitz"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
 import { Category, Workflow } from "@prisma/client"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
+import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 
 type JobFormProps = {
   onSuccess?: () => void
-  initialValues?: {}
+  initialValues?: any
   onSubmit: any
   header: string
   subHeader: string
   user: any
-  category?: Category
-  workflow?: Workflow
+  category?: Category // Need to be provided while editing the form
+  workflow?: Workflow // Need to be provided while editing the form
 }
 
 export const JobForm = (props: JobFormProps) => {
@@ -41,38 +42,40 @@ export const JobForm = (props: JobFormProps) => {
           placeholder="Job Name"
           testid="jobName"
         />
-        <LabeledSelectField
+        <LabeledReactSelectField
           name="categoryId"
           label="Category"
           placeholder="Job Category"
           testid="jobCategory"
           disabled={props.category && !categories.find((c) => c.id === props.category?.id)}
+          // defaultValue={props.initialValues?.categoryId}
           options={
             !props.category || categories.find((c) => c.id === props.category?.id)
               ? [
-                  { text: "Uncategorized", value: "" },
+                  { label: "Uncategorized", value: "" },
                   ...categories.map((c) => {
-                    return { text: c.name!, value: c.id! }
+                    return { label: c.name!, value: c.id! }
                   }),
                 ]
-              : [{ text: props.category?.name!, value: props.category?.id! }]
+              : [{ label: props.category?.name!, value: props.category?.id! }]
           }
         />
-        <LabeledSelectField
+        <LabeledReactSelectField
           name="workflowId"
           label="Workflow"
           placeholder="Job Workflow"
           testid="jobWorkflow"
           disabled={props.workflow && !workflows.find((c) => c.id === props.workflow?.id)}
+          // defaultValue={props.initialValues?.workflowId}
           options={
             !props.workflow || workflows.find((c) => c.id === props.workflow?.id)
               ? [
-                  { text: "Default", value: "" },
+                  { label: "Default", value: "" },
                   ...workflows.map((w) => {
-                    return { text: w.name!, value: w.id! }
+                    return { label: w.name!, value: w.id! }
                   }),
                 ]
-              : [{ text: props.workflow?.name!, value: props.workflow?.id! }]
+              : [{ label: props.workflow?.name!, value: props.workflow?.id! }]
           }
         />
         <LabeledRichTextField

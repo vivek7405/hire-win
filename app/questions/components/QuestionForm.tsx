@@ -1,13 +1,14 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
 import { Question } from "app/questions/validations"
-import LabeledSelectField from "app/core/components/LabeledSelectField"
 import { QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
+import { useState } from "react"
+import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 
 type QuestionFormProps = {
   onSuccess?: () => void
-  initialValues?: {}
+  initialValues?: any
   onSubmit: any
   header: string
   subHeader: string
@@ -15,6 +16,19 @@ type QuestionFormProps = {
 }
 
 export const QuestionForm = (props: QuestionFormProps) => {
+  const [selectedQuestionType, setSelectedQuestionType] = useState(
+    props.initialValues?.type || null
+  )
+
+  // const restrictFileOptions = [
+  //   { label: "pdf", value: "application/pdf" },
+  //   { label: "image", value: "image/*" },
+  //   { label: "document", value: "application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, .pages" },
+  //   { label: "sheet", value: "application/vnd.ms-excel, .numbers" },
+  //   { label: "presentation", value: "application/vnd.ms-powerpoint, .key" },
+  //   { label: "text", value: "text/plain, .rtf" },
+  // ]
+
   return (
     <>
       <Form
@@ -32,16 +46,35 @@ export const QuestionForm = (props: QuestionFormProps) => {
           placeholder="Question Name"
           testid="questionName"
         />
-        <LabeledSelectField
+        <LabeledReactSelectField
           name="type"
           label="Type"
           placeholder="Question Type"
           testid="questionType"
           disabled={props.editMode}
+          // defaultValue={props.initialValues?.type}
           options={Object.keys(QuestionType).map((questionType) => {
-            return { text: questionType.replaceAll("_", " "), value: questionType }
+            return { label: questionType.replaceAll("_", " "), value: questionType }
           })}
+          onChange={setSelectedQuestionType}
         />
+        {
+          selectedQuestionType === QuestionType.Attachment && (
+            <LabeledTextField
+              name="acceptedFiles"
+              label="Accepted Files"
+              placeholder="Add accepted files using comma seperation, eg. application/pdf, .png, .jpg, audio/*"
+              testid="acceptedFiles"
+            />
+          )
+          // <LabeledReactSelectField
+          //   name="restrictFiles"
+          //   label="Restrict Files"
+          //   testid="restrictFiles"
+          //   options={restrictFileOptions}
+          //   isMulti={true}
+          // />
+        }
         <LabeledTextField
           name="info"
           label="Info"

@@ -114,6 +114,7 @@ const QuestionSettingsPage = ({
           placeholder: question?.placeholder,
           required: question?.required,
           hidden: question?.hidden,
+          acceptedFiles: question?.acceptedFiles,
         }}
         editMode={true}
         onSubmit={async (values) => {

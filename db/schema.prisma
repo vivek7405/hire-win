@@ -218,6 +218,8 @@ model Question {
   required    Boolean          @default(false)
   hidden      Boolean          @default(false)
 
+  acceptedFiles String @default("")
+
   slug String @unique
 
   forms FormQuestion[]
@@ -235,7 +237,7 @@ model QuestionOption {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  text String
+  label String
 
   question   Question @relation(fields: [questionId], references: [id])
   questionId String

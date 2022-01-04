@@ -6,7 +6,7 @@ import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 async function createQuestion(data: QuestionInputType, ctx: Ctx) {
-  const { name, info, placeholder, type, required, hidden } = Question.parse(data)
+  const { name, info, placeholder, type, required, hidden, acceptedFiles } = Question.parse(data)
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 
@@ -26,6 +26,7 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
       hidden: hidden,
       slug: newSlug,
       userId: user.id,
+      acceptedFiles: acceptedFiles,
     },
   })
 

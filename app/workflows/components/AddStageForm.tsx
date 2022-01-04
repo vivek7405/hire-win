@@ -49,10 +49,10 @@ export const AddStageForm = (props: AddStageFormProps) => {
             stages?.length
               ? [
                   ...stages.map((c) => {
-                    return { text: c.name, value: c.id }
+                    return { label: c.name, value: c.id }
                   }),
                 ]
-              : [{ text: "No more stages to add", value: "" }]
+              : [{ label: "No more stages to add", value: "" }]
           }
         />
       </Form>
