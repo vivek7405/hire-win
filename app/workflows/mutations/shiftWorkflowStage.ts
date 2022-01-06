@@ -33,7 +33,7 @@ async function shiftWorkflowStage(
       where: { id: workflowId },
       data: {
         stages: {
-          updateMany: workflowStages?.map((ws) => {
+          update: workflowStages?.map((ws) => {
             return {
               where: {
                 id: ws.id,

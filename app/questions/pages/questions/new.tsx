@@ -50,7 +50,7 @@ const NewQuestion = ({ user }: InferGetServerSidePropsType<typeof getServerSideP
           initialValues={{
             name: "",
           }}
-          editMode={false}
+          editmode={false}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Creating Question</span>)
             try {

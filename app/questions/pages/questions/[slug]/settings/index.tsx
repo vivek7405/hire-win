@@ -115,8 +115,11 @@ const QuestionSettingsPage = ({
           required: question?.required,
           hidden: question?.hidden,
           acceptedFiles: question?.acceptedFiles,
+          options: question?.options.map((op) => {
+            return { id: op.id, text: op.text }
+          }),
         }}
-        editMode={true}
+        editmode={true}
         onSubmit={async (values) => {
           const toastId = toast.loading(() => <span>Updating Question</span>)
           try {

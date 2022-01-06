@@ -37,12 +37,12 @@ export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
             {...register(`${name}` as const)}
             {...props}
             data-testid={`${props.testid && `${props.testid}-`}input`}
-            className="flex-initial align-middle border border-gray-300 px-2 py-2 block sm:text-sm rounded"
+            className="align-middle border border-gray-300 px-2 py-2 block sm:text-sm rounded"
           />
           <label
             htmlFor={name}
             data-testid={`${props.testid && `${props.testid}-`}label`}
-            className="flex-initial align-middle block text-sm px-2 font-medium text-gray-700"
+            className="align-middle block text-sm px-2 font-medium text-gray-700"
           >
             {label}
           </label>

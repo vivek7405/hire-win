@@ -6,7 +6,7 @@ export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElem
   /** Field name. */
   name: string
   /** Field label. */
-  label: string
+  label?: string
   /** Field type. Doesn't include radio buttons and checkboxes */
   type?: "text" | "password" | "email" | "number"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
@@ -33,13 +33,15 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
 
     return (
       <div {...outerProps}>
-        <label
-          data-testid={`${props.testid && `${props.testid}-`}label`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {label}
-        </label>
-        <div className="mt-1">
+        {label && (
+          <label
+            data-testid={`${props.testid && `${props.testid}-`}label`}
+            className="block text-sm font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
+        <div className={label && "mt-1"}>
           <input
             disabled={isSubmitting}
             {...register(`${name}` as const)}

@@ -1,4 +1,3 @@
-import { dynamic } from "blitz"
 import { forwardRef, PropsWithoutRef, useMemo, useState } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
@@ -14,7 +13,6 @@ export interface LabeledReactSelectFieldProps
   testid?: string
   options: { label: string; value?: string }[]
   disabled?: boolean
-  onChange?: any
   defaultValue?: any
   isMulti?: boolean
 }
@@ -22,7 +20,6 @@ export interface LabeledReactSelectFieldProps
 export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReactSelectFieldProps>(
   ({ label, outerProps, name, options, defaultValue, disabled, ...props }, ref) => {
     const {
-      register,
       control,
       setValue,
       formState: { isSubmitting, errors },
@@ -56,11 +53,8 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
               return (
                 <Select
                   isDisabled={disabled || isSubmitting}
-                  {...register(`${name}` as const)}
                   data-testid={`${props.testid && `${props.testid}-`}input`}
                   onChange={(selection: any) => {
-                    onChange(selection)
-
                     Array.isArray(selection)
                       ? setValue(
                           name,

@@ -16,7 +16,6 @@ export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.Intrinsic
 export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFieldProps>(
   ({ label, outerProps, name, ...props }, ref) => {
     const {
-      register,
       control,
       formState: { isSubmitting, errors },
     } = useFormContext()

@@ -13,7 +13,10 @@ const getQuestion = resolver.pipe(
   resolver.authorize(),
   async ({ slug }) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const question = await db.question.findFirst({ where: { slug }, include: { forms: true } })
+    const question = await db.question.findFirst({
+      where: { slug },
+      include: { forms: true, options: true },
+    })
 
     if (!question) throw new NotFoundError()
 

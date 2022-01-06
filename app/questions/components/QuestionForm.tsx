@@ -5,6 +5,8 @@ import { QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
+import { PlusIcon, XCircleIcon } from "@heroicons/react/outline"
+import DynamicTextFields from "app/core/components/DynamicTextFields"
 
 type QuestionFormProps = {
   onSuccess?: () => void
@@ -12,7 +14,7 @@ type QuestionFormProps = {
   onSubmit: any
   header: string
   subHeader: string
-  editMode: boolean
+  editmode: boolean
 }
 
 export const QuestionForm = (props: QuestionFormProps) => {
@@ -51,8 +53,8 @@ export const QuestionForm = (props: QuestionFormProps) => {
           label="Type"
           placeholder="Question Type"
           testid="questionType"
-          disabled={props.editMode}
-          // defaultValue={props.initialValues?.type}
+          disabled={props.editmode}
+          defaultValue={Object.keys(QuestionType)[0]}
           options={Object.keys(QuestionType).map((questionType) => {
             return { label: questionType.replaceAll("_", " "), value: questionType }
           })}
@@ -75,6 +77,16 @@ export const QuestionForm = (props: QuestionFormProps) => {
           //   isMulti={true}
           // />
         }
+        {(selectedQuestionType === QuestionType.Single_select ||
+          selectedQuestionType === QuestionType.Multiple_select) && (
+          <DynamicTextFields
+            name="options"
+            type="text"
+            label="Question Options"
+            placeholder="Question option"
+            editmode={props.editmode}
+          />
+        )}
         <LabeledTextField
           name="info"
           label="Info"
