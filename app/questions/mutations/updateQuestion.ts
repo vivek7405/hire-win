@@ -13,7 +13,7 @@ type UpdateQuestionInput = Pick<Prisma.QuestionUpdateArgs, "where" | "data"> & {
 async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, info, placeholder, type, required, hidden, acceptedFiles } = Question.parse(data)
+  const { name, info, placeholder, options, required, hidden, acceptedFiles } = Question.parse(data)
 
   const slug = slugify(name, { strict: true })
   const newSlug: string = await findFreeSlug(
@@ -21,7 +21,22 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
     async (e) => await db.question.findFirst({ where: { slug: e } })
   )
 
-  const question = await db.question.update({
+  const currentQuestion = await db.question.findFirst({
+    where,
+    include: { options: true },
+  })
+
+  const optionsToDelete = currentQuestion?.options.filter(
+    (op) =>
+      !options
+        .filter((opt) => opt.id !== "")
+        .map((o) => {
+          return o.id
+        })
+        .includes(op.id)
+  )
+
+  const updatedQuestion = await db.question.update({
     where,
     data: {
       name: name,
@@ -31,10 +46,22 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
       hidden: hidden,
       slug: initial.name !== name ? newSlug : initial.slug,
       acceptedFiles: acceptedFiles,
+      options: {
+        delete: optionsToDelete?.map((op) => {
+          return { id: op.id }
+        }),
+        upsert: options.map((op) => {
+          return {
+            create: { text: op.text },
+            update: { text: op.text },
+            where: { id: op.id },
+          }
+        }),
+      },
     },
   })
 
-  return question
+  return updatedQuestion
 }
 
 export default Guard.authorize("update", "question", updateQuestion)

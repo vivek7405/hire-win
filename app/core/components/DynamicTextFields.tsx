@@ -2,6 +2,7 @@ import { PlusIcon, XCircleIcon } from "@heroicons/react/outline"
 import { forwardRef, PropsWithoutRef, useEffect, useMemo, useState } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
+import generateUUID from "../utils/generateUUID"
 import LabeledTextField from "./LabeledTextField"
 
 export interface DynamicTextFieldsProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
@@ -10,11 +11,10 @@ export interface DynamicTextFieldsProps extends PropsWithoutRef<JSX.IntrinsicEle
   type?: "text" | "password" | "email" | "number"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
-  editmode: boolean
 }
 
 export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsProps>(
-  ({ label, outerProps, name, editmode, ...props }, ref) => {
+  ({ label, outerProps, name, ...props }, ref) => {
     const {
       control,
       setValue,
@@ -57,8 +57,8 @@ export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsP
               {label}
             </label>
           )}
-          <button type="button" title="Add Field" onClick={handleAdd}>
-            <PlusIcon className="h-5 ml-3 text-indigo-600" />
+          <button type="button" title="Add Field" className="ml-3" onClick={handleAdd}>
+            <PlusIcon className="h-5 text-indigo-600" />
           </button>
         </div>
         <Controller
@@ -80,13 +80,13 @@ export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsP
 
             return (
               <div className={label && "mt-1"}>
-                {formValue.map((fieldValue, index) => {
+                {formValue.map((field, index) => {
                   return (
-                    <div key={`${label}-${index}`} className="flex mt-1">
+                    <div key={`${name}-${index}`} className="flex mt-1">
                       <LabeledTextField
                         {...props}
-                        name={editmode ? fieldValue.id : `${label}-${index}`}
-                        value={editmode ? fieldValue.text : fieldValue.text}
+                        name={`${name}-${index}-${generateUUID()}`}
+                        value={field.text}
                         testid={`${props.testid && `${props.testid}-`}input-${index}`}
                         onChange={(e) => handleChange(index, e)}
                       />
@@ -94,7 +94,7 @@ export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsP
                         <button
                           type="button"
                           title="Remove"
-                          className="mt-2 ml-3 rounded-full"
+                          className="mt-2 ml-3"
                           onClick={() => handleRemove(index)}
                         >
                           <XCircleIcon className="h-5 text-red-600" />

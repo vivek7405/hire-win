@@ -84,7 +84,6 @@ export const QuestionForm = (props: QuestionFormProps) => {
             type="text"
             label="Question Options"
             placeholder="Question option"
-            editmode={props.editmode}
           />
         )}
         <LabeledTextField
