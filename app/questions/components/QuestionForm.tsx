@@ -5,7 +5,6 @@ import { QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
-import { PlusIcon, XCircleIcon } from "@heroicons/react/outline"
 import DynamicTextFields from "app/core/components/DynamicTextFields"
 
 type QuestionFormProps = {

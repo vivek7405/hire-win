@@ -49,6 +49,7 @@ const NewQuestion = ({ user }: InferGetServerSidePropsType<typeof getServerSideP
           subHeader="Enter your question details."
           initialValues={{
             name: "",
+            options: [],
           }}
           editmode={false}
           onSubmit={async (values) => {
