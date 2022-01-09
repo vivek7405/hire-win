@@ -23,9 +23,13 @@ async function getFormQuestions(
       db.formQuestion.findMany({
         ...paginateArgs,
         where,
-        orderBy,
+        orderBy: { order: "asc" },
         include: {
-          question: true,
+          question: {
+            include: {
+              options: true,
+            },
+          },
         },
       }),
   })

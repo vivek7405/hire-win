@@ -2,15 +2,15 @@ import { forwardRef, PropsWithoutRef, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
 
-export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
+export interface LabeledTextAreaFieldProps
+  extends PropsWithoutRef<JSX.IntrinsicElements["textarea"]> {
   name: string
   label?: string
-  type?: "text" | "password" | "email" | "number" | "date" | "url"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
 }
 
-export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldProps>(
+export const LabeledTextAreaField = forwardRef<HTMLTextAreaElement, LabeledTextAreaFieldProps>(
   ({ label, outerProps, name, ...props }, ref) => {
     const {
       register,
@@ -39,7 +39,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
           </label>
         )}
         <div className={label && "mt-1"}>
-          <input
+          <textarea
             disabled={isSubmitting}
             {...register(`${name}` as const)}
             {...props}
@@ -52,4 +52,4 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
   }
 )
 
-export default LabeledTextField
+export default LabeledTextAreaField

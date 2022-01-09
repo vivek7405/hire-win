@@ -4,14 +4,18 @@ import Guard from "app/guard/ability"
 
 interface GetFormQuestionInput extends Pick<Prisma.FormQuestionFindManyArgs, "where" | "orderBy"> {}
 
-async function getFormQuestionsWOPagination({ where, orderBy }: GetFormQuestionInput, ctx: Ctx) {
+async function getFormQuestionsWOPagination({ where }: GetFormQuestionInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const formQuestions = db.formQuestion.findMany({
     where,
-    orderBy,
+    orderBy: { order: "asc" },
     include: {
-      question: true,
+      question: {
+        include: {
+          options: true,
+        },
+      },
     },
   })
 

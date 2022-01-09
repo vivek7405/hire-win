@@ -33,6 +33,7 @@ import { ExtendedFormQuestion, ShiftDirection } from "types"
 import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
+import ApplicationForm from "app/forms/components/ApplicationForm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -153,15 +154,14 @@ export const Questions = ({ user, form }) => {
       accessor: "order",
     },
     {
-      Header: "Id",
-      accessor: "question.id",
-    },
-    {
       Header: "Name",
       accessor: "question.name",
       Cell: (props) => {
         return (
-          <Link href={Routes.SingleQuestionPage({ slug: props.cell.row.original.slug })} passHref>
+          <Link
+            href={Routes.SingleQuestionPage({ slug: props.cell.row.original.question.slug })}
+            passHref
+          >
             <a data-testid={`questionlink`} className="text-indigo-600 hover:text-indigo-900">
               {props.cell.row.original.question.name}
             </a>
@@ -170,8 +170,8 @@ export const Questions = ({ user, form }) => {
       },
     },
     {
-      Header: "Slug",
-      accessor: "question.slug",
+      Header: "Type",
+      accessor: "question.type",
     },
     {
       Header: "",
@@ -330,7 +330,8 @@ const SingleFormPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [open, setOpen] = React.useState(false)
+  const [openAddQuestion, setOpenAddQuestion] = React.useState(false)
+  const [openPreviewForm, setOpenPreviewForm] = React.useState(false)
   const [createFormQuestionMutation] = useMutation(createFormQuestion)
   const router = useRouter()
 
@@ -349,7 +350,7 @@ const SingleFormPage = ({
           </Link>
           <br />
           <br />
-          <Modal header="Add Question" open={open} setOpen={setOpen}>
+          <Modal header="Add Question" open={openAddQuestion} setOpen={setOpenAddQuestion}>
             <AddQuestionForm
               schema={FormQuestion}
               user={user}
@@ -379,13 +380,53 @@ const SingleFormPage = ({
           <button
             onClick={(e) => {
               e.preventDefault()
-              setOpen(true)
+              setOpenAddQuestion(true)
             }}
             data-testid={`open-addQuestion-modal`}
             className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
           >
             Add Question
           </button>
+
+          <Modal header="Preview Form" open={openPreviewForm} setOpen={setOpenPreviewForm}>
+            <ApplicationForm
+              header="Job Application Form"
+              subHeader="Preview"
+              formId={form?.id!}
+              preview={true}
+              onSubmit={async (values) => {
+                const toastId = toast.loading(() => (
+                  <span>Adding Question - {values.question}</span>
+                ))
+                try {
+                  await createFormQuestionMutation({
+                    formId: form?.id as string,
+                    questionId: values.questionId,
+                  })
+                  toast.success(() => <span>Question added - {values.question}</span>, {
+                    id: toastId,
+                  })
+                  router.reload()
+                } catch (error) {
+                  toast.error(
+                    "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+                    { id: toastId }
+                  )
+                }
+              }}
+            />
+          </Modal>
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              setOpenPreviewForm(true)
+            }}
+            data-testid={`open-previewForm-modal`}
+            className="mr-3 float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
+          >
+            Preview Form
+          </button>
+
           <Suspense
             fallback={
               <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />

@@ -5,10 +5,9 @@ import Select from "react-select"
 
 export interface LabeledReactSelectFieldProps
   extends PropsWithoutRef<JSX.IntrinsicElements["select"]> {
-  /** Field name. */
   name: string
-  /** Field label. */
   label: string
+  placeholder?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   options: { label: string; value?: string }[]
@@ -52,7 +51,9 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
             render={({ field: { onChange, value } }) => {
               return (
                 <Select
+                  closeMenuOnSelect={!props.isMulti}
                   isDisabled={disabled || isSubmitting}
+                  placeholder={props.placeholder}
                   data-testid={`${props.testid && `${props.testid}-`}input`}
                   onChange={(selection: any) => {
                     Array.isArray(selection)

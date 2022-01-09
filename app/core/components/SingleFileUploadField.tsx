@@ -12,6 +12,7 @@ export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElem
   /** Field type. Doesn't include radio buttons and checkboxes */
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   onSubmit: () => void
+  accept: any
 }
 
 export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFileUploadProps>(
@@ -30,7 +31,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
 
     const { getRootProps, getInputProps } = useDropzone({
       onDrop,
-      accept: "image/*",
+      accept: props.accept,
     })
 
     const fileUpload = async (file) => {
