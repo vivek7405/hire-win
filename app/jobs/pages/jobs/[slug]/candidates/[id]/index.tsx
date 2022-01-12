@@ -17,10 +17,10 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
-import getJob from "app/jobs/queries/getJob"
+import getCandidate from "app/jobs/queries/getCandidate"
 import Table from "app/core/components/Table"
 import getCandidates from "app/jobs/queries/getCandidates"
-import { ExtendedJob } from "types"
+import { ExtendedCandidate } from "types"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -33,17 +33,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
     "update",
-    "job",
+    "candidate",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    { where: { id: context?.params?.id as string } }
   )
 
   if (user) {
     try {
-      const job = await invokeWithMiddleware(
-        getJob,
+      const candidate = await invokeWithMiddleware(
+        getCandidate,
         {
-          where: { slug: context?.params?.slug as string },
+          where: { id: context?.params?.id as string },
         },
         { ...context }
       )
@@ -52,7 +52,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         props: {
           user: user,
           canUpdate: canUpdate,
-          job: job,
+          candidate: candidate,
         },
       }
     } catch (error) {
@@ -72,7 +72,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=/jobs/${context?.params?.slug}`,
+        destination: `/login?next=jobs/${context?.params?.slug}/candidates/${context?.params?.id}`,
         permanent: false,
       },
       props: {},
@@ -80,9 +80,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const SingleJobPage = ({
+const SingleCandidatePage = ({
   user,
-  job,
+  candidate,
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -92,21 +92,18 @@ const SingleJobPage = ({
 
   return (
     <AuthLayout user={user}>
-      <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
+      <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
       <br />
       {canUpdate && (
-        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
-          <a data-testid={`${job?.name && `${job?.name}-`}settingsLink`}>Settings</a>
-        </Link>
-      )}
-      <br />
-      {canUpdate && (
-        <Link href={Routes.CandidatesHome({ slug: job?.slug! })} passHref>
-          <a data-testid={`${job?.name && `${job?.name}-`}candidates`}>Candidates</a>
+        <Link
+          href={Routes.CandidateSettingsPage({ slug: candidate?.job?.slug!, id: candidate?.id! })}
+          passHref
+        >
+          <a data-testid={`${candidate?.id}-settingsLink`}>Settings</a>
         </Link>
       )}
     </AuthLayout>
   )
 }
 
-export default SingleJobPage
+export default SingleCandidatePage

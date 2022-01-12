@@ -2,13 +2,14 @@ import { Stage } from "app/stages/validations"
 import { z } from "zod"
 
 export const Workflow = z.object({
+  id: z.string().optional(),
   name: z.string().nonempty({ message: "Name can't be empty" }),
   slug: z.string().optional(),
 })
 export type WorkflowInputType = z.infer<typeof Workflow>
 
 export const WorkflowStage = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   order: z.number().optional(),
   workflowId: z.string().optional(),
   stageId: z.string(),

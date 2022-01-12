@@ -10,6 +10,15 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
     include: {
       category: true,
       workflow: true,
+      form: {
+        include: {
+          questions: {
+            include: {
+              question: true,
+            },
+          },
+        },
+      },
       memberships: {
         include: {
           user: {

@@ -1,6 +1,7 @@
 import { z } from "zod"
 
 export const Category = z.object({
+  id: z.string().optional(),
   name: z.string().nonempty({ message: "Name can't be empty" }),
   slug: z.string().optional(),
 })

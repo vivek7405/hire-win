@@ -24,6 +24,9 @@ import updateJob from "app/jobs/mutations/updateJob"
 import { checkPlan } from "app/jobs/utils/checkPlan"
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
+import ApplicationForm from "app/jobs/components/ApplicationForm"
+import createCandidate from "app/jobs/mutations/createCandidate"
+import { CandidateSource } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -103,58 +106,56 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const JobSettingsPage = ({
+const NewCandidate = ({
   user,
   job,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [updateJobMutation] = useMutation(updateJob)
+  const [createCandidateMutation] = useMutation(createCandidate)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
+
   return (
-    <AuthLayout user={user}>
-      <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
-      <JobSettingsLayout job={job!} isOwner={isOwner}>
-        <JobForm
-          user={user}
-          category={job?.category!}
-          workflow={job?.workflow!}
-          header="Job Details"
-          subHeader="Update your job details."
-          initialValues={{
-            name: job?.name,
-            description: job?.description
-              ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
-              : EditorState.createEmpty(),
-            categoryId: job?.category?.id,
-            workflowId: job?.workflow?.id,
-            formId: job?.form?.id,
-          }}
+    <AuthLayout title="New Job" user={user}>
+      <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
+      <div className="mt-6">
+        <ApplicationForm
+          header="Job Application Form"
+          subHeader={`Apply to the job - ${job?.name}`}
+          formId={job?.form?.id!}
+          preview={false}
           onSubmit={async (values) => {
-            const toastId = toast.loading(() => <span>Updating Job</span>)
+            const toastId = toast.loading(() => <span>Creating Candidate</span>)
             try {
-              values.description = convertToRaw(values?.description?.getCurrentContent() || {})
-              await updateJobMutation({
-                where: { id: job?.id },
-                data: { ...values },
-                initial: job!,
+              await createCandidateMutation({
+                jobId: job?.id,
+                source: CandidateSource.Manual,
+                answers:
+                  job?.form?.questions?.map((fq) => {
+                    const val = values[fq.question?.name] || ""
+                    return {
+                      questionId: fq.questionId,
+                      value: typeof val === "string" ? val : JSON.stringify(val),
+                    }
+                  }) || [],
               })
-              toast.success(() => <span>Job Updated</span>, { id: toastId })
-              router.push(Routes.Home())
+              toast.success(() => <span>Candidate created</span>, { id: toastId })
+              router.push(Routes.CandidatesHome({ slug: job?.slug! }))
             } catch (error) {
               toast.error(
-                "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+                { id: toastId }
               )
             }
           }}
         />
-      </JobSettingsLayout>
+      </div>
     </AuthLayout>
   )
 }
 
-export default JobSettingsPage
+export default NewCandidate

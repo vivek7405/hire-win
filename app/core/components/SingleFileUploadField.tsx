@@ -3,6 +3,7 @@ import { useFormContext, Controller } from "react-hook-form"
 import axios from "axios"
 import { useDropzone } from "react-dropzone"
 import { TrashIcon } from "@heroicons/react/outline"
+import { AttachmentObject } from "types"
 
 export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   /** Field name. */
@@ -11,15 +12,15 @@ export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElem
   label: string
   /** Field type. Doesn't include radio buttons and checkboxes */
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
-  onSubmit: () => void
-  accept: any
+  onSubmit?: (e) => void
+  accept: string
 }
 
 export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFileUploadProps>(
   ({ label, outerProps, defaultValue, ...props }, ref) => {
     const { setValue, watch, handleSubmit } = useFormContext()
 
-    const file: { Location: string; Key: string } = watch(`${props.name}` as const)
+    const file: AttachmentObject = watch(`${props.name}` as const)
 
     const onDrop = React.useCallback(
       async (droppedFiles) => {
@@ -58,7 +59,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
       }
       await axios.post(url, file, config)
       setValue(`${props.name}` as const, {}, { shouldValidate: false })
-      handleSubmit(props.onSubmit)()
+      props.onSubmit && handleSubmit(props.onSubmit)()
     }
 
     return (
@@ -73,7 +74,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                   <label className="block text-sm text-center font-medium text-gray-700">
                     {label}
                   </label>
-                  <div className="relative">
+                  {/* <div className="relative">
                     <div
                       className="w-full lg:w-96 h-96 rounded"
                       style={{
@@ -83,6 +84,28 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                     >
                       <button
                         className="absolute top-0 bg-red-600 text-white p-2 rounded-full hover:bg-red-800 m-2"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          removeFile()
+                        }}
+                      >
+                        <TrashIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div> */}
+                  <div>
+                    <div>
+                      <a
+                        className="text-indigo-600 hover:text-indigo-500"
+                        href={file.Location}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {file.Key}
+                      </a>
+                      <button
+                        className="bg-red-600 text-white p-2 rounded-full hover:bg-red-800 m-2"
                         type="button"
                         onClick={(e) => {
                           e.preventDefault()

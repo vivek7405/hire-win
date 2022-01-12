@@ -46,6 +46,7 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
         subHeader="Update your profile details."
         initialValues={{
           avatar: user?.avatar,
+          company: user?.company,
         }}
         onSubmit={async (values) => {
           const toastId = toast.loading(() => <span>Updating User</span>)
@@ -53,6 +54,7 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
             await updateUserMutation({
               where: { id: user?.id },
               data: { ...values },
+              initial: user!,
             })
             toast.success(() => <span>User Updated</span>, { id: toastId })
             // router.push(Routes.Home())

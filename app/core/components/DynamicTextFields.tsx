@@ -33,17 +33,17 @@ export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsP
         })
     }, [errors, name])
 
-    const [formValue, setformValue] = useState(getValues(name) || [{ id: "", text: "" }])
+    const [fieldValues, setfieldValues] = useState(getValues(name) || [{ id: "", text: "" }])
 
     function handleAdd() {
-      const value = [...formValue]
-      value.push({ id: "", text: "" })
-      updateFormValue(value)
+      const values = [...fieldValues]
+      values.push({ id: "", text: "" })
+      updateFieldValues(values)
     }
 
-    function updateFormValue(value) {
-      setformValue(value)
-      setValue(name, value)
+    function updateFieldValues(values) {
+      setfieldValues(values)
+      setValue(name, values)
     }
 
     return (
@@ -67,30 +67,30 @@ export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsP
           defaultValue={[{ id: "", text: "" }]}
           render={({ field: { onChange, value } }) => {
             function handleChange(i, event) {
-              const value = [...formValue]
-              value[i]!.text = event.target.value
-              updateFormValue(value)
+              const values = [...fieldValues]
+              values[i]!.text = event.target.value
+              updateFieldValues(values)
             }
 
             function handleRemove(i) {
-              const value = [...formValue]
-              value.splice(i, 1)
-              updateFormValue(value)
+              const values = [...fieldValues]
+              values.splice(i, 1)
+              updateFieldValues(values)
             }
 
             return (
               <div className={label && "mt-1"}>
-                {formValue.map((field, index) => {
+                {fieldValues.map((fieldValue, index) => {
                   return (
                     <div key={`${name}-${index}`} className="flex mt-1">
                       <LabeledTextField
                         {...props}
                         name={`${name}-${index}-${generateUUID()}`}
-                        value={field.text}
+                        value={fieldValue.text}
                         testid={`${props.testid && `${props.testid}-`}input-${index}`}
                         onChange={(e) => handleChange(index, e)}
                       />
-                      {formValue?.length > 1 && (
+                      {fieldValues?.length > 1 && (
                         <button
                           type="button"
                           title="Remove"

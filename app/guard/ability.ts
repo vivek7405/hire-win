@@ -13,6 +13,7 @@ type ExtendedResourceTypes =
   | "question"
   | "formQuestion"
   | "form"
+  | "candidate"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -56,7 +57,6 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         )
       })
       can("inviteUser", "job", async (args) => {
-        console.log("args", args)
         const job = await db.job.findFirst({
           where: { id: args.jobId },
           include: {
@@ -282,6 +282,41 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return forms.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      // Anyone can create a candidate without authentication
+      can("update", "candidate")
+      can("read", "candidate", async (args) => {
+        const candidate = await db.candidate.findFirst({
+          where: args.where,
+          include: {
+            job: {
+              include: {
+                memberships: true,
+              },
+            },
+          },
+        })
+
+        return candidate?.job.memberships.some((m) => m.userId === ctx.session.userId) === true
+      })
+      can("readAll", "candidate", async (args) => {
+        const candidates = await db.candidate.findMany({
+          where: args.where,
+          include: {
+            job: {
+              include: {
+                memberships: true,
+              },
+            },
+          },
+        })
+
+        return (
+          candidates.every(
+            (c) => c.job.memberships.some((m) => m.userId === ctx.session.userId) === true
+          ) === true
+        )
       })
     }
   }

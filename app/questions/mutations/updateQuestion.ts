@@ -1,4 +1,4 @@
-import { Ctx } from "blitz"
+import { Ctx, resolver } from "blitz"
 import db, { Prisma } from "db"
 import { Question } from "app/questions/validations"
 import slugify from "slugify"
@@ -26,14 +26,13 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
     include: { options: true },
   })
 
-  const optionsToDelete = currentQuestion?.options.filter(
-    (op) =>
-      !options
-        .filter((opt) => opt.id !== "")
-        .map((o) => {
-          return o.id
-        })
-        .includes(op.id)
+  const optionsToDelete = currentQuestion?.options?.filter((op) =>
+    options
+      ?.filter((opt) => opt.id !== "")
+      .map((o) => {
+        return o.id
+      })
+      .includes(op.id)
   )
 
   const updatedQuestion = await db.question.update({
@@ -50,7 +49,7 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
         delete: optionsToDelete?.map((op) => {
           return { id: op.id }
         }),
-        upsert: options.map((op) => {
+        upsert: options?.map((op) => {
           return {
             create: { text: op.text },
             update: { text: op.text },

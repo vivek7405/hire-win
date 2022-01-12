@@ -107,7 +107,6 @@ const Table = ({
                         {...cell.getCellProps()}
                         key={i}
                       >
-                        {/* {console.log(cell)} */}
                         {cell.render("Cell")}
                       </td>
                     )

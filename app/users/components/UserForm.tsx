@@ -1,6 +1,7 @@
 import { SingleFileUploadField } from "app/core/components/SingleFileUploadField"
 import { Form } from "app/core/components/Form"
-import { User } from "app/users/validations"
+import { UserObj } from "app/users/validations"
+import LabeledTextField from "app/core/components/LabeledTextField"
 
 type UserFormProps = {
   onSuccess?: () => void
@@ -17,16 +18,18 @@ export const UserForm = (props: UserFormProps) => {
         header={props.header}
         subHeader={props.subHeader}
         submitText="Submit"
-        schema={User}
+        schema={UserObj}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
       >
-        <SingleFileUploadField
-          accept="image/*"
-          name="avatar"
-          label="Avatar"
-          onSubmit={props.onSubmit}
+        <LabeledTextField
+          type="text"
+          name="company"
+          label="Company Name"
+          placeholder="This shall appear on job board"
+          testid="userUpdateCompany"
         />
+        <SingleFileUploadField accept="image/*" name="avatar" label="Avatar" />
       </Form>
     </>
   )

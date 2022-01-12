@@ -87,6 +87,8 @@ const SingleUserAdminPage = ({
 
           <LabeledTextField name="email" label="Email" disabled />
 
+          <LabeledTextField name="company" label="Company Name" disabled />
+
           <LabeledTextField name="createdAt" label="Created At" disabled />
 
           <RadioGroupField label="Role" name="role" options={["ADMIN", "USER"]} />

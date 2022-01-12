@@ -25,7 +25,7 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
       placeholder: placeholder,
       type: type,
       options: {
-        create: options.map((op) => {
+        create: options?.map((op) => {
           return {
             text: op.text,
           }

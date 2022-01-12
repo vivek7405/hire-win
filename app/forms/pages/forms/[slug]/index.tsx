@@ -33,7 +33,7 @@ import { ExtendedFormQuestion, ShiftDirection } from "types"
 import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
-import ApplicationForm from "app/forms/components/ApplicationForm"
+import ApplicationForm from "app/jobs/components/ApplicationForm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -159,7 +159,7 @@ export const Questions = ({ user, form }) => {
       Cell: (props) => {
         return (
           <Link
-            href={Routes.SingleQuestionPage({ slug: props.cell.row.original.question.slug })}
+            href={Routes.QuestionSettingsPage({ slug: props.cell.row.original.question.slug })}
             passHref
           >
             <a data-testid={`questionlink`} className="text-indigo-600 hover:text-indigo-900">
@@ -356,15 +356,13 @@ const SingleFormPage = ({
               user={user}
               formId={form?.id!}
               onSubmit={async (values) => {
-                const toastId = toast.loading(() => (
-                  <span>Adding Question - {values.question}</span>
-                ))
+                const toastId = toast.loading(() => <span>Adding Question</span>)
                 try {
                   await createFormQuestionMutation({
                     formId: form?.id as string,
                     questionId: values.questionId,
                   })
-                  toast.success(() => <span>Question added - {values.question}</span>, {
+                  toast.success(() => <span>Question added</span>, {
                     id: toastId,
                   })
                   router.reload()
@@ -395,24 +393,7 @@ const SingleFormPage = ({
               formId={form?.id!}
               preview={true}
               onSubmit={async (values) => {
-                const toastId = toast.loading(() => (
-                  <span>Adding Question - {values.question}</span>
-                ))
-                try {
-                  await createFormQuestionMutation({
-                    formId: form?.id as string,
-                    questionId: values.questionId,
-                  })
-                  toast.success(() => <span>Question added - {values.question}</span>, {
-                    id: toastId,
-                  })
-                  router.reload()
-                } catch (error) {
-                  toast.error(
-                    "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                    { id: toastId }
-                  )
-                }
+                toast.error("Can't submit the form in preview mode")
               }}
             />
           </Modal>

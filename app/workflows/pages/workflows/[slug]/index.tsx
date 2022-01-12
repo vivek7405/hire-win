@@ -163,7 +163,10 @@ export const Stages = ({ user, workflow }) => {
       accessor: "stage.name",
       Cell: (props) => {
         return (
-          <Link href={Routes.SingleStagePage({ slug: props.cell.row.original.slug })} passHref>
+          <Link
+            href={Routes.StageSettingsPage({ slug: props.cell.row.original.stage.slug })}
+            passHref
+          >
             <a data-testid={`stagelink`} className="text-indigo-600 hover:text-indigo-900">
               {props.cell.row.original.stage.name}
             </a>

@@ -18,6 +18,8 @@ model User {
   updatedAt DateTime @updatedAt
 
   email          String    @unique
+  company        String
+  slug           String    @unique
   hashedPassword String?
   role           String    @default("USER")
   avatar         Json?
@@ -97,8 +99,9 @@ model Job {
 
   workflow   Workflow? @relation(fields: [workflowId], references: [id])
   workflowId String?
-  Form       Form?     @relation(fields: [formId], references: [id])
-  formId     String?
+
+  form   Form?   @relation(fields: [formId], references: [id])
+  formId String?
 
   candidates Candidate[]
 }
@@ -172,7 +175,7 @@ model Stage {
 }
 
 model WorkflowStage {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -259,7 +262,7 @@ enum QuestionType {
 }
 
 model FormQuestion {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -276,11 +279,11 @@ model FormQuestion {
 }
 
 model Answer {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  answer String
+  value String
 
   question   Question @relation(fields: [questionId], references: [id])
   questionId String
@@ -289,7 +292,7 @@ model Answer {
   candidateId String
 
   @@unique([candidateId, questionId])
-  @@unique([candidateId, questionId, answer])
+  @@unique([candidateId, questionId, value])
 }
 
 model Candidate {
@@ -299,6 +302,14 @@ model Candidate {
 
   answers Answer[]
 
+  source CandidateSource
+
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
+}
+
+enum CandidateSource {
+  Manual
+  JobBoard
+  LinkedIn
 }
