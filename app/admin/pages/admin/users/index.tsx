@@ -135,6 +135,13 @@ const Users = ({ user }) => {
       },
     },
     {
+      Header: "Company",
+      accessor: "company",
+      Cell: (props) => {
+        return props.value && props.value.toString()
+      },
+    },
+    {
       Header: "Role",
       accessor: "role",
       Cell: (props) => {

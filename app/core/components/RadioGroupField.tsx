@@ -53,7 +53,7 @@ export const RadioGroupField = forwardRef<HTMLInputElement, RadioGroupFieldProps
                 }}
                 className="flex flex-col space-y-2"
               >
-                {options.map((option, i) => {
+                {options?.map((option, i) => {
                   return (
                     <div key={i} className="w-full border p-2 rounded flex flex-row items-center">
                       <RadioGroup.Item className="relative w-full" value={option}>

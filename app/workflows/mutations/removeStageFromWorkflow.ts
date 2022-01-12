@@ -1,7 +1,6 @@
 import { Ctx } from "blitz"
 import db from "db"
 import Guard from "app/guard/ability"
-import { ShiftDirection } from "../types"
 
 type RemoveStageFromWorkflowInput = {
   workflowId: string

@@ -132,6 +132,7 @@ const JobSettingsPage = ({
               : EditorState.createEmpty(),
             categoryId: job?.category?.id,
             workflowId: job?.workflow?.id,
+            formId: job?.form?.id,
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating Job</span>)

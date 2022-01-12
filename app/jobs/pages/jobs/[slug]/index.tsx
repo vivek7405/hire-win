@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -8,6 +8,8 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useRouter,
+  usePaginatedQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -16,6 +18,9 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getJob from "app/jobs/queries/getJob"
+import Table from "app/core/components/Table"
+import getCandidates from "app/jobs/queries/getCandidates"
+import { ExtendedJob } from "types"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -90,8 +95,14 @@ const SingleJobPage = ({
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
       {canUpdate && (
-        <Link href={Routes.JobSettingsPage({ slug: job?.slug as string })} passHref>
+        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
           <a data-testid={`${job?.name && `${job?.name}-`}settingsLink`}>Settings</a>
+        </Link>
+      )}
+      <br />
+      {canUpdate && (
+        <Link href={Routes.CandidatesHome({ slug: job?.slug! })} passHref>
+          <a data-testid={`${job?.name && `${job?.name}-`}candidates`}>Candidates</a>
         </Link>
       )}
     </AuthLayout>

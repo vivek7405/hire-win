@@ -10,6 +10,10 @@ type ExtendedResourceTypes =
   | "stage"
   | "workflowStage"
   | "workflow"
+  | "question"
+  | "formQuestion"
+  | "form"
+  | "candidate"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -53,7 +57,6 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         )
       })
       can("inviteUser", "job", async (args) => {
-        console.log("args", args)
         const job = await db.job.findFirst({
           where: { id: args.jobId },
           include: {
@@ -168,31 +171,34 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("create", "workflowStage")
       can("read", "workflowStage", async (args) => {
-        const workflow = await db.workflow.findFirst({
+        const workflowStage = await db.workflowStage.findFirst({
           where: args.where,
           include: {
-            stages: true,
+            workflow: true,
           },
         })
 
-        return workflow?.stages.some((p) => p.userId === ctx.session.userId) === true
+        return workflowStage?.workflow.userId === ctx.session.userId
       })
       can("readAll", "workflowStage", async (args) => {
         const workflowStages = await db.workflowStage.findMany({
           where: args.where,
-        })
-
-        return workflowStages.every((p) => p.userId === ctx.session.userId) === true
-      })
-      can("update", "workflowStage", async (args) => {
-        const workflow = await db.workflow.findFirst({
-          where: args.where,
           include: {
-            stages: true,
+            workflow: true,
           },
         })
 
-        return workflow?.stages.every((p) => p.userId === ctx.session.userId) === true
+        return workflowStages.every((p) => p.workflow.userId === ctx.session.userId) === true
+      })
+      can("update", "workflowStage", async (args) => {
+        const workflowStage = await db.workflowStage.findFirst({
+          where: args.where,
+          include: {
+            workflow: true,
+          },
+        })
+
+        return workflowStage?.workflow.userId === ctx.session.userId
       })
 
       can("create", "workflow")
@@ -210,6 +216,107 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return workflows.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "question")
+      can("update", "question")
+      can("read", "question", async (args) => {
+        const question = await db.question.findFirst({
+          where: args.where,
+        })
+
+        return question?.userId === ctx.session.userId
+      })
+      can("readAll", "question", async (args) => {
+        const questions = await db.question.findMany({
+          where: args.where,
+        })
+
+        return questions.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "formQuestion")
+      can("read", "formQuestion", async (args) => {
+        const formQuestion = await db.formQuestion.findFirst({
+          where: args.where,
+          include: {
+            form: true,
+          },
+        })
+
+        return formQuestion?.form.userId === ctx.session.userId
+      })
+      can("readAll", "formQuestion", async (args) => {
+        const formQuestions = await db.formQuestion.findMany({
+          where: args.where,
+          include: {
+            form: true,
+          },
+        })
+
+        return formQuestions.every((p) => p.form.userId === ctx.session.userId) === true
+      })
+      can("update", "formQuestion", async (args) => {
+        const formQuestion = await db.formQuestion.findFirst({
+          where: args.where,
+          include: {
+            form: true,
+          },
+        })
+
+        return formQuestion?.form.userId === ctx.session.userId
+      })
+
+      can("create", "form")
+      can("update", "form")
+      can("read", "form", async (args) => {
+        const form = await db.form.findFirst({
+          where: args.where,
+        })
+
+        return form?.userId === ctx.session.userId
+      })
+      can("readAll", "form", async (args) => {
+        const forms = await db.form.findMany({
+          where: args.where,
+        })
+
+        return forms.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      // Anyone can create a candidate without authentication
+      can("update", "candidate")
+      can("read", "candidate", async (args) => {
+        const candidate = await db.candidate.findFirst({
+          where: args.where,
+          include: {
+            job: {
+              include: {
+                memberships: true,
+              },
+            },
+          },
+        })
+
+        return candidate?.job.memberships.some((m) => m.userId === ctx.session.userId) === true
+      })
+      can("readAll", "candidate", async (args) => {
+        const candidates = await db.candidate.findMany({
+          where: args.where,
+          include: {
+            job: {
+              include: {
+                memberships: true,
+              },
+            },
+          },
+        })
+
+        return (
+          candidates.every(
+            (c) => c.job.memberships.some((m) => m.userId === ctx.session.userId) === true
+          ) === true
+        )
       })
     }
   }

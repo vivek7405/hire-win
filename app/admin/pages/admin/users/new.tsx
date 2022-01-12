@@ -54,6 +54,7 @@ const NewUserAdminPage = ({ user }: InferGetServerSidePropsType<typeof getServer
           submitText="Submit"
           initialValues={{
             email: "",
+            company: "",
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Creating User</span>)
@@ -73,6 +74,7 @@ const NewUserAdminPage = ({ user }: InferGetServerSidePropsType<typeof getServer
           subHeader={``}
         >
           <LabeledTextField name="email" label="Email" type="email" />
+          <LabeledTextField name="company" label="Company Name" />
         </Form>
       </AdminLayout>
     </AuthLayout>

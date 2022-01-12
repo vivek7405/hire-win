@@ -16,12 +16,14 @@ const Layout = ({ title, children, user }: LayoutProps) => {
         <title>{title || "hire-win"}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar user={user ? user : undefined} />
-      <main>
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-gray-100 min-h-screen">
-          <div className="px-4 py-4 sm:px-0">{children}</div>
-        </div>
-      </main>
+      <div className="min-h-screen">
+        <Navbar user={user ? user : undefined} />
+        <main>
+          <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-gray-100">
+            <div className="px-4 py-4 sm:px-0">{children}</div>
+          </div>
+        </main>
+      </div>
     </>
   )
 }

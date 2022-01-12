@@ -2,6 +2,8 @@ import { resolver, SecurePassword, Ctx, generateToken, hash256 } from "blitz"
 import db from "db"
 import { adminNewUserMailer } from "mailers/adminNewUserMailer"
 import crypto from "crypto"
+import slugify from "slugify"
+import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 const generatePassword = (
   length = 20,
@@ -12,11 +14,24 @@ const generatePassword = (
     .join("")
 
 const RESET_PASSWORD_TOKEN_EXPIRATION_IN_HOURS = 4
-export default resolver.pipe(resolver.authorize("ADMIN"), async ({ email }, ctx: Ctx) => {
+export default resolver.pipe(resolver.authorize("ADMIN"), async ({ email, company }, ctx: Ctx) => {
   // 1. Create User
   const hashedPassword = await SecurePassword.hash(generatePassword().trim())
+
+  const slug = slugify(`${company}`, { strict: true })
+  const newSlug: string = await findFreeSlug(
+    slug,
+    async (e) => await db.user.findFirst({ where: { slug: e } })
+  )
+
   const user = await db.user.create({
-    data: { email: email.toLowerCase().trim(), hashedPassword, role: "USER" },
+    data: {
+      email: email.toLowerCase().trim(),
+      company: company,
+      slug: newSlug,
+      hashedPassword,
+      role: "USER",
+    },
     select: { id: true, email: true, role: true },
   })
 

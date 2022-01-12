@@ -3,12 +3,9 @@ import { useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
 
 export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
-  /** Field name. */
   name: string
-  /** Field label. */
-  label: string
-  /** Field type. Doesn't include radio buttons and checkboxes */
-  type?: "text" | "password" | "email" | "number"
+  label?: string
+  type?: "text" | "password" | "email" | "number" | "date" | "url"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
 }
@@ -33,13 +30,15 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
 
     return (
       <div {...outerProps}>
-        <label
-          data-testid={`${props.testid && `${props.testid}-`}label`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {label}
-        </label>
-        <div className="mt-1">
+        {label && (
+          <label
+            data-testid={`${props.testid && `${props.testid}-`}label`}
+            className="block text-sm font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
+        <div className={label && "mt-1"}>
           <input
             disabled={isSubmitting}
             {...register(`${name}` as const)}

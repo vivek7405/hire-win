@@ -50,6 +50,12 @@ export const SignupForm = (props: SignupFormProps) => {
           testid="signupEmail"
         />
         <LabeledTextField
+          name="company"
+          label="Company Name"
+          placeholder="This shall appear on job board"
+          testid="signupCompany"
+        />
+        <LabeledTextField
           name="password"
           label="Password"
           placeholder="Password"

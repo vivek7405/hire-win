@@ -18,6 +18,8 @@ model User {
   updatedAt DateTime @updatedAt
 
   email          String    @unique
+  company        String
+  slug           String    @unique
   hashedPassword String?
   role           String    @default("USER")
   avatar         Json?
@@ -27,9 +29,11 @@ model User {
   memberships Membership[]
   categories  Category[]
 
-  workflows      Workflow[]
-  stages         Stage[]
-  workflowStages WorkflowStage[]
+  workflows Workflow[]
+  stages    Stage[]
+
+  forms     Form[]
+  questions Question[]
 }
 
 model Session {
@@ -95,6 +99,30 @@ model Job {
 
   workflow   Workflow? @relation(fields: [workflowId], references: [id])
   workflowId String?
+
+  form   Form?   @relation(fields: [formId], references: [id])
+  formId String?
+
+  candidates Candidate[]
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  USER
+}
+
+model Membership {
+  id   Int            @id @default(autoincrement())
+  role MembershipRole
+
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@unique([userId, jobId])
 }
 
 model Category {
@@ -147,40 +175,141 @@ model Stage {
 }
 
 model WorkflowStage {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   order Int
 
-  stage   Stage  @relation(fields: [stageId], references: [id])
-  stageId String
-
   workflow   Workflow @relation(fields: [workflowId], references: [id])
   workflowId String
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
 
-  @@unique([userId, workflowId, stageId])
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
 }
 
-enum MembershipRole {
-  OWNER
-  ADMIN
-  USER
-}
+model Form {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model Membership {
-  id   Int            @id @default(autoincrement())
-  role MembershipRole
+  name String
+  slug String @unique
 
-  job   Job    @relation(fields: [jobId], references: [id])
-  jobId String
+  questions FormQuestion[]
+  jobs      Job[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
-  @@unique([userId, jobId])
+
+  @@unique([userId, name])
+}
+
+model Question {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  info        String           @default("")
+  placeholder String           @default("")
+  type        QuestionType     @default(Single_line_text)
+  options     QuestionOption[]
+  required    Boolean          @default(false)
+  hidden      Boolean          @default(false)
+
+  acceptedFiles String @default("")
+
+  slug String @unique
+
+  forms FormQuestion[]
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  answers Answer[]
+
+  @@unique([userId, name])
+}
+
+model QuestionOption {
+  id        String   @id @default(cuid()) // value
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  text String
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+}
+
+enum QuestionType {
+  Single_line_text
+  Long_text
+  Attachment
+  Checkbox
+  Multiple_select
+  Single_select
+  Date
+  Phone_number
+  Email
+  URL
+  Number
+  Rating
+}
+
+model FormQuestion {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Int
+
+  form   Form   @relation(fields: [formId], references: [id])
+  formId String
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+
+  @@unique([formId, questionId])
+  @@unique([formId, questionId, order])
+}
+
+model Answer {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  value String
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+
+  @@unique([candidateId, questionId])
+  @@unique([candidateId, questionId, value])
+}
+
+model Candidate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  answers Answer[]
+
+  source CandidateSource
+
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+}
+
+enum CandidateSource {
+  Manual
+  JobBoard
+  LinkedIn
 }

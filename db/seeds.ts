@@ -1,6 +1,8 @@
 import db, { User } from "./index"
 import { SecurePassword } from "blitz"
 import seedData from "./seedData.json"
+import slugify from "slugify"
+import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 /*
  * This seed function is executed when you run `blitz db seed`.
@@ -14,8 +16,21 @@ async function createUsers() {
   for (let user of seedData.users) {
     try {
       const hashedPassword = await SecurePassword.hash(user.password.trim())
+
+      const slug = slugify(`${user.company}`, { strict: true })
+      const newSlug: string = await findFreeSlug(
+        slug,
+        async (e) => await db.user.findFirst({ where: { slug: e } })
+      )
+
       const createdUser = await db.user.create({
-        data: { email: user.email, hashedPassword, role: "USER" },
+        data: {
+          email: user.email,
+          company: user.company,
+          slug: newSlug,
+          hashedPassword,
+          role: "USER",
+        },
       })
       userArray = [...userArray, createdUser]
     } catch (err) {

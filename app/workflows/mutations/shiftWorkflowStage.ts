@@ -1,7 +1,7 @@
 import { Ctx } from "blitz"
 import db from "db"
 import Guard from "app/guard/ability"
-import { ShiftDirection } from "../types"
+import { ShiftDirection } from "types"
 
 type ShiftWorkflowStageInput = {
   workflowId: string
@@ -33,7 +33,7 @@ async function shiftWorkflowStage(
       where: { id: workflowId },
       data: {
         stages: {
-          updateMany: workflowStages?.map((ws) => {
+          update: workflowStages?.map((ws) => {
             return {
               where: {
                 id: ws.id,

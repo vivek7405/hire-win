@@ -1,15 +1,16 @@
 import { z } from "zod"
 
-export const User = z.object({
+export const UserObj = z.object({
   avatar: z
     .object({
       Location: z.string().optional(),
       Key: z.string().optional(),
     })
     .nullable(),
+  company: z.string().nonempty({ message: "Required" }),
 })
 
-export type UserInputType = z.infer<typeof User>
+export type UserInputType = z.infer<typeof UserObj>
 
 export const UserSecurity = z
   .object({

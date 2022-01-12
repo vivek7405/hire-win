@@ -17,7 +17,6 @@ async function createWorkflowStage(data: WorkflowStageInputType, ctx: Ctx) {
       order: order,
       workflowId: workflowId!,
       stageId: stageId,
-      userId: user.id,
     },
   })
 
