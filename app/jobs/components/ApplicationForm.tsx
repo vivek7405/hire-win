@@ -81,6 +81,9 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
       >
         {formQuestions.map((fq) => {
           const q = fq.question
+          if (q.hidden) {
+            return
+          }
           switch (q.type) {
             case QuestionType.Single_line_text:
               return (

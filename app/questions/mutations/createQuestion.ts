@@ -7,8 +7,7 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { optionCSS } from "react-select/dist/declarations/src/components/Option"
 
 async function createQuestion(data: QuestionInputType, ctx: Ctx) {
-  const { name, info, placeholder, type, options, required, hidden, acceptedFiles } =
-    Question.parse(data)
+  const { name, placeholder, type, options, required, hidden, acceptedFiles } = Question.parse(data)
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 
@@ -21,7 +20,6 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
   const question = await db.question.create({
     data: {
       name: name,
-      info: info,
       placeholder: placeholder,
       type: type,
       options: {

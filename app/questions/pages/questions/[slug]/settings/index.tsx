@@ -110,7 +110,6 @@ const QuestionSettingsPage = ({
         initialValues={{
           name: question?.name,
           type: question?.type,
-          info: question?.info,
           placeholder: question?.placeholder,
           required: question?.required,
           hidden: question?.hidden,

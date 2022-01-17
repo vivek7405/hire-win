@@ -39,7 +39,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
     "update",
-    "job",
+    "candidate",
     { session },
     { where: { slug: context?.params?.slug as string } }
   )

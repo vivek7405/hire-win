@@ -8,13 +8,15 @@ export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.Intrinsic
   /** Field name. */
   name: string
   /** Field label. */
-  label: string
+  label?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
+  toolbarHidden?: boolean
+  readOnly?: boolean
 }
 
 export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFieldProps>(
-  ({ label, outerProps, name, ...props }, ref) => {
+  ({ label, outerProps, name, toolbarHidden, readOnly, ...props }, ref) => {
     const {
       control,
       formState: { isSubmitting, errors },
@@ -33,13 +35,15 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
 
     return (
       <div {...outerProps}>
-        <label
-          data-testid={`${props.testid && `${props.testid}-`}label`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {label}
-        </label>
-        <div className="mt-1">
+        {label && (
+          <label
+            data-testid={`${props.testid && `${props.testid}-`}label`}
+            className="block text-sm font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
+        <div className={label && "mt-1"}>
           <Controller
             name={name}
             control={control}
@@ -52,7 +56,14 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
                 { ssr: false }
               ) as any
 
-              return <Editor editorState={value} onEditorStateChange={onChange} />
+              return (
+                <Editor
+                  toolbarHidden={toolbarHidden}
+                  readOnly={readOnly}
+                  editorState={value}
+                  onEditorStateChange={onChange}
+                />
+              )
             }}
           />
         </div>

@@ -1,0 +1,35 @@
+{
+  "environments": [
+    {
+      "id": "hire-win-prod",
+      "name": "Hire-win Prod",
+      "region": "us-west-2",
+      "source": {
+        "branch": "main"
+      },
+      "services": [
+        {
+          "id": "hire-win",
+          "name": "Hire-win",
+          "type": "fargate",
+          "cpu": 0.25,
+          "memory": 1024,
+          "domain": "hire.win",
+          "minInstances": 1,
+          "maxInstances": 1,
+          "buildCommand": "npm run build",
+          "startCommand": "npm run start",
+          "envVariables": {
+            "APP_ENV": "production",
+            "DATABASE_URL": {
+              "fromParameterStore": "production.database-url"
+            },
+            "SESSION_SECRET_KEY": {
+              "fromParameterStore": "production.session-secret-key"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

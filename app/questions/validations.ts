@@ -11,7 +11,6 @@ export type QuestionOptionInputType = z.infer<typeof QuestionOption>
 export const Question = z.object({
   id: z.string().optional(),
   name: z.string().nonempty({ message: "Name can't be empty" }),
-  info: z.string().optional(),
   placeholder: z.string().optional(),
   type: z.nativeEnum(QuestionType),
   options: z.array(QuestionOption).optional(),
