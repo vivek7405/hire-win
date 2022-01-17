@@ -26,6 +26,48 @@
             },
             "SESSION_SECRET_KEY": {
               "fromParameterStore": "production.session-secret-key"
+            },
+            "NEXT_PUBLIC_APP_URL": {
+              "fromParameterStore": "production.NEXT_PUBLIC_APP_URL"
+            },
+            "NEXT_PUBLIC_STRIPE_PUBLIC": {
+              "fromParameterStore": "production.NEXT_PUBLIC_STRIPE_PUBLIC"
+            },
+            "PORT": {
+              "fromParameterStore": "production.PORT"
+            },
+            "POSTMARK_TOKEN": {
+              "fromParameterStore": "production.POSTMARK_TOKEN"
+            },
+            "PRO2_PLAN": {
+              "fromParameterStore": "production.PRO2_PLAN"
+            },
+            "PRO_PLAN": {
+              "fromParameterStore": "production.PRO_PLAN"
+            },
+            "S3_ACCESS_KEY": {
+              "fromParameterStore": "production.S3_ACCESS_KEY"
+            },
+            "S3_BUCKET": {
+              "fromParameterStore": "production.S3_BUCKET"
+            },
+            "S3_BUCKET_REGION": {
+              "fromParameterStore": "production.S3_BUCKET_REGION"
+            },
+            "S3_SECRET_KEY": {
+              "fromParameterStore": "production.S3_SECRET_KEY"
+            },
+            "STRIPE_SECRET": {
+              "fromParameterStore": "production.STRIPE_SECRET"
+            },
+            "STRIPE_WEBHOOK": {
+              "fromParameterStore": "production.STRIPE_WEBHOOK"
+            },
+            "database-url": {
+              "fromParameterStore": "production.database-url"
+            },
+            "session-secret-key": {
+              "fromParameterStore": "production.session-secret-key"
             }
           }
         }
