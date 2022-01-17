@@ -12,7 +12,7 @@
           "id": "hire-win",
           "name": "Hire-win",
           "type": "fargate",
-          "cpu": 0.25,
+          "cpu": 0.5,
           "memory": 1024,
           "domain": "hire.win",
           "minInstances": 1,
