@@ -42,4 +42,4 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
   return job
 }
 
-export default Guard.authorize("read", "job", getJob)
+export default getJob

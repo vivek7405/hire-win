@@ -6,7 +6,7 @@ interface GetJobsInput
   extends Pick<Prisma.MembershipFindManyArgs, "where" | "orderBy" | "skip" | "take"> {}
 
 async function getJobs({ where, orderBy, skip = 0, take = 100 }: GetJobsInput, ctx: Ctx) {
-  ctx.session.$authorize()
+  // ctx.session.$authorize()
 
   const {
     items: memberships,
@@ -34,4 +34,4 @@ async function getJobs({ where, orderBy, skip = 0, take = 100 }: GetJobsInput, c
   }
 }
 
-export default Guard.authorize("readAll", "job", getJobs)
+export default getJobs

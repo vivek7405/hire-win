@@ -29,7 +29,7 @@ export const UserForm = (props: UserFormProps) => {
           placeholder="This shall appear on job board"
           testid="userUpdateCompany"
         />
-        <SingleFileUploadField accept="image/*" name="avatar" label="Avatar" />
+        <SingleFileUploadField showImage={true} accept="image/*" name="avatar" label="Avatar" />
       </Form>
     </>
   )

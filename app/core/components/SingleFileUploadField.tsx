@@ -14,6 +14,7 @@ export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElem
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   onSubmit?: (e) => void
   accept: string
+  showImage?: boolean
 }
 
 export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFileUploadProps>(
@@ -71,51 +72,48 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
             <>
               {file && file.Key && file.Key !== "" ? (
                 <div className="w-full">
-                  <label className="block text-sm text-center font-medium text-gray-700">
-                    {label}
-                  </label>
-                  {/* <div className="relative">
-                    <div
-                      className="w-full lg:w-96 h-96 rounded"
-                      style={{
-                        background: `url(${file.Location})`,
-                        backgroundSize: "cover",
-                      }}
-                    >
-                      <button
-                        className="absolute top-0 bg-red-600 text-white p-2 rounded-full hover:bg-red-800 m-2"
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          removeFile()
-                        }}
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
+                  <label className="block text-sm font-medium text-gray-700">{label}</label>
+                  {props.showImage && (
+                    <div className="flex">
+                      <img src={file?.Location} alt="avatar" width={200} className="self-center" />
+                      <div>
+                        <button
+                          className="bg-red-600 text-white p-2 rounded-full hover:bg-red-800 m-2"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            removeFile()
+                          }}
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                  </div> */}
-                  <div>
+                  )}
+                  {!props.showImage && (
                     <div>
-                      <a
-                        className="text-indigo-600 hover:text-indigo-500"
-                        href={file.Location}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {file.Key}
-                      </a>
-                      <button
-                        className="bg-red-600 text-white p-2 rounded-full hover:bg-red-800 m-2"
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          removeFile()
-                        }}
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
+                      <div>
+                        <a
+                          className="text-indigo-600 hover:text-indigo-500"
+                          href={file.Location}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {file.Key}
+                        </a>
+                        <button
+                          className="bg-red-600 text-white p-2 rounded-full hover:bg-red-800 m-2"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            removeFile()
+                          }}
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ) : (
                 <div {...getRootProps({ className: "btn-dropzone" })}>

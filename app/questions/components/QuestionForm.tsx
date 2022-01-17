@@ -86,12 +86,6 @@ export const QuestionForm = (props: QuestionFormProps) => {
           />
         )}
         <LabeledTextField
-          name="info"
-          label="Info"
-          placeholder="Question Info"
-          testid="questionInfo"
-        />
-        <LabeledTextField
           name="placeholder"
           label="Placeholder"
           placeholder="Question Placeholder"

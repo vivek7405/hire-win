@@ -214,7 +214,6 @@ model Question {
   updatedAt DateTime @updatedAt
 
   name        String
-  info        String           @default("")
   placeholder String           @default("")
   type        QuestionType     @default(Single_line_text)
   options     QuestionOption[]
