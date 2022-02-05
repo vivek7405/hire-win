@@ -10,7 +10,7 @@ import { z } from "zod"
 
 interface GetCategoryInput extends Pick<Prisma.CategoryFindFirstArgs, "where"> {}
 
-const getCategory = resolver.pipe(resolver.authorize(), async ({ where }) => {
+const getCategory = resolver.pipe(resolver.authorize(), async ({ where }: GetCategoryInput) => {
   const category = await db.category.findFirst({ where, include: { jobs: true } })
 
   if (!category) throw new NotFoundError()

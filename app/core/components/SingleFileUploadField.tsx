@@ -75,7 +75,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                   <label className="block text-sm font-medium text-gray-700">{label}</label>
                   {props.showImage && (
                     <div className="flex">
-                      <img src={file?.Location} alt="avatar" width={200} className="self-center" />
+                      <img src={file?.Location} alt="logo" width={200} className="self-center" />
                       <div>
                         <button
                           className="bg-red-600 text-white p-2 rounded-full hover:bg-red-800 m-2"
@@ -94,7 +94,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                     <div>
                       <div>
                         <a
-                          className="text-indigo-600 hover:text-indigo-500"
+                          className="text-theme-600 hover:text-theme-500"
                           href={file.Location}
                           target="_blank"
                           rel="noreferrer"
@@ -124,7 +124,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                         <p className="lg:mr-1">Drag and drop file here, </p>
                         <label
                           htmlFor="file-upload"
-                          className="cursor-pointer font-medium text-indigo-600 hover:text-indigo-500"
+                          className="cursor-pointer font-medium text-theme-600 hover:text-theme-500"
                         >
                           <button onClick={(e) => e.preventDefault()}>
                             {" "}

@@ -17,6 +17,8 @@ import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
 import toast from "react-hot-toast"
 import updateUser from "app/admin/mutations/admin/updateUser"
+import LabeledTextAreaField from "app/core/components/LabeledTextAreaField"
+import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -87,7 +89,13 @@ const SingleUserAdminPage = ({
 
           <LabeledTextField name="email" label="Email" disabled />
 
-          <LabeledTextField name="company" label="Company Name" disabled />
+          <LabeledTextField name="companyName" label="Company Name" />
+
+          <LabeledRichTextField
+            name="companyInfo"
+            label="Company Info"
+            placeholder="This shall appear on Job Board"
+          />
 
           <LabeledTextField name="createdAt" label="Created At" disabled />
 

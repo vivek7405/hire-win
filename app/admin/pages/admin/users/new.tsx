@@ -17,6 +17,9 @@ import { Form } from "app/core/components/Form"
 import toast from "react-hot-toast"
 
 import createUser from "app/admin/mutations/admin/createUser"
+import LabeledTextAreaField from "app/core/components/LabeledTextAreaField"
+import LabeledRichTextField from "app/core/components/LabeledRichTextField"
+import { EditorState, convertToRaw } from "draft-js"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -54,9 +57,12 @@ const NewUserAdminPage = ({ user }: InferGetServerSidePropsType<typeof getServer
           submitText="Submit"
           initialValues={{
             email: "",
-            company: "",
+            companyName: "",
+            companyInfo: EditorState.createEmpty(),
+            website: "",
           }}
           onSubmit={async (values) => {
+            values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())
             const toastId = toast.loading(() => <span>Creating User</span>)
             try {
               await createUserMutation({
@@ -74,7 +80,13 @@ const NewUserAdminPage = ({ user }: InferGetServerSidePropsType<typeof getServer
           subHeader={``}
         >
           <LabeledTextField name="email" label="Email" type="email" />
-          <LabeledTextField name="company" label="Company Name" />
+          <LabeledTextField name="companyName" label="Company Name" />
+          <LabeledRichTextField
+            name="companyInfo"
+            label="Company Info"
+            placeholder="This shall appear on Job Board"
+          />
+          <LabeledTextField name="website" label="Company Info" />
         </Form>
       </AdminLayout>
     </AuthLayout>

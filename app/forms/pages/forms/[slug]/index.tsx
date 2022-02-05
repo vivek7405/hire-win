@@ -55,7 +55,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const form = await invokeWithMiddleware(
         getForm,
-        { slug: context?.params?.slug! },
+        { where: { slug: context?.params?.slug!, userId: user?.id } },
         { ...context }
       )
 
@@ -162,7 +162,7 @@ export const Questions = ({ user, form }) => {
             href={Routes.QuestionSettingsPage({ slug: props.cell.row.original.question.slug })}
             passHref
           >
-            <a data-testid={`questionlink`} className="text-indigo-600 hover:text-indigo-900">
+            <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
               {props.cell.row.original.question.name}
             </a>
           </Link>
@@ -172,6 +172,9 @@ export const Questions = ({ user, form }) => {
     {
       Header: "Type",
       accessor: "question.type",
+      Cell: (props) => {
+        return props.value.toString().replaceAll("_", " ")
+      },
     },
     {
       Header: "",
@@ -261,7 +264,7 @@ export const Questions = ({ user, form }) => {
                   }
                 }}
               >
-                <ArrowUpIcon className="h-4 cursor-pointer text-indigo-500 hover:text-indigo-900" />
+                <ArrowUpIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
               </button>
             )}
 
@@ -299,7 +302,7 @@ export const Questions = ({ user, form }) => {
                   }
                 }}
               >
-                <ArrowDownIcon className="h-4 cursor-pointer text-indigo-500 hover:text-indigo-900" />
+                <ArrowDownIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
               </button>
             )}
           </>
@@ -381,7 +384,7 @@ const SingleFormPage = ({
               setOpenAddQuestion(true)
             }}
             data-testid={`open-addQuestion-modal`}
-            className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
+            className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
           >
             Add Question
           </button>
@@ -403,7 +406,7 @@ const SingleFormPage = ({
               setOpenPreviewForm(true)
             }}
             data-testid={`open-previewForm-modal`}
-            className="mr-3 float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
+            className="mr-3 float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
           >
             Preview Form
           </button>

@@ -97,7 +97,7 @@ const Candidates = (props: CandidateProps) => {
       ? {
           AND: {
             job: {
-              name: {
+              title: {
                 contains: JSON.parse(router.query.search as string),
                 mode: "insensitive",
               },
@@ -160,7 +160,7 @@ const Candidates = (props: CandidateProps) => {
               })}
               passHref
             >
-              <a className="text-indigo-600 hover:text-indigo-900">{props.cell.row.original.id}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.cell.row.original.id}</a>
             </Link>
           </>
         )
@@ -169,6 +169,9 @@ const Candidates = (props: CandidateProps) => {
     {
       Header: "Source",
       accessor: "source",
+      Cell: (props) => {
+        return props.value.toString().replace("_", " ")
+      },
     },
   ]
   props.job?.form?.questions?.forEach((formQuestion) => {
@@ -188,7 +191,7 @@ const Candidates = (props: CandidateProps) => {
               return (
                 <a
                   href={val}
-                  className="text-indigo-600 hover:text-indigo-500"
+                  className="text-theme-600 hover:text-theme-500"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -210,7 +213,7 @@ const Candidates = (props: CandidateProps) => {
               return (
                 <a
                   href={attachmentObj.Location}
-                  className="text-indigo-600 hover:text-indigo-500"
+                  className="text-theme-600 hover:text-theme-500"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -242,7 +245,7 @@ const Candidates = (props: CandidateProps) => {
             })}
             passHref
           >
-            <a className="text-indigo-600 hover:text-indigo-900">Settings</a>
+            <a className="text-theme-600 hover:text-theme-900">Settings</a>
           </Link>
         </>
       )
@@ -280,7 +283,7 @@ const CandidatesHome = ({
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
       <Link href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
-        <a className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700">
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Candidate
         </a>
       </Link>

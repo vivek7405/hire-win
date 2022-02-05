@@ -4,7 +4,7 @@ const password = z.string().min(8).max(100)
 
 export const Signup = z.object({
   email: z.string().email(),
-  company: z.string().nonempty({ message: "Required" }),
+  companyName: z.string().nonempty({ message: "Required" }),
   slug: z.string().optional(),
   password,
 })

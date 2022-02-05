@@ -85,7 +85,7 @@ const SingleJobAdminPage = ({
               )
             }
           }}
-          header={`${foundJob?.name}`}
+          header={`${foundJob?.title}`}
           subHeader={``}
         >
           <LabeledTextField name="id" label="Id" disabled />

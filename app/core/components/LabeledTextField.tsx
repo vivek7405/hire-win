@@ -44,7 +44,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             {...register(`${name}` as const)}
             {...props}
             data-testid={`${props.testid && `${props.testid}-`}input`}
-            className="border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded"
+            className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
           />
         </div>
       </div>

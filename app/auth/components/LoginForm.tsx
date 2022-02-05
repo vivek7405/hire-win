@@ -20,7 +20,7 @@ export const LoginForm = (props: LoginFormProps) => {
           Enter your login details to access your account. Or{" "}
           <Link href={Routes.SignupPage()} passHref>
             <a
-              className="text-indigo-600 hover:text-indigo-900 font-medium"
+              className="text-theme-600 hover:text-theme-900 font-medium"
               data-testid={`signupLink`}
             >
               Sign Up

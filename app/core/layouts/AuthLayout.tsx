@@ -1,7 +1,8 @@
-import { ReactNode } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { Head } from "blitz"
 import Navbar from "app/core/components/Navbar"
 import { ExtendedUser } from "types"
+import { useThemeContext } from "../hooks/useTheme"
 
 type LayoutProps = {
   title?: string
@@ -10,7 +11,13 @@ type LayoutProps = {
   hideNavbar?: boolean
 }
 
-const Layout = ({ title, children, user, hideNavbar }: LayoutProps) => {
+const AuthLayout = ({ title, children, user, hideNavbar }: LayoutProps) => {
+  const { theme, setTheme } = useThemeContext()
+  useEffect(() => {
+    const themeName = user?.theme || process.env.DEFAULT_THEME || "indigo"
+    setTheme(themeName)
+  }, [setTheme, user?.theme])
+
   return (
     <>
       <Head>
@@ -29,4 +36,4 @@ const Layout = ({ title, children, user, hideNavbar }: LayoutProps) => {
   )
 }
 
-export default Layout
+export default AuthLayout

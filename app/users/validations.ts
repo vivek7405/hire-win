@@ -1,13 +1,16 @@
 import { z } from "zod"
 
 export const UserObj = z.object({
-  avatar: z
+  logo: z
     .object({
       Location: z.string().optional(),
       Key: z.string().optional(),
     })
     .nullable(),
-  company: z.string().nonempty({ message: "Required" }),
+  companyName: z.string().nonempty({ message: "Required" }),
+  companyInfo: z.any().optional(),
+  website: z.string().url().optional(),
+  theme: z.string().optional(),
 })
 
 export type UserInputType = z.infer<typeof UserObj>

@@ -19,7 +19,7 @@ export const SignupForm = (props: SignupFormProps) => {
         <p className="text-gray-400 text-sm">
           Already have an account?{" "}
           <Link href={Routes.LoginPage()} passHref>
-            <a className="text-indigo-600 hover:text-indigo-900 font-medium">Login</a>
+            <a className="text-theme-600 hover:text-theme-900 font-medium">Login</a>
           </Link>
         </p>
       </div>
@@ -50,10 +50,10 @@ export const SignupForm = (props: SignupFormProps) => {
           testid="signupEmail"
         />
         <LabeledTextField
-          name="company"
+          name="companyName"
           label="Company Name"
           placeholder="This shall appear on job board"
-          testid="signupCompany"
+          testid="signupCompanyName"
         />
         <LabeledTextField
           name="password"

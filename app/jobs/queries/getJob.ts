@@ -16,6 +16,9 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
             include: {
               question: true,
             },
+            orderBy: {
+              order: "asc",
+            },
           },
         },
       },
@@ -26,7 +29,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
               id: true,
               email: true,
               role: true,
-              avatar: true,
+              logo: true,
               memberships: true,
               sessions: true,
               tokens: true,

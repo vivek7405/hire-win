@@ -143,9 +143,9 @@ const JobSettingsBillingPage = ({
                         View your past invoices, cancel your subscription , or update your card.
                       </p>
                     </div>
-                    <div className="mt-5 md:mt-0 md:ml-6 md:flex-shrink-0 md:flex md:items-center">
+                    <div className="mt-5 md:mt-0 md:ml-6 md:shrink-0 md:flex md:items-center">
                       <button
-                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-sm text-white bg-theme-600 hover:bg-theme-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-500 sm:text-sm"
                         onClick={async (e) => {
                           e.preventDefault()
                           try {
@@ -172,7 +172,7 @@ const JobSettingsBillingPage = ({
                         <div className="flex-1 pb-6">
                           <h3 className="text-xl font-semibold text-gray-900">{v.title}</h3>
                           <p className="mt-4 flex items-baseline text-gray-900">
-                            <span className="text-5xl text-indigo-500 font-extrabold tracking-tight">
+                            <span className="text-5xl text-theme-500 font-extrabold tracking-tight">
                               ${v.price}
                             </span>
                             <span className="ml-1 text-sm text-gray-400">{v.frequency}</span>
@@ -221,7 +221,7 @@ const JobSettingsBillingPage = ({
                               {v.features.map((feature) => (
                                 <li key={feature} className="flex">
                                   <CheckIcon
-                                    className="flex-shrink-0 w-6 h-6 text-indigo-500"
+                                    className="shrink-0 w-6 h-6 text-theme-500"
                                     aria-hidden="true"
                                   />
                                   <span className="ml-3 text-gray-500">{feature}</span>

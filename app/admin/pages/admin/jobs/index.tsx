@@ -115,7 +115,7 @@ const Jobs = ({ user }) => {
         return (
           props.value && (
             <Link href={Routes.SingleJobAdminPage({ id: props.cell.row.original.id })} passHref>
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )

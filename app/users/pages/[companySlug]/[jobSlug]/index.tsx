@@ -22,6 +22,9 @@ import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { Form } from "app/core/components/Form"
 import getJob from "app/jobs/queries/getJob"
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
+import { Country, State } from "country-state-city"
+import { titleCase } from "app/core/utils/titleCase"
+import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -79,26 +82,26 @@ const JobDescriptionPage = ({
   user,
   job,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const avatar: AttachmentObject = JSON.parse(JSON.stringify(user?.avatar)) || {
-    Location: "",
-    Key: "",
-  }
   const router = useRouter()
 
   return (
-    <AuthLayout title={`Job Description | ${user?.slug}`} user={user} hideNavbar={true}>
+    <JobApplicationLayout user={user!} job={job!}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <div className="flex justify-center items-center">
-          <img
-            src={avatar?.Location}
-            alt={`${user?.company} logo`}
-            width={200}
-            className="self-center"
-          />
-        </div>
+        <button
+          type="button"
+          className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
+          onClick={() => {
+            router.push(Routes.ApplyToJob({ companySlug: user?.slug!, jobSlug: job?.slug! }))
+          }}
+        >
+          Apply to Job
+        </button>
+
         <br />
+        <br />
+
         <Form
           initialValues={{
             description: job?.description
@@ -107,6 +110,7 @@ const JobDescriptionPage = ({
           }}
           onSubmit={async (values) => {}}
         >
+          <h3 className="text-lg font-bold">Description</h3>
           <LabeledRichTextField
             name="description"
             // label="Description"
@@ -116,17 +120,8 @@ const JobDescriptionPage = ({
             readOnly={true}
           />
         </Form>
-        <button
-          type="button"
-          className="mt-7 w-full text-white bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-700"
-          onClick={() => {
-            router.push(Routes.ApplyToJob({ companySlug: user?.slug!, jobSlug: job?.slug! }))
-          }}
-        >
-          Apply to Job
-        </button>
       </Suspense>
-    </AuthLayout>
+    </JobApplicationLayout>
   )
 }
 

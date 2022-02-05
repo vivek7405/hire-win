@@ -10,11 +10,12 @@ import {
 } from "blitz"
 import { ErrorBoundary } from "react-error-boundary"
 import LoginForm from "app/auth/components/LoginForm"
-import { Suspense } from "react"
+import { Suspense, useEffect } from "react"
 import { Toaster } from "react-hot-toast"
 import ProgressBar from "@badrap/bar-of-progress"
 import "app/core/styles/index.css"
 import { IdProvider } from "@radix-ui/react-id"
+import ThemeProvider from "app/core/hooks/useTheme"
 
 const progress = new ProgressBar({
   size: 2,
@@ -38,13 +39,15 @@ export default function App({ Component, pageProps }: AppProps) {
         onReset={useQueryErrorResetBoundary().reset}
       >
         <IdProvider>
-          <Component {...pageProps} />
-          <Toaster
-            position="bottom-right"
-            toastOptions={{
-              duration: 5000,
-            }}
-          />
+          <ThemeProvider>
+            <Component {...pageProps} />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                duration: 5000,
+              }}
+            />
+          </ThemeProvider>
         </IdProvider>
       </ErrorBoundary>
     </Suspense>

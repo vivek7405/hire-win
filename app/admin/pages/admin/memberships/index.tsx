@@ -118,7 +118,7 @@ const Memberships = ({ user }) => {
               href={Routes.SingleMembershipAdminPage({ id: props.cell.row.original.id })}
               passHref
             >
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )
@@ -138,7 +138,7 @@ const Memberships = ({ user }) => {
         return (
           props.value && (
             <Link href={Routes.SingleJobAdminPage({ id: props.value.toString() })} passHref>
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )
@@ -154,7 +154,7 @@ const Memberships = ({ user }) => {
               href={Routes.SingleUserAdminPage({ id: props.cell.row.original.userId })}
               passHref
             >
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )

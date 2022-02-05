@@ -103,7 +103,7 @@ const Sessions = ({ user }) => {
         return (
           props.value && (
             <Link href={Routes.SingleSessionAdminPage({ id: props.cell.row.original.id })} passHref>
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )
@@ -137,7 +137,7 @@ const Sessions = ({ user }) => {
         return (
           props.value && (
             <Link href={Routes.SingleUserAdminPage({ id: props.cell.row.original.id })} passHref>
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )

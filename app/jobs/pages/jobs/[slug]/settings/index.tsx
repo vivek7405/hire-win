@@ -126,7 +126,17 @@ const JobSettingsPage = ({
           header="Job Details"
           subHeader="Update your job details."
           initialValues={{
-            name: job?.name,
+            title: job?.title,
+            country: job?.country,
+            state: job?.state,
+            city: job?.city,
+            remote: job?.remote,
+            currency: job?.currency,
+            minSalary: job?.minSalary,
+            maxSalary: job?.maxSalary,
+            salaryType: job?.salaryType,
+            employmentType: job?.employmentType,
+            validThrough: job?.validThrough,
             description: job?.description
               ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
               : EditorState.createEmpty(),

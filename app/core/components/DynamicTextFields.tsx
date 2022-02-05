@@ -58,7 +58,7 @@ export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsP
             </label>
           )}
           <button type="button" title="Add Field" className="ml-3" onClick={handleAdd}>
-            <PlusIcon className="h-5 text-indigo-600" />
+            <PlusIcon className="h-5 text-theme-600" />
           </button>
         </div>
         <Controller

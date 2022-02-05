@@ -115,7 +115,7 @@ const Tokens = ({ user }) => {
         return (
           props.value && (
             <Link href={Routes.SingleTokenAdminPage({ id: props.cell.row.original.id })} passHref>
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )
@@ -166,7 +166,7 @@ const Tokens = ({ user }) => {
               href={Routes.SingleUserAdminPage({ id: props.cell.row.original.userId })}
               passHref
             >
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )
@@ -179,7 +179,7 @@ const Tokens = ({ user }) => {
         return (
           props.value && (
             <Link href={Routes.SingleJobAdminPage({ id: props.cell.row.original.jobId })} passHref>
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )
