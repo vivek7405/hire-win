@@ -104,7 +104,7 @@ const Categories = ({ user }) => {
       Cell: (props) => {
         return (
           <Link href={Routes.SingleCategoryPage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`categorylink`} className="text-indigo-600 hover:text-indigo-900">
+            <a data-testid={`categorylink`} className="text-theme-600 hover:text-theme-900">
               {props.cell.row.original.name}
             </a>
           </Link>
@@ -126,7 +126,7 @@ const Categories = ({ user }) => {
                 href={Routes.CategorySettingsPage({ slug: props.cell.row.original.slug })}
                 passHref
               >
-                <a className="text-indigo-600 hover:text-indigo-900">Settings</a>
+                <a className="text-theme-600 hover:text-theme-900">Settings</a>
               </Link>
             )}
           </>
@@ -155,7 +155,7 @@ const CategoriesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSi
   return (
     <AuthLayout title="CategoriesHome | hire-win" user={user}>
       <Link href={Routes.NewCategory()} passHref>
-        <a className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700">
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Category
         </a>
       </Link>

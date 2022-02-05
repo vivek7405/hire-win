@@ -21,7 +21,7 @@ const AdminLayout = ({ children }: LayoutProps) => {
               data-testid={`${item.name}-jobSettingsLink`}
               className={`${
                 item.current
-                  ? "bg-gray-50 text-indigo-600 hover:bg-white"
+                  ? "bg-gray-50 text-theme-600 hover:bg-white"
                   : "text-gray-900 hover:text-gray-900 hover:bg-gray-50"
               } group px-3 py-2 flex items-center text-sm font-medium`}
             >

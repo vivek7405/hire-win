@@ -107,7 +107,7 @@ const Users = ({ user }) => {
         return (
           props.value && (
             <Link href={Routes.SingleUserAdminPage({ id: props.cell.row.original.id })} passHref>
-              <a className="text-indigo-600 hover:text-indigo-900">{props.value.toString()}</a>
+              <a className="text-theme-600 hover:text-theme-900">{props.value.toString()}</a>
             </Link>
           )
         )
@@ -135,8 +135,15 @@ const Users = ({ user }) => {
       },
     },
     {
-      Header: "Company",
-      accessor: "company",
+      Header: "Company Name",
+      accessor: "companyName",
+      Cell: (props) => {
+        return props.value && props.value.toString()
+      },
+    },
+    {
+      Header: "Website",
+      accessor: "website",
       Cell: (props) => {
         return props.value && props.value.toString()
       },
@@ -149,8 +156,8 @@ const Users = ({ user }) => {
       },
     },
     {
-      Header: "Avatar",
-      accessor: "avatar",
+      Header: "Logo",
+      accessor: "logo",
       Cell: (props) => {
         return props.value && props.value.toString()
       },
@@ -181,7 +188,7 @@ const AdminUser = ({ user }: InferGetServerSidePropsType<typeof getServerSidePro
           <p>Users</p>
         </div>
         <Link href={Routes.NewUserAdminPage()}>
-          <a className="text-white bg-indigo-600 px-4 py-2 float-right rounded-sm hover:bg-indigo-700">
+          <a className="text-white bg-theme-600 px-4 py-2 float-right rounded-sm hover:bg-theme-700">
             New User
           </a>
         </Link>

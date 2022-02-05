@@ -8,11 +8,28 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 async function createJob(data: JobInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, description, categoryId, workflowId, formId } = Job.parse(data)
+  const {
+    title,
+    description,
+    categoryId,
+    workflowId,
+    formId,
+    country,
+    state,
+    city,
+    remote,
+    currency,
+    minSalary,
+    maxSalary,
+    salaryType,
+    employmentType,
+    validThrough,
+  } = Job.parse(data)
+
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(title, { strict: true })
   const newSlug = await findFreeSlug(
     slug,
     async (e) => await db.job.findFirst({ where: { slug: e } })
@@ -20,12 +37,22 @@ async function createJob(data: JobInputType, ctx: Ctx) {
 
   const job = await db.job.create({
     data: {
-      name: name,
-      description: description!,
+      title,
       slug: newSlug,
+      description,
       categoryId: categoryId || null,
       workflowId: workflowId || null,
       formId: formId || null,
+      country,
+      state,
+      city,
+      remote,
+      currency,
+      minSalary,
+      maxSalary,
+      salaryType,
+      employmentType,
+      validThrough,
       memberships: {
         create: {
           role: "OWNER",

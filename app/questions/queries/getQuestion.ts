@@ -1,20 +1,21 @@
 import Guard from "app/guard/ability"
 import { resolver, NotFoundError } from "blitz"
-import db from "db"
+import db, { Prisma } from "db"
 import { z } from "zod"
 
-const GetQuestion = z.object({
-  // This accepts type of undefined, but is required at runtime
-  slug: z.string().optional().refine(Boolean, "Required"),
-})
+// const GetQuestion = z.object({
+//   // This accepts type of undefined, but is required at runtime
+//   slug: z.string().optional().refine(Boolean, "Required"),
+// })
+
+interface GetQuestionInput extends Pick<Prisma.QuestionFindFirstArgs, "where"> {}
 
 const getQuestion = resolver.pipe(
-  resolver.zod(GetQuestion),
   resolver.authorize(),
-  async ({ slug }) => {
+  async ({ where }: GetQuestionInput, ctx) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant
     const question = await db.question.findFirst({
-      where: { slug },
+      where,
       include: { forms: true, options: true },
     })
 

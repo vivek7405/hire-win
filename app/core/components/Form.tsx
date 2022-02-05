@@ -76,7 +76,7 @@ export function Form<S extends z.ZodType<any, any>>({
                   data-testid={`${props.testid && `${props.testid}-`}submitButton`}
                   className={`${
                     submitDisabled && "disabled:opacity-50 cursor-not-allowed"
-                  } text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700`}
+                  } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700`}
                 >
                   {submitText}
                 </button>

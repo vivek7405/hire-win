@@ -125,8 +125,8 @@ const NewCandidate = ({
       <div className="mt-6">
         <ApplicationForm
           header="Job Application Form"
-          subHeader={`Apply to the job - ${job?.name}`}
-          formId={job?.form?.id!}
+          subHeader={`Apply to the job - ${job?.title}`}
+          formId={job?.formId || ""}
           preview={false}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Creating Candidate</span>)

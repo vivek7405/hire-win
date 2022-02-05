@@ -104,7 +104,7 @@ const Forms = ({ user }) => {
       Cell: (props) => {
         return (
           <Link href={Routes.SingleFormPage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`formlink`} className="text-indigo-600 hover:text-indigo-900">
+            <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-900">
               {props.cell.row.original.name}
             </a>
           </Link>
@@ -123,7 +123,7 @@ const Forms = ({ user }) => {
           <>
             {props.cell.row.original.canUpdate && (
               <Link href={Routes.FormSettingsPage({ slug: props.cell.row.original.slug })} passHref>
-                <a className="text-indigo-600 hover:text-indigo-900">Settings</a>
+                <a className="text-theme-600 hover:text-theme-900">Settings</a>
               </Link>
             )}
           </>
@@ -152,7 +152,7 @@ const FormsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSidePro
   return (
     <AuthLayout title="FormsHome | hire-win" user={user}>
       <Link href={Routes.NewForm()} passHref>
-        <a className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700">
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Form
         </a>
       </Link>

@@ -39,7 +39,7 @@ const Charts = () => {
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
       <div className="border rounded p-2">
         <h3 className="text-gray-600">💸 Paid Jobs</h3>
-        <h2 className="text-3xl text-green-500">{activeJobs}</h2>
+        <h2 className="text-3xl text-emerald-500">{activeJobs}</h2>
       </div>
 
       <div className="border rounded p-2">

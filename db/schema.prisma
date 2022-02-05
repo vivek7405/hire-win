@@ -18,11 +18,14 @@ model User {
   updatedAt DateTime @updatedAt
 
   email          String    @unique
-  company        String
+  companyName    String
+  companyInfo    Json?
+  website        String?
+  logo           Json?
+  theme          String?   @default("indigo")
   slug           String    @unique
   hashedPassword String?
   role           String    @default("USER")
-  avatar         Json?
   tokens         Token[]
   sessions       Session[]
 
@@ -77,14 +80,47 @@ enum TokenType {
   SECRET_KEY
 }
 
+enum SalaryType {
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACTOR
+  TEMPORARY
+  INTERN
+  VOLUNTEER
+  PER_DIEM
+  OTHER
+}
+
 model Job {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name        String
-  description Json?
-  slug        String @unique
+  title String
+  slug  String @unique
+
+  country String
+  state   String
+  city    String
+
+  remote Boolean
+
+  currency   String
+  minSalary  Int
+  maxSalary  Int
+  salaryType SalaryType
+
+  employmentType EmploymentType[]
+  validThrough   DateTime?
+  description    Json?
 
   stripeCustomerId       String?   @unique
   stripeSubscriptionId   String?   @unique
@@ -309,6 +345,6 @@ model Candidate {
 
 enum CandidateSource {
   Manual
-  JobBoard
+  Job_Board
   LinkedIn
 }

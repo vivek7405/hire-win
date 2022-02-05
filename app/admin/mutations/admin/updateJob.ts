@@ -12,7 +12,7 @@ type UpdateJobInput = Pick<Prisma.JobUpdateArgs, "where" | "data"> & {
 async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   ctx.session.$authorize("ADMIN")
 
-  const slug = slugify(`${data.name}`, { strict: true })
+  const slug = slugify(`${data.title}`, { strict: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.job.findFirst({ where: { slug: e } })
@@ -22,7 +22,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     where,
     data: {
       ...data,
-      slug: initial.name !== data.name ? newSlug : initial.slug,
+      slug: initial.title !== data.title ? newSlug : initial.slug,
     },
     include: {
       memberships: {

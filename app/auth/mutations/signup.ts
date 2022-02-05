@@ -7,10 +7,10 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 export default resolver.pipe(
   resolver.zod(Signup),
-  async ({ email, company, password }, ctx: Ctx) => {
+  async ({ email, companyName, password }, ctx: Ctx) => {
     const hashedPassword = await SecurePassword.hash(password.trim())
 
-    const slug = slugify(company, { strict: true })
+    const slug = slugify(companyName, { strict: true })
     const newSlug = await findFreeSlug(
       slug,
       async (e) => await db.user.findFirst({ where: { slug: e } })
@@ -19,7 +19,7 @@ export default resolver.pipe(
     const user = await db.user.create({
       data: {
         email: email.toLowerCase().trim(),
-        company: company,
+        companyName,
         slug: newSlug,
         hashedPassword,
         role: "USER",

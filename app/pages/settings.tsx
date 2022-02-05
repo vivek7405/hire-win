@@ -13,6 +13,8 @@ import SecurityForm from "app/users/components/SecurityForm"
 import toast from "react-hot-toast"
 import updateUser from "app/users/mutations/updateUser"
 import changePassword from "app/auth/mutations/changePassword"
+import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
+import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/themeHelpers"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -39,19 +41,26 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
   const router = useRouter()
   const [updateUserMutation] = useMutation(updateUser)
   const [changePasswordMutation] = useMutation(changePassword)
+
   return (
     <AuthLayout title="Settings" user={user}>
       <UserForm
         header="Profile"
         subHeader="Update your profile details."
         initialValues={{
-          avatar: user?.avatar,
-          company: user?.company,
+          logo: user?.logo,
+          companyName: user?.companyName || "",
+          companyInfo: user?.companyInfo
+            ? EditorState.createWithContent(convertFromRaw(user?.companyInfo || {}))
+            : EditorState.createEmpty(),
+          website: user?.website || "",
+          theme: user?.theme || process.env.DEFAULT_THEME || "indigo",
         }}
         onSubmit={async (values) => {
+          values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())
           const toastId = toast.loading(() => <span>Updating User</span>)
           try {
-            await updateUserMutation({
+            const updatedUser = await updateUserMutation({
               where: { id: user?.id },
               data: { ...values },
               initial: user!,

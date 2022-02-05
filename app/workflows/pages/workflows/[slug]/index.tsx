@@ -54,7 +54,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const workflow = await invokeWithMiddleware(
         getWorkflow,
-        { slug: context?.params?.slug! },
+        { where: { slug: context?.params?.slug!, userId: user?.id } },
         { ...context }
       )
 
@@ -167,7 +167,7 @@ export const Stages = ({ user, workflow }) => {
             href={Routes.StageSettingsPage({ slug: props.cell.row.original.stage.slug })}
             passHref
           >
-            <a data-testid={`stagelink`} className="text-indigo-600 hover:text-indigo-900">
+            <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
               {props.cell.row.original.stage.name}
             </a>
           </Link>
@@ -266,7 +266,7 @@ export const Stages = ({ user, workflow }) => {
                   }
                 }}
               >
-                <ArrowUpIcon className="h-4 cursor-pointer text-indigo-500 hover:text-indigo-900" />
+                <ArrowUpIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
               </button>
             )}
 
@@ -304,7 +304,7 @@ export const Stages = ({ user, workflow }) => {
                   }
                 }}
               >
-                <ArrowDownIcon className="h-4 cursor-pointer text-indigo-500 hover:text-indigo-900" />
+                <ArrowDownIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
               </button>
             )}
           </>
@@ -383,7 +383,7 @@ const SingleWorkflowPage = ({
               setOpen(true)
             }}
             data-testid={`open-addStage-modal`}
-            className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
+            className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
           >
             Add Stage
           </button>

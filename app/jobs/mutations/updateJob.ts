@@ -1,4 +1,4 @@
-import { Ctx } from "blitz"
+import { AuthenticationError, Ctx } from "blitz"
 import db, { Prisma } from "db"
 import { Job } from "app/jobs/validations"
 import slugify from "slugify"
@@ -13,9 +13,28 @@ type UpdateJobInput = Pick<Prisma.JobUpdateArgs, "where" | "data"> & {
 async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, description, categoryId, workflowId, formId } = Job.parse(data)
+  const {
+    title,
+    description,
+    categoryId,
+    workflowId,
+    formId,
+    country,
+    state,
+    city,
+    remote,
+    currency,
+    minSalary,
+    maxSalary,
+    salaryType,
+    employmentType,
+    validThrough,
+  } = Job.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  if (!user) throw new AuthenticationError()
+
+  const slug = slugify(title, { strict: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.job.findFirst({ where: { slug: e } })
@@ -24,12 +43,22 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   const job = await db.job.update({
     where,
     data: {
-      name,
-      description: description!,
+      title,
+      slug: initial.title !== title ? newSlug : initial.slug,
+      description,
       categoryId: categoryId || null,
       workflowId: workflowId || null,
       formId: formId || null,
-      slug: initial.name !== name ? newSlug : initial.slug,
+      country,
+      state,
+      city,
+      remote,
+      currency,
+      minSalary,
+      maxSalary,
+      salaryType,
+      employmentType,
+      validThrough,
     },
   })
 

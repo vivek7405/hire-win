@@ -53,7 +53,7 @@ const Navbar = ({ user }: NavbarProps) => {
   }, [])
 
   return (
-    <nav className="bg-indigo-600 py-2">
+    <nav className="bg-theme-600 py-2">
       <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
         {/* <img className="h-12 w-auto" src="/logo.svg" alt="hire-win Logo" /> */}
         <a className="h-12 w-auto cursor-pointer">
@@ -71,7 +71,9 @@ const Navbar = ({ user }: NavbarProps) => {
                 <Link href={item.href} passHref key={i}>
                   <a
                     className={`${
-                      item.current ? "text-white bg-indigo-800" : "text-white hover:text-indigo-100"
+                      item.current
+                        ? "text-white bg-theme-800"
+                        : "text-neutral-50 hover:text-neutral-200"
                     } px-3 py-2 rounded-md text-sm font-medium`}
                   >
                     {item.name}
@@ -82,7 +84,7 @@ const Navbar = ({ user }: NavbarProps) => {
           </div>
 
           <DropdownMenu.Root modal={false} open={profileOpen} onOpenChange={setProfileOpen}>
-            <DropdownMenu.Trigger className="bg-indigo-700 flex text-sm rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-700 focus:ring-white">
+            <DropdownMenu.Trigger className="bg-theme-700 flex text-sm rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
               <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100">
                 {user?.email.charAt(0).toUpperCase()}
               </div>
@@ -119,7 +121,7 @@ const Navbar = ({ user }: NavbarProps) => {
                 setMobileNavOpen(!mobileNavOpen)
               }}
             >
-              <XIcon className="h-6 w-6 text-white cursor-pointer text-indigo-400 hover:text-white" />
+              <XIcon className="h-6 w-6 text-white cursor-pointer text-theme-400 hover:text-white" />
             </button>
           ) : (
             <button
@@ -129,7 +131,7 @@ const Navbar = ({ user }: NavbarProps) => {
               }}
               data-testid="openMobileMenu"
             >
-              <MenuIcon className="h-6 w-6 text-white cursor-pointer text-indigo-400 hover:text-white" />
+              <MenuIcon className="h-6 w-6 text-white cursor-pointer text-theme-400 hover:text-white" />
             </button>
           )}
         </div>
@@ -142,7 +144,9 @@ const Navbar = ({ user }: NavbarProps) => {
               <Link href={item.href} passHref key={i}>
                 <a
                   className={`${
-                    item.current ? "text-white bg-indigo-800" : "text-white hover:text-indigo-100"
+                    item.current
+                      ? "text-white bg-theme-800"
+                      : "text-neutral-50 hover:text-neutral-200"
                   } px-3 py-2 rounded-md text-sm font-medium w-full block`}
                 >
                   {item.name}
@@ -151,14 +155,14 @@ const Navbar = ({ user }: NavbarProps) => {
             )
           })}
 
-          <div className="w-full h1 border border-indigo-700 rounded-full mt-4 mb-2" />
+          <div className="w-full h1 border border-theme-700 rounded-full mt-4 mb-2" />
 
           {dropDownNav.map((item, i) => {
             return item.href.length ? (
               <Link href={item.href} passHref key={i}>
                 <a
                   data-testid={`${item.name}-navLink`}
-                  className={`px-4 py-2 text-sm text-white hover:text-indigo-100`}
+                  className={`px-4 py-2 text-sm text-neutral-50 hover:text-neutral-200`}
                 >
                   {item.name}
                 </a>
@@ -171,7 +175,7 @@ const Navbar = ({ user }: NavbarProps) => {
                   e.preventDefault()
                   item.action && item.action()
                 }}
-                className="px-4 py-2 text-left text-sm text-white hover:text-indigo-100"
+                className="px-4 py-2 text-left text-sm text-neutral-50 hover:text-neutral-200"
               >
                 {item.name}
               </button>

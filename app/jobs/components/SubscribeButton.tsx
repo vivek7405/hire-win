@@ -44,7 +44,7 @@ export default function SubscribeButton({
 
   return (
     <button
-      className="text-white bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-700"
+      className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
       data-testid={`${testid && `${testid}-`}upgradeButton`}
       onClick={(e) => {
         e.preventDefault()

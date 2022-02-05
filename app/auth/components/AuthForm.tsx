@@ -58,7 +58,7 @@ export function AuthForm<S extends z.ZodType<any, any>>({
             type="submit"
             disabled={ctx.formState.isSubmitting}
             data-testid={`${props.testid && `${props.testid}-`}submitButton`}
-            className="w-full text-white bg-indigo-600 px-4 py-2 rounded hover:bg-indigo-700"
+            className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
           >
             {submitText}
           </button>

@@ -22,7 +22,11 @@ async function getJobs({ where, orderBy, skip = 0, take = 100 }: GetJobsInput, c
         where,
         orderBy,
         include: {
-          job: true,
+          job: {
+            include: {
+              category: true,
+            },
+          },
         },
       }),
   })

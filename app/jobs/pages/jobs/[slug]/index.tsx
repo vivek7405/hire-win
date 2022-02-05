@@ -96,13 +96,13 @@ const SingleJobPage = ({
       <br />
       {canUpdate && (
         <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
-          <a data-testid={`${job?.name && `${job?.name}-`}settingsLink`}>Settings</a>
+          <a data-testid={`${job?.title && `${job?.title}-`}settingsLink`}>Settings</a>
         </Link>
       )}
       <br />
       {canUpdate && (
         <Link href={Routes.CandidatesHome({ slug: job?.slug! })} passHref>
-          <a data-testid={`${job?.name && `${job?.name}-`}candidates`}>Candidates</a>
+          <a data-testid={`${job?.title && `${job?.title}-`}candidates`}>Candidates</a>
         </Link>
       )}
     </AuthLayout>

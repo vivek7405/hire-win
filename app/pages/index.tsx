@@ -101,13 +101,13 @@ const Jobs = ({ user }) => {
       accessor: "id",
     },
     {
-      Header: "Name",
-      accessor: "name",
+      Header: "Title",
+      accessor: "title",
       Cell: (props) => {
         return (
           <Link href={Routes.CandidatesHome({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`joblink`} className="text-indigo-600 hover:text-indigo-900">
-              {props.cell.row.original.name}
+            <a data-testid={`joblink`} className="text-theme-600 hover:text-theme-900">
+              {props.value}
             </a>
           </Link>
         )
@@ -125,7 +125,7 @@ const Jobs = ({ user }) => {
           <>
             {props.cell.row.original.canUpdate && (
               <Link href={Routes.JobSettingsPage({ slug: props.cell.row.original.slug })} passHref>
-                <a className="text-indigo-600 hover:text-indigo-900">Settings</a>
+                <a className="text-theme-600 hover:text-theme-900">Settings</a>
               </Link>
             )}
           </>
@@ -154,7 +154,7 @@ const Home = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) 
   return (
     <AuthLayout title="Home | hire-win" user={user}>
       <Link href={Routes.NewJob()} passHref>
-        <a className="float-right text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700">
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Job
         </a>
       </Link>

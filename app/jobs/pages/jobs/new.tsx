@@ -56,9 +56,9 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
             const toastId = toast.loading(() => <span>Creating Job</span>)
             try {
               values.description = convertToRaw(values?.description?.getCurrentContent())
-              await createJobMutation(values)
+              const createdJob = await createJobMutation(values)
               toast.success(() => <span>Job Created</span>, { id: toastId })
-              router.push(Routes.Home())
+              router.push(Routes.JobSettingsPage({ slug: createdJob?.slug }))
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()

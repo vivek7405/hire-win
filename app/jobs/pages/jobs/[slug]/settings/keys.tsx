@@ -288,7 +288,7 @@ const JobSettingsKeysPage = ({
                     setModalOpen(true)
                   }}
                   data-testid={`open-secretToken-modal`}
-                  className="text-white bg-indigo-600 px-4 py-2 rounded-sm hover:bg-indigo-700"
+                  className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
                 >
                   Generate New Keys
                 </button>

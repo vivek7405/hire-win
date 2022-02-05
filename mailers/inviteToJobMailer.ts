@@ -30,7 +30,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
     to,
     subject: "You have been invited to a job",
     html: `
-      <h1>You've been invited to ${job?.name}</h1>
+      <h1>You've been invited to ${job?.title}</h1>
 
       <a href="${webhookUrl}">
         Click here to accept your invite

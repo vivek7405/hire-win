@@ -1,4 +1,4 @@
-import { CandidateSource } from "@prisma/client"
+import { CandidateSource, EmploymentType, SalaryType } from "@prisma/client"
 import { z } from "zod"
 
 // type Literal = boolean | null | number | string
@@ -10,13 +10,27 @@ import { z } from "zod"
 
 export const Job = z.object({
   id: z.string().optional(),
-  name: z.string().nonempty({ message: "Name can't be empty" }),
+  title: z.string().nonempty({ message: "Required" }),
   description: z.any(),
   categoryId: z.string().optional(),
   workflowId: z.string().optional(),
   formId: z.string().optional(),
   slug: z.string().optional(),
   stripeSubscriptionId: z.string().optional(),
+
+  country: z.string(),
+  state: z.string(),
+  city: z.string(),
+
+  remote: z.boolean(),
+
+  currency: z.string(),
+  minSalary: z.number(),
+  maxSalary: z.number(),
+  salaryType: z.nativeEnum(SalaryType),
+
+  employmentType: z.array(z.nativeEnum(EmploymentType)),
+  validThrough: z.date(),
 })
 export type JobInputType = z.infer<typeof Job>
 

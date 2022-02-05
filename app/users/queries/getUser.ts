@@ -14,8 +14,10 @@ async function getUser({ where }: GetUserInput, ctx: Ctx) {
             select: {
               id: true,
               email: true,
-              company: true,
-              avatar: true,
+              companyName: true,
+              companyInfo: true,
+              website: true,
+              logo: true,
             },
           },
           job: {

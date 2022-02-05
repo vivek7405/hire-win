@@ -37,7 +37,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const stage = await invokeWithMiddleware(
         getStage,
-        { slug: context?.params?.slug! },
+        { where: { slug: context?.params?.slug!, userId: user?.id } },
         { ...context }
       )
 

@@ -3,6 +3,7 @@ import { SecurePassword } from "blitz"
 import seedData from "./seedData.json"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import { Job } from "app/jobs/validations"
 
 /*
  * This seed function is executed when you run `blitz db seed`.
@@ -17,7 +18,7 @@ async function createUsers() {
     try {
       const hashedPassword = await SecurePassword.hash(user.password.trim())
 
-      const slug = slugify(`${user.company}`, { strict: true })
+      const slug = slugify(`${user.companyName}`, { strict: true })
       const newSlug: string = await findFreeSlug(
         slug,
         async (e) => await db.user.findFirst({ where: { slug: e } })
@@ -26,7 +27,7 @@ async function createUsers() {
       const createdUser = await db.user.create({
         data: {
           email: user.email,
-          company: user.company,
+          companyName: user.companyName,
           slug: newSlug,
           hashedPassword,
           role: "USER",
@@ -41,11 +42,44 @@ async function createUsers() {
 
 async function createJobs() {
   for (let job of seedData.jobs) {
+    const {
+      title,
+      description,
+      categoryId,
+      workflowId,
+      formId,
+      country,
+      state,
+      city,
+      remote,
+      currency,
+      minSalary,
+      maxSalary,
+      salaryType,
+      employmentType,
+      validThrough,
+      slug,
+    } = Job.parse(job)
+
     try {
       const createdJob = await db.job.create({
         data: {
-          name: job.name,
-          slug: job.slug,
+          title,
+          slug: slug!,
+          description,
+          categoryId: categoryId || null,
+          workflowId: workflowId || null,
+          formId: formId || null,
+          country,
+          state,
+          city,
+          remote,
+          currency,
+          minSalary,
+          maxSalary,
+          salaryType,
+          employmentType,
+          validThrough,
           memberships: {
             create: {
               role: "OWNER",

@@ -79,7 +79,7 @@ entities.map((e, i) => {
                         j.jsxOpeningElement(j.jsxIdentifier("a"), [
                           j.jsxAttribute(
                             j.jsxIdentifier("className"),
-                            j.literal("text-indigo-600 hover:text-indigo-900")
+                            j.literal("text-theme-600 hover:text-theme-900")
                           ),
                         ]),
                         j.jsxClosingElement(j.jsxIdentifier("a")),

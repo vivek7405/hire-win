@@ -65,7 +65,7 @@ export const RadioGroupField = forwardRef<HTMLInputElement, RadioGroupFieldProps
                             rounded-full
                             p-1
                             top-1
-                            after:bg-indigo-500 after:block after:w-2 after:h-2 after:rounded-full
+                            after:bg-theme-500 after:block after:w-2 after:h-2 after:rounded-full
                           `}
                         />
                         <span className="pl-8">{option}</span>
