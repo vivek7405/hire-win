@@ -55,7 +55,7 @@ const JobApplicationLayout = ({ children, user, job, isJobBoard }: JobApplicatio
                   Remote
                 </span>
               )}
-              <div className="flex">
+              <div className="flex flex-wrap justify-center items-center mx-3">
                 <span>{job?.city},&nbsp;</span>
                 <span>
                   {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name},&nbsp;

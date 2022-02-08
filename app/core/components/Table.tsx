@@ -54,7 +54,7 @@ const Table = ({
         <input
           placeholder="Search"
           type="text"
-          className="border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded"
+          className="border border-gray-300 lg:w-1/4 px-2 py-2 w-full rounded"
           onChange={(e) => {
             execDebouncer(e)
           }}
