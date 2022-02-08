@@ -176,6 +176,7 @@ const Jobs = ({ user }) => {
       totalCount={count}
       startPage={startPage}
       endPage={endPage}
+      noMarginRight={true}
     />
   )
 }

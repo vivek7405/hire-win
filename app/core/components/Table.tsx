@@ -4,6 +4,20 @@ import "regenerator-runtime/runtime"
 import Debouncer from "app/core/utils/debouncer"
 import Pagination from "./Pagination"
 
+type TableProps = {
+  columns: any
+  data: any
+  pageCount: any
+  pageIndex: any
+  pageSize: any
+  hasNext: any
+  hasPrevious: any
+  totalCount: any
+  startPage: any
+  endPage: any
+  noMarginRight?: boolean
+}
+
 const Table = ({
   columns,
   data,
@@ -15,7 +29,8 @@ const Table = ({
   totalCount,
   startPage,
   endPage,
-}) => {
+  noMarginRight,
+}: TableProps) => {
   const router = useRouter()
   const { getTableProps, getTableBodyProps, headerGroups, prepareRow, page } = useTable(
     {
@@ -54,7 +69,9 @@ const Table = ({
         <input
           placeholder="Search"
           type="text"
-          className="border border-gray-300 lg:w-1/4 px-2 py-2 w-full rounded"
+          className={`border border-gray-300 ${
+            !noMarginRight && `mr-2`
+          } lg:w-1/4 px-2 py-2 w-full rounded`}
           onChange={(e) => {
             execDebouncer(e)
           }}
