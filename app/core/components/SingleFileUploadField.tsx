@@ -126,10 +126,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                           htmlFor="file-upload"
                           className="cursor-pointer font-medium text-theme-600 hover:text-theme-500"
                         >
-                          <button onClick={(e) => e.preventDefault()}>
-                            {" "}
-                            or click to select image
-                          </button>
+                          <button onClick={(e) => e.preventDefault()}> or click to select</button>
                           <input
                             {...props}
                             {...getInputProps()}
