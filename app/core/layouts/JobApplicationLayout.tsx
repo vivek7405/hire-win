@@ -3,7 +3,6 @@ import { Head, Link, Routes, Script } from "blitz"
 import { AttachmentObject, ExtendedJob, ExtendedUser } from "types"
 import { Country, State } from "country-state-city"
 import { titleCase } from "../utils/titleCase"
-import { useThemeContext } from "../hooks/useTheme"
 import draftToHtml from "draftjs-to-html"
 import moment from "moment"
 
@@ -67,7 +66,7 @@ const JobApplicationLayout = ({
 }: JobApplicationLayoutProps) => {
   const logo = user?.logo as AttachmentObject
 
-  const { theme, setTheme } = useThemeContext()
+  const [theme, setTheme] = useState(user?.theme || process.env.DEFAULT_THEME || "indigo")
   useEffect(() => {
     const themeName = user?.theme || process.env.DEFAULT_THEME || "indigo"
     setTheme(themeName)
@@ -102,7 +101,7 @@ const JobApplicationLayout = ({
           />
         )}
       </Head>
-      <div className="min-h-screen flex flex-col justify-between space-y-6">
+      <div className={`min-h-screen flex flex-col justify-between space-y-6 theme-${theme}`}>
         <header className="py-10 bg-white">
           <div className="flex justify-center items-center">
             <span className="self-center cursor-pointer">

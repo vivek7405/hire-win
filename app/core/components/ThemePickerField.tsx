@@ -66,9 +66,9 @@ export const ThemePickerField = forwardRef<HTMLInputElement, ThemePickerFieldPro
                 <div className="flex items-center">
                   <div className="w-40">
                     <LabeledColorField
-                      name="pickTheme"
-                      label="Pick Theme"
-                      testid="userUpdatePickTheme"
+                      name="pickColor"
+                      label="Pick Color"
+                      testid="userUpdatePickColor"
                       defaultValue={nearestThemeColorObj?.value || defaultColorValue}
                       value={userSelectedColorValue}
                       onChange={(e) => {
@@ -87,9 +87,9 @@ export const ThemePickerField = forwardRef<HTMLInputElement, ThemePickerFieldPro
                   <div className="mx-16">&#8594;</div>
                   <div className="w-40">
                     <LabeledColorField
-                      name="appliedTheme"
-                      label="Applied Theme"
-                      testid="userUpdateTheme"
+                      name="appliedColor"
+                      label="Applied Color"
+                      testid="userUpdateAppliedColor"
                       // defaultValue={nearestThemeColorObj?.value || defaultColorValue}
                       value={nearestThemeColorObj?.value || defaultColorValue}
                       disabled={true}
