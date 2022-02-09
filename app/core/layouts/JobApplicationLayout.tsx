@@ -15,7 +15,7 @@ type JobApplicationLayoutProps = {
   addGoogleJobPostingScript?: boolean
 }
 
-function getStructuredDataForGoogleJobPosting(job: ExtendedJob, user: ExtendedUser) {
+function getGoogleJobPostingScript(job: ExtendedJob, user: ExtendedUser) {
   return (
     <script type="application/ld+json">
       {{
@@ -76,9 +76,9 @@ const JobApplicationLayout = ({
     const themeName = user?.theme || process.env.DEFAULT_THEME || "indigo"
     setTheme(themeName)
 
-    if (addGoogleJobPostingScript && user && job) {
-      console.log(getStructuredDataForGoogleJobPosting(job, user))
-    }
+    // if (addGoogleJobPostingScript && user && job) {
+    //   console.log(getGoogleJobPostingScript(job, user))
+    // }
   }, [setTheme, user?.theme, user, job, addGoogleJobPostingScript])
 
   return (
@@ -93,10 +93,10 @@ const JobApplicationLayout = ({
           )}`}</title>
         )}
         <link rel="icon" href="/favicon.ico" />
-        {addGoogleJobPostingScript &&
+        {/* {addGoogleJobPostingScript &&
           user &&
           job &&
-          getStructuredDataForGoogleJobPosting(job, user)}
+          getGoogleJobPostingScript(job, user)} */}
       </Head>
       <div className="min-h-screen flex flex-col justify-between space-y-6">
         <header className="py-10 bg-white">

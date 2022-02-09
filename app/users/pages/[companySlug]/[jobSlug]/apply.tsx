@@ -86,11 +86,6 @@ const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerS
   const router = useRouter()
   const [createCandidateMutation] = useMutation(createCandidate)
 
-  // useEffect(() => {
-  //   // ADDED FOR TESTING
-  //   user && job && console.log(getJobStructuredData(job, user))
-  // }, [user, job])
-
   return (
     <JobApplicationLayout user={user} job={job} addGoogleJobPostingScript={true}>
       <Suspense
