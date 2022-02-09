@@ -3,10 +3,7 @@ import { Head, Link, Routes } from "blitz"
 import { AttachmentObject, ExtendedJob, ExtendedUser } from "types"
 import { Country, State } from "country-state-city"
 import { titleCase } from "../utils/titleCase"
-import draftToHtml from "draftjs-to-html"
 import { useThemeContext } from "../hooks/useTheme"
-import LabeledRichTextField from "../components/LabeledRichTextField"
-import moment from "moment"
 
 type JobApplicationLayoutProps = {
   children: ReactNode
@@ -16,77 +13,14 @@ type JobApplicationLayoutProps = {
   addGoogleJobStructuredData?: boolean
 }
 
-type GoogleJobStructuredDataProps = {
-  job: ExtendedJob
-  user: ExtendedUser
-}
-
-function getJobStructuredData(job: ExtendedJob, user: ExtendedUser) {
-  return {
-    "@context": "https://schema.org/",
-    "@type": "JobPosting",
-    title: job.title,
-    description: draftToHtml(job.description),
-    identifier: {
-      "@type": "PropertyValue",
-      name: user.companyName,
-      value: job.id,
-    },
-    datePosted: moment(job.createdAt).format("YYYY-MM-DD"),
-    validThrough: moment(job.validThrough).format("YYYY-MM-DDT00:00"),
-    employmentType: job.employmentType,
-    hiringOrganization: {
-      "@type": "Organization",
-      name: user.companyName,
-      sameAs: user.website,
-      logo: (user.logo as AttachmentObject)?.Location,
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: job.city,
-        addressRegion: job.state,
-        addressCountry: job.country,
-      },
-    },
-    jobLocationType: job.remote ? "TELECOMMUTE" : "",
-    baseSalary: {
-      "@type": "MonetaryAmount",
-      currency: job.currency,
-      value: {
-        "@type": "QuantitativeValue",
-        minValue: job.minSalary,
-        maxValue: job.maxSalary,
-        unitText: job.salaryType,
-      },
-    },
-  }
-}
-const GoogleJobStructuredData = ({ job, user }: GoogleJobStructuredDataProps) => {
-  return <script type="application/ld+json">{getJobStructuredData(job, user)}</script>
-}
-
-const JobApplicationLayout = ({
-  children,
-  user,
-  job,
-  isJobBoard,
-  addGoogleJobStructuredData,
-}: JobApplicationLayoutProps) => {
-  const logo: AttachmentObject = JSON.parse(JSON.stringify(user?.logo)) || {
-    Location: "",
-    Key: "",
-  }
+const JobApplicationLayout = ({ children, user, job, isJobBoard }: JobApplicationLayoutProps) => {
+  const logo = user?.logo as AttachmentObject
 
   const { theme, setTheme } = useThemeContext()
   useEffect(() => {
     const themeName = user?.theme || process.env.DEFAULT_THEME || "indigo"
     setTheme(themeName)
-
-    // ADDED CONSOLE LOG FOR TESTING
-    addGoogleJobStructuredData && job && console.log(getJobStructuredData(job, user))
-  }, [setTheme, user?.theme, job, user, addGoogleJobStructuredData])
+  }, [setTheme, user?.theme])
 
   return (
     <>
@@ -99,10 +33,7 @@ const JobApplicationLayout = ({
             user?.companyName?.toLocaleLowerCase()
           )}`}</title>
         )}
-
         <link rel="icon" href="/favicon.ico" />
-
-        {addGoogleJobStructuredData && job && <GoogleJobStructuredData job={job!} user={user!} />}
       </Head>
       <div className="min-h-screen flex flex-col justify-between space-y-6">
         <header className="py-10 bg-white">
