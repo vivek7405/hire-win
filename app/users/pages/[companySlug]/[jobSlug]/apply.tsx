@@ -93,40 +93,40 @@ function getJobStructuredData(job: ExtendedJob, user: ExtendedUser) {
   return {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
-    title: job.title,
-    description: draftToHtml(job.description),
+    title: job?.title,
+    description: draftToHtml(job?.description),
     identifier: {
       "@type": "PropertyValue",
-      name: user.companyName,
-      value: job.id,
+      name: user?.companyName,
+      value: job?.id,
     },
-    datePosted: moment(job.createdAt).format("YYYY-MM-DD"),
-    validThrough: moment(job.validThrough).format("YYYY-MM-DDT00:00"),
-    employmentType: job.employmentType,
+    datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
+    validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
+    employmentType: job?.employmentType,
     hiringOrganization: {
       "@type": "Organization",
-      name: user.companyName,
-      sameAs: user.website,
-      logo: (user.logo as AttachmentObject)?.Location,
+      name: user?.companyName,
+      sameAs: user?.website,
+      logo: (user?.logo as AttachmentObject)?.Location,
     },
     jobLocation: {
       "@type": "Place",
       address: {
         "@type": "PostalAddress",
-        addressLocality: job.city,
-        addressRegion: job.state,
-        addressCountry: job.country,
+        addressLocality: job?.city,
+        addressRegion: job?.state,
+        addressCountry: job?.country,
       },
     },
-    jobLocationType: job.remote ? "TELECOMMUTE" : "",
+    jobLocationType: job?.remote ? "TELECOMMUTE" : "",
     baseSalary: {
       "@type": "MonetaryAmount",
-      currency: job.currency,
+      currency: job?.currency,
       value: {
         "@type": "QuantitativeValue",
-        minValue: job.minSalary,
-        maxValue: job.maxSalary,
-        unitText: job.salaryType,
+        minValue: job?.minSalary,
+        maxValue: job?.maxSalary,
+        unitText: job?.salaryType,
       },
     },
   }
@@ -144,11 +144,12 @@ const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerS
   const [createCandidateMutation] = useMutation(createCandidate)
 
   useEffect(() => {
-    job && user && console.log(getJobStructuredData(job, user))
-  }, [job, user])
+    // ADDED FOR TESTING
+    user && job && console.log(getJobStructuredData(job, user))
+  }, [user, job])
 
   return (
-    <JobApplicationLayout user={user!} job={job!}>
+    <JobApplicationLayout user={user} job={job}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >

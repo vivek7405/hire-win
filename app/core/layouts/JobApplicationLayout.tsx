@@ -7,7 +7,7 @@ import { useThemeContext } from "../hooks/useTheme"
 
 type JobApplicationLayoutProps = {
   children: ReactNode
-  user: ExtendedUser
+  user?: ExtendedUser
   job?: ExtendedJob
   isJobBoard?: boolean
   addGoogleJobStructuredData?: boolean
@@ -39,9 +39,11 @@ const JobApplicationLayout = ({ children, user, job, isJobBoard }: JobApplicatio
         <header className="py-10 bg-white">
           <div className="flex justify-center items-center">
             <span className="self-center cursor-pointer">
-              <Link href={Routes.JobBoard({ companySlug: user?.slug })}>
-                <img src={logo?.Location} alt={`${user?.companyName} logo`} width={200} />
-              </Link>
+              {user?.slug && (
+                <Link href={Routes.JobBoard({ companySlug: user?.slug })}>
+                  <img src={logo?.Location} alt={`${user?.companyName} logo`} width={200} />
+                </Link>
+              )}
             </span>
           </div>
           {!isJobBoard && (
@@ -58,11 +60,11 @@ const JobApplicationLayout = ({ children, user, job, isJobBoard }: JobApplicatio
                   {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name},&nbsp;
                 </span>
                 <span>{Country.getCountryByCode(job?.country!)?.name}</span>
-                {job?.category && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{job.category?.name}</span>}
+                {job?.category && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{job?.category?.name}</span>}
                 {job?.employmentType && (
                   <span>
                     &nbsp;&nbsp;·&nbsp;&nbsp;
-                    {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
+                    {titleCase(job?.employmentType?.join(" ")?.replaceAll("_", " "))}
                   </span>
                 )}
               </div>
@@ -81,12 +83,14 @@ const JobApplicationLayout = ({ children, user, job, isJobBoard }: JobApplicatio
             <div className="flex justify-center items-center">
               {!isJobBoard && (
                 <span className="hover:text-neutral-200">
-                  <Link href={Routes.JobBoard({ companySlug: user?.slug })}>View all jobs</Link>
+                  {user?.slug && (
+                    <Link href={Routes.JobBoard({ companySlug: user?.slug })}>View all jobs</Link>
+                  )}
                 </span>
               )}
               <span className="hover:text-neutral-200">
                 {user?.website && (
-                  <a href={user.website} target="_blank" rel="noreferrer">
+                  <a href={user?.website} target="_blank" rel="noreferrer">
                     {!isJobBoard && <>&nbsp;&nbsp;·&nbsp;&nbsp;</>}View Website
                   </a>
                 )}
