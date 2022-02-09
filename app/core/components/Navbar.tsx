@@ -121,7 +121,7 @@ const Navbar = ({ user }: NavbarProps) => {
                 setMobileNavOpen(!mobileNavOpen)
               }}
             >
-              <XIcon className="h-6 w-6 text-white cursor-pointer text-theme-400 hover:text-white" />
+              <XIcon className="h-6 w-6 text-white cursor-pointer" />
             </button>
           ) : (
             <button
@@ -131,7 +131,7 @@ const Navbar = ({ user }: NavbarProps) => {
               }}
               data-testid="openMobileMenu"
             >
-              <MenuIcon className="h-6 w-6 text-white cursor-pointer text-theme-400 hover:text-white" />
+              <MenuIcon className="h-6 w-6 text-white cursor-pointer" />
             </button>
           )}
         </div>
