@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react"
-import { Head, Link, Routes } from "blitz"
+import { Head, Link, Routes, Script } from "blitz"
 import { AttachmentObject, ExtendedJob, ExtendedUser } from "types"
 import { Country, State } from "country-state-city"
 import { titleCase } from "../utils/titleCase"
@@ -13,6 +13,49 @@ type JobApplicationLayoutProps = {
   job?: ExtendedJob
   isJobBoard?: boolean
   addGoogleJobPostingScript?: boolean
+}
+
+function getGoogleJobPostingStructuredData(user: ExtendedUser, job: ExtendedJob) {
+  return {
+    "@context": "https://schema.org/",
+    "@type": "JobPosting",
+    title: job?.title,
+    description: draftToHtml(job?.description),
+    identifier: {
+      "@type": "PropertyValue",
+      name: user?.companyName,
+      value: job?.id,
+    },
+    datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
+    validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
+    employmentType: job?.employmentType,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: user?.companyName,
+      sameAs: user?.website,
+      logo: (user?.logo as AttachmentObject)?.Location,
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: job?.city,
+        addressRegion: job?.state,
+        addressCountry: job?.country,
+      },
+    },
+    jobLocationType: job?.remote ? "TELECOMMUTE" : "",
+    baseSalary: {
+      "@type": "MonetaryAmount",
+      currency: job?.currency,
+      value: {
+        "@type": "QuantitativeValue",
+        minValue: job?.minSalary,
+        maxValue: job?.maxSalary,
+        unitText: job?.salaryType,
+      },
+    },
+  }
 }
 
 const JobApplicationLayout = ({
@@ -30,6 +73,13 @@ const JobApplicationLayout = ({
     setTheme(themeName)
   }, [setTheme, user?.theme])
 
+  // ADDED FOR TESTING
+  useEffect(() => {
+    if (addGoogleJobPostingScript && user && job) {
+      console.log(getGoogleJobPostingStructuredData(user, job))
+    }
+  }, [user, job, addGoogleJobPostingScript])
+
   return (
     <>
       <Head>
@@ -43,52 +93,13 @@ const JobApplicationLayout = ({
         )}
         <link rel="icon" href="/favicon.ico" />
         {addGoogleJobPostingScript && user && job && (
-          <script type="application/ld+json">
-            {addGoogleJobPostingScript && user && job
-              ? {
-                  "@context": "https://schema.org/",
-                  "@type": "JobPosting",
-                  title: job?.title,
-                  description: draftToHtml(job?.description),
-                  identifier: {
-                    "@type": "PropertyValue",
-                    name: user?.companyName,
-                    value: job?.id,
-                  },
-                  datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
-                  validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
-                  employmentType: job?.employmentType,
-                  hiringOrganization: {
-                    "@type": "Organization",
-                    name: user?.companyName,
-                    sameAs: user?.website,
-                    logo: (user?.logo as AttachmentObject)?.Location,
-                  },
-                  jobLocation: {
-                    "@type": "Place",
-                    address: {
-                      "@type": "PostalAddress",
-                      addressLocality: job?.city,
-                      addressRegion: job?.state,
-                      addressCountry: job?.country,
-                    },
-                  },
-                  jobLocationType: job?.remote ? "TELECOMMUTE" : "",
-                  baseSalary: {
-                    "@type": "MonetaryAmount",
-                    currency: job?.currency,
-                    value: {
-                      "@type": "QuantitativeValue",
-                      minValue: job?.minSalary,
-                      maxValue: job?.maxSalary,
-                      unitText: job?.salaryType,
-                    },
-                  },
-                }
-              : {
-                  "@context": "https://schema.org/",
-                }}
-          </script>
+          <script
+            id={`jobJSON-${job?.id}`}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(getGoogleJobPostingStructuredData(user, job)),
+            }}
+          />
         )}
       </Head>
       <div className="min-h-screen flex flex-col justify-between space-y-6">
