@@ -85,8 +85,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 type GoogleJobStructuredDataProps = {
-  job: ExtendedJob
-  user: ExtendedUser
+  job?: ExtendedJob
+  user?: ExtendedUser
 }
 
 function getJobStructuredData(job: ExtendedJob, user: ExtendedUser) {
@@ -132,19 +132,19 @@ function getJobStructuredData(job: ExtendedJob, user: ExtendedUser) {
   }
 }
 const GoogleJobStructuredData = ({ job, user }: GoogleJobStructuredDataProps) => {
-  return <script type="application/ld+json">{getJobStructuredData(job, user)}</script>
+  return (
+    <>
+      {job && user && <script type="application/ld+json">{getJobStructuredData(job, user)}</script>}
+    </>
+  )
 }
 
 const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const logo: AttachmentObject = JSON.parse(JSON.stringify(user?.logo)) || {
-    Location: "",
-    Key: "",
-  }
   const router = useRouter()
   const [createCandidateMutation] = useMutation(createCandidate)
 
   useEffect(() => {
-    console.log(getJobStructuredData(job!, user!))
+    job && user && console.log(getJobStructuredData(job, user))
   }, [job, user])
 
   return (
@@ -153,7 +153,7 @@ const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerS
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <Head>
-          <GoogleJobStructuredData job={job!} user={user!} />
+          <GoogleJobStructuredData job={job} user={user} />
         </Head>
         <button
           type="button"
