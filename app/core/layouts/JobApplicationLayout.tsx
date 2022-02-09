@@ -42,52 +42,54 @@ const JobApplicationLayout = ({
           )}`}</title>
         )}
         <link rel="icon" href="/favicon.ico" />
-        <script type="application/ld+json">
-          {addGoogleJobPostingScript && user && job
-            ? {
-                "@context": "https://schema.org/",
-                "@type": "JobPosting",
-                title: job?.title,
-                description: draftToHtml(job?.description),
-                identifier: {
-                  "@type": "PropertyValue",
-                  name: user?.companyName,
-                  value: job?.id,
-                },
-                datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
-                validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
-                employmentType: job?.employmentType,
-                hiringOrganization: {
-                  "@type": "Organization",
-                  name: user?.companyName,
-                  sameAs: user?.website,
-                  logo: (user?.logo as AttachmentObject)?.Location,
-                },
-                jobLocation: {
-                  "@type": "Place",
-                  address: {
-                    "@type": "PostalAddress",
-                    addressLocality: job?.city,
-                    addressRegion: job?.state,
-                    addressCountry: job?.country,
+        {addGoogleJobPostingScript && user && job && (
+          <script type="application/ld+json">
+            {addGoogleJobPostingScript && user && job
+              ? {
+                  "@context": "https://schema.org/",
+                  "@type": "JobPosting",
+                  title: job?.title,
+                  description: draftToHtml(job?.description),
+                  identifier: {
+                    "@type": "PropertyValue",
+                    name: user?.companyName,
+                    value: job?.id,
                   },
-                },
-                jobLocationType: job?.remote ? "TELECOMMUTE" : "",
-                baseSalary: {
-                  "@type": "MonetaryAmount",
-                  currency: job?.currency,
-                  value: {
-                    "@type": "QuantitativeValue",
-                    minValue: job?.minSalary,
-                    maxValue: job?.maxSalary,
-                    unitText: job?.salaryType,
+                  datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
+                  validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
+                  employmentType: job?.employmentType,
+                  hiringOrganization: {
+                    "@type": "Organization",
+                    name: user?.companyName,
+                    sameAs: user?.website,
+                    logo: (user?.logo as AttachmentObject)?.Location,
                   },
-                },
-              }
-            : {
-                "@context": "https://schema.org/",
-              }}
-        </script>
+                  jobLocation: {
+                    "@type": "Place",
+                    address: {
+                      "@type": "PostalAddress",
+                      addressLocality: job?.city,
+                      addressRegion: job?.state,
+                      addressCountry: job?.country,
+                    },
+                  },
+                  jobLocationType: job?.remote ? "TELECOMMUTE" : "",
+                  baseSalary: {
+                    "@type": "MonetaryAmount",
+                    currency: job?.currency,
+                    value: {
+                      "@type": "QuantitativeValue",
+                      minValue: job?.minSalary,
+                      maxValue: job?.maxSalary,
+                      unitText: job?.salaryType,
+                    },
+                  },
+                }
+              : {
+                  "@context": "https://schema.org/",
+                }}
+          </script>
+        )}
       </Head>
       <div className="min-h-screen flex flex-col justify-between space-y-6">
         <header className="py-10 bg-white">
