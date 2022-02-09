@@ -15,53 +15,6 @@ type JobApplicationLayoutProps = {
   addGoogleJobPostingScript?: boolean
 }
 
-function getGoogleJobPostingScript(job: ExtendedJob, user: ExtendedUser) {
-  return (
-    <script type="application/ld+json">
-      {{
-        "@context": "https://schema.org/",
-        "@type": "JobPosting",
-        title: job?.title,
-        description: draftToHtml(job?.description),
-        identifier: {
-          "@type": "PropertyValue",
-          name: user?.companyName,
-          value: job?.id,
-        },
-        datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
-        validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
-        employmentType: job?.employmentType,
-        hiringOrganization: {
-          "@type": "Organization",
-          name: user?.companyName,
-          sameAs: user?.website,
-          logo: (user?.logo as AttachmentObject)?.Location,
-        },
-        jobLocation: {
-          "@type": "Place",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: job?.city,
-            addressRegion: job?.state,
-            addressCountry: job?.country,
-          },
-        },
-        jobLocationType: job?.remote ? "TELECOMMUTE" : "",
-        baseSalary: {
-          "@type": "MonetaryAmount",
-          currency: job?.currency,
-          value: {
-            "@type": "QuantitativeValue",
-            minValue: job?.minSalary,
-            maxValue: job?.maxSalary,
-            unitText: job?.salaryType,
-          },
-        },
-      }}
-    </script>
-  )
-}
-
 const JobApplicationLayout = ({
   children,
   user,
@@ -75,11 +28,7 @@ const JobApplicationLayout = ({
   useEffect(() => {
     const themeName = user?.theme || process.env.DEFAULT_THEME || "indigo"
     setTheme(themeName)
-
-    // if (addGoogleJobPostingScript && user && job) {
-    //   console.log(getGoogleJobPostingScript(job, user))
-    // }
-  }, [setTheme, user?.theme, user, job, addGoogleJobPostingScript])
+  }, [setTheme, user?.theme])
 
   return (
     <>
@@ -93,10 +42,50 @@ const JobApplicationLayout = ({
           )}`}</title>
         )}
         <link rel="icon" href="/favicon.ico" />
-        {/* {addGoogleJobPostingScript &&
-          user &&
-          job &&
-          getGoogleJobPostingScript(job, user)} */}
+        {addGoogleJobPostingScript && user && job && (
+          <script type="application/ld+json">
+            {{
+              "@context": "https://schema.org/",
+              "@type": "JobPosting",
+              title: job?.title,
+              description: draftToHtml(job?.description),
+              identifier: {
+                "@type": "PropertyValue",
+                name: user?.companyName,
+                value: job?.id,
+              },
+              datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
+              validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
+              employmentType: job?.employmentType,
+              hiringOrganization: {
+                "@type": "Organization",
+                name: user?.companyName,
+                sameAs: user?.website,
+                logo: (user?.logo as AttachmentObject)?.Location,
+              },
+              jobLocation: {
+                "@type": "Place",
+                address: {
+                  "@type": "PostalAddress",
+                  addressLocality: job?.city,
+                  addressRegion: job?.state,
+                  addressCountry: job?.country,
+                },
+              },
+              jobLocationType: job?.remote ? "TELECOMMUTE" : "",
+              baseSalary: {
+                "@type": "MonetaryAmount",
+                currency: job?.currency,
+                value: {
+                  "@type": "QuantitativeValue",
+                  minValue: job?.minSalary,
+                  maxValue: job?.maxSalary,
+                  unitText: job?.salaryType,
+                },
+              },
+            }}
+          </script>
+        )}
       </Head>
       <div className="min-h-screen flex flex-col justify-between space-y-6">
         <header className="py-10 bg-white">
