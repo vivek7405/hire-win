@@ -40,7 +40,7 @@ export const UserForm = (props: UserFormProps) => {
         />
 
         <SingleFileUploadField showImage={true} accept="image/*" name="logo" label="Logo" />
-        <ThemePickerField name="theme" />
+        <ThemePickerField name="theme" label="Job Board Theme" />
 
         <LabeledRichTextField
           name="companyInfo"
