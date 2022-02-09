@@ -90,7 +90,7 @@ const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerS
   const [createCandidateMutation] = useMutation(createCandidate)
 
   return (
-    <JobApplicationLayout user={user!} job={job!}>
+    <JobApplicationLayout user={user!} job={job!} addGoogleJobStructuredData={true}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
