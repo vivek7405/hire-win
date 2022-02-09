@@ -29,8 +29,6 @@ import createCandidate from "app/jobs/mutations/createCandidate"
 import { CandidateSource } from "@prisma/client"
 import toast from "react-hot-toast"
 import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
-import draftToHtml from "draftjs-to-html"
-import moment from "moment"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -84,78 +82,20 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-type GoogleJobStructuredDataProps = {
-  job?: ExtendedJob
-  user?: ExtendedUser
-}
-
-function getJobStructuredData(job: ExtendedJob, user: ExtendedUser) {
-  return {
-    "@context": "https://schema.org/",
-    "@type": "JobPosting",
-    title: job?.title,
-    description: draftToHtml(job?.description),
-    identifier: {
-      "@type": "PropertyValue",
-      name: user?.companyName,
-      value: job?.id,
-    },
-    datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
-    validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
-    employmentType: job?.employmentType,
-    hiringOrganization: {
-      "@type": "Organization",
-      name: user?.companyName,
-      sameAs: user?.website,
-      logo: (user?.logo as AttachmentObject)?.Location,
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: job?.city,
-        addressRegion: job?.state,
-        addressCountry: job?.country,
-      },
-    },
-    jobLocationType: job?.remote ? "TELECOMMUTE" : "",
-    baseSalary: {
-      "@type": "MonetaryAmount",
-      currency: job?.currency,
-      value: {
-        "@type": "QuantitativeValue",
-        minValue: job?.minSalary,
-        maxValue: job?.maxSalary,
-        unitText: job?.salaryType,
-      },
-    },
-  }
-}
-const GoogleJobStructuredData = ({ job, user }: GoogleJobStructuredDataProps) => {
-  return (
-    <>
-      {job && user && <script type="application/ld+json">{getJobStructuredData(job, user)}</script>}
-    </>
-  )
-}
-
 const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [createCandidateMutation] = useMutation(createCandidate)
 
-  useEffect(() => {
-    // ADDED FOR TESTING
-    user && job && console.log(getJobStructuredData(job, user))
-  }, [user, job])
+  // useEffect(() => {
+  //   // ADDED FOR TESTING
+  //   user && job && console.log(getJobStructuredData(job, user))
+  // }, [user, job])
 
   return (
-    <JobApplicationLayout user={user} job={job}>
+    <JobApplicationLayout user={user} job={job} addGoogleJobPostingScript={true}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Head>
-          <GoogleJobStructuredData job={job} user={user} />
-        </Head>
         <button
           type="button"
           className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"

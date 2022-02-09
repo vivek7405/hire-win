@@ -33,23 +33,23 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <Suspense fallback="Loading...">
-      {/* <ErrorBoundary
+      <ErrorBoundary
         FallbackComponent={RootErrorFallback}
         resetKeys={[router.asPath]}
         onReset={useQueryErrorResetBoundary().reset}
-      > */}
-      <IdProvider>
-        <ThemeProvider>
-          <Component {...pageProps} />
-          <Toaster
-            position="bottom-right"
-            toastOptions={{
-              duration: 5000,
-            }}
-          />
-        </ThemeProvider>
-      </IdProvider>
-      {/* </ErrorBoundary> */}
+      >
+        <IdProvider>
+          <ThemeProvider>
+            <Component {...pageProps} />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                duration: 5000,
+              }}
+            />
+          </ThemeProvider>
+        </IdProvider>
+      </ErrorBoundary>
     </Suspense>
   )
 }
