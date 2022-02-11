@@ -66,9 +66,9 @@ const JobApplicationLayout = ({
 }: JobApplicationLayoutProps) => {
   const logo = user?.logo as AttachmentObject
 
-  const [theme, setTheme] = useState(user?.theme || process.env.DEFAULT_THEME || "indigo")
+  const [theme, setTheme] = useState(user?.theme || "indigo")
   useEffect(() => {
-    const themeName = user?.theme || process.env.DEFAULT_THEME || "indigo"
+    const themeName = user?.theme || "indigo"
     setTheme(themeName)
   }, [setTheme, user?.theme])
 

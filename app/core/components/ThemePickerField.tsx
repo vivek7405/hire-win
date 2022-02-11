@@ -29,9 +29,7 @@ export const ThemePickerField = forwardRef<HTMLInputElement, ThemePickerFieldPro
     const tailwindColors = getTailwindColors(true)
     const getNearestTailwindColor = nearestColor.from(tailwindColors) // returns a function
 
-    const defaultColorValue = getColorValueFromTheme(
-      getValues(name) || process.env.DEFAULT_THEME || "indigo"
-    )
+    const defaultColorValue = getColorValueFromTheme(getValues(name) || "indigo")
     const [userSelectedColorValue, setUserSelectedColorValue] = useState(defaultColorValue) // indigo-600
     const [nearestThemeColorObj, setNearestThemeColorObj] = useState({} as any)
 
@@ -98,7 +96,6 @@ export const ThemePickerField = forwardRef<HTMLInputElement, ThemePickerFieldPro
                       {nearestThemeColorObj?.value || userSelectedColorValue} (
                       {nearestThemeColorObj?.name?.replace("-600", "") ||
                         getValues(name) ||
-                        process.env.DEFAULT_THEME ||
                         "indigo"}
                       )
                     </p>

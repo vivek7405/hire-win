@@ -54,7 +54,7 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
             ? EditorState.createWithContent(convertFromRaw(user?.companyInfo || {}))
             : EditorState.createEmpty(),
           website: user?.website || "",
-          theme: user?.theme || process.env.DEFAULT_THEME || "indigo",
+          theme: user?.theme || "indigo",
         }}
         onSubmit={async (values) => {
           values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())
