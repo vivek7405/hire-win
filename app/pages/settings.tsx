@@ -66,7 +66,7 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
               initial: user!,
             })
             toast.success(() => <span>User Updated</span>, { id: toastId })
-            router.push(Routes.Home())
+            router.push(Routes.JobsHome())
           } catch (error) {
             toast.error(
               "Sorry, we had an unexpected error. Please try again. - " + error.toString()
@@ -87,7 +87,7 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
                 newPassword: values.newPassword,
               })
               toast.success(() => <span>Password Updated</span>, { id: toastId })
-              router.push(Routes.Home())
+              router.push(Routes.JobsHome())
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()

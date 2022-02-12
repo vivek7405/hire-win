@@ -45,7 +45,7 @@ export const Breadcrumbs = ({ ignore }: BreadcrumbsProps) => {
   return (
     <ul className="flex items-center space-x-4">
       <li>
-        <Link href={Routes.Home()} passHref>
+        <Link href={Routes.JobsHome()} passHref>
           <a className="text-gray-400 hover:text-gray-500">
             <HomeIcon className="h-5 w-5 text-theme-500" aria-hidden="true" />
           </a>

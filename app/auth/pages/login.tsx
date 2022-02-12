@@ -1,6 +1,28 @@
-import { useRouter, BlitzPage, Head, Routes, Link, Image } from "blitz"
+import { useRouter, BlitzPage, Head, Routes, Link, Image, GetServerSidePropsContext } from "blitz"
 import { LoginForm } from "app/auth/components/LoginForm"
 import transparentLogoColored from "app/assets/logo_transparent_colored.png"
+import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
+import path from "path"
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  path.resolve("next.config.js")
+  path.resolve("blitz.config.js")
+  path.resolve(".next/blitz/db.js")
+
+  const user = await getCurrentUserServer({ ...context })
+
+  if (user) {
+    return {
+      redirect: {
+        destination: "/jobs",
+        permanent: false,
+      },
+      props: {},
+    }
+  }
+
+  return { props: {} }
+}
 
 const LoginPage: BlitzPage = () => {
   const router = useRouter()
@@ -36,8 +58,8 @@ const LoginPage: BlitzPage = () => {
                 // router.push(url.replace(/&next=/g, ""))
                 window.location.href = url.replace(/&next=/g, "")
               } else {
-                // router.push("/")
-                window.location.href = "/"
+                // router.push("/jobs")
+                window.location.href = "/jobs"
               }
             }}
           />

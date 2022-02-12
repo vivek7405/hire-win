@@ -1,6 +1,28 @@
-import { useRouter, BlitzPage, Head, Image } from "blitz"
+import { useRouter, BlitzPage, Head, Image, GetServerSidePropsContext } from "blitz"
 import { SignupForm } from "app/auth/components/SignupForm"
 import transparentLogoColored from "app/assets/logo_transparent_colored.png"
+import path from "path"
+import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  path.resolve("next.config.js")
+  path.resolve("blitz.config.js")
+  path.resolve(".next/blitz/db.js")
+
+  const user = await getCurrentUserServer({ ...context })
+
+  if (user) {
+    return {
+      redirect: {
+        destination: "/jobs",
+        permanent: false,
+      },
+      props: {},
+    }
+  }
+
+  return { props: {} }
+}
 
 const SignupPage: BlitzPage = () => {
   const router = useRouter()

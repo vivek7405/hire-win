@@ -57,7 +57,7 @@ const Navbar = ({ user }: NavbarProps) => {
       <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
         {/* <img className="h-12 w-auto" src="/logo.svg" alt="hire-win Logo" /> */}
         <a className="h-12 w-auto cursor-pointer">
-          <Link href={Routes.Home()}>
+          <Link href={Routes.JobsHome()}>
             <span>
               <Image alt="hire.win" src={transparentLogoWhite} height="50" width="50" />
             </span>
