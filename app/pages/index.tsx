@@ -110,7 +110,7 @@ export default function Home() {
               </ul>
               <button
                 id="navAction"
-                className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-2 px-8 shadow opacity-75"
+                className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
               >
                 <Link href={Routes.LoginPage()}>Login</Link>
               </button>
@@ -863,16 +863,18 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
               <div className="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
                 <div className="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                  <div className="p-8 text-3xl font-bold text-center border-b-4">
-                    Basic (Free +)
+                  <div className="p-8 text-center border-b-4">
+                    <span className="text-3xl font-bold">Basic</span>
+                    <br />
+                    <span>(Demo at the top uses this plan)</span>
                   </div>
                   <ul className="w-full text-center text-sm">
-                    <li className="border-b py-4 font-semibold">10 Jobs</li>
-                    <li className="border-b py-4 font-semibold">20 GB Storage</li>
+                    <li className="border-b py-4 font-semibold">3 Jobs</li>
+                    <li className="border-b py-4 font-semibold">Unlimited Applicants</li>
+                    <li className="border-b py-4 font-semibold">1 GB Storage</li>
                     <li className="border-b py-4 font-semibold">
-                      Collaborate with 3 users per job
+                      Fully Customizable Application Form
                     </li>
-                    <li className="border-b py-4 font-semibold">Theme Customization</li>
                   </ul>
                 </div>
                 <div className="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
@@ -884,29 +886,37 @@ export default function Home() {
 
               <div className="text-black flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 gradient shadow hover:shadow-lg z-10">
                 <div className="flex-1 rounded-t rounded-b-none overflow-hidden">
-                  <div className="w-full p-8 text-3xl font-bold text-center">Free</div>
+                  <div className="w-full p-8 text-center">
+                    <span className="text-3xl font-bold">Plus</span>
+                    <br />
+                    <span>(Extends the features of Basic)</span>
+                  </div>
                   <ul className="w-full text-center text-base font-bold">
-                    <li className="py-4">3 Jobs</li>
-                    <li className="py-4">Unlimited Applicants</li>
-                    <li className="py-4">1 GB Storage (Files submitted by applicants)</li>
-                    <li className="py-4">Fully Customizable Application Form</li>
+                    <li className="py-4">10 Jobs</li>
+                    <li className="py-4">20 GB Storage</li>
+                    <li className="py-4">Collaborate with 3 users per job</li>
+                    <li className="py-4">Theme Customization</li>
                   </ul>
                 </div>
                 <div className="flex-none mt-auto rounded-b rounded-t-none overflow-hidden p-6">
-                  {/* <div className="w-full py-6 text-4xl font-bold text-center">
-                    $0
-                  </div> */}
-                  <div className="flex items-center justify-center">
+                  <div className="w-full py-6 text-4xl font-bold text-center">
+                    $14.99 <span className="text-base">/ month</span>
+                  </div>
+                  {/* <div className="flex items-center justify-center">
                     <button className="mx-auto lg:mx-0 hover:underline gradient2 text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
                       <Link href={Routes.SignupPage()}>Sign Up</Link>
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
               <div className="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
                 <div className="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                  <div className="p-8 text-3xl font-bold text-center border-b-4">Pro (Basic +)</div>
+                  <div className="p-8 text-center border-b-4">
+                    <span className="text-3xl font-bold">Pro</span>
+                    <br />
+                    <span>(Extends the features of Plus)</span>
+                  </div>
                   <ul className="w-full text-center text-sm">
                     <li className="border-b py-4 font-semibold">Unlimited Jobs</li>
                     <li className="border-b py-4 font-semibold">500 GB Storage</li>
@@ -920,7 +930,7 @@ export default function Home() {
                 </div>
                 <div className="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
                   <div className="w-full py-6 text-3xl text-gray-600 font-bold text-center">
-                    $14.99 <span className="text-base">/ month</span>
+                    $24.99 <span className="text-base">/ month</span>
                   </div>
                 </div>
               </div>
@@ -936,7 +946,7 @@ export default function Home() {
             <div className="h-1 mx-auto bg-white w-1/6 opacity-25 my-0 py-0 rounded-t"></div>
           </div>
 
-          <h3 className="my-4 text-3xl font-extrabold">Get your Job Board up and Running, Free!</h3>
+          <h3 className="my-4 text-3xl font-extrabold">Get your Job Board up and Running now!</h3>
 
           <button className="mx-auto lg:mx-0 hover:underline bg-white text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
             <Link href={Routes.SignupPage()}>Sign Up Now</Link>
