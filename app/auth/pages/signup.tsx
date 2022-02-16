@@ -3,6 +3,7 @@ import { SignupForm } from "app/auth/components/SignupForm"
 import transparentLogoColored from "app/assets/logo_transparent_colored.png"
 import path from "path"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
+import LogoBrand from "app/assets/LogoBrand"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -32,13 +33,14 @@ const SignupPage: BlitzPage = () => {
       <Head>
         <title>Sign Up | hire-win</title>
       </Head>
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center space-y-6">
-        <div>
-          {/* <img src="/logo_color.svg" alt="hire-win Logo" className="mx-auto w-20 h-20" /> */}
-          <div className="mx-auto w-20 h-20">
-            <Image alt="hire.win" src={transparentLogoColored} />
-          </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center lg:space-y-6">
+        <div className="mx-auto w-60 h-32 lg:h-12">
+          <LogoBrand
+            logoProps={{ fill: "#4f46e5", strokeWidth: 3 }}
+            brandProps={{ fill: "#4f46e5" }}
+          />
         </div>
+
         <div className="bg-white rounded p-6 w-full max-w-xl rounded shadow-sm">
           <SignupForm
             onSuccess={() => {

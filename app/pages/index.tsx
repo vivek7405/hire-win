@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext, Image, Link, Routes } from "blitz"
+import { GetServerSidePropsContext, Link, Routes } from "blitz"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import LogoBrand from "app/assets/LogoBrand"
@@ -61,14 +61,14 @@ export default function Home() {
     <>
       <div id="landingPage" className="gradient leading-relaxed tracking-wide flex flex-col">
         <nav id="header" className="w-full z-30 top-0 text-white py-1 lg:py-6">
-          <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-2 py-2 lg:py-6">
-            <div className="pl-4 flex items-center">
+          <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-2 lg:py-6">
+            <div className="flex items-center">
               <div className="w-40 lg:w-72">
                 <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
               </div>
             </div>
 
-            <div className="block lg:hidden pr-4">
+            <div className="block lg:hidden">
               <button
                 id="nav-toggle"
                 className="flex items-center px-3 py-2 border rounded text-gray-700 border-gray-600 hover:text-gray-900 hover:border-green-500 appearance-none focus:outline-none"
@@ -86,7 +86,7 @@ export default function Home() {
 
             <div
               id="nav-content"
-              className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 text-black p-4 lg:p-0 lg:pr-4 z-20"
+              className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
             >
               <ul className="list-reset lg:flex justify-end flex-1 items-center">
                 {/* <li className="mr-3">

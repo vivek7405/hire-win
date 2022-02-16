@@ -51,15 +51,16 @@ export default function Brand({
     <div className="flex items-center w-full h-full">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        // viewBox="0 0 1404.401 378.014"      // No Padding
-        // viewBox="-20 -20 1804.401 418.014"  // More Padding
-        viewBox="-10 -10 1604.401 398.014" // Little Padding
+        // viewBox="71.824 202.042 356.351 95.916"    // No Padding
+        // viewBox="51.824 182.042 396.351 135.916"   // More Padding
+        viewBox="61.824 192.042 376.351 115.916" // Little Padding
       >
         <g
           fill={fill || defaultFill}
           stroke={stroke || defaultStroke}
           strokeWidth={strokeWidth || defaultStrokeWidth}
           strokeLinecap={strokeLinecap}
+          transform="matrix(0.253739, 0, 0, 0.253739, 71.824333, 202.042068)"
         >
           {/* hire w/o i dot */}
           <path

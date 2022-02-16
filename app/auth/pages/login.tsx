@@ -1,8 +1,8 @@
 import { useRouter, BlitzPage, Head, Routes, Link, Image, GetServerSidePropsContext } from "blitz"
 import { LoginForm } from "app/auth/components/LoginForm"
-import transparentLogoColored from "app/assets/logo_transparent_colored.png"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
+import LogoBrand from "app/assets/LogoBrand"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -31,13 +31,14 @@ const LoginPage: BlitzPage = () => {
       <Head>
         <title>Login | hire-win</title>
       </Head>
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center space-y-6">
-        <div>
-          {/* <img src="/logo_color.svg" alt="hire-win Logo" className="mx-auto w-20 h-20" /> */}
-          <div className="mx-auto w-20 h-20">
-            <Image alt="hire.win" src={transparentLogoColored} />
-          </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center md:space-y-6 lg:space-y-6">
+        <div className="mx-auto w-60 h-32 lg:h-12">
+          <LogoBrand
+            logoProps={{ fill: "#4f46e5", strokeWidth: 3 }}
+            brandProps={{ fill: "#4f46e5" }}
+          />
         </div>
+
         <div className="bg-white p-6 w-full max-w-xl">
           <LoginForm
             onSuccess={() => {
@@ -64,6 +65,7 @@ const LoginPage: BlitzPage = () => {
             }}
           />
         </div>
+
         <div>
           <p className="text-gray-400">
             Forgot your password?{" "}
