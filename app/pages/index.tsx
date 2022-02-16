@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext, Image, Link, Routes } from "blitz"
-import transparentLogoColored from "app/assets/logo_transparent_colored.png"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
+import LogoBrand from "app/assets/LogoBrand"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -59,16 +59,13 @@ export default function Home() {
 
   return (
     <>
-      <div className="gradient leading-relaxed tracking-wide flex flex-col">
+      <div id="landingPage" className="gradient leading-relaxed tracking-wide flex flex-col">
         <nav id="header" className="w-full z-30 top-0 text-white py-1 lg:py-6">
           <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-2 py-2 lg:py-6">
             <div className="pl-4 flex items-center">
-              <a className="text-3xl lg:text-5xl brand-name flex items-center text-indigo-600 no-underline hover:no-underline">
-                <div className="w-12 h-12 mr-2 lg:w-20 lg:h-20 lg:mr-4">
-                  <Image alt="logo" src={transparentLogoColored} />
-                </div>
-                hire.win
-              </a>
+              <div className="w-40 lg:w-72">
+                <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
+              </div>
             </div>
 
             <div className="block lg:hidden pr-4">
@@ -89,7 +86,7 @@ export default function Home() {
 
             <div
               id="nav-content"
-              className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
+              className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 text-black p-4 lg:p-0 lg:pr-4 z-20"
             >
               <ul className="list-reset lg:flex justify-end flex-1 items-center">
                 {/* <li className="mr-3">
@@ -108,12 +105,14 @@ export default function Home() {
                   </a>
                 </li> */}
               </ul>
-              <button
-                id="navAction"
-                className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
-              >
-                <Link href={Routes.LoginPage()}>Login</Link>
-              </button>
+              <Link href={Routes.LoginPage()}>
+                <button
+                  id="navAction"
+                  className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
+                >
+                  Login
+                </button>
+              </Link>
             </div>
           </div>
         </nav>
@@ -127,12 +126,16 @@ export default function Home() {
               Fully customizable Application Form, Theme, Company Info & Job Description!
             </p>
 
-            <button className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
-              <Link href={Routes.SignupPage()}>Sign Up</Link>
-            </button>
-            <div className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-gray-600 font-extrabold py-2 lg:py-4 px-8">
-              <Link href={Routes.LoginPage()}>Login</Link>
-            </div>
+            <Link href={Routes.SignupPage()}>
+              <button className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
+                Sign Up
+              </button>
+            </Link>
+            <Link href={Routes.LoginPage()}>
+              <a className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-gray-600 font-extrabold py-2 lg:py-4 px-8">
+                Login
+              </a>
+            </Link>
           </div>
 
           <div className="flex items-center w-full mx-auto content-end">
@@ -903,9 +906,11 @@ export default function Home() {
                     $14.99 <span className="text-base">/ month</span>
                   </div>
                   {/* <div className="flex items-center justify-center">
-                    <button className="mx-auto lg:mx-0 hover:underline gradient2 text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
-                      <Link href={Routes.SignupPage()}>Sign Up</Link>
-                    </button>
+                    <Link href={Routes.SignupPage()}>
+                      <button className="mx-auto lg:mx-0 hover:underline gradient2 text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
+                        Sign Up
+                      </button>
+                    </Link>
                   </div> */}
                 </div>
               </div>
@@ -948,9 +953,11 @@ export default function Home() {
 
           <h3 className="my-4 text-3xl font-extrabold">Get your Job Board up and Running now!</h3>
 
-          <button className="mx-auto lg:mx-0 hover:underline bg-white text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
-            <Link href={Routes.SignupPage()}>Sign Up Now</Link>
-          </button>
+          <Link href={Routes.SignupPage()}>
+            <button className="mx-auto lg:mx-0 hover:underline bg-white text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
+              Sign Up
+            </button>
+          </Link>
         </section>
 
         <footer className="bg-white">
@@ -1043,19 +1050,12 @@ export default function Home() {
       </div>
 
       <style jsx>{`
-        @import url("https://rsms.me/inter/inter.css");
-        @import url("https://fonts.googleapis.com/css?family=Pacifico");
-
-        html {
-          font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-            "Segoe UI Symbol", "Noto Color Emoji", "Pacifico";
+        #landingPage {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+            Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+            "Noto Color Emoji";
 
           scroll-behavior: smooth;
-        }
-
-        .brand-name {
-          font-family: "Pacifico" !important;
         }
 
         .gradient {
