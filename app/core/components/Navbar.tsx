@@ -4,7 +4,7 @@ import { MenuIcon, XIcon } from "@heroicons/react/outline"
 import { ExtendedUser } from "types"
 import logout from "app/auth/mutations/logout"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
-import transparentLogoWhite from "app/assets/logo_transparent_white.png"
+import Logo from "app/assets/Logo"
 
 type NavbarProps = {
   user?: ExtendedUser | null
@@ -55,14 +55,11 @@ const Navbar = ({ user }: NavbarProps) => {
   return (
     <nav className="bg-theme-600 py-2">
       <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
-        {/* <img className="h-12 w-auto" src="/logo.svg" alt="hire-win Logo" /> */}
-        <a className="h-12 w-auto cursor-pointer">
-          <Link href={Routes.JobsHome()}>
-            <span>
-              <Image alt="hire.win" src={transparentLogoWhite} height="50" width="50" />
-            </span>
-          </Link>
-        </a>
+        <Link href={Routes.JobsHome()}>
+          <a className="w-12 h-12">
+            <Logo fill="white" strokeWidth={0.1} />
+          </a>
+        </Link>
 
         <div className="lg:flex justify-between items-center w-full hidden">
           <div className="space-x-2 flex">
