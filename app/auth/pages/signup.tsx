@@ -35,7 +35,7 @@ const SignupPage: BlitzPage = () => {
       </Head>
       <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center space-y-6">
         <Link href={Routes.Home()}>
-          <a className="w-auto h-12 mt-6 lg:h-14 lg:mt-0 md:mt-0">
+          <a className="w-56 lg:w-64 h-12 lg:h-14 mt-6 lg:mt-0 md:mt-0">
             <LogoBrand
               logoProps={{ fill: "#4f46e5", strokeWidth: 3 }}
               brandProps={{ fill: "#4f46e5" }}
@@ -43,7 +43,7 @@ const SignupPage: BlitzPage = () => {
           </a>
         </Link>
 
-        <div className="bg-white rounded p-6 w-full max-w-xl rounded shadow-sm">
+        <div className="bg-white rounded p-6 w-full max-w-xl shadow-sm">
           <SignupForm
             onSuccess={() => {
               if (router.query.next) {
