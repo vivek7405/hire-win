@@ -62,7 +62,7 @@ export default function Home() {
       <div id="landingPage" className="gradient leading-relaxed tracking-wide flex flex-col">
         <nav id="header" className="w-full z-30 top-0 text-white py-1 lg:py-6">
           <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-2 lg:py-6">
-            <div className="w-auto h-10 lg:h-16">
+            <div className="w-44 h-10 lg:h-16 lg:w-72">
               <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
             </div>
 
