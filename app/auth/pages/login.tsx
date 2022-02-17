@@ -31,13 +31,15 @@ const LoginPage: BlitzPage = () => {
       <Head>
         <title>Login | hire-win</title>
       </Head>
-      <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center md:space-y-6 lg:space-y-6">
-        <div className="mx-auto w-60 h-32 lg:h-12">
-          <LogoBrand
-            logoProps={{ fill: "#4f46e5", strokeWidth: 3 }}
-            brandProps={{ fill: "#4f46e5" }}
-          />
-        </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center space-y-6">
+        <Link href={Routes.Home()}>
+          <a className="w-auto h-12 mt-6 lg:h-14 lg:mt-0 md:mt-0">
+            <LogoBrand
+              logoProps={{ fill: "#4f46e5", strokeWidth: 3 }}
+              brandProps={{ fill: "#4f46e5" }}
+            />
+          </a>
+        </Link>
 
         <div className="bg-white p-6 w-full max-w-xl">
           <LoginForm

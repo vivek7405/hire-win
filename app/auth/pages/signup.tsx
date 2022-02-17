@@ -1,4 +1,4 @@
-import { useRouter, BlitzPage, Head, Image, GetServerSidePropsContext } from "blitz"
+import { useRouter, BlitzPage, Head, Image, GetServerSidePropsContext, Link, Routes } from "blitz"
 import { SignupForm } from "app/auth/components/SignupForm"
 import transparentLogoColored from "app/assets/logo_transparent_colored.png"
 import path from "path"
@@ -33,13 +33,15 @@ const SignupPage: BlitzPage = () => {
       <Head>
         <title>Sign Up | hire-win</title>
       </Head>
-      <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center lg:space-y-6">
-        <div className="mx-auto w-60 h-32 lg:h-12">
-          <LogoBrand
-            logoProps={{ fill: "#4f46e5", strokeWidth: 3 }}
-            brandProps={{ fill: "#4f46e5" }}
-          />
-        </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center space-y-6">
+        <Link href={Routes.Home()}>
+          <a className="w-auto h-12 mt-6 lg:h-14 lg:mt-0 md:mt-0">
+            <LogoBrand
+              logoProps={{ fill: "#4f46e5", strokeWidth: 3 }}
+              brandProps={{ fill: "#4f46e5" }}
+            />
+          </a>
+        </Link>
 
         <div className="bg-white rounded p-6 w-full max-w-xl rounded shadow-sm">
           <SignupForm

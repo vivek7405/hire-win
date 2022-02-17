@@ -54,6 +54,8 @@ export default function Brand({
         // viewBox="71.824 202.042 356.351 95.916"    // No Padding
         // viewBox="51.824 182.042 396.351 135.916"   // More Padding
         viewBox="61.824 192.042 376.351 115.916" // Little Padding
+        width="100%"
+        height="100%"
       >
         <g
           fill={fill || defaultFill}

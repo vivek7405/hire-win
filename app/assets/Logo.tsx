@@ -51,6 +51,8 @@ export default function Logo({
         // viewBox="81.327 114.126 312.688 259.686"  // No Padding
         // viewBox="61.327 94.126 352.688 299.686"   // More Padding
         viewBox="71.327 104.126 332.688 279.686" // Little Padding
+        width="100%"
+        height="100%"
       >
         <g
           transform="matrix(1, 0, 0, 1, -29.885393, 96.211571)"
