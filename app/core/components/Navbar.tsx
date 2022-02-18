@@ -16,7 +16,7 @@ const Navbar = ({ user }: NavbarProps) => {
   const router = useRouter()
   const [logoutMutation] = useMutation(logout)
   const nav = [
-    { name: "Jobs", href: "/", current: router.route === "/" },
+    { name: "Jobs", href: "/jobs", current: router.route === "/jobs" },
     { name: "Categories", href: "/categories", current: router.route === "/categories" },
     { name: "Stages", href: "/stages", current: router.route === "/stages" },
     { name: "Workflows", href: "/workflows", current: router.route === "/workflows" },
@@ -28,7 +28,7 @@ const Navbar = ({ user }: NavbarProps) => {
     {
       name: "Sign Out",
       action: async () => {
-        await router.push("/login")
+        await router.push(Routes.LoginPage())
         await logoutMutation()
       },
       href: "",
@@ -87,7 +87,7 @@ const Navbar = ({ user }: NavbarProps) => {
               </div>
             </DropdownMenu.Trigger>
 
-            <DropdownMenu.Content className="w-48 bg-white text-white p-1 shadow-md rounded top-1 absolute w-auto">
+            <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
               <DropdownMenu.Arrow className="fill-current" offset={10} />
               {dropDownNav.map((item, i) => {
                 return (
@@ -98,9 +98,7 @@ const Navbar = ({ user }: NavbarProps) => {
                       e.preventDefault()
                       item.href.length ? router.push(item.href) : item.action!()
                     }}
-                    className={`${
-                      !item.href.length && "text-left w-full"
-                    } cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500`}
+                    className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
                   >
                     {item.name}
                   </DropdownMenu.Item>

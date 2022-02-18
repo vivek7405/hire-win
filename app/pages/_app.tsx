@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast"
 import ProgressBar from "@badrap/bar-of-progress"
 import "app/core/styles/index.css"
 import { IdProvider } from "@radix-ui/react-id"
+import LoginPage from "app/auth/pages/login"
 
 const progress = new ProgressBar({
   size: 2,
@@ -53,7 +54,8 @@ export default function App({ Component, pageProps }: AppProps) {
 
 function RootErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
   if (error instanceof AuthenticationError) {
-    return <LoginForm onSuccess={resetErrorBoundary} />
+    // return <LoginForm onSuccess={resetErrorBoundary} />
+    return <LoginPage />
   } else if (error instanceof AuthorizationError) {
     return (
       <ErrorComponent

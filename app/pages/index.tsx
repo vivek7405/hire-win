@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext, Link, Routes } from "blitz"
+import { GetServerSidePropsContext, Head, Link, Routes } from "blitz"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import LogoBrand from "app/assets/LogoBrand"
@@ -59,35 +59,40 @@ export default function Home() {
 
   return (
     <>
-      <div id="landingPage" className="gradient leading-relaxed tracking-wide flex flex-col">
-        <nav id="header" className="w-full z-30 top-0 text-white py-1 lg:py-6">
-          <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-2 lg:py-6">
-            <div className="w-44 h-10 lg:h-16 lg:w-72">
-              <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
-            </div>
+      <Head>
+        <title>hire-win</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main>
+        <div id="landingPage" className="gradient leading-relaxed tracking-wide flex flex-col">
+          <nav id="header" className="w-full z-30 top-0 text-white py-1 lg:py-6">
+            <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 px-6 py-2 lg:py-6">
+              <div className="w-44 h-10 lg:h-16 lg:w-72">
+                <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
+              </div>
 
-            <div className="block lg:hidden">
-              <button
-                id="nav-toggle"
-                className="flex items-center px-3 py-2 border rounded text-gray-700 border-gray-600 hover:text-gray-900 hover:border-green-500 appearance-none focus:outline-none"
-              >
-                <svg
-                  className="fill-current h-3 w-3"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
+              <div className="block lg:hidden">
+                <button
+                  id="nav-toggle"
+                  className="flex items-center px-3 py-2 border rounded text-gray-700 border-gray-600 hover:text-gray-900 hover:border-green-500 appearance-none focus:outline-none"
                 >
-                  <title>Menu</title>
-                  <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-                </svg>
-              </button>
-            </div>
+                  <svg
+                    className="fill-current h-3 w-3"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <title>Menu</title>
+                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                  </svg>
+                </button>
+              </div>
 
-            <div
-              id="nav-content"
-              className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
-            >
-              <ul className="list-reset lg:flex justify-end flex-1 items-center">
-                {/* <li className="mr-3">
+              <div
+                id="nav-content"
+                className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
+              >
+                <ul className="list-reset lg:flex justify-end flex-1 items-center">
+                  {/* <li className="mr-3">
                   <a href="#compareWithOthers" className="inline-block cursor-pointer hover:underline font-semibold py-2 px-4 text-black no-underline">
                     Compare with others
                   </a>
@@ -102,109 +107,109 @@ export default function Home() {
                     Pricing
                   </a>
                 </li> */}
-              </ul>
-              <Link href={Routes.LoginPage()}>
-                <button
-                  id="navAction"
-                  className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
-                >
-                  Login
+                </ul>
+                <Link href={Routes.LoginPage()}>
+                  <button
+                    id="navAction"
+                    className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
+                  >
+                    Login
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </nav>
+
+          <div className="container mx-auto h-screen">
+            <div className="text-center px-3 lg:px-0">
+              <h1 className="my-4 text-2xl md:text-3xl lg:text-5xl font-black leading-tight">
+                Your Job Board, the way you Like!
+              </h1>
+              <p className="leading-normal text-gray-800 text-base md:text-xl lg:text-2xl mb-8">
+                Fully customizable Application Form, Theme, Company Info & Job Description!
+              </p>
+
+              <Link href={Routes.SignupPage()}>
+                <button className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
+                  Sign Up
                 </button>
               </Link>
-            </div>
-          </div>
-        </nav>
-
-        <div className="container mx-auto h-screen">
-          <div className="text-center px-3 lg:px-0">
-            <h1 className="my-4 text-2xl md:text-3xl lg:text-5xl font-black leading-tight">
-              Your Job Board, the way you Like!
-            </h1>
-            <p className="leading-normal text-gray-800 text-base md:text-xl lg:text-2xl mb-8">
-              Fully customizable Application Form, Theme, Company Info & Job Description!
-            </p>
-
-            <Link href={Routes.SignupPage()}>
-              <button className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
-                Sign Up
-              </button>
-            </Link>
-            <Link href={Routes.LoginPage()}>
-              <a className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-gray-600 font-extrabold py-2 lg:py-4 px-8">
-                Login
-              </a>
-            </Link>
-          </div>
-
-          <div className="flex items-center w-full mx-auto content-end">
-            <div className="browser-mockup flex flex-1 m-6 md:px-0 md:m-12 bg-white w-1/2 rounded shadow-xl">
-              <iframe
-                src="https://hire.win/basecamp/Software-Engineer"
-                title="Job Board"
-                className="w-full h-full"
-              ></iframe>
-            </div>
-          </div>
-        </div>
-
-        <section className="bg-white border-b py-12">
-          <div className="container mx-auto flex flex-wrap items-center justify-between pb-12">
-            <h2 className="w-full my-2 text-xl font-black leading-tight text-center text-gray-800 lg:mt-8">
-              Our Customers / Featured in
-            </h2>
-            <div className="w-full mb-4">
-              <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
+              <Link href={Routes.LoginPage()}>
+                <a className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-gray-600 font-extrabold py-2 lg:py-4 px-8">
+                  Login
+                </a>
+              </Link>
             </div>
 
-            <div className="flex flex-1 flex-wrap max-w-4xl mx-auto items-center justify-between text-xl text-gray-500 font-bold opacity-75">
-              <span className="w-1/2 p-4 md:w-auto flex items-center">
-                <svg
-                  className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M7 0H6L0 3v6l4-1v12h12V8l4 1V3l-6-3h-1a3 3 0 0 1-6 0z" />
-                </svg>
-                TeeShirtz
-              </span>
-
-              <span className="w-1/2 p-4 md:w-auto flex items-center">
-                <svg
-                  className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M15.75 8l-3.74-3.75a3.99 3.99 0 0 1 6.82-3.08A4 4 0 0 1 15.75 8zM1.85 15.3l9.2-9.19 2.83 2.83-9.2 9.2-2.82-2.84zm-1.4 2.83l2.11-2.12 1.42 1.42-2.12 2.12-1.42-1.42zM10 15l2-2v7h-2v-5z" />
-                </svg>
-                Mic.Check
-              </span>
-
-              <span className="w-1/2 p-4 md:w-auto flex items-center">
-                <svg
-                  className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10 12a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-3a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 2.75V20l-4-4-4 4v-8.25a6.97 6.97 0 0 0 8 0z" />
-                </svg>
-                BadgeLife.io
-              </span>
-
-              <span className="w-1/2 p-4 md:w-auto flex items-center">
-                <svg
-                  className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M15.3 14.89l2.77 2.77a1 1 0 0 1 0 1.41 1 1 0 0 1-1.41 0l-2.59-2.58A5.99 5.99 0 0 1 11 18V9.04a1 1 0 0 0-2 0V18a5.98 5.98 0 0 1-3.07-1.51l-2.59 2.58a1 1 0 0 1-1.41 0 1 1 0 0 1 0-1.41l2.77-2.77A5.95 5.95 0 0 1 4.07 13H1a1 1 0 1 1 0-2h3V8.41L.93 5.34a1 1 0 0 1 0-1.41 1 1 0 0 1 1.41 0l2.1 2.1h11.12l2.1-2.1a1 1 0 0 1 1.41 0 1 1 0 0 1 0 1.41L16 8.41V11h3a1 1 0 1 1 0 2h-3.07c-.1.67-.32 1.31-.63 1.89zM15 5H5a5 5 0 1 1 10 0z" />
-                </svg>
-                Bugz 4 Life
-              </span>
+            <div className="flex items-center w-full mx-auto content-end">
+              <div className="browser-mockup flex flex-1 m-6 md:px-0 md:m-12 bg-white w-1/2 rounded shadow-xl">
+                <iframe
+                  src="https://hire.win/basecamp/Software-Engineer"
+                  title="Job Board"
+                  className="w-full h-full"
+                ></iframe>
+              </div>
             </div>
           </div>
-        </section>
 
-        {/* <section id="compareWithOthers" className="bg-gray-100 border-b py-8">
+          <section className="bg-white border-b py-12">
+            <div className="container mx-auto flex flex-wrap items-center justify-between pb-12">
+              <h2 className="w-full my-2 text-xl font-black leading-tight text-center text-gray-800 lg:mt-8">
+                Our Customers / Featured in
+              </h2>
+              <div className="w-full mb-4">
+                <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
+              </div>
+
+              <div className="flex flex-1 flex-wrap max-w-4xl mx-auto items-center justify-between text-xl text-gray-500 font-bold opacity-75">
+                <span className="w-1/2 p-4 md:w-auto flex items-center">
+                  <svg
+                    className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M7 0H6L0 3v6l4-1v12h12V8l4 1V3l-6-3h-1a3 3 0 0 1-6 0z" />
+                  </svg>
+                  TeeShirtz
+                </span>
+
+                <span className="w-1/2 p-4 md:w-auto flex items-center">
+                  <svg
+                    className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M15.75 8l-3.74-3.75a3.99 3.99 0 0 1 6.82-3.08A4 4 0 0 1 15.75 8zM1.85 15.3l9.2-9.19 2.83 2.83-9.2 9.2-2.82-2.84zm-1.4 2.83l2.11-2.12 1.42 1.42-2.12 2.12-1.42-1.42zM10 15l2-2v7h-2v-5z" />
+                  </svg>
+                  Mic.Check
+                </span>
+
+                <span className="w-1/2 p-4 md:w-auto flex items-center">
+                  <svg
+                    className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M10 12a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-3a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4 2.75V20l-4-4-4 4v-8.25a6.97 6.97 0 0 0 8 0z" />
+                  </svg>
+                  BadgeLife.io
+                </span>
+
+                <span className="w-1/2 p-4 md:w-auto flex items-center">
+                  <svg
+                    className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M15.3 14.89l2.77 2.77a1 1 0 0 1 0 1.41 1 1 0 0 1-1.41 0l-2.59-2.58A5.99 5.99 0 0 1 11 18V9.04a1 1 0 0 0-2 0V18a5.98 5.98 0 0 1-3.07-1.51l-2.59 2.58a1 1 0 0 1-1.41 0 1 1 0 0 1 0-1.41l2.77-2.77A5.95 5.95 0 0 1 4.07 13H1a1 1 0 1 1 0-2h3V8.41L.93 5.34a1 1 0 0 1 0-1.41 1 1 0 0 1 1.41 0l2.1 2.1h11.12l2.1-2.1a1 1 0 0 1 1.41 0 1 1 0 0 1 0 1.41L16 8.41V11h3a1 1 0 1 1 0 2h-3.07c-.1.67-.32 1.31-.63 1.89zM15 5H5a5 5 0 1 1 10 0z" />
+                  </svg>
+                  Bugz 4 Life
+                </span>
+              </div>
+            </div>
+          </section>
+
+          {/* <section id="compareWithOthers" className="bg-gray-100 border-b py-8">
           <div className="container max-w-5xl mx-auto m-8">
             <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-gray-800">
               hireWIN Vs Others
@@ -681,7 +686,7 @@ export default function Home() {
           </div>
         </section> */}
 
-        {/* <section id="features" className="bg-white border-b py-8">
+          {/* <section id="features" className="bg-white border-b py-8">
           <div className="container mx-auto flex flex-wrap pt-4">
             <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-gray-800">
               Features
@@ -852,200 +857,201 @@ export default function Home() {
           </div>
         </section> */}
 
-        <section id="pricing" className="bg-gray-100 py-8">
-          <div className="container mx-auto px-2 pt-4 pb-12 text-gray-800">
-            <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-gray-800">
-              Pricing
-            </h2>
-            <div className="w-full mb-4">
-              <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
-              <div className="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-                <div className="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                  <div className="p-8 text-center border-b-4">
-                    <span className="text-3xl font-bold">Basic</span>
-                    <br />
-                    <span>(Demo at the top uses this plan)</span>
-                  </div>
-                  <ul className="w-full text-center text-sm">
-                    <li className="border-b py-4 font-semibold">3 Jobs</li>
-                    <li className="border-b py-4 font-semibold">Unlimited Applicants</li>
-                    <li className="border-b py-4 font-semibold">1 GB Storage</li>
-                    <li className="border-b py-4 font-semibold">
-                      Fully Customizable Application Form
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                  <div className="w-full py-6 text-3xl text-gray-600 font-bold text-center">
-                    $4.99 <span className="text-base">/ month</span>
-                  </div>
-                </div>
+          <section id="pricing" className="bg-gray-100 py-8">
+            <div className="container mx-auto px-2 pt-4 pb-12 text-gray-800">
+              <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-gray-800">
+                Pricing
+              </h2>
+              <div className="w-full mb-4">
+                <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
               </div>
 
-              <div className="text-black flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 gradient shadow hover:shadow-lg z-10">
-                <div className="flex-1 rounded-t rounded-b-none overflow-hidden">
-                  <div className="w-full p-8 text-center">
-                    <span className="text-3xl font-bold">Plus</span>
-                    <br />
-                    <span>(Extends the features of Basic)</span>
+              <div className="flex flex-col sm:flex-row justify-center pt-12 my-12 sm:my-4">
+                <div className="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
+                  <div className="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
+                    <div className="p-8 text-center border-b-4">
+                      <span className="text-3xl font-bold">Basic</span>
+                      <br />
+                      <span>(Demo at the top uses this plan)</span>
+                    </div>
+                    <ul className="w-full text-center text-sm">
+                      <li className="border-b py-4 font-semibold">3 Jobs</li>
+                      <li className="border-b py-4 font-semibold">Unlimited Applicants</li>
+                      <li className="border-b py-4 font-semibold">1 GB Storage</li>
+                      <li className="border-b py-4 font-semibold">
+                        Fully Customizable Application Form
+                      </li>
+                    </ul>
                   </div>
-                  <ul className="w-full text-center text-base font-bold">
-                    <li className="py-4">10 Jobs</li>
-                    <li className="py-4">20 GB Storage</li>
-                    <li className="py-4">Collaborate with 3 users per job</li>
-                    <li className="py-4">Theme Customization</li>
-                  </ul>
+                  <div className="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
+                    <div className="w-full py-6 text-3xl text-gray-600 font-bold text-center">
+                      $4.99 <span className="text-base">/ month</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-none mt-auto rounded-b rounded-t-none overflow-hidden p-6">
-                  <div className="w-full py-6 text-4xl font-bold text-center">
-                    $14.99 <span className="text-base">/ month</span>
+
+                <div className="text-black flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 gradient shadow hover:shadow-lg z-10">
+                  <div className="flex-1 rounded-t rounded-b-none overflow-hidden">
+                    <div className="w-full p-8 text-center">
+                      <span className="text-3xl font-bold">Plus</span>
+                      <br />
+                      <span>(Extends the features of Basic)</span>
+                    </div>
+                    <ul className="w-full text-center text-base font-bold">
+                      <li className="py-4">10 Jobs</li>
+                      <li className="py-4">20 GB Storage</li>
+                      <li className="py-4">Collaborate with 3 users per job</li>
+                      <li className="py-4">Theme Customization</li>
+                    </ul>
                   </div>
-                  {/* <div className="flex items-center justify-center">
+                  <div className="flex-none mt-auto rounded-b rounded-t-none overflow-hidden p-6">
+                    <div className="w-full py-6 text-4xl font-bold text-center">
+                      $14.99 <span className="text-base">/ month</span>
+                    </div>
+                    {/* <div className="flex items-center justify-center">
                     <Link href={Routes.SignupPage()}>
                       <button className="mx-auto lg:mx-0 hover:underline gradient2 text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
                         Sign Up
                       </button>
                     </Link>
                   </div> */}
+                  </div>
+                </div>
+
+                <div className="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
+                  <div className="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
+                    <div className="p-8 text-center border-b-4">
+                      <span className="text-3xl font-bold">Pro</span>
+                      <br />
+                      <span>(Extends the features of Plus)</span>
+                    </div>
+                    <ul className="w-full text-center text-sm">
+                      <li className="border-b py-4 font-semibold">Unlimited Jobs</li>
+                      <li className="border-b py-4 font-semibold">500 GB Storage</li>
+                      <li className="border-b py-4 font-semibold">
+                        Collaborate with Unlimited Users per Job
+                      </li>
+                      <li className="border-b py-4 font-semibold">
+                        Automatic Job Posting to Google Jobs
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
+                    <div className="w-full py-6 text-3xl text-gray-600 font-bold text-center">
+                      $24.99 <span className="text-base">/ month</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </section>
 
-              <div className="flex flex-col w-5/6 lg:w-1/4 mx-auto lg:mx-0 rounded-none lg:rounded-l-lg bg-white mt-4">
-                <div className="flex-1 bg-white text-gray-600 rounded-t rounded-b-none overflow-hidden shadow">
-                  <div className="p-8 text-center border-b-4">
-                    <span className="text-3xl font-bold">Pro</span>
-                    <br />
-                    <span>(Extends the features of Plus)</span>
-                  </div>
-                  <ul className="w-full text-center text-sm">
-                    <li className="border-b py-4 font-semibold">Unlimited Jobs</li>
-                    <li className="border-b py-4 font-semibold">500 GB Storage</li>
-                    <li className="border-b py-4 font-semibold">
-                      Collaborate with Unlimited Users per Job
+          <section className="gradient w-full mx-auto text-center pt-6 pb-12">
+            <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-white">
+              It only takes 5 mins
+            </h2>
+            <div className="w-full mb-4">
+              <div className="h-1 mx-auto bg-white w-1/6 opacity-25 my-0 py-0 rounded-t"></div>
+            </div>
+
+            <h3 className="my-4 text-3xl font-extrabold">Get your Job Board up and Running now!</h3>
+
+            <Link href={Routes.SignupPage()}>
+              <button className="mx-auto lg:mx-0 hover:underline bg-white text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
+                Sign Up
+              </button>
+            </Link>
+          </section>
+
+          <footer className="bg-white">
+            <div className="container mx-auto mt-8 px-8">
+              <div className="w-full flex flex-col md:flex-row py-6">
+                <div className="flex-1 mb-6">
+                  <a className="text-orange-600 no-underline hover:no-underline font-bold text-2xl lg:text-4xl">
+                    #hireWIN
+                  </a>
+                </div>
+
+                <div className="flex-1">
+                  <p className="uppercase font-extrabold text-gray-500 md:mb-6">Links</p>
+                  <ul className="list-reset mb-6">
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        FAQ
+                      </a>
                     </li>
-                    <li className="border-b py-4 font-semibold">
-                      Automatic Job Posting to Google Jobs
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Help
+                      </a>
+                    </li>
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Support
+                      </a>
                     </li>
                   </ul>
                 </div>
-                <div className="flex-none mt-auto bg-white rounded-b rounded-t-none overflow-hidden shadow p-6">
-                  <div className="w-full py-6 text-3xl text-gray-600 font-bold text-center">
-                    $24.99 <span className="text-base">/ month</span>
-                  </div>
+                <div className="flex-1">
+                  <p className="uppercase font-extrabold text-gray-500 md:mb-6">Legal</p>
+                  <ul className="list-reset mb-6">
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Terms
+                      </a>
+                    </li>
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Privacy
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="flex-1">
+                  <p className="uppercase font-extrabold text-gray-500 md:mb-6">Social</p>
+                  <ul className="list-reset mb-6">
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Facebook
+                      </a>
+                    </li>
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Linkedin
+                      </a>
+                    </li>
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Twitter
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div className="flex-1">
+                  <p className="uppercase font-extrabold text-gray-500 md:mb-6">Company</p>
+                  <ul className="list-reset mb-6">
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Official Blog
+                      </a>
+                    </li>
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        About Us
+                      </a>
+                    </li>
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
+                        Contact
+                      </a>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section className="gradient w-full mx-auto text-center pt-6 pb-12">
-          <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-white">
-            It only takes 5 mins
-          </h2>
-          <div className="w-full mb-4">
-            <div className="h-1 mx-auto bg-white w-1/6 opacity-25 my-0 py-0 rounded-t"></div>
-          </div>
-
-          <h3 className="my-4 text-3xl font-extrabold">Get your Job Board up and Running now!</h3>
-
-          <Link href={Routes.SignupPage()}>
-            <button className="mx-auto lg:mx-0 hover:underline bg-white text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
-              Sign Up
-            </button>
-          </Link>
-        </section>
-
-        <footer className="bg-white">
-          <div className="container mx-auto mt-8 px-8">
-            <div className="w-full flex flex-col md:flex-row py-6">
-              <div className="flex-1 mb-6">
-                <a className="text-orange-600 no-underline hover:no-underline font-bold text-2xl lg:text-4xl">
-                  #hireWIN
-                </a>
-              </div>
-
-              <div className="flex-1">
-                <p className="uppercase font-extrabold text-gray-500 md:mb-6">Links</p>
-                <ul className="list-reset mb-6">
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      FAQ
-                    </a>
-                  </li>
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Help
-                    </a>
-                  </li>
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Support
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div className="flex-1">
-                <p className="uppercase font-extrabold text-gray-500 md:mb-6">Legal</p>
-                <ul className="list-reset mb-6">
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Terms
-                    </a>
-                  </li>
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Privacy
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div className="flex-1">
-                <p className="uppercase font-extrabold text-gray-500 md:mb-6">Social</p>
-                <ul className="list-reset mb-6">
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Facebook
-                    </a>
-                  </li>
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Linkedin
-                    </a>
-                  </li>
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Twitter
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div className="flex-1">
-                <p className="uppercase font-extrabold text-gray-500 md:mb-6">Company</p>
-                <ul className="list-reset mb-6">
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Official Blog
-                    </a>
-                  </li>
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      About Us
-                    </a>
-                  </li>
-                  <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                    <a className="cursor-pointer font-light no-underline hover:underline text-gray-800 hover:text-orange-500">
-                      Contact
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </footer>
-      </div>
+          </footer>
+        </div>
+      </main>
 
       <style jsx>{`
         #landingPage {
