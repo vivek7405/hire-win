@@ -109,12 +109,14 @@ export default function Home() {
                 </li> */}
                 </ul>
                 <Link href={Routes.LoginPage()}>
-                  <button
-                    id="navAction"
-                    className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
-                  >
-                    Login
-                  </button>
+                  <a>
+                    <button
+                      id="navAction"
+                      className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
+                    >
+                      Login
+                    </button>
+                  </a>
                 </Link>
               </div>
             </div>
@@ -130,9 +132,11 @@ export default function Home() {
               </p>
 
               <Link href={Routes.SignupPage()}>
-                <button className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
-                  Sign Up
-                </button>
+                <a>
+                  <button className="mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
+                    Sign Up
+                  </button>
+                </a>
               </Link>
               <Link href={Routes.LoginPage()}>
                 <a className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-gray-600 font-extrabold py-2 lg:py-4 px-8">
@@ -957,9 +961,11 @@ export default function Home() {
             <h3 className="my-4 text-3xl font-extrabold">Get your Job Board up and Running now!</h3>
 
             <Link href={Routes.SignupPage()}>
-              <button className="mx-auto lg:mx-0 hover:underline bg-white text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
-                Sign Up
-              </button>
+              <a>
+                <button className="mx-auto lg:mx-0 hover:underline bg-white text-white font-bold rounded my-6 py-4 px-8 shadow-lg">
+                  Sign Up
+                </button>
+              </a>
             </Link>
           </section>
 
