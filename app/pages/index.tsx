@@ -145,12 +145,48 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="flex items-center w-full mx-auto content-end">
+            {/* <div className="flex items-center w-full mx-auto content-end">
               <div className="browser-mockup flex flex-1 m-6 md:px-0 md:m-12 bg-white w-1/2 rounded shadow-xl">
                 <iframe
                   src="https://hire.win/basecamp/Software-Engineer"
                   title="Job Board"
                   className="w-full h-full"
+                ></iframe>
+              </div>
+            </div> */}
+            <div className="w-full h-4/6 px-5 py-8 lg:px-10 rounded-lg drop-shadow-lg">
+              <div className="w-full h-8 space-x-2 px-3 rounded-t-lg bg-gray-200 flex justify-start items-center">
+                <span className="w-3 h-3 rounded-full bg-red-400"></span>
+                <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
+                <span className="w-3 h-3 rounded-full bg-green-400"></span>
+                <span className="flex-1"></span>
+                <a
+                  title="Open in new tab"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://hire.win/basecamp"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5 ml-auto text-neutral-500 hover:text-neutral-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div className="bg-white border-t-0 w-full h-full rounded-b-lg">
+                <iframe
+                  src="https://hire.win/basecamp/Software-Engineer"
+                  title="Job Board"
+                  className="w-full h-full rounded-b-lg"
                 ></iframe>
               </div>
             </div>
@@ -165,8 +201,8 @@ export default function Home() {
                 <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
               </div>
 
-              <div className="flex flex-1 flex-wrap max-w-4xl mx-auto items-center justify-between text-xl text-gray-500 font-bold opacity-75">
-                <span className="w-1/2 p-4 md:w-auto flex items-center">
+              <div className="flex flex-1 flex-wrap max-w-4xl mx-auto items-center justify-center lg:justify-between text-xl text-gray-500 font-bold opacity-75">
+                <span className="w-1/2 p-4 md:w-auto flex items-center justify-center">
                   <svg
                     className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
                     xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +213,7 @@ export default function Home() {
                   TeeShirtz
                 </span>
 
-                <span className="w-1/2 p-4 md:w-auto flex items-center">
+                <span className="w-1/2 p-4 md:w-auto flex items-center justify-center">
                   <svg
                     className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
                     xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +224,7 @@ export default function Home() {
                   Mic.Check
                 </span>
 
-                <span className="w-1/2 p-4 md:w-auto flex items-center">
+                <span className="w-1/2 p-4 md:w-auto flex items-center justify-center">
                   <svg
                     className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
                     xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +235,7 @@ export default function Home() {
                   BadgeLife.io
                 </span>
 
-                <span className="w-1/2 p-4 md:w-auto flex items-center">
+                <span className="w-1/2 p-4 md:w-auto flex items-center justify-center">
                   <svg
                     className="h-10 w-10 mr-4 fill-current text-gray-500 opacity-75"
                     xmlns="http://www.w3.org/2000/svg"
@@ -894,7 +930,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="text-black flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 gradient shadow hover:shadow-lg z-10">
+                <div className="text-black flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white mt-4 sm:-mt-6 bg-gradient-to-br from-pink-100 via-violet-300 to-indigo-300 shadow hover:shadow-lg z-10">
                   <div className="flex-1 rounded-t rounded-b-none overflow-hidden">
                     <div className="w-full p-8 text-center">
                       <span className="text-3xl font-bold">Plus</span>
@@ -950,7 +986,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="gradient w-full mx-auto text-center pt-6 pb-12">
+          <section className="bg-gradient-to-tr from-fuchsia-100 via-violet-300 to-indigo-600 w-full mx-auto text-center pt-6 pb-12">
             <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-white">
               It only takes 5 mins
             </h2>
@@ -958,7 +994,9 @@ export default function Home() {
               <div className="h-1 mx-auto bg-white w-1/6 opacity-25 my-0 py-0 rounded-t"></div>
             </div>
 
-            <h3 className="my-4 text-3xl font-extrabold">Get your Job Board up and Running now!</h3>
+            <h3 className="my-4 mx-3 text-3xl font-extrabold">
+              Get your Job Board up and Running now!
+            </h3>
 
             <Link href={Routes.SignupPage()}>
               <a>
