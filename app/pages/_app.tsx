@@ -31,6 +31,19 @@ Router.events.on("routeChangeError", progress.finish)
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
+  const handleRouteChange = (url) => {
+    ;(window as any).gtag("config", "G-CL7G43RP1E", {
+      page_path: url,
+    })
+  }
+
+  useEffect(() => {
+    router.events.on("routeChangeComplete", handleRouteChange)
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange)
+    }
+  }, [router.events])
+
   return (
     <Suspense fallback="Loading...">
       <ErrorBoundary

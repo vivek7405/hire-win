@@ -10,7 +10,20 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <DocumentHead />
+        <DocumentHead>
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-CL7G43RP1E" />
+
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-CL7G43RP1E', { page_path: window.location.pathname });
+            `,
+            }}
+          />
+        </DocumentHead>
         <body>
           <Main />
           <BlitzScript />
