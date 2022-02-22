@@ -19,9 +19,9 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
 
   const question = await db.question.create({
     data: {
-      name: name,
-      placeholder: placeholder,
-      type: type,
+      name,
+      placeholder,
+      type,
       options: {
         create: options?.map((op) => {
           return {

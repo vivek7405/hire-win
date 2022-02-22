@@ -24,6 +24,7 @@ import updateCandidate from "app/jobs/mutations/updateCandidate"
 import getCandidate from "app/jobs/queries/getCandidate"
 import { AttachmentObject, ExtendedAnswer } from "types"
 import { QuestionType } from "@prisma/client"
+import mandatoryFormQuestions from "app/jobs/utils/mandatoryFormQuestions"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -38,14 +39,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "candidate",
     { session },
-    { where: { id: context?.params?.id as string } }
+    { where: { slug: context?.params?.candidateSlug as string } }
   )
 
   const { can: isOwner } = await Guard.can(
     "isOwner",
     "candidate",
     { session },
-    { where: { id: context?.params?.id as string } }
+    { where: { slug: context?.params?.candidateSlug as string } }
   )
 
   if (user) {
@@ -54,7 +55,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         const candidate = await invokeWithMiddleware(
           getCandidate,
           {
-            where: { id: context?.params?.id as string },
+            where: { slug: context?.params?.candidateSlug as string },
           },
           { ...context }
         )
@@ -114,6 +115,12 @@ const CandidateSettingsPage = ({
   function getInitialValues() {
     const initialValues: any = {}
 
+    mandatoryFormQuestions.forEach((formQuestion) => {
+      initialValues[formQuestion?.question?.name] = eval(
+        `candidate?.${formQuestion?.question?.name?.toLowerCase()}`
+      )
+    })
+
     candidate?.answers?.forEach((answer) => {
       if (answer) {
         const val = answer.value
@@ -163,9 +170,14 @@ const CandidateSettingsPage = ({
           try {
             await updateCandidateMutation({
               where: { id: candidate?.id },
+              initial: candidate!,
               data: {
                 id: candidate?.id,
                 jobId: candidate?.job?.id,
+                name: values.Name,
+                email: values.Email,
+                resume: values.Resume,
+                source: candidate?.source,
                 answers:
                   candidate?.job?.form?.questions?.map((fq) => {
                     const val = values[fq.question?.name] || ""

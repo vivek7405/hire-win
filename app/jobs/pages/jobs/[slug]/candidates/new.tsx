@@ -133,6 +133,9 @@ const NewCandidate = ({
             try {
               await createCandidateMutation({
                 jobId: job?.id,
+                name: values.Name,
+                email: values.Email,
+                resume: values.Resume,
                 source: CandidateSource.Manual,
                 answers:
                   job?.form?.questions?.map((fq) => {

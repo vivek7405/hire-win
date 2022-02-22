@@ -18,9 +18,6 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getCandidate from "app/jobs/queries/getCandidate"
-import Table from "app/core/components/Table"
-import getCandidates from "app/jobs/queries/getCandidates"
-import { ExtendedCandidate } from "types"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -35,7 +32,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "candidate",
     { session },
-    { where: { id: context?.params?.id as string } }
+    { where: { slug: context?.params?.candidateSlug as string } }
   )
 
   if (user) {
@@ -43,7 +40,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       const candidate = await invokeWithMiddleware(
         getCandidate,
         {
-          where: { id: context?.params?.id as string },
+          where: { slug: context?.params?.candidateSlug as string },
         },
         { ...context }
       )
@@ -72,7 +69,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=jobs/${context?.params?.slug}/candidates/${context?.params?.id}`,
+        destination: `/login?next=jobs/${context?.params?.slug}/candidates/${context?.params?.candidateSlug}`,
         permanent: false,
       },
       props: {},
@@ -96,12 +93,18 @@ const SingleCandidatePage = ({
       <br />
       {canUpdate && (
         <Link
-          href={Routes.CandidateSettingsPage({ slug: candidate?.job?.slug!, id: candidate?.id! })}
+          href={Routes.CandidateSettingsPage({
+            slug: candidate?.job?.slug!,
+            candidateSlug: candidate?.slug!,
+          })}
           passHref
         >
           <a data-testid={`${candidate?.id}-settingsLink`}>Settings</a>
         </Link>
       )}
+      <br />
+      <br />
+      <h3 className="font-bold text-5xl">{candidate?.name}</h3>
     </AuthLayout>
   )
 }

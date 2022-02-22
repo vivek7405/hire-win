@@ -116,6 +116,9 @@ const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerS
             try {
               await createCandidateMutation({
                 jobId: job?.id,
+                name: values.Name,
+                email: values.Email,
+                resume: values.Resume,
                 source: CandidateSource.Job_Board,
                 answers:
                   job?.form?.questions?.map((fq) => {

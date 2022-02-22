@@ -97,10 +97,6 @@ const Jobs = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Title",
       accessor: "title",
       Cell: (props) => {
@@ -114,8 +110,10 @@ const Jobs = ({ user }) => {
       },
     },
     {
-      Header: "Slug",
-      accessor: "slug",
+      Header: "Candidates",
+      Cell: (props) => {
+        return props.cell.row.original.candidates?.length
+      },
     },
     {
       Header: "",

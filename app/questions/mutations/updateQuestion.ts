@@ -38,12 +38,12 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
   const updatedQuestion = await db.question.update({
     where,
     data: {
-      name: name,
-      placeholder: placeholder,
-      required: required,
-      hidden: hidden,
+      name,
+      placeholder,
+      required,
+      hidden,
       slug: initial.name !== name ? newSlug : initial.slug,
-      acceptedFiles: acceptedFiles,
+      acceptedFiles,
       options: {
         delete: optionsToDelete?.map((op) => {
           return { id: op.id }

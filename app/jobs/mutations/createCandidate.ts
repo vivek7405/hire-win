@@ -1,24 +1,41 @@
 import { Ctx, resolver } from "blitz"
 import db from "db"
 import { Candidate, CandidateInputType } from "app/jobs/validations"
+import slugify from "slugify"
+import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 // Candidate can be created without authentication
 async function createCandidate(data: CandidateInputType, ctx: Ctx) {
-  const { answers, jobId, source } = Candidate.parse(data)
+  const { name, email, resume, answers, jobId, source } = Candidate.parse(data)
+
+  const slug = slugify(name, { strict: true })
+  const newSlug = await findFreeSlug(
+    slug,
+    async (e) => await db.candidate.findFirst({ where: { slug: e } })
+  )
+
+  let candidateData = {
+    name,
+    email,
+    slug: newSlug,
+    answers: {
+      create: answers?.map((answer) => {
+        return {
+          value: answer.value,
+          questionId: answer.questionId!,
+        }
+      }),
+    },
+    jobId: jobId!,
+    source,
+  }
+
+  if (resume) {
+    candidateData["resume"] = resume
+  }
 
   const candidate = await db.candidate.create({
-    data: {
-      answers: {
-        create: answers?.map((answer) => {
-          return {
-            value: answer.value,
-            questionId: answer.questionId!,
-          }
-        }),
-      },
-      jobId: jobId!,
-      source,
-    },
+    data: candidateData,
   })
 
   return candidate

@@ -23,6 +23,8 @@ import getCandidates from "app/jobs/queries/getCandidates"
 import { AttachmentObject, ExtendedAnswer, ExtendedJob } from "types"
 import Skeleton from "react-loading-skeleton"
 import { QuestionType } from "@prisma/client"
+import mandatoryFormQuestions from "app/jobs/utils/mandatoryFormQuestions"
+import { FormQuestion } from "app/forms/validations"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -96,11 +98,9 @@ const Candidates = (props: CandidateProps) => {
     const search = router.query.search
       ? {
           AND: {
-            job: {
-              title: {
-                contains: JSON.parse(router.query.search as string),
-                mode: "insensitive",
-              },
+            name: {
+              contains: JSON.parse(router.query.search as string),
+              mode: "insensitive",
             },
           },
         }
@@ -142,40 +142,8 @@ const Candidates = (props: CandidateProps) => {
     })
   }, [candidates])
 
-  type ColumnType = {
-    Header: string
-    accessor?: string
-    Cell?: (props) => any
-  }
-  let columns: ColumnType[] = [
-    {
-      Header: "Id",
-      Cell: (props) => {
-        return (
-          <>
-            <Link
-              href={Routes.SingleCandidatePage({
-                slug: props.cell.row.original.job?.slug,
-                id: props.cell.row.original.id,
-              })}
-              passHref
-            >
-              <a className="text-theme-600 hover:text-theme-900">{props.cell.row.original.id}</a>
-            </Link>
-          </>
-        )
-      },
-    },
-    {
-      Header: "Source",
-      accessor: "source",
-      Cell: (props) => {
-        return props.value.toString().replace("_", " ")
-      },
-    },
-  ]
-  props.job?.form?.questions?.forEach((formQuestion) => {
-    columns.push({
+  const getDynamicColumn = (formQuestion) => {
+    return {
       Header: formQuestion?.question?.name,
       Cell: (props) => {
         const answer: ExtendedAnswer = props.cell.row.original?.answers?.find(
@@ -229,7 +197,65 @@ const Candidates = (props: CandidateProps) => {
 
         return ""
       },
-    })
+    }
+  }
+
+  type ColumnType = {
+    Header: string
+    accessor?: string
+    Cell?: (props) => any
+  }
+  let columns: ColumnType[] = [
+    {
+      Header: "Name",
+      accessor: "name",
+      Cell: (props) => {
+        return (
+          <>
+            <Link
+              href={Routes.SingleCandidatePage({
+                slug: props.cell.row.original.job?.slug,
+                candidateSlug: props.cell.row.original.slug,
+              })}
+              passHref
+            >
+              <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
+            </Link>
+          </>
+        )
+      },
+    },
+    {
+      Header: "Source",
+      accessor: "source",
+      Cell: (props) => {
+        return props.value.toString().replace("_", " ")
+      },
+    },
+    {
+      Header: "Email",
+      accessor: "email",
+    },
+    {
+      Header: "Resume",
+      accessor: "resume",
+      Cell: (props) => {
+        const attachmentObj = props.value
+        return (
+          <a
+            href={attachmentObj.Location}
+            className="text-theme-600 hover:text-theme-500"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {attachmentObj.Key}
+          </a>
+        )
+      },
+    },
+  ]
+  props.job?.form?.questions?.forEach((formQuestion) => {
+    columns.push(getDynamicColumn(formQuestion))
   })
 
   columns.push({
@@ -241,7 +267,7 @@ const Candidates = (props: CandidateProps) => {
           <Link
             href={Routes.CandidateSettingsPage({
               slug: props.cell.row.original.job?.slug,
-              id: props.cell.row.original.id,
+              candidateSlug: props.cell.row.original.slug,
             })}
             passHref
           >
