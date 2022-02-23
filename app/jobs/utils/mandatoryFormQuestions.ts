@@ -1,4 +1,4 @@
-import { FormQuestion, Question, QuestionType } from "@prisma/client"
+import { Question, QuestionType } from "@prisma/client"
 import { ExtendedFormQuestion } from "types"
 
 const mandatoryQuestions = [
@@ -12,8 +12,6 @@ const mandatoryQuestions = [
     placeholder: "Enter your name",
     type: QuestionType.Single_line_text,
     options: null,
-    required: true,
-    hidden: false,
 
     acceptedFiles: "",
 
@@ -36,8 +34,6 @@ const mandatoryQuestions = [
     placeholder: "Enter your email",
     type: QuestionType.Email,
     options: null,
-    required: true,
-    hidden: false,
 
     acceptedFiles: "",
 
@@ -60,8 +56,6 @@ const mandatoryQuestions = [
     placeholder: "Upload your resume",
     type: QuestionType.Attachment,
     options: null,
-    required: true,
-    hidden: false,
 
     acceptedFiles: "application/pdf",
 
@@ -84,11 +78,12 @@ const mandatoryFormQuestions = mandatoryQuestions.map((q) => {
     updatedAt: new Date(),
 
     order: 0,
+    behaviour: "REQUIRED",
 
     form: null,
     formId: "",
 
-    question: q,
+    question: q as any,
     questionId: "",
   } as ExtendedFormQuestion
 })

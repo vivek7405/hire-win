@@ -13,7 +13,7 @@ type UpdateQuestionInput = Pick<Prisma.QuestionUpdateArgs, "where" | "data"> & {
 async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, placeholder, options, required, hidden, acceptedFiles } = Question.parse(data)
+  const { name, placeholder, options, acceptedFiles } = Question.parse(data)
 
   const slug = slugify(name, { strict: true })
   const newSlug: string = await findFreeSlug(
@@ -40,8 +40,6 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
     data: {
       name,
       placeholder,
-      required,
-      hidden,
       slug: initial.name !== name ? newSlug : initial.slug,
       acceptedFiles,
       options: {

@@ -78,9 +78,20 @@ export type ExtendedStage = Prisma.StageGetPayload<{ include: { workflows: true 
 export type ExtendedWorkflow = Prisma.WorkflowGetPayload<{ include: { stages: true } }>
 export type ExtendedWorkflowStage = Prisma.WorkflowStageGetPayload<{ include: { stage: true } }>
 
-export type ExtendedQuestion = Prisma.QuestionGetPayload<{ include: { forms: true } }>
+export type ExtendedQuestion = Prisma.QuestionGetPayload<{
+  include: { forms: true; options: true }
+}>
 export type ExtendedForm = Prisma.FormGetPayload<{ include: { questions: true } }>
-export type ExtendedFormQuestion = Prisma.FormQuestionGetPayload<{ include: { question: true } }>
+export type ExtendedFormQuestion = Prisma.FormQuestionGetPayload<{
+  include: {
+    question: {
+      include: {
+        options: true
+        forms: true
+      }
+    }
+  }
+}>
 
 export type AttachmentObject = {
   Key: string

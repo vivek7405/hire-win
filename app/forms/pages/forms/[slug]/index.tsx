@@ -35,6 +35,10 @@ import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
 import ApplicationForm from "app/jobs/components/ApplicationForm"
 import mandatoryFormQuestions from "app/jobs/utils/mandatoryFormQuestions"
+import { FormQuestionBehaviour } from "@prisma/client"
+import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
+import Form from "app/core/components/Form"
+import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -99,6 +103,7 @@ export const Questions = ({ user, form }) => {
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
   const [shiftFormQuestionMutation] = useMutation(shiftFormQuestion)
+  const [updateFormQuestionMutation] = useMutation(updateFormQuestion)
   const [removeQuestionFromFormMutation] = useMutation(removeQuestionFromForm)
   const [openConfirm, setOpenConfirm] = React.useState(false)
   const [formQuestionToRemove, setFormQuestionToRemove] = React.useState({} as ExtendedFormQuestion)
@@ -150,7 +155,7 @@ export const Questions = ({ user, form }) => {
         return { ...fq, order: (fq.order += mandatoryFormQuestions.length) }
       }),
     ].forEach((formQuestion) => {
-      data = [...data, { ...formQuestion }]
+      data = [...(data as any), { ...formQuestion }]
 
       setData(data)
     })
@@ -195,141 +200,225 @@ export const Questions = ({ user, form }) => {
       Header: "",
       accessor: "action",
       Cell: (props) => {
+        const formQuestion: ExtendedFormQuestion = props.cell.row.original
+
         return (
-          props.cell.row.original.order > mandatoryFormQuestions.length && (
-            <>
-              <Confirm
-                open={openConfirm}
-                setOpen={setOpenConfirm}
-                header={
-                  Object.entries(formQuestionToRemove).length
-                    ? `Remove Question - ${formQuestionToRemove.question.name}?`
-                    : "Remove Question?"
-                }
-                onSuccess={async () => {
-                  const toastId = toast.loading(() => (
-                    <span>Removing Question {formQuestionToRemove.question.name}</span>
-                  ))
-                  try {
-                    await removeQuestionFromFormMutation({
-                      formId: formQuestionToRemove.formId,
-                      order: formQuestionToRemove.order,
-                    })
-                    toast.success(
-                      () => <span>Question removed - {formQuestionToRemove.question.name}</span>,
-                      {
-                        id: toastId,
-                      }
-                    )
-                  } catch (error) {
-                    toast.error(
-                      "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                      { id: toastId }
-                    )
-                  }
-                  router.reload()
-                }}
-              >
-                Are you sure you want to remove this question from the form?
-              </Confirm>
-              {props.cell.row.original.order > mandatoryFormQuestions.length && (
-                <button
-                  title="Remove Question"
-                  className="mr-16 align-middle bg-red-500 rounded-full"
-                  onClick={async (e) => {
-                    e.preventDefault()
-
-                    const formQuestion: ExtendedFormQuestion = props.cell.row.original
-                    setFormQuestionToRemove(formQuestion)
-                    setOpenConfirm(true)
+          <>
+            <div className="flex space-x-8">
+              <Form noFormatting={true} onSubmit={async (values) => {}}>
+                <LabeledToggleGroupField
+                  name={`formQuestion-${props.cell.row.original.id}-behaviour`}
+                  paddingX={3}
+                  paddingY={1}
+                  defaultValue={formQuestion?.behaviour || FormQuestionBehaviour.OPTIONAL}
+                  value={formQuestion?.behaviour}
+                  options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
+                    return { label: formQuestionBehaviour, value: formQuestionBehaviour }
+                  })}
+                  onChange={async (value) => {
+                    const toastId = toast.loading(() => (
+                      <span>
+                        <b>Setting behaviour as {value}</b>
+                        <br />
+                        for question - {formQuestion.question.name}
+                      </span>
+                    ))
+                    try {
+                      await updateFormQuestionMutation({
+                        where: { id: formQuestion?.id },
+                        data: {
+                          order: formQuestion.order - mandatoryFormQuestions.length,
+                          behaviour: value,
+                        },
+                      })
+                      toast.success(
+                        () => (
+                          <span>
+                            <b>Behaviour changed successfully</b>
+                            <br />
+                            for question - {formQuestion?.question?.name}
+                          </span>
+                        ),
+                        { id: toastId }
+                      )
+                      formQuestion.behaviour = value
+                      // router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
+                      )
+                    }
                   }}
-                >
-                  <XCircleIcon className="w-auto h-4 text-red-100" />
-                </button>
+                />
+              </Form>
+
+              {props.cell.row.original.order > mandatoryFormQuestions.length && (
+                <>
+                  <Confirm
+                    open={openConfirm}
+                    setOpen={setOpenConfirm}
+                    header={
+                      Object.entries(formQuestionToRemove).length
+                        ? `Remove Question - ${formQuestionToRemove.question.name}?`
+                        : "Remove Question?"
+                    }
+                    onSuccess={async () => {
+                      const toastId = toast.loading(() => (
+                        <span>Removing Question {formQuestionToRemove.question.name}</span>
+                      ))
+                      try {
+                        await removeQuestionFromFormMutation({
+                          formId: formQuestionToRemove.formId,
+                          order: formQuestionToRemove.order - mandatoryFormQuestions.length,
+                        })
+                        toast.success(
+                          () => (
+                            <span>Question removed - {formQuestionToRemove.question.name}</span>
+                          ),
+                          {
+                            id: toastId,
+                          }
+                        )
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          { id: toastId }
+                        )
+                      }
+                      router.reload()
+                    }}
+                  >
+                    Are you sure you want to remove this question from the form?
+                  </Confirm>
+                  {props.cell.row.original.order > mandatoryFormQuestions.length && (
+                    <button
+                      title="Remove Question"
+                      className="align-middle rounded-full"
+                      onClick={async (e) => {
+                        e.preventDefault()
+
+                        const formQuestion: ExtendedFormQuestion = props.cell.row.original
+                        setFormQuestionToRemove(formQuestion)
+                        setOpenConfirm(true)
+                      }}
+                    >
+                      <XCircleIcon className="w-6 h-auto text-red-500 hover:text-red-600" />
+                    </button>
+                  )}
+
+                  <div className="flex">
+                    <button
+                      disabled={
+                        !(
+                          props.cell.row.original.order > mandatoryFormQuestions.length &&
+                          props.cell.row.original.order !==
+                            formQuestions.length + mandatoryFormQuestions.length
+                        )
+                      }
+                      title="Move Down"
+                      className="align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
+                      onClick={async (e) => {
+                        const formQuestion: ExtendedFormQuestion = props.cell.row.original
+
+                        const toastId = toast.loading(() => (
+                          <span>Changing question order for {formQuestion.question.name}</span>
+                        ))
+                        try {
+                          await shiftFormQuestionMutation({
+                            formId: formQuestion.formId,
+                            order: formQuestion.order - mandatoryFormQuestions.length,
+                            shiftDirection: ShiftDirection.DOWN,
+                          })
+                          toast.success(
+                            () => (
+                              <span>
+                                Order changed from {formQuestion.order} to {formQuestion.order + 1}{" "}
+                                for Question {formQuestion.question.name}
+                              </span>
+                            ),
+                            { id: toastId }
+                          )
+                          router.reload()
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString(),
+                            { id: toastId }
+                          )
+                        }
+                      }}
+                    >
+                      {props.cell.row.original.order > mandatoryFormQuestions.length &&
+                        props.cell.row.original.order !==
+                          formQuestions.length + mandatoryFormQuestions.length && (
+                          <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+                        )}
+
+                      {!(
+                        props.cell.row.original.order > mandatoryFormQuestions.length &&
+                        props.cell.row.original.order !==
+                          formQuestions.length + mandatoryFormQuestions.length
+                      ) && <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />}
+                    </button>
+
+                    <button
+                      disabled={
+                        !(
+                          props.cell.row.original.order > mandatoryFormQuestions.length &&
+                          props.cell.row.original.order !== mandatoryFormQuestions.length + 1
+                        )
+                      }
+                      title="Move Up"
+                      className="ml-2 align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
+                      onClick={async (e) => {
+                        const formQuestion: ExtendedFormQuestion = props.cell.row.original
+
+                        const toastId = toast.loading(() => (
+                          <span>Changing question order for {formQuestion.question.name}</span>
+                        ))
+                        try {
+                          await shiftFormQuestionMutation({
+                            formId: formQuestion.formId,
+                            order: formQuestion.order - mandatoryFormQuestions.length,
+                            shiftDirection: ShiftDirection.UP,
+                          })
+                          toast.success(
+                            () => (
+                              <span>
+                                Order changed from {formQuestion.order} to {formQuestion.order - 1}{" "}
+                                for Question {formQuestion.question.name}
+                              </span>
+                            ),
+                            { id: toastId }
+                          )
+                          router.reload()
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString(),
+                            { id: toastId }
+                          )
+                        }
+                      }}
+                    >
+                      {props.cell.row.original.order > mandatoryFormQuestions.length &&
+                        props.cell.row.original.order !== mandatoryFormQuestions.length + 1 && (
+                          <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+                        )}
+
+                      {!(
+                        props.cell.row.original.order > mandatoryFormQuestions.length &&
+                        props.cell.row.original.order !== mandatoryFormQuestions.length + 1
+                      ) && <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />}
+                    </button>
+                  </div>
+                </>
               )}
-
-              {props.cell.row.original.order > mandatoryFormQuestions.length &&
-                props.cell.row.original.order !== mandatoryFormQuestions.length + 1 && (
-                  <button
-                    title="Move Up"
-                    className="ml-2 align-middle"
-                    onClick={async (e) => {
-                      const formQuestion: ExtendedFormQuestion = props.cell.row.original
-
-                      const toastId = toast.loading(() => (
-                        <span>Changing question order for {formQuestion.question.name}</span>
-                      ))
-                      try {
-                        await shiftFormQuestionMutation({
-                          formId: formQuestion.formId,
-                          order: formQuestion.order - mandatoryFormQuestions.length,
-                          shiftDirection: ShiftDirection.UP,
-                        })
-                        toast.success(
-                          () => (
-                            <span>
-                              Order changed from {formQuestion.order} to {formQuestion.order - 1}{" "}
-                              for Question {formQuestion.question.name}
-                            </span>
-                          ),
-                          { id: toastId }
-                        )
-                        router.reload()
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          { id: toastId }
-                        )
-                      }
-                    }}
-                  >
-                    <ArrowUpIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
-                  </button>
-                )}
-
-              {props.cell.row.original.order > mandatoryFormQuestions.length &&
-                props.cell.row.original.order !==
-                  formQuestions.length + mandatoryFormQuestions.length && (
-                  <button
-                    title="Move Down"
-                    className="ml-2 align-middle"
-                    onClick={async (e) => {
-                      const formQuestion: ExtendedFormQuestion = props.cell.row.original
-
-                      const toastId = toast.loading(() => (
-                        <span>Changing question order for {formQuestion.question.name}</span>
-                      ))
-                      try {
-                        await shiftFormQuestionMutation({
-                          formId: formQuestion.formId,
-                          order: formQuestion.order - mandatoryFormQuestions.length,
-                          shiftDirection: ShiftDirection.DOWN,
-                        })
-                        toast.success(
-                          () => (
-                            <span>
-                              Order changed from {formQuestion.order} to {formQuestion.order + 1}{" "}
-                              for Question {formQuestion.question.name}
-                            </span>
-                          ),
-                          { id: toastId }
-                        )
-                        router.reload()
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          { id: toastId }
-                        )
-                      }
-                    }}
-                  >
-                    <ArrowDownIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
-                  </button>
-                )}
-            </>
-          )
+            </div>
+          </>
         )
       },
     },

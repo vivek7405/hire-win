@@ -111,8 +111,6 @@ const QuestionSettingsPage = ({
           name: question?.name,
           type: question?.type,
           placeholder: question?.placeholder,
-          required: question?.required,
-          hidden: question?.hidden,
           acceptedFiles: question?.acceptedFiles,
           options: question?.options?.map((op) => {
             return { id: op.id, text: op.text }

@@ -14,8 +14,6 @@ export const Question = z.object({
   placeholder: z.string().optional(),
   type: z.nativeEnum(QuestionType),
   options: z.array(QuestionOption).optional(),
-  required: z.boolean().optional(),
-  hidden: z.boolean().optional(),
   slug: z.string().optional(),
   formId: z.string().optional(),
   acceptedFiles: z.string().optional(),

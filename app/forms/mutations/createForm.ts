@@ -4,6 +4,7 @@ import slugify from "slugify"
 import { FormObj, FormInputType } from "app/forms/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import createFormQuestion from "./createFormQuestion"
 
 async function createForm(data: FormInputType, ctx: Ctx) {
   ctx.session.$authorize()

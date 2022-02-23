@@ -1,7 +1,7 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "app/core/components/LabeledTextAreaField"
 import { Form } from "app/core/components/Form"
-import { Question, QuestionOption } from "app/questions/validations"
+import { QuestionInputType, QuestionOption } from "app/questions/validations"
 import { Job, QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useState } from "react"
@@ -15,6 +15,7 @@ import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import mandatoryFormQuestions from "../utils/mandatoryFormQuestions"
+import { ExtendedFormQuestion, ExtendedQuestion } from "types"
 
 type ApplicationFormProps = {
   onSuccess?: () => void
@@ -31,36 +32,32 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
     where: { formId: props.formId },
   })
 
-  const getZodType = (question, zodType) => {
-    return question.required
+  const getZodType = (fq: ExtendedFormQuestion, zodType) => {
+    return fq.behaviour === "REQUIRED"
       ? zodType.nonempty
         ? zodType.nonempty({ message: "Required" })
         : zodType
       : zodType.optional()
   }
 
-  const getValidationObj = (q, validationObj) => {
+  const getValidationObj = (fq: ExtendedFormQuestion) => {
+    const q = fq.question
+
     switch (q.type) {
-      // case (QuestionType.Single_line_text || QuestionType.Long_text ||
-      //   QuestionType.Single_select || QuestionType.Phone_number || QuestionType.Date ||
-      //   QuestionType.Number || QuestionType.Email || QuestionType.URL
-      // ):
-      //   validationObj = { ...validationObj, [q.name]: getZodType(q, z.string()) }
-      //   break
       case QuestionType.Attachment:
-        return { [q.name]: getZodType(q, z.any()) }
+        return { [q.name]: getZodType(fq, z.any()) }
       case QuestionType.Checkbox:
-        return { [q.name]: getZodType(q, z.boolean()) }
+        return { [q.name]: getZodType(fq, z.boolean()) }
       case QuestionType.Multiple_select:
-        return { [q.name]: getZodType(q, z.array(z.string())) }
+        return { [q.name]: getZodType(fq, z.array(z.string())) }
       case QuestionType.Rating:
-        return { [q.name]: getZodType(q, z.number()) }
+        return { [q.name]: getZodType(fq, z.number()) }
       default:
-        return { [q.name]: getZodType(q, z.string()) }
+        return { [q.name]: getZodType(fq, z.string()) }
     }
   }
 
-  const getQuestionField = (q) => {
+  const getQuestionField = (q: ExtendedQuestion) => {
     switch (q.type) {
       case QuestionType.Single_line_text:
         return (
@@ -190,10 +187,10 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
 
   let validationObj = {}
   mandatoryFormQuestions.forEach((fq) => {
-    validationObj = { ...validationObj, ...getValidationObj(fq.question, validationObj) }
+    validationObj = { ...validationObj, ...getValidationObj(fq) }
   })
   formQuestions.forEach((fq) => {
-    validationObj = { ...validationObj, ...getValidationObj(fq.question, validationObj) }
+    validationObj = { ...validationObj, ...getValidationObj(fq as any) }
   })
   let zodObj = z.object(validationObj)
 
@@ -210,17 +207,17 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
         subHeader={props.subHeader}
       >
         {mandatoryFormQuestions.map((fq) => {
-          if (fq.question.hidden) {
+          if (fq.behaviour === "OFF") {
             return
           }
-          return getQuestionField(fq.question)
+          return getQuestionField(fq.question as any)
         })}
         {formQuestions.map((fq) => {
           const q = fq.question
-          if (q.hidden) {
+          if (fq.behaviour === "OFF") {
             return
           }
-          return getQuestionField(q)
+          return getQuestionField(q as any)
         })}
       </Form>
     </>

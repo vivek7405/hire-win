@@ -1,3 +1,4 @@
+import { FormQuestionBehaviour } from "@prisma/client"
 import { z } from "zod"
 
 export const FormObj = z.object({
@@ -10,7 +11,8 @@ export type FormInputType = z.infer<typeof FormObj>
 export const FormQuestion = z.object({
   id: z.string().optional(),
   order: z.number().optional(),
+  behaviour: z.nativeEnum(FormQuestionBehaviour).optional(),
   formId: z.string().optional(),
-  questionId: z.string(),
+  questionId: z.string().optional(),
 })
 export type FormQuestionInputType = z.infer<typeof FormQuestion>

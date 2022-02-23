@@ -253,8 +253,6 @@ model Question {
   placeholder String           @default("")
   type        QuestionType     @default(Single_line_text)
   options     QuestionOption[]
-  required    Boolean          @default(false)
-  hidden      Boolean          @default(false)
 
   acceptedFiles String @default("")
 
@@ -301,7 +299,8 @@ model FormQuestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order Int
+  order     Int
+  behaviour FormQuestionBehaviour @default(OPTIONAL)
 
   form   Form   @relation(fields: [formId], references: [id])
   formId String
@@ -311,6 +310,12 @@ model FormQuestion {
 
   @@unique([formId, questionId])
   @@unique([formId, questionId, order])
+}
+
+enum FormQuestionBehaviour {
+  REQUIRED
+  OPTIONAL
+  OFF
 }
 
 model Answer {

@@ -16,6 +16,7 @@ export interface FormProps<S extends z.ZodType<any, any>>
   testid?: string
   header?: string
   subHeader?: string
+  noFormatting?: boolean
 }
 
 interface OnSubmitResult {
@@ -31,6 +32,7 @@ export function Form<S extends z.ZodType<any, any>>({
   onSubmit,
   header,
   subHeader,
+  noFormatting,
   ...props
 }: FormProps<S>) {
   const ctx = useForm<z.infer<S>>({
@@ -53,10 +55,10 @@ export function Form<S extends z.ZodType<any, any>>({
             })
           }
         })}
-        className="form space-y-5"
+        className={!noFormatting ? `form space-y-5` : ``}
         {...props}
       >
-        <div className="bg-white py-6 px-4 sm:p-6">
+        <div className={!noFormatting ? `bg-white py-6 px-4 sm:p-6` : ``}>
           <div>
             {(header || subHeader) && (
               <div>
@@ -64,12 +66,12 @@ export function Form<S extends z.ZodType<any, any>>({
                 <p className="mt-1 text-sm text-gray-500">{subHeader}</p>
               </div>
             )}
-            <div className="mt-6 space-y-5">
+            <div className={!noFormatting ? `mt-6 space-y-5` : ``}>
               {/* Form fields supplied as children are rendered here */}
               {children}
             </div>
-            <div className="mt-4 text-right">
-              {submitText && (
+            {submitText && (
+              <div className="mt-4 text-right">
                 <button
                   type="submit"
                   disabled={submitDisabled || ctx.formState.isSubmitting}
@@ -80,8 +82,8 @@ export function Form<S extends z.ZodType<any, any>>({
                 >
                   {submitText}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </form>
