@@ -16,7 +16,7 @@ async function createFormQuestion(data: FormQuestionInputType, ctx: Ctx) {
     data: {
       order: order,
       formId: formId!,
-      questionId: questionId,
+      questionId: questionId!,
     },
   })
 
