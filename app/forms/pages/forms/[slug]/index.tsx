@@ -242,7 +242,6 @@ export const Questions = ({ user, form }) => {
                         { id: toastId }
                       )
                       formQuestion.behaviour = value
-                      // router.reload()
                     } catch (error) {
                       toast.error(
                         "Sorry, we had an unexpected error. Please try again. - " +
