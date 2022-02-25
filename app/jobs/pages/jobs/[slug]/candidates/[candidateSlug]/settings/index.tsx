@@ -24,7 +24,6 @@ import updateCandidate from "app/jobs/mutations/updateCandidate"
 import getCandidate from "app/jobs/queries/getCandidate"
 import { AttachmentObject, ExtendedAnswer } from "types"
 import { QuestionType } from "@prisma/client"
-import mandatoryFormQuestions from "app/jobs/utils/mandatoryFormQuestions"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -114,12 +113,6 @@ const CandidateSettingsPage = ({
 
   function getInitialValues() {
     const initialValues: any = {}
-
-    mandatoryFormQuestions.forEach((formQuestion) => {
-      initialValues[formQuestion?.question?.name] = eval(
-        `candidate?.${formQuestion?.question?.name?.toLowerCase()}`
-      )
-    })
 
     candidate?.answers?.forEach((answer) => {
       if (answer) {

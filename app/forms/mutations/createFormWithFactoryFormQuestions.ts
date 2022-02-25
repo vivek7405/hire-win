@@ -1,0 +1,85 @@
+import { Ctx, AuthenticationError, resolver } from "blitz"
+import db from "db"
+import slugify from "slugify"
+import { Question as QuestionObj, QuestionInputType } from "app/questions/validations"
+import Guard from "app/guard/ability"
+import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import factoryFormQuestions from "../../questions/utils/factoryFormQuestions"
+import { Question, QuestionType } from "@prisma/client"
+
+async function createFormWithFactoryFormQuestions(formName: string, userId: number) {
+  const slugForm = slugify(formName, { strict: true })
+  const newSlugForm = await findFreeSlug(
+    slugForm,
+    async (e) => await db.form.findFirst({ where: { slug: e } })
+  )
+
+  await factoryFormQuestions.forEach(async (fq) => {
+    const slugQuestion = slugify(fq.question.name, { strict: true })
+    const newSlugQuestion = await findFreeSlug(
+      slugQuestion,
+      async (e) => await db.question.findFirst({ where: { slug: e } })
+    )
+
+    fq.question.slug = newSlugQuestion
+  })
+
+  const existingQuestions = await db.question.findMany({
+    where: {
+      userId,
+      name: {
+        in: factoryFormQuestions.map((fq) => {
+          return fq.question.name
+        }),
+      },
+    },
+  })
+
+  const createForm = await db.form.create({
+    data: {
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      name: formName,
+      slug: newSlugForm,
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      questions: {
+        create: factoryFormQuestions.map((fq) => {
+          return {
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            order: fq.order,
+            behaviour: fq.behaviour,
+            question: {
+              connectOrCreate: {
+                where: {
+                  id: existingQuestions?.find((q) => q.name === fq.question.name)?.id || "",
+                },
+                create: {
+                  name: fq.question.name || "",
+                  type: fq.question.type || QuestionType.Single_line_text,
+                  placeholder: fq.question.placeholder || "",
+                  acceptedFiles: fq.question.acceptedFiles || "",
+                  slug: fq.question.slug || "",
+                  factory: true,
+                  user: {
+                    connect: {
+                      id: userId,
+                    },
+                  },
+                },
+              },
+            },
+          }
+        }),
+      },
+    },
+  })
+
+  return createForm
+}
+
+export default createFormWithFactoryFormQuestions

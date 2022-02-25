@@ -34,11 +34,11 @@ import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
 import ApplicationForm from "app/jobs/components/ApplicationForm"
-import mandatoryFormQuestions from "app/jobs/utils/mandatoryFormQuestions"
 import { FormQuestionBehaviour } from "@prisma/client"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
+import factoryFormQuestions from "app/questions/utils/factoryFormQuestions"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -142,21 +142,11 @@ export const Questions = ({ user, form }) => {
     endPage = count
   }
 
-  // formQuestions.splice(0, 0, ...mandatoryFormQuestions as any)
-
   useMemo(async () => {
     let data: ExtendedFormQuestion[] = []
 
-    await [
-      ...mandatoryFormQuestions.map((mfq, index) => {
-        return { ...mfq, order: index + 1 }
-      }),
-      ...formQuestions.map((fq) => {
-        return { ...fq, order: (fq.order += mandatoryFormQuestions.length) }
-      }),
-    ].forEach((formQuestion) => {
-      data = [...(data as any), { ...formQuestion }]
-
+    await formQuestions.forEach((formQuestion) => {
+      data = [...data, { ...formQuestion }]
       setData(data)
     })
   }, [formQuestions])
@@ -172,7 +162,7 @@ export const Questions = ({ user, form }) => {
       Cell: (props) => {
         return (
           <>
-            {props.cell.row.original.order > mandatoryFormQuestions.length && (
+            {!props.cell.row.original.question.factory ? (
               <Link
                 href={Routes.QuestionSettingsPage({ slug: props.cell.row.original.question.slug })}
                 passHref
@@ -181,10 +171,9 @@ export const Questions = ({ user, form }) => {
                   {props.cell.row.original.question.name}
                 </a>
               </Link>
+            ) : (
+              props.cell.row.original.question.name
             )}
-
-            {props.cell.row.original.order <= mandatoryFormQuestions.length &&
-              props.cell.row.original.question.name}
           </>
         )
       },
@@ -227,7 +216,7 @@ export const Questions = ({ user, form }) => {
                       await updateFormQuestionMutation({
                         where: { id: formQuestion?.id },
                         data: {
-                          order: formQuestion.order - mandatoryFormQuestions.length,
+                          order: formQuestion.order,
                           behaviour: value,
                         },
                       })
@@ -253,7 +242,7 @@ export const Questions = ({ user, form }) => {
                 />
               </Form>
 
-              {props.cell.row.original.order > mandatoryFormQuestions.length && (
+              {!props.cell.row.original.question.factory && (
                 <>
                   <Confirm
                     open={openConfirm}
@@ -270,7 +259,7 @@ export const Questions = ({ user, form }) => {
                       try {
                         await removeQuestionFromFormMutation({
                           formId: formQuestionToRemove.formId,
-                          order: formQuestionToRemove.order - mandatoryFormQuestions.length,
+                          order: formQuestionToRemove.order,
                         })
                         toast.success(
                           () => (
@@ -292,7 +281,7 @@ export const Questions = ({ user, form }) => {
                   >
                     Are you sure you want to remove this question from the form?
                   </Confirm>
-                  {props.cell.row.original.order > mandatoryFormQuestions.length && (
+                  {!props.cell.row.original.question.factory && (
                     <button
                       title="Remove Question"
                       className="align-middle rounded-full"
@@ -310,13 +299,7 @@ export const Questions = ({ user, form }) => {
 
                   <div className="flex">
                     <button
-                      disabled={
-                        !(
-                          props.cell.row.original.order > mandatoryFormQuestions.length &&
-                          props.cell.row.original.order !==
-                            formQuestions.length + mandatoryFormQuestions.length
-                        )
-                      }
+                      disabled={props.cell.row.original.order === formQuestions.length}
                       title="Move Down"
                       className="align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
                       onClick={async (e) => {
@@ -328,7 +311,7 @@ export const Questions = ({ user, form }) => {
                         try {
                           await shiftFormQuestionMutation({
                             formId: formQuestion.formId,
-                            order: formQuestion.order - mandatoryFormQuestions.length,
+                            order: formQuestion.order,
                             shiftDirection: ShiftDirection.DOWN,
                           })
                           toast.success(
@@ -350,25 +333,19 @@ export const Questions = ({ user, form }) => {
                         }
                       }}
                     >
-                      {props.cell.row.original.order > mandatoryFormQuestions.length &&
-                        props.cell.row.original.order !==
-                          formQuestions.length + mandatoryFormQuestions.length && (
-                          <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
-                        )}
+                      {!(props.cell.row.original.order === formQuestions.length) && (
+                        <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+                      )}
 
-                      {!(
-                        props.cell.row.original.order > mandatoryFormQuestions.length &&
-                        props.cell.row.original.order !==
-                          formQuestions.length + mandatoryFormQuestions.length
-                      ) && <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />}
+                      {props.cell.row.original.order === formQuestions.length && (
+                        <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />
+                      )}
                     </button>
 
                     <button
                       disabled={
-                        !(
-                          props.cell.row.original.order > mandatoryFormQuestions.length &&
-                          props.cell.row.original.order !== mandatoryFormQuestions.length + 1
-                        )
+                        props.cell.row.original.order ===
+                        formQuestions.length - factoryFormQuestions.length + 1
                       }
                       title="Move Up"
                       className="ml-2 align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
@@ -381,7 +358,7 @@ export const Questions = ({ user, form }) => {
                         try {
                           await shiftFormQuestionMutation({
                             formId: formQuestion.formId,
-                            order: formQuestion.order - mandatoryFormQuestions.length,
+                            order: formQuestion.order,
                             shiftDirection: ShiftDirection.UP,
                           })
                           toast.success(
@@ -403,15 +380,17 @@ export const Questions = ({ user, form }) => {
                         }
                       }}
                     >
-                      {props.cell.row.original.order > mandatoryFormQuestions.length &&
-                        props.cell.row.original.order !== mandatoryFormQuestions.length + 1 && (
-                          <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
-                        )}
-
                       {!(
-                        props.cell.row.original.order > mandatoryFormQuestions.length &&
-                        props.cell.row.original.order !== mandatoryFormQuestions.length + 1
-                      ) && <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />}
+                        props.cell.row.original.order ===
+                        formQuestions.length - factoryFormQuestions.length + 1
+                      ) && (
+                        <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+                      )}
+
+                      {props.cell.row.original.order ===
+                        formQuestions.length - factoryFormQuestions.length + 1 && (
+                        <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />
+                      )}
                     </button>
                   </div>
                 </>
@@ -432,9 +411,9 @@ export const Questions = ({ user, form }) => {
       pageSize={ITEMS_PER_PAGE}
       hasNext={hasMore}
       hasPrevious={tablePage !== 0}
-      totalCount={count + mandatoryFormQuestions.length}
+      totalCount={count}
       startPage={startPage}
-      endPage={endPage + mandatoryFormQuestions.length}
+      endPage={endPage}
     />
   )
 }

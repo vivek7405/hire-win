@@ -95,10 +95,6 @@ const Forms = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Name",
       accessor: "name",
       Cell: (props) => {
@@ -112,8 +108,10 @@ const Forms = ({ user }) => {
       },
     },
     {
-      Header: "Slug",
-      accessor: "slug",
+      Header: "Questions",
+      Cell: (props) => {
+        return props.cell.row.original.questions.length
+      },
     },
     {
       Header: "",

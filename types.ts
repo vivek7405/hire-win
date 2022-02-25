@@ -87,7 +87,6 @@ export type ExtendedFormQuestion = Prisma.FormQuestionGetPayload<{
     question: {
       include: {
         options: true
-        forms: true
       }
     }
   }

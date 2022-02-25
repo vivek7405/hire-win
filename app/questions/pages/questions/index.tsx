@@ -68,8 +68,6 @@ export const Questions = ({ user }) => {
     take: ITEMS_PER_PAGE,
   })
 
-  // Use blitz guard to check if user can update t
-
   let startPage = tablePage * ITEMS_PER_PAGE + 1
   let endPage = startPage - 1 + ITEMS_PER_PAGE
 
@@ -95,19 +93,17 @@ export const Questions = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Name",
       accessor: "name",
       Cell: (props) => {
-        return (
+        return !props.cell.row.original.factory ? (
           <Link href={Routes.SingleQuestionPage({ slug: props.cell.row.original.slug })} passHref>
             <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
               {props.cell.row.original.name}
             </a>
           </Link>
+        ) : (
+          props.cell.row.original.name
         )
       },
     },
@@ -124,7 +120,7 @@ export const Questions = ({ user }) => {
       Cell: (props) => {
         return (
           <>
-            {props.cell.row.original.canUpdate && (
+            {props.cell.row.original.canUpdate && !props.cell.row.original.factory && (
               <Link
                 href={Routes.QuestionSettingsPage({ slug: props.cell.row.original.slug })}
                 passHref

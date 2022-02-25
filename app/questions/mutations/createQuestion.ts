@@ -4,7 +4,6 @@ import slugify from "slugify"
 import { Question, QuestionInputType } from "app/questions/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { optionCSS } from "react-select/dist/declarations/src/components/Option"
 
 async function createQuestion(data: QuestionInputType, ctx: Ctx) {
   const { name, placeholder, type, options, acceptedFiles } = Question.parse(data)

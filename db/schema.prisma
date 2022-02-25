@@ -249,20 +249,20 @@ model Question {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name        String
-  placeholder String           @default("")
-  type        QuestionType     @default(Single_line_text)
-  options     QuestionOption[]
+  name          String
+  placeholder   String           @default("")
+  type          QuestionType     @default(Single_line_text)
+  options       QuestionOption[]
+  acceptedFiles String           @default("")
 
-  acceptedFiles String @default("")
+  factory Boolean @default(false)
 
   slug String @unique
-
-  forms FormQuestion[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
+  forms   FormQuestion[]
   answers Answer[]
 
   @@unique([userId, name])

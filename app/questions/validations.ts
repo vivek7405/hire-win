@@ -17,5 +17,6 @@ export const Question = z.object({
   slug: z.string().optional(),
   formId: z.string().optional(),
   acceptedFiles: z.string().optional(),
+  factory: z.boolean().optional(),
 })
 export type QuestionInputType = z.infer<typeof Question>

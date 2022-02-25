@@ -14,7 +14,6 @@ import LabeledPhoneNumberField from "app/core/components/LabeledPhoneNumberField
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
-import mandatoryFormQuestions from "../utils/mandatoryFormQuestions"
 import { ExtendedFormQuestion, ExtendedQuestion } from "types"
 
 type ApplicationFormProps = {
@@ -186,9 +185,6 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
   }
 
   let validationObj = {}
-  mandatoryFormQuestions.forEach((fq) => {
-    validationObj = { ...validationObj, ...getValidationObj(fq) }
-  })
   formQuestions.forEach((fq) => {
     validationObj = { ...validationObj, ...getValidationObj(fq as any) }
   })
@@ -206,12 +202,6 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
         header={props.header}
         subHeader={props.subHeader}
       >
-        {mandatoryFormQuestions.map((fq) => {
-          if (fq.behaviour === "OFF") {
-            return
-          }
-          return getQuestionField(fq.question as any)
-        })}
         {formQuestions.map((fq) => {
           const q = fq.question
           if (fq.behaviour === "OFF") {
