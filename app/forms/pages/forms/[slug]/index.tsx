@@ -11,6 +11,7 @@ import {
   usePaginatedQuery,
   useRouter,
   useMutation,
+  useQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -39,6 +40,7 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
 import factoryFormQuestions from "app/questions/utils/factoryFormQuestions"
+import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -125,22 +127,30 @@ export const Questions = ({ user, form }) => {
     setQuery(search)
   }, [router.query])
 
-  const [{ formQuestions, hasMore, count }] = usePaginatedQuery(getFormQuestions, {
+  // const [{ formQuestions, hasMore, count }] = usePaginatedQuery(getFormQuestions, {
+  //   where: {
+  //     formId: form?.id,
+  //     ...query,
+  //   },
+  //   orderBy: { order: "asc" },
+  //   skip: ITEMS_PER_PAGE * Number(tablePage),
+  //   take: ITEMS_PER_PAGE,
+  // })
+
+  // let startPage = tablePage * ITEMS_PER_PAGE + 1
+  // let endPage = startPage - 1 + ITEMS_PER_PAGE
+
+  // if (endPage > count) {
+  //   endPage = count
+  // }
+
+  const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
     where: {
       formId: form?.id,
       ...query,
     },
     orderBy: { order: "asc" },
-    skip: ITEMS_PER_PAGE * Number(tablePage),
-    take: ITEMS_PER_PAGE,
   })
-
-  let startPage = tablePage * ITEMS_PER_PAGE + 1
-  let endPage = startPage - 1 + ITEMS_PER_PAGE
-
-  if (endPage > count) {
-    endPage = count
-  }
 
   useMemo(async () => {
     let data: ExtendedFormQuestion[] = []
@@ -160,19 +170,21 @@ export const Questions = ({ user, form }) => {
       Header: "Name",
       accessor: "question.name",
       Cell: (props) => {
+        const formQuestion: ExtendedFormQuestion = props.cell.row.original
+
         return (
           <>
-            {!props.cell.row.original.question.factory ? (
+            {!formQuestion.question.factory ? (
               <Link
-                href={Routes.QuestionSettingsPage({ slug: props.cell.row.original.question.slug })}
+                href={Routes.QuestionSettingsPage({ slug: formQuestion.question.slug })}
                 passHref
               >
                 <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
-                  {props.cell.row.original.question.name}
+                  {formQuestion.question.name}
                 </a>
               </Link>
             ) : (
-              props.cell.row.original.question.name
+              formQuestion.question.name
             )}
           </>
         )
@@ -196,7 +208,7 @@ export const Questions = ({ user, form }) => {
             <div className="flex space-x-8">
               <Form noFormatting={true} onSubmit={async (values) => {}}>
                 <LabeledToggleGroupField
-                  name={`formQuestion-${props.cell.row.original.id}-behaviour`}
+                  name={`formQuestion-${formQuestion.id}-behaviour`}
                   paddingX={3}
                   paddingY={1}
                   defaultValue={formQuestion?.behaviour || FormQuestionBehaviour.OPTIONAL}
@@ -242,7 +254,7 @@ export const Questions = ({ user, form }) => {
                 />
               </Form>
 
-              {!props.cell.row.original.question.factory && (
+              {!formQuestion.question.factory && (
                 <>
                   <Confirm
                     open={openConfirm}
@@ -281,14 +293,13 @@ export const Questions = ({ user, form }) => {
                   >
                     Are you sure you want to remove this question from the form?
                   </Confirm>
-                  {!props.cell.row.original.question.factory && (
+                  {!formQuestion.question.factory && (
                     <button
                       title="Remove Question"
                       className="align-middle rounded-full"
                       onClick={async (e) => {
                         e.preventDefault()
 
-                        const formQuestion: ExtendedFormQuestion = props.cell.row.original
                         setFormQuestionToRemove(formQuestion)
                         setOpenConfirm(true)
                       }}
@@ -299,12 +310,10 @@ export const Questions = ({ user, form }) => {
 
                   <div className="flex">
                     <button
-                      disabled={props.cell.row.original.order === formQuestions.length}
+                      disabled={formQuestion.order === formQuestions.length}
                       title="Move Down"
                       className="align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
                       onClick={async (e) => {
-                        const formQuestion: ExtendedFormQuestion = props.cell.row.original
-
                         const toastId = toast.loading(() => (
                           <span>Changing question order for {formQuestion.question.name}</span>
                         ))
@@ -323,7 +332,19 @@ export const Questions = ({ user, form }) => {
                             ),
                             { id: toastId }
                           )
-                          router.reload()
+                          const x = formQuestion.order
+                          const y = formQuestion.order - 1
+                          if (x <= formQuestions.length - 1 && y <= formQuestions.length - 1) {
+                            const row = formQuestions[x]!
+                            formQuestions[x] = {
+                              ...formQuestions[y]!,
+                              order: formQuestion.order + 1,
+                            }
+                            formQuestions[y] = { ...row, order: formQuestion.order }
+                            setData(formQuestions)
+                          } else {
+                            toast.error("Index out of range")
+                          }
                         } catch (error) {
                           toast.error(
                             "Sorry, we had an unexpected error. Please try again. - " +
@@ -333,25 +354,20 @@ export const Questions = ({ user, form }) => {
                         }
                       }}
                     >
-                      {!(props.cell.row.original.order === formQuestions.length) && (
+                      {!(formQuestion.order === formQuestions.length) && (
                         <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
                       )}
 
-                      {props.cell.row.original.order === formQuestions.length && (
+                      {formQuestion.order === formQuestions.length && (
                         <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />
                       )}
                     </button>
 
                     <button
-                      disabled={
-                        props.cell.row.original.order ===
-                        formQuestions.length - factoryFormQuestions.length + 1
-                      }
+                      disabled={formQuestion.order === factoryFormQuestions.length + 1}
                       title="Move Up"
                       className="ml-2 align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
                       onClick={async (e) => {
-                        const formQuestion: ExtendedFormQuestion = props.cell.row.original
-
                         const toastId = toast.loading(() => (
                           <span>Changing question order for {formQuestion.question.name}</span>
                         ))
@@ -370,7 +386,16 @@ export const Questions = ({ user, form }) => {
                             ),
                             { id: toastId }
                           )
-                          router.reload()
+                          const x = formQuestion.order - 1
+                          const y = formQuestion.order - 2
+                          if (x <= formQuestions.length - 1 && y <= formQuestions.length - 1) {
+                            const row = formQuestions[x]!
+                            formQuestions[x] = { ...formQuestions[y]!, order: formQuestion.order }
+                            formQuestions[y] = { ...row, order: formQuestion.order - 1 }
+                            setData(formQuestions)
+                          } else {
+                            toast.error("Index out of range")
+                          }
                         } catch (error) {
                           toast.error(
                             "Sorry, we had an unexpected error. Please try again. - " +
@@ -380,15 +405,11 @@ export const Questions = ({ user, form }) => {
                         }
                       }}
                     >
-                      {!(
-                        props.cell.row.original.order ===
-                        formQuestions.length - factoryFormQuestions.length + 1
-                      ) && (
+                      {!(formQuestion.order === factoryFormQuestions.length + 1) && (
                         <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
                       )}
 
-                      {props.cell.row.original.order ===
-                        formQuestions.length - factoryFormQuestions.length + 1 && (
+                      {formQuestion.order === factoryFormQuestions.length + 1 && (
                         <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />
                       )}
                     </button>
@@ -406,14 +427,15 @@ export const Questions = ({ user, form }) => {
     <Table
       columns={columns}
       data={data}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+      pageCount={formQuestions.length}
       pageIndex={tablePage}
       pageSize={ITEMS_PER_PAGE}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
+      hasNext={false}
+      hasPrevious={false}
+      totalCount={formQuestions.length}
+      startPage={1}
+      endPage={1}
+      noPagination={true}
     />
   )
 }

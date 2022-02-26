@@ -1,11 +1,8 @@
-import { Ctx, AuthenticationError, resolver } from "blitz"
 import db from "db"
 import slugify from "slugify"
-import { Question as QuestionObj, QuestionInputType } from "app/questions/validations"
-import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryFormQuestions from "../../questions/utils/factoryFormQuestions"
-import { Question, QuestionType } from "@prisma/client"
+import { QuestionType } from "@prisma/client"
 
 async function createFormWithFactoryFormQuestions(formName: string, userId: number) {
   const slugForm = slugify(formName, { strict: true })
@@ -14,15 +11,19 @@ async function createFormWithFactoryFormQuestions(formName: string, userId: numb
     async (e) => await db.form.findFirst({ where: { slug: e } })
   )
 
-  await factoryFormQuestions.forEach(async (fq) => {
+  const getQuestionSlug = async (fq) => {
     const slugQuestion = slugify(fq.question.name, { strict: true })
     const newSlugQuestion = await findFreeSlug(
       slugQuestion,
       async (e) => await db.question.findFirst({ where: { slug: e } })
     )
-
     fq.question.slug = newSlugQuestion
+  }
+  const promises = [] as any
+  factoryFormQuestions.forEach(async (fq) => {
+    promises.push(getQuestionSlug(fq))
   })
+  await Promise.all(promises)
 
   const existingQuestions = await db.question.findMany({
     where: {
