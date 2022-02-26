@@ -1,10 +1,10 @@
 import { resolver, SecurePassword, Ctx } from "blitz"
 import db from "db"
 import { Signup } from "app/auth/validations"
-import { Role } from "types"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWithFactoryFormQuestions"
+import { UserRole } from "@prisma/client"
 
 export default resolver.pipe(
   resolver.zod(Signup),
@@ -23,14 +23,14 @@ export default resolver.pipe(
         companyName,
         slug: newSlug,
         hashedPassword,
-        role: "USER",
+        role: UserRole.USER,
       },
       select: { id: true, email: true, role: true },
     })
 
     await createFormWithFactoryFormQuestions("Default", user?.id)
 
-    await ctx.session.$create({ userId: user.id, role: user.role as Role })
+    await ctx.session.$create({ userId: user.id, role: user.role as UserRole })
     return user
   }
 )

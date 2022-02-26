@@ -1,10 +1,7 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
-import { Prisma } from "@prisma/client"
+import { Prisma, UserRole } from "@prisma/client"
 import { plans } from "app/core/utils/plans"
-
-// Note: You should switch to Postgres and then use a DB enum for role type
-export type Role = "ADMIN" | "USER"
 
 export type Plan = keyof typeof plans
 
@@ -13,10 +10,10 @@ declare module "blitz" {
     session: SessionContext
   }
   export interface Session {
-    isAuthorized: SimpleRolesIsAuthorized<Role>
+    isAuthorized: SimpleRolesIsAuthorized<UserRole>
     PublicData: {
       userId: User["id"]
-      role: Role
+      role: UserRole
     }
   }
 }

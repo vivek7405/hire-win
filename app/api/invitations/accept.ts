@@ -1,6 +1,7 @@
 import db from "db"
 import { hash256, BlitzApiRequest, BlitzApiResponse } from "blitz"
 import stripe from "app/core/utils/stripe"
+import { UserRole } from "@prisma/client"
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
@@ -49,7 +50,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
     // 6. If there is a user, create a new membership associated with the project and user
     await db.membership.create({
       data: {
-        role: "USER",
+        role: UserRole.USER,
         job: {
           connect: {
             id: req.query.jobId as string,

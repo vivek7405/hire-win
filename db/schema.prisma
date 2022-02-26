@@ -25,7 +25,7 @@ model User {
   theme          String?   @default("indigo")
   slug           String    @unique
   hashedPassword String?
-  role           String    @default("USER")
+  role           UserRole  @default(USER)
   tokens         Token[]
   sessions       Session[]
 
@@ -37,6 +37,11 @@ model User {
 
   forms     Form[]
   questions Question[]
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }
 
 model Session {

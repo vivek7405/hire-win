@@ -4,6 +4,7 @@ import slugify from "slugify"
 import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import { MembershipRole } from "@prisma/client"
 
 async function createJob(data: JobInputType, ctx: Ctx) {
   ctx.session.$authorize()
@@ -55,7 +56,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       validThrough,
       memberships: {
         create: {
-          role: "OWNER",
+          role: MembershipRole.OWNER,
           user: {
             connect: {
               id: user.id,
