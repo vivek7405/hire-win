@@ -156,7 +156,7 @@ const CandidateSettingsPage = ({
         formId={candidate?.job?.formId!}
         preview={false}
         header="Candidate Details"
-        subHeader="Update your candidate details."
+        subHeader="Update candidate details"
         initialValues={getInitialValues()}
         onSubmit={async (values) => {
           const toastId = toast.loading(() => <span>Updating Candidate</span>)

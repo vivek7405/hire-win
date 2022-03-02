@@ -106,7 +106,7 @@ const FormSettingsPage = ({
       <br />
       <FormForm
         header="Form Details"
-        subHeader="Update your form details."
+        subHeader="Update form details"
         initialValues={{
           name: form?.name,
         }}

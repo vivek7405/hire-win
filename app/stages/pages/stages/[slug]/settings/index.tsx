@@ -106,7 +106,7 @@ const StageSettingsPage = ({
       <br />
       <StageForm
         header="Stage Details"
-        subHeader="Update your stage details."
+        subHeader="Update stage details"
         initialValues={{
           name: stage?.name,
         }}

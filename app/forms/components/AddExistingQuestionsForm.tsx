@@ -32,8 +32,8 @@ export const AddExistingQuestionsForm = (props: AddQuestionFormProps) => {
   return (
     <>
       <Form
-        header="Add Question"
-        subHeader="Add an existing question to the form"
+        header="Add Questions"
+        subHeader="Add existing questions to the form"
         submitText="Add"
         submitDisabled={questions?.length ? false : true}
         schema={props.schema}

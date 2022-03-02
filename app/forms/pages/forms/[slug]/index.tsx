@@ -467,11 +467,6 @@ const SingleFormPage = ({
       <br />
       {canUpdate && (
         <>
-          <Link href={Routes.FormSettingsPage({ slug: form?.slug! })} passHref>
-            <a data-testid={`${form?.name && `${form?.name}-`}settingsLink`}>Settings</a>
-          </Link>
-          <br />
-          <br />
           <Modal
             header="Add Existing Questions"
             open={openAddExistingQuestion}
@@ -581,6 +576,15 @@ const SingleFormPage = ({
           <Link href={Routes.QuestionsHome()} passHref>
             <a className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800">
               Question Pool
+            </a>
+          </Link>
+
+          <Link href={Routes.FormSettingsPage({ slug: form?.slug! })} passHref>
+            <a
+              className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+              data-testid={`${form?.name && `${form?.name}-`}settingsLink`}
+            >
+              Form Settings
             </a>
           </Link>
 
