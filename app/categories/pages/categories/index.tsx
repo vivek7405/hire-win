@@ -95,10 +95,6 @@ const Categories = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Name",
       accessor: "name",
       Cell: (props) => {
@@ -110,10 +106,6 @@ const Categories = ({ user }) => {
           </Link>
         )
       },
-    },
-    {
-      Header: "Slug",
-      accessor: "slug",
     },
     {
       Header: "",

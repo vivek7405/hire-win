@@ -157,6 +157,16 @@ const JobsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
         </a>
       </Link>
 
+      <Link href={Routes.JobBoard({ companySlug: user?.slug! })} passHref>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+        >
+          Job Board
+        </a>
+      </Link>
+
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >

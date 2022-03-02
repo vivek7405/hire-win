@@ -16,3 +16,9 @@ export const FormQuestion = z.object({
   questionId: z.string().optional(),
 })
 export type FormQuestionInputType = z.infer<typeof FormQuestion>
+
+export const FormQuestions = z.object({
+  formId: z.string().optional(),
+  questionIds: z.string().array(),
+})
+export type FormQuestionsInputType = z.infer<typeof FormQuestions>

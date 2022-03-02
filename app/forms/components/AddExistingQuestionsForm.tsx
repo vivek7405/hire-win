@@ -4,6 +4,7 @@ import LabeledSelectField from "app/core/components/LabeledSelectField"
 import getQuestionsWOPagination from "app/questions/queries/getQuestionsWOPagination"
 import { useQuery } from "blitz"
 import getFormQuestionsWOPagination from "../queries/getFormQuestionsWOPagination"
+import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 
 type AddQuestionFormProps = {
   onSuccess?: () => void
@@ -14,7 +15,7 @@ type AddQuestionFormProps = {
   formId: string
 }
 
-export const AddQuestionForm = (props: AddQuestionFormProps) => {
+export const AddExistingQuestionsForm = (props: AddQuestionFormProps) => {
   const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
     where: { formId: props.formId },
   })
@@ -40,11 +41,12 @@ export const AddQuestionForm = (props: AddQuestionFormProps) => {
         onSubmit={props.onSubmit}
         testid="addQuestionForm"
       >
-        <LabeledSelectField
-          name="questionId"
+        <LabeledReactSelectField
+          name="questionIds"
           label="Questions"
-          placeholder="Form Question"
-          testid="formQuestion"
+          placeholder="Select Questions"
+          testid="formQuestions"
+          isMulti={true}
           options={
             questions?.length
               ? [
@@ -60,4 +62,4 @@ export const AddQuestionForm = (props: AddQuestionFormProps) => {
   )
 }
 
-export default AddQuestionForm
+export default AddExistingQuestionsForm

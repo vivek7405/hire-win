@@ -24,10 +24,10 @@ import Skeleton from "react-loading-skeleton"
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import getFormQuestions from "app/forms/queries/getFormQuestions"
-import AddQuestionForm from "app/forms/components/AddQuestionForm"
+import AddExistingQuestionsForm from "app/forms/components/AddExistingQuestionsForm"
 import toast from "react-hot-toast"
 import createFormQuestion from "app/forms/mutations/createFormQuestion"
-import { FormQuestion } from "app/forms/validations"
+import { FormQuestion, FormQuestions } from "app/forms/validations"
 
 import { ArrowUpIcon, ArrowDownIcon, XCircleIcon } from "@heroicons/react/outline"
 import { ExtendedFormQuestion, ShiftDirection } from "types"
@@ -41,6 +41,9 @@ import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
 import factoryFormQuestions from "app/questions/utils/factoryFormQuestions"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
+import QuestionForm from "app/questions/components/QuestionForm"
+import createQuestion from "app/questions/mutations/createQuestion"
+import addExistingFormQuestions from "app/forms/mutations/addExistingFormQuestions"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -446,9 +449,12 @@ const SingleFormPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [openAddQuestion, setOpenAddQuestion] = React.useState(false)
+  const [openAddExistingQuestion, setOpenAddExistingQuestion] = React.useState(false)
+  const [openAddNewQuestion, setOpenAddNewQuestion] = React.useState(false)
   const [openPreviewForm, setOpenPreviewForm] = React.useState(false)
   const [createFormQuestionMutation] = useMutation(createFormQuestion)
+  const [addExistingFormQuestionsMutation] = useMutation(addExistingFormQuestions)
+  const [createQuestionMutation] = useMutation(createQuestion)
   const router = useRouter()
 
   if (error) {
@@ -466,19 +472,23 @@ const SingleFormPage = ({
           </Link>
           <br />
           <br />
-          <Modal header="Add Question" open={openAddQuestion} setOpen={setOpenAddQuestion}>
-            <AddQuestionForm
-              schema={FormQuestion}
+          <Modal
+            header="Add Existing Questions"
+            open={openAddExistingQuestion}
+            setOpen={setOpenAddExistingQuestion}
+          >
+            <AddExistingQuestionsForm
+              schema={FormQuestions}
               user={user}
               formId={form?.id!}
               onSubmit={async (values) => {
-                const toastId = toast.loading(() => <span>Adding Question</span>)
+                const toastId = toast.loading(() => <span>Adding Question(s)</span>)
                 try {
-                  await createFormQuestionMutation({
+                  await addExistingFormQuestionsMutation({
                     formId: form?.id as string,
-                    questionId: values.questionId,
+                    questionIds: values.questionIds,
                   })
-                  toast.success(() => <span>Question added</span>, {
+                  toast.success(() => <span>Question(s) added</span>, {
                     id: toastId,
                   })
                   router.reload()
@@ -494,12 +504,56 @@ const SingleFormPage = ({
           <button
             onClick={(e) => {
               e.preventDefault()
-              setOpenAddQuestion(true)
+              setOpenAddExistingQuestion(true)
             }}
             data-testid={`open-addQuestion-modal`}
             className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
           >
-            Add Question
+            Add Existing Questions
+          </button>
+
+          <Modal
+            header="Add New Question"
+            open={openAddNewQuestion}
+            setOpen={setOpenAddNewQuestion}
+          >
+            <QuestionForm
+              header="Add New Question to Form"
+              subHeader="Enter question details"
+              initialValues={{
+                name: "",
+              }}
+              editmode={false}
+              onSubmit={async (values) => {
+                const toastId = toast.loading(() => <span>Adding Question</span>)
+                try {
+                  const createQuestionResponse = await createQuestionMutation(values)
+
+                  await createFormQuestionMutation({
+                    formId: form?.id as string,
+                    questionId: createQuestionResponse.id,
+                  })
+                  toast.success(() => <span>Question added</span>, {
+                    id: toastId,
+                  })
+                  router.reload()
+                } catch (error) {
+                  toast.error(
+                    "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                  )
+                }
+              }}
+            />
+          </Modal>
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              setOpenAddNewQuestion(true)
+            }}
+            data-testid={`open-addQuestion-modal`}
+            className="float-right text-white bg-theme-600 mr-3 px-4 py-2 rounded-sm hover:bg-theme-700"
+          >
+            Add New Question
           </button>
 
           <Modal header="Preview Form" open={openPreviewForm} setOpen={setOpenPreviewForm}>
@@ -519,10 +573,16 @@ const SingleFormPage = ({
               setOpenPreviewForm(true)
             }}
             data-testid={`open-previewForm-modal`}
-            className="mr-3 float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
           >
             Preview Form
           </button>
+
+          <Link href={Routes.QuestionsHome()} passHref>
+            <a className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800">
+              Question Pool
+            </a>
+          </Link>
 
           <Suspense
             fallback={

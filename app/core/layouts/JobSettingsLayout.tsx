@@ -20,13 +20,13 @@ const JobSettingsLayout = ({ job, children, isOwner }: LayoutProps) => {
       icon: CogIcon,
       canView: true,
     },
-    {
-      name: "Billing",
-      href: `/jobs/${job?.slug}/settings/billing`,
-      current: router.route === `/jobs/[slug]/settings/billing`,
-      icon: CreditCardIcon,
-      canView: isOwner,
-    },
+    // {
+    //   name: "Billing",
+    //   href: `/jobs/${job?.slug}/settings/billing`,
+    //   current: router.route === `/jobs/[slug]/settings/billing`,
+    //   icon: CreditCardIcon,
+    //   canView: isOwner,
+    // },
     {
       name: "Members",
       href: `/jobs/${job?.slug}/settings/members`,
@@ -34,13 +34,13 @@ const JobSettingsLayout = ({ job, children, isOwner }: LayoutProps) => {
       icon: UserGroupIcon,
       canView: true,
     },
-    {
-      name: "API Keys",
-      href: `/jobs/${job?.slug}/settings/keys`,
-      current: router.route === `/jobs/[slug]/settings/keys`,
-      icon: KeyIcon,
-      canView: true,
-    },
+    // {
+    //   name: "API Keys",
+    //   href: `/jobs/${job?.slug}/settings/keys`,
+    //   current: router.route === `/jobs/[slug]/settings/keys`,
+    //   icon: KeyIcon,
+    //   canView: true,
+    // },
   ]
 
   return (

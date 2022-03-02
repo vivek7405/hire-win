@@ -106,7 +106,7 @@ const QuestionSettingsPage = ({
       <br />
       <QuestionForm
         header="Question Details"
-        subHeader="Update your question details."
+        subHeader="Update the question details"
         initialValues={{
           name: question?.name,
           type: question?.type,
