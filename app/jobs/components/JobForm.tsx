@@ -254,13 +254,13 @@ export const JobForm = (props: JobFormProps) => {
               options={
                 !props.form || forms.find((f) => f.id === props.form?.id)
                   ? [
-                      // { label: "Default", value: "" },
                       ...forms.map((f) => {
                         return { label: f.name!, value: f.id! }
                       }),
                     ]
                   : [{ label: props.form?.name!, value: props.form?.id! }]
               }
+              defaultValue={forms.find((f) => f.name === "Default")?.id}
             />
           </div>
         </div>
