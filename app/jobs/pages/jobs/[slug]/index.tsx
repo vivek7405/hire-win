@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { Suspense, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -20,7 +20,9 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import getJob from "app/jobs/queries/getJob"
 import Table from "app/core/components/Table"
 import getCandidates from "app/jobs/queries/getCandidates"
-import { ExtendedJob } from "types"
+import { AttachmentObject, ExtendedAnswer, ExtendedJob } from "types"
+import { QuestionType } from "@prisma/client"
+import Skeleton from "react-loading-skeleton"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -80,6 +82,216 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
+type CandidateProps = {
+  job: ExtendedJob
+}
+const Candidates = (props: CandidateProps) => {
+  const ITEMS_PER_PAGE = 12
+  const router = useRouter()
+  const tablePage = Number(router.query.page) || 0
+  const [data, setData] = useState<{}[]>([])
+  const [query, setQuery] = useState({})
+
+  useEffect(() => {
+    const search = router.query.search
+      ? {
+          AND: {
+            name: {
+              contains: JSON.parse(router.query.search as string),
+              mode: "insensitive",
+            },
+          },
+        }
+      : {}
+
+    setQuery(search)
+  }, [router.query])
+
+  const [{ candidates, hasMore, count }] = usePaginatedQuery(getCandidates, {
+    where: {
+      jobId: props.job?.id,
+      ...query,
+    },
+    skip: ITEMS_PER_PAGE * Number(tablePage),
+    take: ITEMS_PER_PAGE,
+  })
+
+  // Use blitz guard to check if user can update
+
+  let startPage = tablePage * ITEMS_PER_PAGE + 1
+  let endPage = startPage - 1 + ITEMS_PER_PAGE
+
+  if (endPage > count) {
+    endPage = count
+  }
+
+  useMemo(async () => {
+    let data: {}[] = []
+
+    await candidates.forEach((candidate) => {
+      data = [
+        ...data,
+        {
+          ...candidate,
+        },
+      ]
+
+      setData(data)
+    })
+  }, [candidates])
+
+  const getDynamicColumn = (formQuestion) => {
+    return {
+      Header: formQuestion?.question?.name,
+      Cell: (props) => {
+        const answer: ExtendedAnswer = props.cell.row.original?.answers?.find(
+          (ans) => ans.question?.name === formQuestion?.question?.name
+        )
+
+        if (answer) {
+          const val = answer.value
+          const type = answer?.question?.type
+
+          switch (type) {
+            case QuestionType.URL:
+              return (
+                <a
+                  href={val}
+                  className="text-theme-600 hover:text-theme-500"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {val}
+                </a>
+              )
+            case QuestionType.Multiple_select:
+              const answerSelectedOptionIds: String[] = JSON.parse(val)
+              const selectedOptions = answer?.question?.options
+                ?.filter((op) => answerSelectedOptionIds?.includes(op.id))
+                ?.map((op) => {
+                  return op.text
+                })
+              return JSON.stringify(selectedOptions)
+            case QuestionType.Single_select:
+              return answer?.question?.options?.find((op) => val === op.id)?.text
+            case QuestionType.Attachment:
+              const attachmentObj: AttachmentObject = JSON.parse(val)
+              return (
+                <a
+                  href={attachmentObj.Location}
+                  className="text-theme-600 hover:text-theme-500"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {attachmentObj.Key}
+                </a>
+              )
+            case QuestionType.Long_text:
+              return <p className="max-w-md overflow-auto">{val}</p>
+            default:
+              return val
+          }
+        }
+
+        return ""
+      },
+    }
+  }
+
+  type ColumnType = {
+    Header: string
+    accessor?: string
+    Cell?: (props) => any
+  }
+  let columns: ColumnType[] = [
+    {
+      Header: "Name",
+      accessor: "name",
+      Cell: (props) => {
+        return (
+          <>
+            <Link
+              href={Routes.SingleCandidatePage({
+                slug: props.cell.row.original.job?.slug,
+                candidateSlug: props.cell.row.original.slug,
+              })}
+              passHref
+            >
+              <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
+            </Link>
+          </>
+        )
+      },
+    },
+    {
+      Header: "Source",
+      accessor: "source",
+      Cell: (props) => {
+        return props.value.toString().replace("_", " ")
+      },
+    },
+    {
+      Header: "Email",
+      accessor: "email",
+    },
+    {
+      Header: "Resume",
+      accessor: "resume",
+      Cell: (props) => {
+        const attachmentObj = props.value
+        return (
+          <a
+            href={attachmentObj.Location}
+            className="text-theme-600 hover:text-theme-500"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {attachmentObj.Key}
+          </a>
+        )
+      },
+    },
+  ]
+  props.job?.form?.questions?.forEach((formQuestion) => {
+    columns.push(getDynamicColumn(formQuestion))
+  })
+
+  columns.push({
+    Header: "",
+    accessor: "action",
+    Cell: (props) => {
+      return (
+        <>
+          <Link
+            href={Routes.CandidateSettingsPage({
+              slug: props.cell.row.original.job?.slug,
+              candidateSlug: props.cell.row.original.slug,
+            })}
+            passHref
+          >
+            <a className="text-theme-600 hover:text-theme-900">Settings</a>
+          </Link>
+        </>
+      )
+    },
+  })
+
+  return (
+    <Table
+      columns={columns}
+      data={data}
+      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+      pageIndex={tablePage}
+      pageSize={ITEMS_PER_PAGE}
+      hasNext={hasMore}
+      hasPrevious={tablePage !== 0}
+      totalCount={count}
+      startPage={startPage}
+      endPage={endPage}
+    />
+  )
+}
+
 const SingleJobPage = ({
   user,
   job,
@@ -93,7 +305,7 @@ const SingleJobPage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
-      <br />
+      {/* <br />
       {canUpdate && (
         <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
           <a data-testid={`${job?.title && `${job?.title}-`}settingsLink`}>Settings</a>
@@ -104,7 +316,28 @@ const SingleJobPage = ({
         <Link href={Routes.CandidatesHome({ slug: job?.slug! })} passHref>
           <a data-testid={`${job?.title && `${job?.title}-`}candidates`}>Candidates</a>
         </Link>
+      )} */}
+      <br />
+      <Link href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+          New Candidate
+        </a>
+      </Link>
+      {canUpdate && (
+        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
+          <a
+            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+            data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
+          >
+            Job Settings
+          </a>
+        </Link>
       )}
+      <Suspense
+        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
+      >
+        <Candidates job={job as any} />
+      </Suspense>
     </AuthLayout>
   )
 }

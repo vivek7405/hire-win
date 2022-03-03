@@ -311,6 +311,16 @@ const CandidatesHome = ({
           New Candidate
         </a>
       </Link>
+      {canUpdate && (
+        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
+          <a
+            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+            data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
+          >
+            Job Settings
+          </a>
+        </Link>
+      )}
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}

@@ -101,7 +101,7 @@ const Jobs = ({ user }) => {
       accessor: "title",
       Cell: (props) => {
         return (
-          <Link href={Routes.CandidatesHome({ slug: props.cell.row.original.slug })} passHref>
+          <Link href={Routes.SingleJobPage({ slug: props.cell.row.original.slug })} passHref>
             <a data-testid={`joblink`} className="text-theme-600 hover:text-theme-900">
               {props.value}
             </a>

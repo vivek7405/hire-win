@@ -107,24 +107,6 @@ const Categories = ({ user }) => {
         )
       },
     },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        return (
-          <>
-            {props.cell.row.original.canUpdate && (
-              <Link
-                href={Routes.CategorySettingsPage({ slug: props.cell.row.original.slug })}
-                passHref
-              >
-                <a className="text-theme-600 hover:text-theme-900">Settings</a>
-              </Link>
-            )}
-          </>
-        )
-      },
-    },
   ]
 
   return (

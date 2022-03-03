@@ -114,24 +114,6 @@ export const Questions = ({ user }) => {
         return props.cell.row.original.type?.replaceAll("_", " ")
       },
     },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        return (
-          <>
-            {props.cell.row.original.canUpdate && !props.cell.row.original.factory && (
-              <Link
-                href={Routes.QuestionSettingsPage({ slug: props.cell.row.original.slug })}
-                passHref
-              >
-                <a className="text-theme-600 hover:text-theme-900">Settings</a>
-              </Link>
-            )}
-          </>
-        )
-      },
-    },
   ]
 
   return (

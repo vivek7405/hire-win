@@ -8,6 +8,8 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useMutation,
+  useRouter,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -16,6 +18,9 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getCategory from "app/categories/queries/getCategory"
+import CategoryForm from "app/categories/components/CategoryForm"
+import toast from "react-hot-toast"
+import updateCategory from "app/categories/mutations/updateCategory"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -79,6 +84,8 @@ const SingleCategoryPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter()
+  const [updateCategoryMutation] = useMutation(updateCategory)
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -87,11 +94,29 @@ const SingleCategoryPage = ({
     <AuthLayout user={user}>
       <Breadcrumbs />
       <br />
-      {canUpdate && (
-        <Link href={Routes.CategorySettingsPage({ slug: category?.slug! })} passHref>
-          <a data-testid={`${category?.name && `${category?.name}-`}settingsLink`}>Settings</a>
-        </Link>
-      )}
+      <CategoryForm
+        header="Category Details"
+        subHeader="Update category details"
+        initialValues={{
+          name: category?.name,
+        }}
+        onSubmit={async (values) => {
+          const toastId = toast.loading(() => <span>Updating Category</span>)
+          try {
+            await updateCategoryMutation({
+              where: { slug: category?.slug },
+              data: { ...values },
+              initial: category!,
+            })
+            toast.success(() => <span>Category Updated</span>, { id: toastId })
+            router.push(Routes.CategoriesHome())
+          } catch (error) {
+            toast.error(
+              "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+            )
+          }
+        }}
+      />
     </AuthLayout>
   )
 }

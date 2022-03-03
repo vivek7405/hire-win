@@ -178,10 +178,7 @@ export const Questions = ({ user, form }) => {
         return (
           <>
             {!formQuestion.question.factory ? (
-              <Link
-                href={Routes.QuestionSettingsPage({ slug: formQuestion.question.slug })}
-                passHref
-              >
+              <Link href={Routes.SingleQuestionPage({ slug: formQuestion.question.slug })} passHref>
                 <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
                   {formQuestion.question.name}
                 </a>
