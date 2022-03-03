@@ -207,21 +207,21 @@ const Candidates = (props: CandidateProps) => {
     {
       Header: "Name",
       accessor: "name",
-      Cell: (props) => {
-        return (
-          <>
-            <Link
-              href={Routes.SingleCandidatePage({
-                slug: props.cell.row.original.job?.slug,
-                candidateSlug: props.cell.row.original.slug,
-              })}
-              passHref
-            >
-              <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
-            </Link>
-          </>
-        )
-      },
+      // Cell: (props) => {
+      //   return (
+      //     <>
+      //       <Link
+      //         href={Routes.SingleCandidatePage({
+      //           slug: props.cell.row.original.job?.slug,
+      //           candidateSlug: props.cell.row.original.slug,
+      //         })}
+      //         passHref
+      //       >
+      //         <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
+      //       </Link>
+      //     </>
+      //   )
+      // },
     },
     {
       Header: "Source",
@@ -252,9 +252,11 @@ const Candidates = (props: CandidateProps) => {
       },
     },
   ]
-  props.job?.form?.questions?.forEach((formQuestion) => {
-    columns.push(getDynamicColumn(formQuestion))
-  })
+  props.job?.form?.questions
+    ?.filter((q) => !q.question.factory)
+    ?.forEach((formQuestion) => {
+      columns.push(getDynamicColumn(formQuestion))
+    })
 
   columns.push({
     Header: "",
@@ -305,18 +307,6 @@ const SingleJobPage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
-      {/* <br />
-      {canUpdate && (
-        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
-          <a data-testid={`${job?.title && `${job?.title}-`}settingsLink`}>Settings</a>
-        </Link>
-      )}
-      <br />
-      {canUpdate && (
-        <Link href={Routes.CandidatesHome({ slug: job?.slug! })} passHref>
-          <a data-testid={`${job?.title && `${job?.title}-`}candidates`}>Candidates</a>
-        </Link>
-      )} */}
       <br />
       <Link href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">

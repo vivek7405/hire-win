@@ -252,9 +252,11 @@ const Candidates = (props: CandidateProps) => {
       },
     },
   ]
-  props.job?.form?.questions?.forEach((formQuestion) => {
-    columns.push(getDynamicColumn(formQuestion))
-  })
+  props.job?.form?.questions
+    ?.filter((q) => !q.question.factory)
+    ?.forEach((formQuestion) => {
+      columns.push(getDynamicColumn(formQuestion))
+    })
 
   columns.push({
     Header: "",
