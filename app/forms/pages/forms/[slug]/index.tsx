@@ -364,7 +364,10 @@ export const Questions = ({ user, form }) => {
                     </button>
 
                     <button
-                      disabled={formQuestion.order === factoryFormQuestions.length + 1}
+                      disabled={
+                        formQuestion.order === 1 ||
+                        formQuestion.order === factoryFormQuestions.length + 1
+                      }
                       title="Move Up"
                       className="ml-2 align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
                       onClick={async (e) => {
@@ -405,11 +408,15 @@ export const Questions = ({ user, form }) => {
                         }
                       }}
                     >
-                      {!(formQuestion.order === factoryFormQuestions.length + 1) && (
+                      {!(
+                        formQuestion.order === 1 ||
+                        formQuestion.order === factoryFormQuestions.length + 1
+                      ) && (
                         <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
                       )}
 
-                      {formQuestion.order === factoryFormQuestions.length + 1 && (
+                      {(formQuestion.order === 1 ||
+                        formQuestion.order === factoryFormQuestions.length + 1) && (
                         <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />
                       )}
                     </button>
