@@ -16,6 +16,7 @@ type TableProps = {
   startPage: any
   endPage: any
   noMarginRight?: boolean
+  noPagination?: boolean
 }
 
 const Table = ({
@@ -30,6 +31,7 @@ const Table = ({
   startPage,
   endPage,
   noMarginRight,
+  noPagination,
 }: TableProps) => {
   const router = useRouter()
   const { getTableProps, getTableBodyProps, headerGroups, prepareRow, page } = useTable(
@@ -118,14 +120,16 @@ const Table = ({
         </table>
       </div>
 
-      <Pagination
-        endPage={endPage}
-        hasNext={controlledHasNext}
-        hasPrevious={controlledHasPrevious}
-        pageIndex={controlledPageIndex}
-        startPage={startPage}
-        totalCount={totalCount}
-      />
+      {!noPagination && (
+        <Pagination
+          endPage={endPage}
+          hasNext={controlledHasNext}
+          hasPrevious={controlledHasPrevious}
+          pageIndex={controlledPageIndex}
+          startPage={startPage}
+          totalCount={totalCount}
+        />
+      )}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "app/core/components/LabeledTextAreaField"
 import { Form } from "app/core/components/Form"
-import { Question, QuestionOption } from "app/questions/validations"
+import { QuestionInputType, QuestionOption } from "app/questions/validations"
 import { Job, QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useState } from "react"
@@ -14,6 +14,7 @@ import LabeledPhoneNumberField from "app/core/components/LabeledPhoneNumberField
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
+import { ExtendedFormQuestion, ExtendedQuestion } from "types"
 
 type ApplicationFormProps = {
   onSuccess?: () => void
@@ -30,40 +31,162 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
     where: { formId: props.formId },
   })
 
-  const getZodType = (question, zodType) => {
-    return question.required
+  const getZodType = (fq: ExtendedFormQuestion, zodType) => {
+    return fq.behaviour === "REQUIRED"
       ? zodType.nonempty
         ? zodType.nonempty({ message: "Required" })
         : zodType
       : zodType.optional()
   }
 
+  const getValidationObj = (fq: ExtendedFormQuestion) => {
+    const q = fq.question
+
+    switch (q.type) {
+      case QuestionType.Attachment:
+        return { [q.name]: getZodType(fq, z.any()) }
+      case QuestionType.Checkbox:
+        return { [q.name]: getZodType(fq, z.boolean()) }
+      case QuestionType.Multiple_select:
+        return { [q.name]: getZodType(fq, z.array(z.string())) }
+      case QuestionType.Rating:
+        return { [q.name]: getZodType(fq, z.number()) }
+      default:
+        return { [q.name]: getZodType(fq, z.string()) }
+    }
+  }
+
+  const getQuestionField = (q: ExtendedQuestion) => {
+    switch (q.type) {
+      case QuestionType.Single_line_text:
+        return (
+          <LabeledTextField
+            key={q.id}
+            type="text"
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Long_text:
+        return (
+          <LabeledTextAreaField
+            key={q.id}
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Attachment:
+        return (
+          <SingleFileUploadField key={q.id} accept={q.acceptedFiles} name={q.name} label={q.name} />
+        )
+
+      case QuestionType.Checkbox:
+        return <CheckboxField key={q.id} name={q.name} label={q.name} />
+
+      case QuestionType.Multiple_select:
+        return (
+          <LabeledReactSelectField
+            key={q.id}
+            isMulti={true}
+            options={q.options?.map((op) => {
+              return { label: op.text, value: op.id }
+            })}
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Single_select:
+        return (
+          <LabeledReactSelectField
+            key={q.id}
+            options={q.options?.map((op) => {
+              return { label: op.text, value: op.id }
+            })}
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Date:
+        return (
+          <LabeledTextField
+            key={q.id}
+            type="date"
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Phone_number:
+        return (
+          <LabeledPhoneNumberField
+            key={q.id}
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Email:
+        return (
+          <LabeledTextField
+            key={q.id}
+            type="email"
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.URL:
+        return (
+          <LabeledTextField
+            key={q.id}
+            type="url"
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Number:
+        return (
+          <LabeledTextField
+            key={q.id}
+            type="number"
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+
+      case QuestionType.Rating:
+        return <LabeledRatingField key={q.id} name={q.name} label={q.name} />
+
+      default:
+        return (
+          <LabeledTextField
+            key={q.id}
+            type="text"
+            name={q.name}
+            label={q.name}
+            placeholder={q.placeholder}
+          />
+        )
+    }
+  }
+
   let validationObj = {}
   formQuestions.forEach((fq) => {
-    const q = fq.question
-    switch (q.type) {
-      // case (QuestionType.Single_line_text || QuestionType.Long_text ||
-      //   QuestionType.Single_select || QuestionType.Phone_number || QuestionType.Date ||
-      //   QuestionType.Number || QuestionType.Email || QuestionType.URL
-      // ):
-      //   validationObj = { ...validationObj, [q.name]: getZodType(q, z.string()) }
-      //   break
-      case QuestionType.Attachment:
-        validationObj = { ...validationObj, [q.name]: getZodType(q, z.any()) }
-        break
-      case QuestionType.Checkbox:
-        validationObj = { ...validationObj, [q.name]: getZodType(q, z.boolean()) }
-        break
-      case QuestionType.Multiple_select:
-        validationObj = { ...validationObj, [q.name]: getZodType(q, z.array(z.string())) }
-        break
-      case QuestionType.Rating:
-        validationObj = { ...validationObj, [q.name]: getZodType(q, z.number()) }
-        break
-      default:
-        validationObj = { ...validationObj, [q.name]: getZodType(q, z.string()) }
-        break
-    }
+    validationObj = { ...validationObj, ...getValidationObj(fq as any) }
   })
   let zodObj = z.object(validationObj)
 
@@ -81,128 +204,10 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
       >
         {formQuestions.map((fq) => {
           const q = fq.question
-          if (q.hidden) {
+          if (fq.behaviour === "OFF") {
             return
           }
-          switch (q.type) {
-            case QuestionType.Single_line_text:
-              return (
-                <LabeledTextField
-                  key={q.id}
-                  type="text"
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Long_text:
-              return (
-                <LabeledTextAreaField
-                  key={q.id}
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Attachment:
-              return (
-                <SingleFileUploadField
-                  key={q.id}
-                  accept={q.acceptedFiles}
-                  name={q.name}
-                  label={q.name}
-                />
-              )
-
-            case QuestionType.Checkbox:
-              return <CheckboxField key={q.id} name={q.name} label={q.name} />
-
-            case QuestionType.Multiple_select:
-              return (
-                <LabeledReactSelectField
-                  key={q.id}
-                  isMulti={true}
-                  options={q.options?.map((op) => {
-                    return { label: op.text, value: op.id }
-                  })}
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Single_select:
-              return (
-                <LabeledReactSelectField
-                  key={q.id}
-                  options={q.options?.map((op) => {
-                    return { label: op.text, value: op.id }
-                  })}
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Date:
-              return (
-                <LabeledTextField
-                  key={q.id}
-                  type="date"
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Phone_number:
-              return (
-                <LabeledPhoneNumberField
-                  key={q.id}
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Email:
-              return (
-                <LabeledTextField
-                  key={q.id}
-                  type="email"
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.URL:
-              return (
-                <LabeledTextField
-                  key={q.id}
-                  type="url"
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Number:
-              return (
-                <LabeledTextField
-                  key={q.id}
-                  type="number"
-                  name={q.name}
-                  label={q.name}
-                  placeholder={q.placeholder}
-                />
-              )
-
-            case QuestionType.Rating:
-              return <LabeledRatingField key={q.id} name={q.name} label={q.name} />
-          }
+          return getQuestionField(q as any)
         })}
       </Form>
     </>

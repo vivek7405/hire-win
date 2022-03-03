@@ -106,7 +106,7 @@ const CategorySettingsPage = ({
       <br />
       <CategoryForm
         header="Category Details"
-        subHeader="Update your category details."
+        subHeader="Update category details"
         initialValues={{
           name: category?.name,
         }}

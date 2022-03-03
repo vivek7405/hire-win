@@ -46,7 +46,7 @@ const NewQuestion = ({ user }: InferGetServerSidePropsType<typeof getServerSideP
       <div className="mt-6">
         <QuestionForm
           header="Create A New Question"
-          subHeader="Enter your question details"
+          subHeader="Enter question details"
           initialValues={{
             name: "",
           }}

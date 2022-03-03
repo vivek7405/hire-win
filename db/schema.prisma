@@ -25,7 +25,7 @@ model User {
   theme          String?   @default("indigo")
   slug           String    @unique
   hashedPassword String?
-  role           String    @default("USER")
+  role           UserRole  @default(USER)
   tokens         Token[]
   sessions       Session[]
 
@@ -37,6 +37,11 @@ model User {
 
   forms     Form[]
   questions Question[]
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }
 
 model Session {
@@ -249,22 +254,20 @@ model Question {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name        String
-  placeholder String           @default("")
-  type        QuestionType     @default(Single_line_text)
-  options     QuestionOption[]
-  required    Boolean          @default(false)
-  hidden      Boolean          @default(false)
+  name          String
+  placeholder   String           @default("")
+  type          QuestionType     @default(Single_line_text)
+  options       QuestionOption[]
+  acceptedFiles String           @default("")
 
-  acceptedFiles String @default("")
+  factory Boolean @default(false)
 
   slug String @unique
-
-  forms FormQuestion[]
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
+  forms   FormQuestion[]
   answers Answer[]
 
   @@unique([userId, name])
@@ -301,7 +304,8 @@ model FormQuestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order Int
+  order     Int
+  behaviour FormQuestionBehaviour @default(OPTIONAL)
 
   form   Form   @relation(fields: [formId], references: [id])
   formId String
@@ -311,6 +315,12 @@ model FormQuestion {
 
   @@unique([formId, questionId])
   @@unique([formId, questionId, order])
+}
+
+enum FormQuestionBehaviour {
+  REQUIRED
+  OPTIONAL
+  OFF
 }
 
 model Answer {
@@ -335,12 +345,20 @@ model Candidate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  name   String
+  email  String
+  resume Json?
+
+  slug String @unique
+
   answers Answer[]
 
   source CandidateSource
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
+
+  @@unique([jobId, email])
 }
 
 enum CandidateSource {

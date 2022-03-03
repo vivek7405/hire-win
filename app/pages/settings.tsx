@@ -78,7 +78,7 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
       <div className="mt-6">
         <SecurityForm
           header="Security"
-          subHeader="Update your account password."
+          subHeader="Update your account password"
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating password</span>)
             try {

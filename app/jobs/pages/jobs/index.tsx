@@ -97,15 +97,11 @@ const Jobs = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Title",
       accessor: "title",
       Cell: (props) => {
         return (
-          <Link href={Routes.CandidatesHome({ slug: props.cell.row.original.slug })} passHref>
+          <Link href={Routes.SingleJobPage({ slug: props.cell.row.original.slug })} passHref>
             <a data-testid={`joblink`} className="text-theme-600 hover:text-theme-900">
               {props.value}
             </a>
@@ -114,8 +110,10 @@ const Jobs = ({ user }) => {
       },
     },
     {
-      Header: "Slug",
-      accessor: "slug",
+      Header: "Candidates",
+      Cell: (props) => {
+        return props.cell.row.original.candidates?.length
+      },
     },
     {
       Header: "",
@@ -156,6 +154,16 @@ const JobsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
       <Link href={Routes.NewJob()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Job
+        </a>
+      </Link>
+
+      <Link href={Routes.JobBoard({ companySlug: user?.slug! })} passHref>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+        >
+          Job Board
         </a>
       </Link>
 

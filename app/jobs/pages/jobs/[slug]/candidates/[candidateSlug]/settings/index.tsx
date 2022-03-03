@@ -38,14 +38,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "candidate",
     { session },
-    { where: { id: context?.params?.id as string } }
+    { where: { slug: context?.params?.candidateSlug as string } }
   )
 
   const { can: isOwner } = await Guard.can(
     "isOwner",
     "candidate",
     { session },
-    { where: { id: context?.params?.id as string } }
+    { where: { slug: context?.params?.candidateSlug as string } }
   )
 
   if (user) {
@@ -54,7 +54,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         const candidate = await invokeWithMiddleware(
           getCandidate,
           {
-            where: { id: context?.params?.id as string },
+            where: { slug: context?.params?.candidateSlug as string },
           },
           { ...context }
         )
@@ -156,16 +156,21 @@ const CandidateSettingsPage = ({
         formId={candidate?.job?.formId!}
         preview={false}
         header="Candidate Details"
-        subHeader="Update your candidate details."
+        subHeader="Update candidate details"
         initialValues={getInitialValues()}
         onSubmit={async (values) => {
           const toastId = toast.loading(() => <span>Updating Candidate</span>)
           try {
             await updateCandidateMutation({
               where: { id: candidate?.id },
+              initial: candidate!,
               data: {
                 id: candidate?.id,
                 jobId: candidate?.job?.id,
+                name: values.Name,
+                email: values.Email,
+                resume: values.Resume,
+                source: candidate?.source,
                 answers:
                   candidate?.job?.form?.questions?.map((fq) => {
                     const val = values[fq.question?.name] || ""

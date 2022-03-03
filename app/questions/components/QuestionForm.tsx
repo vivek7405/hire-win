@@ -6,6 +6,7 @@ import CheckboxField from "app/core/components/CheckboxField"
 import { useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import DynamicTextFields from "app/core/components/DynamicTextFields"
+import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 
 type QuestionFormProps = {
   onSuccess?: () => void
@@ -91,8 +92,6 @@ export const QuestionForm = (props: QuestionFormProps) => {
           placeholder="Question Placeholder"
           testid="questionPlaceholder"
         />
-        <CheckboxField name="required" label="Required" testid="questionRequired" />
-        <CheckboxField name="hidden" label="Hidden" testid="questionHidden" />
       </Form>
     </>
   )

@@ -4,6 +4,7 @@ import { adminNewUserMailer } from "mailers/adminNewUserMailer"
 import crypto from "crypto"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import { UserRole } from "@prisma/client"
 
 const generatePassword = (
   length = 20,
@@ -34,7 +35,7 @@ export default resolver.pipe(
         website,
         slug: newSlug,
         hashedPassword,
-        role: "USER",
+        role: UserRole.USER,
       },
       select: { id: true, email: true, role: true },
     })

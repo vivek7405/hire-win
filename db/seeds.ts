@@ -4,6 +4,7 @@ import seedData from "./seedData.json"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { Job } from "app/jobs/validations"
+import { MembershipRole, UserRole } from "@prisma/client"
 
 /*
  * This seed function is executed when you run `blitz db seed`.
@@ -30,7 +31,7 @@ async function createUsers() {
           companyName: user.companyName,
           slug: newSlug,
           hashedPassword,
-          role: "USER",
+          role: UserRole.USER,
         },
       })
       userArray = [...userArray, createdUser]
@@ -82,7 +83,7 @@ async function createJobs() {
           validThrough,
           memberships: {
             create: {
-              role: "OWNER",
+              role: MembershipRole.USER,
               user: {
                 connect: {
                   id: job.owner,
@@ -97,7 +98,7 @@ async function createJobs() {
         if (job.members.includes(user.id)) {
           await db.membership.create({
             data: {
-              role: "USER",
+              role: UserRole.USER,
               job: {
                 connect: {
                   id: createdJob.id,

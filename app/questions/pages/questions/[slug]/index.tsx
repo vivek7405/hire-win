@@ -8,6 +8,8 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useRouter,
+  useMutation,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -16,6 +18,9 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getQuestion from "app/questions/queries/getQuestion"
+import QuestionForm from "app/questions/components/QuestionForm"
+import toast from "react-hot-toast"
+import updateQuestion from "app/questions/mutations/updateQuestion"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -79,6 +84,8 @@ const SingleQuestionPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter()
+  const [updateQuestionMutation] = useMutation(updateQuestion)
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -87,11 +94,36 @@ const SingleQuestionPage = ({
     <AuthLayout user={user}>
       <Breadcrumbs />
       <br />
-      {canUpdate && (
-        <Link href={Routes.QuestionSettingsPage({ slug: question?.slug! })} passHref>
-          <a data-testid={`${question?.name && `${question?.name}-`}settingsLink`}>Settings</a>
-        </Link>
-      )}
+      <QuestionForm
+        header="Question Details"
+        subHeader="Update the question details"
+        initialValues={{
+          name: question?.name,
+          type: question?.type,
+          placeholder: question?.placeholder,
+          acceptedFiles: question?.acceptedFiles,
+          options: question?.options?.map((op) => {
+            return { id: op.id, text: op.text }
+          }),
+        }}
+        editmode={true}
+        onSubmit={async (values) => {
+          const toastId = toast.loading(() => <span>Updating Question</span>)
+          try {
+            await updateQuestionMutation({
+              where: { slug: question?.slug },
+              data: { ...values },
+              initial: question!,
+            })
+            toast.success(() => <span>Question Updated</span>, { id: toastId })
+            router.push(Routes.QuestionsHome())
+          } catch (error) {
+            toast.error(
+              "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+            )
+          }
+        }}
+      />
     </AuthLayout>
   )
 }

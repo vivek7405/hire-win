@@ -106,13 +106,11 @@ const QuestionSettingsPage = ({
       <br />
       <QuestionForm
         header="Question Details"
-        subHeader="Update your question details."
+        subHeader="Update the question details"
         initialValues={{
           name: question?.name,
           type: question?.type,
           placeholder: question?.placeholder,
-          required: question?.required,
-          hidden: question?.hidden,
           acceptedFiles: question?.acceptedFiles,
           options: question?.options?.map((op) => {
             return { id: op.id, text: op.text }

@@ -25,6 +25,7 @@ async function getJobs({ where, orderBy, skip = 0, take = 100 }: GetJobsInput, c
           job: {
             include: {
               category: true,
+              candidates: true,
             },
           },
         },

@@ -95,10 +95,6 @@ const Forms = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Name",
       accessor: "name",
       Cell: (props) => {
@@ -112,8 +108,10 @@ const Forms = ({ user }) => {
       },
     },
     {
-      Header: "Slug",
-      accessor: "slug",
+      Header: "Questions",
+      Cell: (props) => {
+        return props.cell.row.original.questions.length
+      },
     },
     {
       Header: "",
@@ -154,6 +152,12 @@ const FormsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSidePro
       <Link href={Routes.NewForm()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Form
+        </a>
+      </Link>
+
+      <Link href={Routes.QuestionsHome()} passHref>
+        <a className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800">
+          Question Pool
         </a>
       </Link>
 

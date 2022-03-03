@@ -106,7 +106,7 @@ const WorkflowSettingsPage = ({
       <br />
       <WorkflowForm
         header="Workflow Details"
-        subHeader="Update your workflow details."
+        subHeader="Update workflow details"
         initialValues={{
           name: workflow?.name,
         }}

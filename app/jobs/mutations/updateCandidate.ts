@@ -6,34 +6,51 @@ import Guard from "app/guard/ability"
 import { ExtendedCandidate } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
-type UpdateCandidateInput = Pick<Prisma.CandidateUpdateArgs, "where" | "data">
+type UpdateCandidateInput = Pick<Prisma.CandidateUpdateArgs, "where" | "data"> & {
+  initial: ExtendedCandidate
+}
 
-async function updateCandidate({ where, data }: UpdateCandidateInput, ctx: Ctx) {
+async function updateCandidate({ where, data, initial }: UpdateCandidateInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { id, answers, jobId } = Candidate.parse(data)
+  const { id, name, email, resume, answers, jobId } = Candidate.parse(data)
+
+  const slug = slugify(name, { strict: true })
+  const newSlug: string = await findFreeSlug(
+    slug,
+    async (e) => await db.candidate.findFirst({ where: { slug: e } })
+  )
+
+  let updateData = {
+    name,
+    email,
+    slug: initial.name !== data.name ? newSlug : initial.slug,
+    jobId: jobId!,
+    answers: {
+      update: answers?.map((answer) => {
+        return {
+          where: {
+            candidateId_questionId: {
+              candidateId: id!,
+              questionId: answer.questionId!,
+            },
+          },
+          data: {
+            value: answer.value,
+            questionId: answer.questionId!,
+          },
+        }
+      }),
+    },
+  }
+
+  if (resume) {
+    updateData["resume"] = resume
+  }
 
   const candidate = await db.candidate.update({
     where,
-    data: {
-      jobId: jobId!,
-      answers: {
-        update: answers?.map((answer) => {
-          return {
-            where: {
-              candidateId_questionId: {
-                candidateId: id!,
-                questionId: answer.questionId!,
-              },
-            },
-            data: {
-              value: answer.value,
-              questionId: answer.questionId!,
-            },
-          }
-        }),
-      },
-    },
+    data: updateData,
   })
 
   return candidate

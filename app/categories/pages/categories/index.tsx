@@ -95,10 +95,6 @@ const Categories = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Name",
       accessor: "name",
       Cell: (props) => {
@@ -108,28 +104,6 @@ const Categories = ({ user }) => {
               {props.cell.row.original.name}
             </a>
           </Link>
-        )
-      },
-    },
-    {
-      Header: "Slug",
-      accessor: "slug",
-    },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        return (
-          <>
-            {props.cell.row.original.canUpdate && (
-              <Link
-                href={Routes.CategorySettingsPage({ slug: props.cell.row.original.slug })}
-                passHref
-              >
-                <a className="text-theme-600 hover:text-theme-900">Settings</a>
-              </Link>
-            )}
-          </>
         )
       },
     },

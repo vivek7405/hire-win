@@ -124,7 +124,7 @@ const JobSettingsPage = ({
           category={job?.category!}
           workflow={job?.workflow!}
           header="Job Details"
-          subHeader="Update your job details."
+          subHeader="Update job details"
           initialValues={{
             title: job?.title,
             country: job?.country,

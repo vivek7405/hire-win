@@ -219,13 +219,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       })
 
       can("create", "question")
-      can("update", "question")
       can("read", "question", async (args) => {
         const question = await db.question.findFirst({
           where: args.where,
         })
 
         return question?.userId === ctx.session.userId
+      })
+      can("update", "question", async (args) => {
+        const question = await db.question.findFirst({
+          where: args.where,
+        })
+
+        return !question?.factory && question?.userId === ctx.session.userId
       })
       can("readAll", "question", async (args) => {
         const questions = await db.question.findMany({

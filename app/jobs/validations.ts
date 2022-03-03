@@ -43,6 +43,15 @@ export type AnswerInputType = z.infer<typeof Answer>
 
 export const Candidate = z.object({
   id: z.string().optional(),
+  name: z.string(),
+  email: z.string(),
+  resume: z
+    .object({
+      Location: z.string().optional(),
+      Key: z.string().optional(),
+    })
+    .nullable(),
+  slug: z.string().optional(),
   answers: z.array(Answer),
   jobId: z.string().optional(),
   source: z.nativeEnum(CandidateSource),

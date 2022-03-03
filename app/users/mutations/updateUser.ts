@@ -22,24 +22,21 @@ async function updateUser({ where, data, initial }: UpdateUserInput, ctx: Ctx) {
     async (e) => await db.user.findFirst({ where: { slug: e } })
   )
 
+  let updateData = {
+    companyName,
+    companyInfo,
+    website,
+    theme,
+    slug: initial.companyName !== data.companyName ? newSlug : initial.slug,
+  }
+
+  if (logo) {
+    updateData["logo"] = logo
+  }
+
   const user = await db.user.update({
     where,
-    data: logo
-      ? {
-          logo,
-          companyName,
-          companyInfo,
-          website,
-          theme,
-          slug: initial.companyName !== data.companyName ? newSlug : initial.slug,
-        }
-      : {
-          companyName,
-          companyInfo,
-          website,
-          theme,
-          slug: initial.companyName !== data.companyName ? newSlug : initial.slug,
-        },
+    data: updateData,
   })
 
   return user

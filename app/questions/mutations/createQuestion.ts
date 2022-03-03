@@ -4,10 +4,9 @@ import slugify from "slugify"
 import { Question, QuestionInputType } from "app/questions/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { optionCSS } from "react-select/dist/declarations/src/components/Option"
 
 async function createQuestion(data: QuestionInputType, ctx: Ctx) {
-  const { name, placeholder, type, options, required, hidden, acceptedFiles } = Question.parse(data)
+  const { name, placeholder, type, options, acceptedFiles } = Question.parse(data)
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 
@@ -19,9 +18,9 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
 
   const question = await db.question.create({
     data: {
-      name: name,
-      placeholder: placeholder,
-      type: type,
+      name,
+      placeholder,
+      type,
       options: {
         create: options?.map((op) => {
           return {
@@ -29,8 +28,6 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
           }
         }),
       },
-      required: required,
-      hidden: hidden,
       slug: newSlug,
       userId: user.id,
       acceptedFiles: acceptedFiles,

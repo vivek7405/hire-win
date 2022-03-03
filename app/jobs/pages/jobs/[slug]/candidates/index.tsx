@@ -96,11 +96,9 @@ const Candidates = (props: CandidateProps) => {
     const search = router.query.search
       ? {
           AND: {
-            job: {
-              title: {
-                contains: JSON.parse(router.query.search as string),
-                mode: "insensitive",
-              },
+            name: {
+              contains: JSON.parse(router.query.search as string),
+              mode: "insensitive",
             },
           },
         }
@@ -142,40 +140,8 @@ const Candidates = (props: CandidateProps) => {
     })
   }, [candidates])
 
-  type ColumnType = {
-    Header: string
-    accessor?: string
-    Cell?: (props) => any
-  }
-  let columns: ColumnType[] = [
-    {
-      Header: "Id",
-      Cell: (props) => {
-        return (
-          <>
-            <Link
-              href={Routes.SingleCandidatePage({
-                slug: props.cell.row.original.job?.slug,
-                id: props.cell.row.original.id,
-              })}
-              passHref
-            >
-              <a className="text-theme-600 hover:text-theme-900">{props.cell.row.original.id}</a>
-            </Link>
-          </>
-        )
-      },
-    },
-    {
-      Header: "Source",
-      accessor: "source",
-      Cell: (props) => {
-        return props.value.toString().replace("_", " ")
-      },
-    },
-  ]
-  props.job?.form?.questions?.forEach((formQuestion) => {
-    columns.push({
+  const getDynamicColumn = (formQuestion) => {
+    return {
       Header: formQuestion?.question?.name,
       Cell: (props) => {
         const answer: ExtendedAnswer = props.cell.row.original?.answers?.find(
@@ -229,8 +195,68 @@ const Candidates = (props: CandidateProps) => {
 
         return ""
       },
+    }
+  }
+
+  type ColumnType = {
+    Header: string
+    accessor?: string
+    Cell?: (props) => any
+  }
+  let columns: ColumnType[] = [
+    {
+      Header: "Name",
+      accessor: "name",
+      Cell: (props) => {
+        return (
+          <>
+            <Link
+              href={Routes.SingleCandidatePage({
+                slug: props.cell.row.original.job?.slug,
+                candidateSlug: props.cell.row.original.slug,
+              })}
+              passHref
+            >
+              <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
+            </Link>
+          </>
+        )
+      },
+    },
+    {
+      Header: "Source",
+      accessor: "source",
+      Cell: (props) => {
+        return props.value.toString().replace("_", " ")
+      },
+    },
+    {
+      Header: "Email",
+      accessor: "email",
+    },
+    {
+      Header: "Resume",
+      accessor: "resume",
+      Cell: (props) => {
+        const attachmentObj = props.value
+        return (
+          <a
+            href={attachmentObj.Location}
+            className="text-theme-600 hover:text-theme-500"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {attachmentObj.Key}
+          </a>
+        )
+      },
+    },
+  ]
+  props.job?.form?.questions
+    ?.filter((q) => !q.question.factory)
+    ?.forEach((formQuestion) => {
+      columns.push(getDynamicColumn(formQuestion))
     })
-  })
 
   columns.push({
     Header: "",
@@ -241,7 +267,7 @@ const Candidates = (props: CandidateProps) => {
           <Link
             href={Routes.CandidateSettingsPage({
               slug: props.cell.row.original.job?.slug,
-              id: props.cell.row.original.id,
+              candidateSlug: props.cell.row.original.slug,
             })}
             passHref
           >
@@ -287,6 +313,16 @@ const CandidatesHome = ({
           New Candidate
         </a>
       </Link>
+      {canUpdate && (
+        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
+          <a
+            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+            data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
+          >
+            Job Settings
+          </a>
+        </Link>
+      )}
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
