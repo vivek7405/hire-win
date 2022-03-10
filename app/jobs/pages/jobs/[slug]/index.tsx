@@ -17,12 +17,12 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
-import getJob from "app/jobs/queries/getJob"
 import Table from "app/core/components/Table"
 import getCandidates from "app/jobs/queries/getCandidates"
 import { AttachmentObject, ExtendedAnswer, ExtendedJob } from "types"
 import { QuestionType } from "@prisma/client"
 import Skeleton from "react-loading-skeleton"
+import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -43,7 +43,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user) {
     try {
       const job = await invokeWithMiddleware(
-        getJob,
+        getJobWithGuard,
         {
           where: { slug: context?.params?.slug as string },
         },

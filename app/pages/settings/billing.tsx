@@ -75,7 +75,7 @@ const UserSettingsBillingPage = ({
               {currentPlan ? (
                 <div className="my-5">
                   <h3 className="text-xl font-bold">
-                    You have subscribed to the {currentPlan?.title}
+                    You are subscribed to the {currentPlan?.title}
                   </h3>
                   <br />
                   <h3 className="text-lg leading-6 font-medium text-gray-900">
