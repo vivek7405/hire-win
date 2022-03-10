@@ -316,7 +316,7 @@ const SingleJobPage = ({
       {canUpdate && (
         <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
           <a
-            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+            className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
             data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
           >
             Job Settings

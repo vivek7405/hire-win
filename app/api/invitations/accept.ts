@@ -78,18 +78,18 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
     })
 
     // 9. Fetch the job subscription and update based on the job membership length
-    if (job?.stripeSubscriptionId) {
-      const subscription = await stripe.subscriptions.retrieve(job?.stripeSubscriptionId as string)
-      await stripe.subscriptions.update(job?.stripeSubscriptionId as string, {
-        proration_behavior: "none",
-        items: [
-          {
-            id: subscription.items.data[0]?.id,
-            quantity: job?.memberships.length,
-          },
-        ],
-      })
-    }
+    // if (job?.stripeSubscriptionId) {
+    //   const subscription = await stripe.subscriptions.retrieve(job?.stripeSubscriptionId as string)
+    //   await stripe.subscriptions.update(job?.stripeSubscriptionId as string, {
+    //     proration_behavior: "none",
+    //     items: [
+    //       {
+    //         id: subscription.items.data[0]?.id,
+    //         quantity: job?.memberships.length,
+    //       },
+    //     ],
+    //   })
+    // }
 
     res.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job?.slug}`)
   }

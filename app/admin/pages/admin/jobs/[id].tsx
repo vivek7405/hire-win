@@ -14,7 +14,6 @@ import AdminLayout from "app/core/layouts/AdminLayout"
 import getJobs from "app/admin/queries/admin/getJobs"
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
-import { plans } from "app/core/utils/plans"
 import { RadioGroupField } from "app/core/components/RadioGroupField"
 import toast from "react-hot-toast"
 import updateJob from "app/admin/mutations/admin/updateJob"
@@ -41,7 +40,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       props: {
         foundJob: foundJob.jobs[0],
         user: user,
-        plans: plans,
       },
     }
   } else {
@@ -58,7 +56,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const SingleJobAdminPage = ({
   user,
   foundJob,
-  plans,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [updateJobMutation] = useMutation(updateJob)
@@ -97,22 +94,6 @@ const SingleJobAdminPage = ({
           <LabeledTextField name="name" label="Name" />
 
           <LabeledTextField name="slug" label="Slug" disabled />
-
-          <LabeledTextField name="stripeCustomerId" label="Stripe Customer Id" disabled />
-
-          <LabeledTextField name="stripeSubscriptionId" label="Stripe Subscription Id" disabled />
-
-          <LabeledTextField
-            name="stripeCurrentPeriodEnd"
-            label="Stripe Current Period End Date"
-            disabled
-          />
-
-          <RadioGroupField
-            label="Select a plan"
-            name="stripePriceId"
-            options={Object.entries(plans!).map((plan) => plan[1].priceId)}
-          />
         </Form>
       </AdminLayout>
     </AuthLayout>

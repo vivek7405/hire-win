@@ -24,7 +24,11 @@ const Navbar = ({ user }: NavbarProps) => {
     { name: "Forms", href: "/forms", current: router.route === "/forms" },
   ]
   let dropDownNav = [
-    { name: "Settings", href: Routes.Settings().pathname, current: router.route === "/settings" },
+    {
+      name: "Settings",
+      href: Routes.UserSettingsPage().pathname,
+      current: router.route === "/settings",
+    },
     {
       name: "Sign Out",
       action: async () => {

@@ -15,6 +15,7 @@ import updateUser from "app/users/mutations/updateUser"
 import changePassword from "app/auth/mutations/changePassword"
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/themeHelpers"
+import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -29,7 +30,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: "/login?next=settings",
+        destination: "/login?next=settings/security",
         permanent: false,
       },
       props: {},
@@ -37,45 +38,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const UserSettingsSecurityPage = ({
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [updateUserMutation] = useMutation(updateUser)
   const [changePasswordMutation] = useMutation(changePassword)
 
   return (
     <AuthLayout title="Settings" user={user}>
-      <UserForm
-        header="Profile"
-        subHeader="Update your profile details."
-        initialValues={{
-          logo: user?.logo,
-          companyName: user?.companyName || "",
-          companyInfo: user?.companyInfo
-            ? EditorState.createWithContent(convertFromRaw(user?.companyInfo || {}))
-            : EditorState.createEmpty(),
-          website: user?.website || "",
-          theme: user?.theme || "indigo",
-        }}
-        onSubmit={async (values) => {
-          values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())
-          const toastId = toast.loading(() => <span>Updating User</span>)
-          try {
-            const updatedUser = await updateUserMutation({
-              where: { id: user?.id },
-              data: { ...values },
-              initial: user!,
-            })
-            toast.success(() => <span>User Updated</span>, { id: toastId })
-            router.push(Routes.JobsHome())
-          } catch (error) {
-            toast.error(
-              "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-            )
-          }
-        }}
-      />
-
-      <div className="mt-6">
+      <UserSettingsLayout>
         <SecurityForm
           header="Security"
           subHeader="Update your account password"
@@ -95,11 +67,11 @@ const Settings = ({ user }: InferGetServerSidePropsType<typeof getServerSideProp
             }
           }}
         />
-      </div>
+      </UserSettingsLayout>
     </AuthLayout>
   )
 }
 
-Settings.suppressFirstRenderFlicker = true
+UserSettingsSecurityPage.suppressFirstRenderFlicker = true
 
-export default Settings
+export default UserSettingsSecurityPage

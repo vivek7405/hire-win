@@ -43,7 +43,7 @@ export const Breadcrumbs = ({ ignore }: BreadcrumbsProps) => {
   }, [])
 
   return (
-    <ul className="flex items-center space-x-4">
+    <ul className="flex items-center space-x-4 flex-wrap">
       <li>
         <Link href={Routes.JobsHome()} passHref>
           <a className="text-gray-400 hover:text-gray-500">

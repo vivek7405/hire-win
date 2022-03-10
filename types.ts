@@ -1,9 +1,20 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
 import { Prisma, UserRole } from "@prisma/client"
-import { plans } from "app/core/utils/plans"
 
-export type Plan = keyof typeof plans
+export enum PlanName {
+  PRO,
+}
+
+export type Plan = {
+  name: PlanName
+  priceId: string
+  title: string
+  price: number
+  frequency: string
+  description: string
+  features: string[]
+}
 
 declare module "blitz" {
   export interface Ctx extends DefaultCtx {

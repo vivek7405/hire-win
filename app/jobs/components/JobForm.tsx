@@ -54,8 +54,8 @@ export const JobForm = (props: JobFormProps) => {
           testid="jobTitle"
         />
 
-        <div className="flex space-x-6">
-          <div className="w-1/3">
+        <div className="flex flex-col space-y-2 md:space-y-0 lg:space-y-0 w-full md:flex-row lg:flex-row md:space-x-6 lg:space-x-6">
+          <div className="w-full md:w-1/3 lg:w-1/3">
             <LabeledReactSelectField
               name="country"
               label="Country"
@@ -71,7 +71,7 @@ export const JobForm = (props: JobFormProps) => {
               }}
             />
           </div>
-          <div className="w-1/3">
+          <div className="w-full md:w-1/3 lg:w-1/3">
             <LabeledReactSelectField
               name="state"
               label="State"
@@ -88,7 +88,7 @@ export const JobForm = (props: JobFormProps) => {
               }}
             />
           </div>
-          <div className="w-1/3">
+          <div className="w-full md:w-1/3 lg:w-1/3">
             <LabeledReactSelectField
               name="city"
               label="City"
@@ -107,8 +107,8 @@ export const JobForm = (props: JobFormProps) => {
           </div>
         </div>
 
-        <div className="flex space-x-6">
-          <div className="w-1/4">
+        <div className="flex flex-col space-y-2 md:space-y-0 lg:space-y-0 w-full md:flex-row lg:flex-row md:space-x-6 lg:space-x-6">
+          <div className="w-full md:w-1/4 lg:w-1/4">
             <LabeledReactSelectField
               name="currency"
               label="Currency"
@@ -121,7 +121,7 @@ export const JobForm = (props: JobFormProps) => {
               ]}
             />
           </div>
-          <div className="w-1/4">
+          <div className="w-full md:w-1/4 lg:w-1/4">
             <LabeledTextValidatedField
               type="number"
               min="0"
@@ -131,7 +131,7 @@ export const JobForm = (props: JobFormProps) => {
               testid="jobMinSalary"
             />
           </div>
-          <div className="w-1/4">
+          <div className="w-full md:w-1/4 lg:w-1/4">
             <LabeledTextValidatedField
               type="number"
               min="0"
@@ -141,7 +141,7 @@ export const JobForm = (props: JobFormProps) => {
               testid="jobMaxSalary"
             />
           </div>
-          <div className="w-1/4">
+          <div className="w-full md:w-1/4 lg:w-1/4">
             <LabeledReactSelectField
               name="salaryType"
               label="Salary Type"
@@ -176,8 +176,8 @@ export const JobForm = (props: JobFormProps) => {
           </div>
         </div>
 
-        <div className="flex space-x-6">
-          <div className="w-1/2">
+        <div className="flex flex-col space-y-2 md:space-y-0 lg:space-y-0 w-full md:flex-row lg:flex-row md:space-x-6 lg:space-x-6">
+          <div className="w-full md:w-1/2 lg:w-1/2">
             <LabeledReactSelectField
               name="employmentType"
               label="Employment Type"
@@ -192,7 +192,7 @@ export const JobForm = (props: JobFormProps) => {
               })}
             />
           </div>
-          <div className="w-1/2">
+          <div className="w-full md:w-1/2 lg:w-1/2">
             <LabeledTextValidatedField
               type="date"
               name="validThrough"

@@ -37,18 +37,18 @@ async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
     },
   })
 
-  if (job?.stripeSubscriptionId) {
-    const subscription = await stripe.subscriptions.retrieve(job?.stripeSubscriptionId as string)
-    await stripe.subscriptions.update(job?.stripeSubscriptionId as string, {
-      proration_behavior: "none",
-      items: [
-        {
-          id: subscription.items.data[0]?.id,
-          quantity: job?.memberships.length,
-        },
-      ],
-    })
-  }
+  // if (job?.stripeSubscriptionId) {
+  //   const subscription = await stripe.subscriptions.retrieve(job?.stripeSubscriptionId as string)
+  //   await stripe.subscriptions.update(job?.stripeSubscriptionId as string, {
+  //     proration_behavior: "none",
+  //     items: [
+  //       {
+  //         id: subscription.items.data[0]?.id,
+  //         quantity: job?.memberships.length,
+  //       },
+  //     ],
+  //   })
+  // }
 }
 
 export default Guard.authorize("inviteUser", "job", removeFromJob)

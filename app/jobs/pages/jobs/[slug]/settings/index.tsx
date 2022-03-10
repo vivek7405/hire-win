@@ -21,7 +21,7 @@ import Guard from "app/guard/ability"
 import JobForm from "app/jobs/components/JobForm"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 import updateJob from "app/jobs/mutations/updateJob"
-import { checkPlan } from "app/jobs/utils/checkPlan"
+import { checkPlan } from "app/users/utils/checkPlan"
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
 
@@ -63,7 +63,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           props: {
             user: user,
             job: job,
-            currentPlan: checkPlan(job),
             canUpdate,
             isOwner,
           },

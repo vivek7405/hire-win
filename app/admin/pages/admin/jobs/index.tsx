@@ -151,34 +151,6 @@ const Jobs = ({ user }) => {
         return props.value && props.value.toString()
       },
     },
-    {
-      Header: "StripeCustomerId",
-      accessor: "stripeCustomerId",
-      Cell: (props) => {
-        return props.value && props.value.toString()
-      },
-    },
-    {
-      Header: "StripeSubscriptionId",
-      accessor: "stripeSubscriptionId",
-      Cell: (props) => {
-        return props.value && props.value.toString()
-      },
-    },
-    {
-      Header: "StripePriceId",
-      accessor: "stripePriceId",
-      Cell: (props) => {
-        return props.value && props.value.toString()
-      },
-    },
-    {
-      Header: "StripeCurrentPeriodEnd",
-      accessor: "stripeCurrentPeriodEnd",
-      Cell: (props) => {
-        return props.value && props.value.toString()
-      },
-    },
   ]
 
   return (
