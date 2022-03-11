@@ -16,7 +16,6 @@ export const Job = z.object({
   workflowId: z.string().optional(),
   formId: z.string().optional(),
   slug: z.string().optional(),
-  stripeSubscriptionId: z.string().optional(),
 
   country: z.string(),
   state: z.string(),

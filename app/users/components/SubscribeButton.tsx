@@ -1,19 +1,19 @@
 import { useMutation, useRouter } from "blitz"
 import { loadStripe } from "@stripe/stripe-js"
-import createStripeCheckoutSession from "app/jobs/mutations/createStripeCheckoutSession"
-import updateStripeSubscription from "app/jobs/mutations/updateStripeSubscription"
+import createStripeCheckoutSession from "app/users/mutations/createStripeCheckoutSession"
+import updateStripeSubscription from "app/users/mutations/updateStripeSubscription"
 import { Plan } from "types"
 import { toast } from "react-hot-toast"
 
 export default function SubscribeButton({
-  jobId,
-  plan,
+  userId,
+  priceId,
   quantity,
   type,
   testid,
 }: {
-  jobId: string
-  plan: Plan
+  userId: number
+  priceId: string
   quantity: number
   type: "new" | "update"
   testid?: string
@@ -24,17 +24,18 @@ export default function SubscribeButton({
 
   const createSubscription = async () => {
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
-    const sessionId = await createStripeSessionMutation({ plan, jobId, quantity })
+    const sessionId = await createStripeSessionMutation({ priceId, userId, quantity })
 
-    stripe?.redirectToCheckout({
-      sessionId: sessionId,
-    })
+    sessionId &&
+      stripe?.redirectToCheckout({
+        sessionId: sessionId,
+      })
   }
 
   const updateSubscription = async () => {
     const toastId = toast.loading(() => <span>Upgrading Subscription</span>)
     try {
-      await updateStripeSubscriptionMutation({ plan, jobId })
+      await updateStripeSubscriptionMutation({ priceId, userId })
       toast.success(() => <span>Subscription Updated</span>, { id: toastId })
       router.reload()
     } catch (error) {

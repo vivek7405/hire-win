@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -8,6 +8,7 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  Routes,
 } from "blitz"
 import path from "path"
 
@@ -28,6 +29,7 @@ import { XCircleIcon } from "@heroicons/react/outline"
 
 import { MembershipRole } from "db"
 import updateMemberRole from "app/jobs/mutations/updateMemberRole"
+import { checkPlan } from "app/users/utils/checkPlan"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -38,6 +40,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
+
+  const currentPlan = checkPlan(user)
+
   const { can: canUpdate } = await Guard.can(
     "update",
     "job",
@@ -68,6 +73,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             job: job,
             canUpdate,
+            currentPlan,
             isOwner,
           },
         }
@@ -110,15 +116,17 @@ const JobSettingsMembersPage = ({
   user,
   job,
   canUpdate,
+  currentPlan,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [open, setOpen] = React.useState(false)
-  const [openConfirm, setOpenConfirm] = React.useState(false)
+  const [openInvite, setOpenInvite] = useState(false)
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(false)
   const [inviteToJobMutation] = useMutation(inviteToJob)
   const [removeFromJobMutation] = useMutation(removeFromJob)
   const [changePermissionMutation] = useMutation(updateMemberRole)
+  const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -136,7 +144,7 @@ const JobSettingsMembersPage = ({
               >
                 Members
               </h2>
-              <Modal header="Invite A User" open={open} setOpen={setOpen}>
+              <Modal header="Invite A User" open={openInvite} setOpen={setOpenInvite}>
                 <InvitationForm
                   initialValues={{ email: "" }}
                   onSubmit={async (values) => {
@@ -157,10 +165,25 @@ const JobSettingsMembersPage = ({
                   }}
                 />
               </Modal>
+              <Confirm
+                open={openConfirmBilling}
+                setOpen={setOpenConfirmBilling}
+                header="Upgrade to the Pro Plan?"
+                onSuccess={async () => {
+                  router.push(Routes.UserSettingsBillingPage())
+                }}
+              >
+                Upgrade to the Pro Plan to invite unlimited users. You cannot invite users on the
+                Free plan.
+              </Confirm>
               <button
                 onClick={(e) => {
                   e.preventDefault()
-                  setOpen(true)
+                  if (currentPlan) {
+                    setOpenInvite(true)
+                  } else {
+                    setOpenConfirmBilling(true)
+                  }
                 }}
                 data-testid={`open-inviteUser-modal`}
                 className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
@@ -241,8 +264,8 @@ const JobSettingsMembersPage = ({
                           {canUpdate && user?.id !== m.user.id && m.role !== "OWNER" && (
                             <>
                               <Confirm
-                                open={openConfirm}
-                                setOpen={setOpenConfirm}
+                                open={openConfirmDelete}
+                                setOpen={setOpenConfirmDelete}
                                 header={"Delete Member?"}
                                 onSuccess={async () => {
                                   const toastId = toast.loading(() => (
@@ -263,7 +286,7 @@ const JobSettingsMembersPage = ({
                                       { id: toastId }
                                     )
                                   }
-                                  setOpen(false)
+                                  setOpenInvite(false)
                                   router.reload()
                                 }}
                               >
@@ -275,7 +298,7 @@ const JobSettingsMembersPage = ({
                                 className="bg-red-500 rounded-full"
                                 onClick={async (e) => {
                                   e.preventDefault()
-                                  setOpenConfirm(true)
+                                  setOpenConfirmDelete(true)
                                 }}
                               >
                                 <XCircleIcon className="w-auto h-6 text-red-100" />

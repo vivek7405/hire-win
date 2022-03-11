@@ -29,6 +29,7 @@ import createCandidate from "app/jobs/mutations/createCandidate"
 import { CandidateSource } from "@prisma/client"
 import toast from "react-hot-toast"
 import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
+import { checkPlan } from "app/users/utils/checkPlan"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -47,6 +48,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   )
 
   if (user) {
+    const currentPlan = checkPlan(user)
+
     const job = await invokeWithMiddleware(
       getJob,
       {
@@ -58,8 +61,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     if (job) {
       return {
         props: {
-          user: user,
-          job: job,
+          user,
+          job,
+          currentPlan,
         },
       }
     } else {
@@ -82,12 +86,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const ApplyToJob = ({ user, job }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ApplyToJob = ({
+  user,
+  job,
+  currentPlan,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [createCandidateMutation] = useMutation(createCandidate)
 
+  // Post job to Google if on paid plan
   return (
-    <JobApplicationLayout user={user} job={job} addGoogleJobPostingScript={true}>
+    <JobApplicationLayout user={user} job={job} addGoogleJobPostingScript={!!currentPlan}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >

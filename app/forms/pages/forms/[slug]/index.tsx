@@ -443,6 +443,7 @@ export const Questions = ({ user, form }) => {
       startPage={1}
       endPage={1}
       noPagination={true}
+      noMarginRight={true}
     />
   )
 }
@@ -470,127 +471,134 @@ const SingleFormPage = ({
       <Breadcrumbs />
       <br />
       {canUpdate && (
-        <>
-          <Modal
-            header="Add Existing Questions"
-            open={openAddExistingQuestion}
-            setOpen={setOpenAddExistingQuestion}
-          >
-            <AddExistingQuestionsForm
-              schema={FormQuestions}
-              user={user}
-              formId={form?.id!}
-              onSubmit={async (values) => {
-                const toastId = toast.loading(() => <span>Adding Question(s)</span>)
-                try {
-                  await addExistingFormQuestionsMutation({
-                    formId: form?.id as string,
-                    questionIds: values.questionIds,
-                  })
-                  toast.success(() => <span>Question(s) added</span>, {
-                    id: toastId,
-                  })
-                  router.reload()
-                } catch (error) {
-                  toast.error(
-                    "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                    { id: toastId }
-                  )
-                }
-              }}
-            />
-          </Modal>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              setOpenAddExistingQuestion(true)
-            }}
-            data-testid={`open-addQuestion-modal`}
-            className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-          >
-            Add Existing Questions
-          </button>
+        <div className="space-y-6">
+          <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
+            <div className="space-x-8 flex flex-row justify-between">
+              <Modal header="Preview Form" open={openPreviewForm} setOpen={setOpenPreviewForm}>
+                <ApplicationForm
+                  header="Job Application Form"
+                  subHeader="Preview"
+                  formId={form?.id!}
+                  preview={true}
+                  onSubmit={async (values) => {
+                    toast.error("Can't submit the form in preview mode")
+                  }}
+                />
+              </Modal>
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setOpenPreviewForm(true)
+                }}
+                data-testid={`open-previewForm-modal`}
+                className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
+              >
+                Preview Form
+              </button>
 
-          <Modal
-            header="Add New Question"
-            open={openAddNewQuestion}
-            setOpen={setOpenAddNewQuestion}
-          >
-            <QuestionForm
-              header="Add New Question to Form"
-              subHeader="Enter question details"
-              initialValues={{
-                name: "",
-              }}
-              editmode={false}
-              onSubmit={async (values) => {
-                const toastId = toast.loading(() => <span>Adding Question</span>)
-                try {
-                  const createQuestionResponse = await createQuestionMutation(values)
+              <Link href={Routes.QuestionsHome()} passHref>
+                <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
+                  Question Pool
+                </a>
+              </Link>
 
-                  await createFormQuestionMutation({
-                    formId: form?.id as string,
-                    questionId: createQuestionResponse.id,
-                  })
-                  toast.success(() => <span>Question added</span>, {
-                    id: toastId,
-                  })
-                  router.reload()
-                } catch (error) {
-                  toast.error(
-                    "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                  )
-                }
-              }}
-            />
-          </Modal>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              setOpenAddNewQuestion(true)
-            }}
-            data-testid={`open-addQuestion-modal`}
-            className="float-right text-white bg-theme-600 mr-3 px-4 py-2 rounded-sm hover:bg-theme-700"
-          >
-            Add New Question
-          </button>
+              <Link href={Routes.FormSettingsPage({ slug: form?.slug! })} passHref>
+                <a
+                  className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
+                  data-testid={`${form?.name && `${form?.name}-`}settingsLink`}
+                >
+                  Form Settings
+                </a>
+              </Link>
+            </div>
 
-          <Modal header="Preview Form" open={openPreviewForm} setOpen={setOpenPreviewForm}>
-            <ApplicationForm
-              header="Job Application Form"
-              subHeader="Preview"
-              formId={form?.id!}
-              preview={true}
-              onSubmit={async (values) => {
-                toast.error("Can't submit the form in preview mode")
-              }}
-            />
-          </Modal>
-          <button
-            onClick={(e) => {
-              e.preventDefault()
-              setOpenPreviewForm(true)
-            }}
-            data-testid={`open-previewForm-modal`}
-            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
-          >
-            Preview Form
-          </button>
+            <div className="flex flex-row justify-between space-x-3">
+              <Modal
+                header="Add Existing Questions"
+                open={openAddExistingQuestion}
+                setOpen={setOpenAddExistingQuestion}
+              >
+                <AddExistingQuestionsForm
+                  schema={FormQuestions}
+                  user={user}
+                  formId={form?.id!}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Adding Question(s)</span>)
+                    try {
+                      await addExistingFormQuestionsMutation({
+                        formId: form?.id as string,
+                        questionIds: values.questionIds,
+                      })
+                      toast.success(() => <span>Question(s) added</span>, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
+                      )
+                    }
+                  }}
+                />
+              </Modal>
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setOpenAddExistingQuestion(true)
+                }}
+                data-testid={`open-addQuestion-modal`}
+                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+              >
+                Add Existing Questions
+              </button>
 
-          <Link href={Routes.QuestionsHome()} passHref>
-            <a className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800">
-              Question Pool
-            </a>
-          </Link>
+              <Modal
+                header="Add New Question"
+                open={openAddNewQuestion}
+                setOpen={setOpenAddNewQuestion}
+              >
+                <QuestionForm
+                  header="Add New Question to Form"
+                  subHeader="Enter question details"
+                  initialValues={{
+                    name: "",
+                  }}
+                  editmode={false}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Adding Question</span>)
+                    try {
+                      const createQuestionResponse = await createQuestionMutation(values)
 
-          <Link href={Routes.FormSettingsPage({ slug: form?.slug! })} passHref>
-            <a
-              className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
-              data-testid={`${form?.name && `${form?.name}-`}settingsLink`}
-            >
-              Form Settings
-            </a>
-          </Link>
+                      await createFormQuestionMutation({
+                        formId: form?.id as string,
+                        questionId: createQuestionResponse.id,
+                      })
+                      toast.success(() => <span>Question added</span>, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                      )
+                    }
+                  }}
+                />
+              </Modal>
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setOpenAddNewQuestion(true)
+                }}
+                data-testid={`open-addQuestion-modal`}
+                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+              >
+                Add New Question
+              </button>
+            </div>
+          </div>
 
           <Suspense
             fallback={
@@ -599,7 +607,7 @@ const SingleFormPage = ({
           >
             <Questions form={form} user={user} />
           </Suspense>
-        </>
+        </div>
       )}
     </AuthLayout>
   )

@@ -11,6 +11,7 @@ export const UserObj = z.object({
   companyInfo: z.any().optional(),
   website: z.string().url().optional(),
   theme: z.string().optional(),
+  stripeSubscriptionId: z.string().optional(),
 })
 
 export type UserInputType = z.infer<typeof UserObj>

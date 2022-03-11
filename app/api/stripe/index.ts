@@ -1,25 +1,38 @@
 import Stripe from "stripe"
 import stripe from "app/core/utils/stripe"
 import db from "db"
-import getRawBody from "raw-body"
 
 interface ISession {
   customer: string
   metadata: {
-    jobId: string
+    userId: string
   }
   subscription: string
 }
 
+const getRawData = (req): Promise<string> => {
+  return new Promise((resolve) => {
+    let buffer = ""
+    req.on("data", (chunk) => {
+      buffer += chunk
+    })
+
+    req.on("end", () => {
+      resolve(Buffer.from(buffer).toString())
+    })
+  })
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req, res) => {
-  const body = await getRawBody(req)
+  // const body = await getRawBody(req)
+  const body = await getRawData(req)
   let event: Stripe.Event | null
 
   try {
     event = stripe.webhooks.constructEvent(
       body,
-      req.headers["stripe-signature"],
+      req.headers["stripe-signature"]!,
       process.env.STRIPE_WEBHOOK!
     )
   } catch (err) {
@@ -32,9 +45,9 @@ export default async (req, res) => {
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(session.subscription)
 
-    await db.job.update({
+    await db.user.update({
       where: {
-        id: session.metadata.jobId,
+        id: parseInt(session.metadata.userId || "0"),
       },
       data: {
         stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
@@ -48,7 +61,7 @@ export default async (req, res) => {
   if (event.type === "invoice.payment_succeeded") {
     const subscription = await stripe.subscriptions.retrieve(session.subscription)
 
-    await db.job.update({
+    await db.user.update({
       where: {
         stripeSubscriptionId: subscription.id,
       },

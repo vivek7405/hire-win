@@ -4,7 +4,7 @@ import db from "db"
 export default resolver.pipe(resolver.authorize("ADMIN"), async () => {
   const counter = db.job.count({
     where: {
-      stripeCurrentPeriodEnd: {
+      validThrough: {
         lte: new Date(),
       },
     },

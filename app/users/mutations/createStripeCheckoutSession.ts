@@ -1,45 +1,44 @@
 import { Ctx } from "blitz"
 import db from "db"
 import stripe from "app/core/utils/stripe"
-import { plans } from "app/core/utils/plans"
+import { Plan } from "types"
 
 interface CreateStripeCheckoutSessionInput {
-  jobId: string
-  plan: string
+  userId: number
+  priceId: string
   quantity: number
 }
 
 async function createStripeCheckoutSession(
-  { jobId, plan, quantity }: CreateStripeCheckoutSessionInput,
+  { userId, priceId, quantity }: CreateStripeCheckoutSessionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const planId = plans[plan].priceId
-
-  const job = await db.job.findFirst({
+  const user = await db.user.findFirst({
     where: {
-      id: jobId,
+      id: userId,
     },
   })
+
+  if (!user || ctx.session.userId !== user?.id || !priceId) return null
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [
       {
-        price: planId,
+        price: priceId,
         quantity: quantity,
       },
     ],
     metadata: {
-      jobId,
-      userId: ctx.session.userId,
+      userId,
     },
     allow_promotion_codes: true,
     billing_address_collection: "auto",
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job?.slug}/settings/billing/`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job?.slug}/settings/billing`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
+    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
   })
 
   return session?.id

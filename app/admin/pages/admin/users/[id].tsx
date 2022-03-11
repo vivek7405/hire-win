@@ -19,6 +19,8 @@ import toast from "react-hot-toast"
 import updateUser from "app/admin/mutations/admin/updateUser"
 import LabeledTextAreaField from "app/core/components/LabeledTextAreaField"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
+import { plans } from "app/core/utils/plans"
+import { PlanName } from "types"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -41,6 +43,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     return {
       props: {
         user: user,
+        plans: plans,
         foundUser: foundUser.users[0],
       },
     }
@@ -57,6 +60,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 const SingleUserAdminPage = ({
   user,
+  plans,
   foundUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -73,6 +77,7 @@ const SingleUserAdminPage = ({
               await updateUserMutation({
                 where: { id: foundUser?.id },
                 data: { ...values },
+                initial: foundUser!,
               })
               toast.success(() => <span>User Updated</span>, { id: toastId })
               router.push(Routes.AdminUser())
@@ -100,6 +105,22 @@ const SingleUserAdminPage = ({
           <LabeledTextField name="createdAt" label="Created At" disabled />
 
           <RadioGroupField label="Role" name="role" options={["ADMIN", "USER"]} />
+
+          <LabeledTextField name="stripeCustomerId" label="Stripe Customer Id" disabled />
+
+          <LabeledTextField name="stripeSubscriptionId" label="Stripe Subscription Id" disabled />
+
+          <LabeledTextField
+            name="stripeCurrentPeriodEnd"
+            label="Stripe Current Period End Date"
+            disabled
+          />
+
+          <RadioGroupField
+            label="Select a plan"
+            name="stripePriceId"
+            options={plans?.filter((p) => p.name === PlanName.PRO)}
+          />
         </Form>
       </AdminLayout>
     </AuthLayout>

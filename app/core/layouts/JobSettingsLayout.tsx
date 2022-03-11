@@ -20,13 +20,6 @@ const JobSettingsLayout = ({ job, children, isOwner }: LayoutProps) => {
       icon: CogIcon,
       canView: true,
     },
-    // {
-    //   name: "Billing",
-    //   href: `/jobs/${job?.slug}/settings/billing`,
-    //   current: router.route === `/jobs/[slug]/settings/billing`,
-    //   icon: CreditCardIcon,
-    //   canView: isOwner,
-    // },
     {
       name: "Members",
       href: `/jobs/${job?.slug}/settings/members`,

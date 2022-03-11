@@ -1,5 +1,6 @@
 import db from "db"
 import { GuardBuilder } from "@blitz-guard/core"
+import { checkPlan } from "app/users/utils/checkPlan"
 
 type ExtendedResourceTypes =
   | "job"
@@ -22,14 +23,55 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
     cannot("manage", "all")
 
     if (ctx.session.$isAuthorized()) {
-      can("create", "job")
+      can("create", "job", async (args) => {
+        // Check user plan and don't allow to create a new job
+        // if the user is running on the Free Plan and already has 1 (or more) job
+        const user = await db.user.findFirst({
+          where: { id: ctx.session.userId || 0 },
+          include: {
+            memberships: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        })
+        const allUserJobsLength = user?.memberships?.length || 0
+        if (allUserJobsLength > 1) {
+          const currentPlan = checkPlan(user)
+          if (!currentPlan) return false
+        }
+        return true
+      })
       can("read", "job", async (args) => {
         const job = await db.job.findFirst({
           where: args.where,
           include: {
-            memberships: true,
+            memberships: {
+              include: {
+                user: true,
+              },
+            },
           },
         })
+
+        // Check user plan and don't allow to read the job
+        // if the user is running on the Free Plan and has more than 1 job
+        const user = await db.user.findFirst({
+          where: { id: ctx.session.userId || 0 },
+          include: {
+            memberships: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        })
+        const allUserJobsLength = user?.memberships?.length || 0
+        if (allUserJobsLength > 1) {
+          const currentPlan = checkPlan(user)
+          if (!currentPlan) return false
+        }
 
         return job?.memberships.some((p) => p.userId === ctx.session.userId) === true
       })
@@ -48,6 +90,24 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
+        // Check user plan and don't allow to read the job
+        // if the user is running on the Free Plan and has more than 1 job
+        const user = await db.user.findFirst({
+          where: { id: ctx.session.userId || 0 },
+          include: {
+            memberships: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        })
+        const allUserJobsLength = user?.memberships?.length || 0
+        if (allUserJobsLength > 1) {
+          const currentPlan = checkPlan(user)
+          if (!currentPlan) return false
+        }
+
         const owner = job?.memberships.find((p) => p.role === "OWNER")
         const admins = job?.memberships.filter((m) => m.role === "ADMIN")
 
@@ -63,6 +123,21 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             memberships: true,
           },
         })
+
+        // Check user plan and don't allow to invite to job
+        // if the user is running on the Free Plan
+        const user = await db.user.findFirst({
+          where: { id: ctx.session.userId || 0 },
+          include: {
+            memberships: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        })
+        const currentPlan = checkPlan(user)
+        if (!currentPlan) return false
 
         const owner = job?.memberships.find((p) => p.role === "OWNER")
         const admins = job?.memberships.filter((m) => m.role === "ADMIN")
