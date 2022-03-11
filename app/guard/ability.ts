@@ -124,6 +124,21 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
+        // Check user plan and don't allow to invite to job
+        // if the user is running on the Free Plan
+        const user = await db.user.findFirst({
+          where: { id: ctx.session.userId || 0 },
+          include: {
+            memberships: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        })
+        const currentPlan = checkPlan(user)
+        if (!currentPlan) return false
+
         const owner = job?.memberships.find((p) => p.role === "OWNER")
         const admins = job?.memberships.filter((m) => m.role === "ADMIN")
 
