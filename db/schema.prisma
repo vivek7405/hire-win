@@ -260,7 +260,7 @@ model Question {
   options       QuestionOption[]
   acceptedFiles String           @default("")
 
-  factory Boolean @default(false)
+  factory   Boolean @default(false)
 
   slug String @unique
 
@@ -306,6 +306,7 @@ model FormQuestion {
 
   order     Int
   behaviour FormQuestionBehaviour @default(OPTIONAL)
+  allowBehaviourEdit Boolean @default(true)
 
   form   Form   @relation(fields: [formId], references: [id])
   formId String

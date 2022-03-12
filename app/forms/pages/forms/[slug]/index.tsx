@@ -206,53 +206,55 @@ export const Questions = ({ user, form }) => {
         return (
           <>
             <div className="flex space-x-8">
-              <Form noFormatting={true} onSubmit={async (values) => {}}>
-                <LabeledToggleGroupField
-                  name={`formQuestion-${formQuestion.id}-behaviour`}
-                  paddingX={3}
-                  paddingY={1}
-                  defaultValue={formQuestion?.behaviour || FormQuestionBehaviour.OPTIONAL}
-                  value={formQuestion?.behaviour}
-                  options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
-                    return { label: formQuestionBehaviour, value: formQuestionBehaviour }
-                  })}
-                  onChange={async (value) => {
-                    const toastId = toast.loading(() => (
-                      <span>
-                        <b>Setting behaviour as {value}</b>
-                        <br />
-                        for question - {formQuestion.question.name}
-                      </span>
-                    ))
-                    try {
-                      await updateFormQuestionMutation({
-                        where: { id: formQuestion?.id },
-                        data: {
-                          order: formQuestion.order,
-                          behaviour: value,
-                        },
-                      })
-                      toast.success(
-                        () => (
-                          <span>
-                            <b>Behaviour changed successfully</b>
-                            <br />
-                            for question - {formQuestion?.question?.name}
-                          </span>
-                        ),
-                        { id: toastId }
-                      )
-                      formQuestion.behaviour = value
-                    } catch (error) {
-                      toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " +
-                          error.toString(),
-                        { id: toastId }
-                      )
-                    }
-                  }}
-                />
-              </Form>
+              {formQuestion.allowBehaviourEdit && (
+                <Form noFormatting={true} onSubmit={async (values) => {}}>
+                  <LabeledToggleGroupField
+                    name={`formQuestion-${formQuestion.id}-behaviour`}
+                    paddingX={3}
+                    paddingY={1}
+                    defaultValue={formQuestion?.behaviour || FormQuestionBehaviour.OPTIONAL}
+                    value={formQuestion?.behaviour}
+                    options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
+                      return { label: formQuestionBehaviour, value: formQuestionBehaviour }
+                    })}
+                    onChange={async (value) => {
+                      const toastId = toast.loading(() => (
+                        <span>
+                          <b>Setting behaviour as {value}</b>
+                          <br />
+                          for question - {formQuestion.question.name}
+                        </span>
+                      ))
+                      try {
+                        await updateFormQuestionMutation({
+                          where: { id: formQuestion?.id },
+                          data: {
+                            order: formQuestion.order,
+                            behaviour: value,
+                          },
+                        })
+                        toast.success(
+                          () => (
+                            <span>
+                              <b>Behaviour changed successfully</b>
+                              <br />
+                              for question - {formQuestion?.question?.name}
+                            </span>
+                          ),
+                          { id: toastId }
+                        )
+                        formQuestion.behaviour = value
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          { id: toastId }
+                        )
+                      }
+                    }}
+                  />
+                </Form>
+              )}
 
               {!formQuestion.question.factory && (
                 <>

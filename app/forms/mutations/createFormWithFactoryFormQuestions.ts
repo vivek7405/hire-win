@@ -54,6 +54,7 @@ async function createFormWithFactoryFormQuestions(formName: string, userId: numb
             updatedAt: new Date(),
             order: fq.order,
             behaviour: fq.behaviour,
+            allowBehaviourEdit: fq.allowBehaviourEdit,
             question: {
               connectOrCreate: {
                 where: {
