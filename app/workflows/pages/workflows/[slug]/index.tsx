@@ -174,7 +174,7 @@ export const Stages = ({ user, workflow }) => {
         return (
           <>
             <div className="flex space-x-8">
-              {workflowStage.allowEdit && (
+              {workflowStage.stage.allowEdit && (
                 <>
                   <Confirm
                     open={openConfirm}
@@ -211,7 +211,7 @@ export const Stages = ({ user, workflow }) => {
                   >
                     Are you sure you want to remove this stage from the workflow?
                   </Confirm>
-                  {workflowStage.allowEdit && (
+                  {workflowStage.stage.allowEdit && (
                     <button
                       title="Remove Stage"
                       className="align-middle rounded-full"

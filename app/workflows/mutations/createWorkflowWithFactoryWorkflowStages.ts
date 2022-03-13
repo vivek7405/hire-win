@@ -52,7 +52,6 @@ async function createWorkflowWithFactoryWorkflowStages(workflowName: string, use
             createdAt: new Date(),
             updatedAt: new Date(),
             order: fq.order,
-            allowEdit: fq.allowEdit,
             stage: {
               connectOrCreate: {
                 where: {
@@ -61,6 +60,7 @@ async function createWorkflowWithFactoryWorkflowStages(workflowName: string, use
                 create: {
                   name: fq.stage.name || "",
                   slug: fq.stage.slug || "",
+                  allowEdit: fq.stage.allowEdit,
                   user: {
                     connect: {
                       id: userId,

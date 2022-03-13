@@ -13,7 +13,6 @@ export const WorkflowStage = z.object({
   order: z.number().optional(),
   workflowId: z.string().optional(),
   stageId: z.string(),
-  allowEdit: z.boolean().optional(),
 })
 export type WorkflowStageInputType = z.infer<typeof WorkflowStage>
 

@@ -207,6 +207,8 @@ model Stage {
   name String
   slug String @unique
 
+  allowEdit Boolean @default(true)
+
   workflows WorkflowStage[]
 
   user   User @relation(fields: [userId], references: [id])
@@ -221,8 +223,6 @@ model WorkflowStage {
   updatedAt DateTime @updatedAt
 
   order Int
-
-  allowEdit Boolean @default(true)
 
   workflow   Workflow @relation(fields: [workflowId], references: [id])
   workflowId String

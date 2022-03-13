@@ -4,30 +4,30 @@ import { ExtendedWorkflowStage } from "types"
 const factoryWorkflowStages = [
   {
     order: 1,
-    allowEdit: false,
     stage: {
       name: "Sourced",
+      allowEdit: false,
     } as Stage,
   } as ExtendedWorkflowStage,
   {
     order: 2,
-    allowEdit: true,
     stage: {
       name: "Shortlisted",
+      allowEdit: true,
     } as Stage,
   } as ExtendedWorkflowStage,
   {
     order: 3,
-    allowEdit: true,
     stage: {
       name: "Interview",
+      allowEdit: true,
     } as Stage,
   } as ExtendedWorkflowStage,
   {
     order: 4,
-    allowEdit: false,
     stage: {
       name: "Hired",
+      allowEdit: false,
     } as Stage,
   } as ExtendedWorkflowStage,
 ]

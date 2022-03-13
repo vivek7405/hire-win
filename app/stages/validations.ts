@@ -6,6 +6,7 @@ export const Stage = z.object({
   slug: z.string().optional(),
   order: z.number().optional(),
   workflowId: z.string().optional(),
+  allowEdit: z.boolean().optional(),
 })
 
 export type StageInputType = z.infer<typeof Stage>
