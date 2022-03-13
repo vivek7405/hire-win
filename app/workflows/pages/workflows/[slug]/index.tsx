@@ -23,16 +23,23 @@ import Skeleton from "react-loading-skeleton"
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import getWorkflowStages from "app/workflows/queries/getWorkflowStages"
-import AddStageForm from "app/workflows/components/AddStageForm"
+// import AddStageWorkflow from "app/workflows/components/AddStageWorkflow"
 import toast from "react-hot-toast"
 import createWorkflowStage from "app/workflows/mutations/createWorkflowStage"
-import { WorkflowStage } from "app/workflows/validations"
+import { WorkflowStage, WorkflowStages } from "app/workflows/validations"
 
 import { ArrowUpIcon, ArrowDownIcon, XCircleIcon } from "@heroicons/react/outline"
 import { ExtendedWorkflowStage, ShiftDirection } from "types"
 import shiftWorkflowStage from "app/workflows/mutations/shiftWorkflowStage"
 import Confirm from "app/core/components/Confirm"
 import removeStageFromWorkflow from "app/workflows/mutations/removeStageFromWorkflow"
+import getWorkflowStagesWOPagination from "app/workflows/queries/getWorkflowStagesWOPagination"
+import StageForm from "app/stages/components/StageForm"
+import addExistingWorkflowStages from "app/workflows/mutations/addExistingWorkflowStages"
+import AddExistingStagesForm from "app/workflows/components/AddExistingStagesForm"
+import createQuestion from "app/questions/mutations/createQuestion"
+import createStage from "app/stages/mutations/createStage"
+import addNewStageToWorkflow from "app/workflows/mutations/addNewStageToWorkflow"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -120,24 +127,13 @@ export const Stages = ({ user, workflow }) => {
     setQuery(search)
   }, [router.query])
 
-  const [{ workflowStages, hasMore, count }] = usePaginatedQuery(getWorkflowStages, {
+  const [workflowStages] = usePaginatedQuery(getWorkflowStagesWOPagination, {
     where: {
       workflowId: workflow?.id,
       ...query,
     },
     orderBy: { order: "asc" },
-    skip: ITEMS_PER_PAGE * Number(tablePage),
-    take: ITEMS_PER_PAGE,
   })
-
-  // Use blitz guard to check if user can update t
-
-  let startPage = tablePage * ITEMS_PER_PAGE + 1
-  let endPage = startPage - 1 + ITEMS_PER_PAGE
-
-  if (endPage > count) {
-    endPage = count
-  }
 
   useMemo(async () => {
     let data: ExtendedWorkflowStage[] = []
@@ -155,158 +151,193 @@ export const Stages = ({ user, workflow }) => {
       accessor: "order",
     },
     {
-      Header: "Id",
-      accessor: "stage.id",
-    },
-    {
       Header: "Name",
       accessor: "stage.name",
       Cell: (props) => {
+        const workflowStage: ExtendedWorkflowStage = props.cell.row.original
+
         return (
-          <Link
-            href={Routes.StageSettingsPage({ slug: props.cell.row.original.stage.slug })}
-            passHref
-          >
+          <Link href={Routes.StageSettingsPage({ slug: workflowStage.stage.slug })} passHref>
             <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
-              {props.cell.row.original.stage.name}
+              {workflowStage.stage.name}
             </a>
           </Link>
         )
       },
     },
     {
-      Header: "Slug",
-      accessor: "stage.slug",
-    },
-    {
       Header: "",
       accessor: "action",
       Cell: (props) => {
+        const workflowStage: ExtendedWorkflowStage = props.cell.row.original
+
         return (
           <>
-            <Confirm
-              open={openConfirm}
-              setOpen={setOpenConfirm}
-              header={
-                Object.entries(workflowStageToRemove).length
-                  ? `Remove Stage - ${workflowStageToRemove.stage.name}?`
-                  : "Remove Stage?"
-              }
-              onSuccess={async () => {
-                const toastId = toast.loading(() => (
-                  <span>Removing Stage {workflowStageToRemove.stage.name}</span>
-                ))
-                try {
-                  await removeStageFromWorkflowMutation({
-                    workflowId: workflowStageToRemove.workflowId,
-                    order: workflowStageToRemove.order,
-                  })
-                  toast.success(
-                    () => <span>Stage removed - {workflowStageToRemove.stage.name}</span>,
-                    {
-                      id: toastId,
+            <div className="flex space-x-8">
+              {workflowStage.allowEdit && (
+                <>
+                  <Confirm
+                    open={openConfirm}
+                    setOpen={setOpenConfirm}
+                    header={
+                      Object.entries(workflowStageToRemove).length
+                        ? `Remove Stage - ${workflowStageToRemove.stage.name}?`
+                        : "Remove Stage?"
                     }
-                  )
-                } catch (error) {
-                  toast.error(
-                    "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                    { id: toastId }
-                  )
-                }
-                router.reload()
-              }}
-            >
-              Are you sure you want to remove this stage from the workflow?
-            </Confirm>
-            <button
-              title="Remove Stage"
-              className="mr-16 align-middle bg-red-500 rounded-full"
-              onClick={async (e) => {
-                e.preventDefault()
+                    onSuccess={async () => {
+                      const toastId = toast.loading(() => (
+                        <span>Removing Stage {workflowStageToRemove.stage.name}</span>
+                      ))
+                      try {
+                        await removeStageFromWorkflowMutation({
+                          workflowId: workflowStageToRemove.workflowId,
+                          order: workflowStageToRemove.order,
+                        })
+                        toast.success(
+                          () => <span>Stage removed - {workflowStageToRemove.stage.name}</span>,
+                          {
+                            id: toastId,
+                          }
+                        )
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          { id: toastId }
+                        )
+                      }
+                      router.reload()
+                    }}
+                  >
+                    Are you sure you want to remove this stage from the workflow?
+                  </Confirm>
+                  {workflowStage.allowEdit && (
+                    <button
+                      title="Remove Stage"
+                      className="align-middle rounded-full"
+                      onClick={async (e) => {
+                        e.preventDefault()
 
-                const workflowStage: ExtendedWorkflowStage = props.cell.row.original
-                setWorkflowStageToRemove(workflowStage)
-                setOpenConfirm(true)
-              }}
-            >
-              <XCircleIcon className="w-auto h-4 text-red-100" />
-            </button>
+                        setWorkflowStageToRemove(workflowStage)
+                        setOpenConfirm(true)
+                      }}
+                    >
+                      <XCircleIcon className="w-6 h-auto text-red-500 hover:text-red-600" />
+                    </button>
+                  )}
 
-            {props.cell.row.original.order !== 1 && (
-              <button
-                title="Move Up"
-                className="ml-2 align-middle"
-                onClick={async (e) => {
-                  const workflowStage: ExtendedWorkflowStage = props.cell.row.original
+                  <div className="flex">
+                    <button
+                      disabled={workflowStage.order === workflowStages.length - 1}
+                      title="Move Down"
+                      className="align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
+                      onClick={async (e) => {
+                        const toastId = toast.loading(() => (
+                          <span>Changing stage order for {workflowStage.stage.name}</span>
+                        ))
+                        try {
+                          await shiftWorkflowStageMutation({
+                            workflowId: workflowStage.workflowId,
+                            order: workflowStage.order,
+                            shiftDirection: ShiftDirection.DOWN,
+                          })
+                          toast.success(
+                            () => (
+                              <span>
+                                Order changed from {workflowStage.order} to{" "}
+                                {workflowStage.order + 1} for Stage {workflowStage.stage.name}
+                              </span>
+                            ),
+                            { id: toastId }
+                          )
+                          const x = workflowStage.order
+                          const y = workflowStage.order - 1
+                          if (x <= workflowStages.length - 1 && y <= workflowStages.length - 1) {
+                            const row = workflowStages[x]!
+                            workflowStages[x] = {
+                              ...workflowStages[y]!,
+                              order: workflowStage.order + 1,
+                            }
+                            workflowStages[y] = { ...row, order: workflowStage.order }
+                            setData(workflowStages)
+                          } else {
+                            toast.error("Index out of range")
+                          }
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString(),
+                            { id: toastId }
+                          )
+                        }
+                      }}
+                    >
+                      {!(workflowStage.order === workflowStages.length - 1) && (
+                        <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+                      )}
 
-                  const toastId = toast.loading(() => (
-                    <span>Changing stage order for {workflowStage.stage.name}</span>
-                  ))
-                  try {
-                    await shiftWorkflowStageMutation({
-                      workflowId: workflowStage.workflowId,
-                      order: workflowStage.order,
-                      shiftDirection: ShiftDirection.UP,
-                    })
-                    toast.success(
-                      () => (
-                        <span>
-                          Order changed from {workflowStage.order} to {workflowStage.order - 1} for
-                          Stage {workflowStage.stage.name}
-                        </span>
-                      ),
-                      { id: toastId }
-                    )
-                    router.reload()
-                  } catch (error) {
-                    toast.error(
-                      "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                      { id: toastId }
-                    )
-                  }
-                }}
-              >
-                <ArrowUpIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
-              </button>
-            )}
+                      {workflowStage.order === workflowStages.length - 1 && (
+                        <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />
+                      )}
+                    </button>
 
-            {props.cell.row.original.order !== workflowStages.length && (
-              <button
-                title="Move Down"
-                className="ml-2 align-middle"
-                onClick={async (e) => {
-                  const workflowStage: ExtendedWorkflowStage = props.cell.row.original
+                    <button
+                      disabled={workflowStage.order === 2}
+                      title="Move Up"
+                      className="ml-2 align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
+                      onClick={async (e) => {
+                        const toastId = toast.loading(() => (
+                          <span>Changing stage order for {workflowStage.stage.name}</span>
+                        ))
+                        try {
+                          await shiftWorkflowStageMutation({
+                            workflowId: workflowStage.workflowId,
+                            order: workflowStage.order,
+                            shiftDirection: ShiftDirection.UP,
+                          })
+                          toast.success(
+                            () => (
+                              <span>
+                                Order changed from {workflowStage.order} to{" "}
+                                {workflowStage.order - 1} for Stage {workflowStage.stage.name}
+                              </span>
+                            ),
+                            { id: toastId }
+                          )
+                          const x = workflowStage.order - 1
+                          const y = workflowStage.order - 2
+                          if (x <= workflowStages.length - 1 && y <= workflowStages.length - 1) {
+                            const row = workflowStages[x]!
+                            workflowStages[x] = {
+                              ...workflowStages[y]!,
+                              order: workflowStage.order,
+                            }
+                            workflowStages[y] = { ...row, order: workflowStage.order - 1 }
+                            setData(workflowStages)
+                          } else {
+                            toast.error("Index out of range")
+                          }
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString(),
+                            { id: toastId }
+                          )
+                        }
+                      }}
+                    >
+                      {!(workflowStage.order === 2) && (
+                        <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+                      )}
 
-                  const toastId = toast.loading(() => (
-                    <span>Changing stage order for {workflowStage.stage.name}</span>
-                  ))
-                  try {
-                    await shiftWorkflowStageMutation({
-                      workflowId: workflowStage.workflowId,
-                      order: workflowStage.order,
-                      shiftDirection: ShiftDirection.DOWN,
-                    })
-                    toast.success(
-                      () => (
-                        <span>
-                          Order changed from {workflowStage.order} to {workflowStage.order + 1} for
-                          Stage {workflowStage.stage.name}
-                        </span>
-                      ),
-                      { id: toastId }
-                    )
-                    router.reload()
-                  } catch (error) {
-                    toast.error(
-                      "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                      { id: toastId }
-                    )
-                  }
-                }}
-              >
-                <ArrowDownIcon className="h-4 cursor-pointer text-theme-500 hover:text-theme-900" />
-              </button>
-            )}
+                      {workflowStage.order === 2 && (
+                        <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </>
         )
       },
@@ -317,14 +348,15 @@ export const Stages = ({ user, workflow }) => {
     <Table
       columns={columns}
       data={data}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+      pageCount={Math.ceil(workflowStages.length / ITEMS_PER_PAGE)}
       pageIndex={tablePage}
       pageSize={ITEMS_PER_PAGE}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
+      hasNext={false}
+      hasPrevious={false}
+      totalCount={workflowStages.length}
+      startPage={1}
+      endPage={1}
+      noPagination={true}
     />
   )
 }
@@ -335,8 +367,13 @@ const SingleWorkflowPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [open, setOpen] = React.useState(false)
+  // const [open, setOpen] = React.useState(false)
+  const [createStageMutation] = useMutation(createStage)
+  const [addNewStageToWorkflowMutation] = useMutation(addNewStageToWorkflow)
   const [createWorkflowStageMutation] = useMutation(createWorkflowStage)
+  const [addExistingWorkflowStagesMutation] = useMutation(addExistingWorkflowStages)
+  const [openAddExistingStage, setOpenAddExistingStage] = React.useState(false)
+  const [openAddNewStage, setOpenAddNewStage] = React.useState(false)
   const router = useRouter()
 
   if (error) {
@@ -347,7 +384,7 @@ const SingleWorkflowPage = ({
     <AuthLayout user={user}>
       <Breadcrumbs />
       <br />
-      {canUpdate && (
+      {/* {canUpdate && (
         <>
           <Link href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })} passHref>
             <a data-testid={`${workflow?.name && `${workflow?.name}-`}settingsLink`}>Settings</a>
@@ -355,7 +392,7 @@ const SingleWorkflowPage = ({
           <br />
           <br />
           <Modal header="Add Stage" open={open} setOpen={setOpen}>
-            <AddStageForm
+            <AddStageWorkflow
               schema={WorkflowStage}
               user={user}
               workflowId={workflow?.id!}
@@ -395,6 +432,117 @@ const SingleWorkflowPage = ({
             <Stages workflow={workflow} user={user} />
           </Suspense>
         </>
+      )} */}
+
+      {canUpdate && (
+        <div className="space-y-6">
+          <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
+            <div className="space-x-8 flex flex-row justify-between">
+              <Link href={Routes.StagesHome()} passHref>
+                <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
+                  Stage Pool
+                </a>
+              </Link>
+
+              <Link href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })} passHref>
+                <a
+                  className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
+                  data-testid={`${workflow?.name && `${workflow?.name}-`}settingsLink`}
+                >
+                  Workflow Settings
+                </a>
+              </Link>
+            </div>
+
+            <div className="flex flex-row justify-between space-x-3">
+              <Modal
+                header="Add Existing Stages"
+                open={openAddExistingStage}
+                setOpen={setOpenAddExistingStage}
+              >
+                <AddExistingStagesForm
+                  schema={WorkflowStages}
+                  user={user}
+                  workflowId={workflow?.id!}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Adding Stage(s)</span>)
+                    try {
+                      await addExistingWorkflowStagesMutation({
+                        workflowId: workflow?.id as string,
+                        stageIds: values.stageIds,
+                      })
+                      toast.success(() => <span>Stage(s) added</span>, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
+                      )
+                    }
+                  }}
+                />
+              </Modal>
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setOpenAddExistingStage(true)
+                }}
+                data-testid={`open-addStage-modal`}
+                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+              >
+                Add Existing Stages
+              </button>
+
+              <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
+                <StageForm
+                  header="Add New Stage to Workflow"
+                  subHeader="Enter stage details"
+                  initialValues={{
+                    name: "",
+                  }}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Adding Stage</span>)
+                    try {
+                      await addNewStageToWorkflowMutation({
+                        ...values,
+                        workflowId: workflow?.id as string,
+                      })
+                      toast.success(() => <span>Stage added</span>, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                      )
+                    }
+                  }}
+                />
+              </Modal>
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  setOpenAddNewStage(true)
+                }}
+                data-testid={`open-addStage-modal`}
+                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+              >
+                Add New Stage
+              </button>
+            </div>
+          </div>
+
+          <Suspense
+            fallback={
+              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
+            }
+          >
+            <Stages workflow={workflow} user={user} />
+          </Suspense>
+        </div>
       )}
     </AuthLayout>
   )

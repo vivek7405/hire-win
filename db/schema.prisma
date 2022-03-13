@@ -222,6 +222,8 @@ model WorkflowStage {
 
   order Int
 
+  allowEdit Boolean @default(true)
+
   workflow   Workflow @relation(fields: [workflowId], references: [id])
   workflowId String
 
@@ -260,7 +262,7 @@ model Question {
   options       QuestionOption[]
   acceptedFiles String           @default("")
 
-  factory   Boolean @default(false)
+  factory Boolean @default(false)
 
   slug String @unique
 
@@ -304,9 +306,9 @@ model FormQuestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order     Int
-  behaviour FormQuestionBehaviour @default(OPTIONAL)
-  allowBehaviourEdit Boolean @default(true)
+  order              Int
+  behaviour          FormQuestionBehaviour @default(OPTIONAL)
+  allowBehaviourEdit Boolean               @default(true)
 
   form   Form   @relation(fields: [formId], references: [id])
   formId String

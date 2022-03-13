@@ -35,7 +35,7 @@ import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
 import ApplicationForm from "app/jobs/components/ApplicationForm"
-import { FormQuestionBehaviour } from "@prisma/client"
+import { FormQuestionBehaviour, QuestionType } from "@prisma/client"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
@@ -44,6 +44,7 @@ import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPa
 import QuestionForm from "app/questions/components/QuestionForm"
 import createQuestion from "app/questions/mutations/createQuestion"
 import addExistingFormQuestions from "app/forms/mutations/addExistingFormQuestions"
+import addNewQuestionToForm from "app/forms/mutations/addNewQuestionToForm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -456,12 +457,13 @@ const SingleFormPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [openAddExistingQuestion, setOpenAddExistingQuestion] = React.useState(false)
+  const [openAddExistingQuestions, setOpenAddExistingQuestions] = React.useState(false)
   const [openAddNewQuestion, setOpenAddNewQuestion] = React.useState(false)
   const [openPreviewForm, setOpenPreviewForm] = React.useState(false)
   const [createFormQuestionMutation] = useMutation(createFormQuestion)
   const [addExistingFormQuestionsMutation] = useMutation(addExistingFormQuestions)
   const [createQuestionMutation] = useMutation(createQuestion)
+  const [addNewQuestionToFormMutation] = useMutation(addNewQuestionToForm)
   const router = useRouter()
 
   if (error) {
@@ -517,8 +519,8 @@ const SingleFormPage = ({
             <div className="flex flex-row justify-between space-x-3">
               <Modal
                 header="Add Existing Questions"
-                open={openAddExistingQuestion}
-                setOpen={setOpenAddExistingQuestion}
+                open={openAddExistingQuestions}
+                setOpen={setOpenAddExistingQuestions}
               >
                 <AddExistingQuestionsForm
                   schema={FormQuestions}
@@ -548,7 +550,7 @@ const SingleFormPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
-                  setOpenAddExistingQuestion(true)
+                  setOpenAddExistingQuestions(true)
                 }}
                 data-testid={`open-addQuestion-modal`}
                 className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
@@ -571,11 +573,9 @@ const SingleFormPage = ({
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Adding Question</span>)
                     try {
-                      const createQuestionResponse = await createQuestionMutation(values)
-
-                      await createFormQuestionMutation({
+                      await addNewQuestionToFormMutation({
+                        ...values,
                         formId: form?.id as string,
-                        questionId: createQuestionResponse.id,
                       })
                       toast.success(() => <span>Question added</span>, {
                         id: toastId,

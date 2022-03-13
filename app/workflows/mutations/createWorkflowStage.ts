@@ -2,6 +2,8 @@ import { Ctx, AuthenticationError } from "blitz"
 import db from "db"
 import { WorkflowStage, WorkflowStageInputType } from "app/workflows/validations"
 import Guard from "app/guard/ability"
+import shiftWorkflowStage from "./shiftWorkflowStage"
+import { ShiftDirection } from "types"
 
 async function createWorkflowStage(data: WorkflowStageInputType, ctx: Ctx) {
   ctx.session.$authorize()
@@ -12,6 +14,7 @@ async function createWorkflowStage(data: WorkflowStageInputType, ctx: Ctx) {
 
   const order = (await db.workflowStage.count({ where: { workflowId: workflowId } })) + 1
 
+  // Add stage to the last position
   const workflowStage = await db.workflowStage.create({
     data: {
       order: order,
@@ -19,6 +22,12 @@ async function createWorkflowStage(data: WorkflowStageInputType, ctx: Ctx) {
       stageId: stageId,
     },
   })
+
+  // After adding stage to the last position, shift it up
+  await shiftWorkflowStage(
+    { workflowId: workflowId!, order, shiftDirection: ShiftDirection.UP },
+    ctx
+  )
 
   return workflowStage
 }

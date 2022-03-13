@@ -5,6 +5,7 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWithFactoryFormQuestions"
 import { UserRole } from "@prisma/client"
+import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
 
 export default resolver.pipe(
   resolver.zod(Signup),
@@ -29,6 +30,7 @@ export default resolver.pipe(
     })
 
     await createFormWithFactoryFormQuestions("Default", user?.id)
+    await createWorkflowWithFactoryWorkflowStages("Default", user?.id)
 
     await ctx.session.$create({ userId: user.id, role: user.role as UserRole })
     return user
