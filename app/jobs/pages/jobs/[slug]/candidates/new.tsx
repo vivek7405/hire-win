@@ -146,7 +146,7 @@ const NewCandidate = ({
                   }) || [],
               })
               toast.success(() => <span>Candidate created</span>, { id: toastId })
-              router.push(Routes.CandidatesHome({ slug: job?.slug! }))
+              router.push(Routes.SingleJobPage({ slug: job?.slug! }))
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString(),

@@ -230,6 +230,8 @@ model WorkflowStage {
   stage   Stage  @relation(fields: [stageId], references: [id])
   stageId String
 
+  candidates Candidate[]
+
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
 }
@@ -351,6 +353,9 @@ model Candidate {
   name   String
   email  String
   resume Json?
+
+  workflowStage   WorkflowStage? @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String?
 
   slug String @unique
 

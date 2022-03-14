@@ -20,9 +20,15 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import getJob from "app/jobs/queries/getJob"
 import Table from "app/core/components/Table"
 import getCandidates from "app/jobs/queries/getCandidates"
-import { AttachmentObject, ExtendedAnswer, ExtendedJob } from "types"
+import {
+  AttachmentObject,
+  ExtendedAnswer,
+  ExtendedCandidate,
+  ExtendedJob,
+  ExtendedWorkflowStage,
+} from "types"
 import Skeleton from "react-loading-skeleton"
-import { QuestionType } from "@prisma/client"
+import { QuestionType, WorkflowStage } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

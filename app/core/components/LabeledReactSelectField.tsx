@@ -6,7 +6,7 @@ import Select from "react-select"
 export interface LabeledReactSelectFieldProps
   extends PropsWithoutRef<JSX.IntrinsicElements["select"]> {
   name: string
-  label: string
+  label?: string
   placeholder?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
@@ -37,13 +37,15 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
 
     return (
       <div {...outerProps}>
-        <label
-          data-testid={`${props.testid && `${props.testid}-`}label`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {label}
-        </label>
-        <div className="mt-1">
+        {label && (
+          <label
+            data-testid={`${props.testid && `${props.testid}-`}label`}
+            className="block text-sm font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
+        <div className={label && "mt-1"}>
           <Controller
             name={name}
             control={control}

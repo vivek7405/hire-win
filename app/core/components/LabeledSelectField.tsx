@@ -7,7 +7,7 @@ export interface LabeledSelectFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   /** Field name. */
   name: string
   /** Field label. */
-  label: string
+  label?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   options: { label: string; value?: string }[]
@@ -35,13 +35,15 @@ export const LabeledSelectField = forwardRef<HTMLSelectElement, LabeledSelectFie
 
     return (
       <div {...outerProps}>
-        <label
-          data-testid={`${props.testid && `${props.testid}-`}label`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {label}
-        </label>
-        <div className="mt-1">
+        {label && (
+          <label
+            data-testid={`${props.testid && `${props.testid}-`}label`}
+            className="block text-sm font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
+        <div className={label && "mt-1"}>
           <select
             disabled={disabled || isSubmitting}
             {...register(`${name}` as const)}

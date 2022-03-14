@@ -106,7 +106,7 @@ export const Questions = ({ user, form }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
+  const [data, setData] = useState<ExtendedFormQuestion[]>([])
   const [query, setQuery] = useState({})
   const [shiftFormQuestionMutation] = useMutation(shiftFormQuestion)
   const [updateFormQuestionMutation] = useMutation(updateFormQuestion)

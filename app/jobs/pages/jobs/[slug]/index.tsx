@@ -10,6 +10,7 @@ import {
   getSession,
   useRouter,
   usePaginatedQuery,
+  useMutation,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -19,10 +20,22 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import Table from "app/core/components/Table"
 import getCandidates from "app/jobs/queries/getCandidates"
-import { AttachmentObject, ExtendedAnswer, ExtendedJob } from "types"
+import {
+  AttachmentObject,
+  ExtendedAnswer,
+  ExtendedCandidate,
+  ExtendedJob,
+  ExtendedWorkflowStage,
+} from "types"
 import { QuestionType } from "@prisma/client"
 import Skeleton from "react-loading-skeleton"
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
+import Form from "app/core/components/Form"
+import LabeledSelectField from "app/core/components/LabeledSelectField"
+import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
+import toast from "react-hot-toast"
+import updateCandidate from "app/jobs/mutations/updateCandidate"
+import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -89,7 +102,7 @@ const Candidates = (props: CandidateProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
+  const [data, setData] = useState<ExtendedCandidate[]>([])
   const [query, setQuery] = useState({})
 
   useEffect(() => {
@@ -126,16 +139,10 @@ const Candidates = (props: CandidateProps) => {
   }
 
   useMemo(async () => {
-    let data: {}[] = []
+    let data: ExtendedCandidate[] = []
 
     await candidates.forEach((candidate) => {
-      data = [
-        ...data,
-        {
-          ...candidate,
-        },
-      ]
-
+      data = [...data, { ...candidate }]
       setData(data)
     })
   }, [candidates])
@@ -222,6 +229,72 @@ const Candidates = (props: CandidateProps) => {
       //     </>
       //   )
       // },
+    },
+    {
+      Header: "Stage",
+      accessor: "workflowStage",
+      Cell: (props) => {
+        const candidate = props.cell.row.original as ExtendedCandidate
+        const stages =
+          candidate?.job.workflow?.stages?.sort((a, b) => {
+            return a.order - b.order
+          }) || []
+        const workflowStage = props.value as ExtendedWorkflowStage
+        const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
+
+        return (
+          <Form noFormatting={true} onSubmit={async (values) => {}}>
+            <LabeledSelectField
+              name={`candidate-${candidate?.id}-stage`}
+              defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
+              value={workflowStage.id}
+              options={stages.map((ws) => {
+                return { label: ws?.stage?.name, value: ws?.id }
+              })}
+              onChange={async (e) => {
+                const selectedWorkflowStageId = e.target.value || ("" as string)
+                const selectedStageName =
+                  stages.find((ws) => ws.id === selectedWorkflowStageId)?.stage?.name || ""
+                const toastId = toast.loading(() => (
+                  <span>
+                    <b>Setting stage as {selectedStageName}</b>
+                    <br />
+                    for candidate - {candidate?.name}
+                  </span>
+                ))
+                try {
+                  await updateCandidateStageMutation({
+                    where: { id: candidate?.id },
+                    data: { workflowStageId: selectedWorkflowStageId },
+                  })
+                  const candidateData = data.find((c) => c.id === candidate.id)
+                  if (candidateData) {
+                    candidateData.workflowStageId = selectedWorkflowStageId
+                    candidateData.workflowStage =
+                      stages.find((ws) => ws.id === selectedWorkflowStageId) || null
+                    setData([...data])
+                  }
+                  toast.success(
+                    () => (
+                      <span>
+                        <b>Stage changed successfully</b>
+                        <br />
+                        for candidate - {candidate?.name}
+                      </span>
+                    ),
+                    { id: toastId }
+                  )
+                } catch (error) {
+                  toast.error(
+                    "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+                    { id: toastId }
+                  )
+                }
+              }}
+            />
+          </Form>
+        )
+      },
     },
     {
       Header: "Source",
