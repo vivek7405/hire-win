@@ -37,7 +37,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
         const allUserJobsLength = user?.memberships?.length || 0
-        if (allUserJobsLength > 1) {
+        if (allUserJobsLength >= 1) {
           const currentPlan = checkPlan(user)
           if (!currentPlan) return false
         }
