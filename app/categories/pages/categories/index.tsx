@@ -13,6 +13,7 @@ import path from "path"
 import getCategories from "app/categories/queries/getCategories"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
+import { Job } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -105,6 +106,14 @@ const Categories = ({ user }) => {
             </a>
           </Link>
         )
+      },
+    },
+    {
+      Header: "Jobs",
+      accessor: "jobs",
+      Cell: (props) => {
+        const jobs = props.value as Job[]
+        return <p>{jobs?.length}</p>
       },
     },
   ]
