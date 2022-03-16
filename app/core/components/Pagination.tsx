@@ -11,6 +11,7 @@ type PaginationProps = {
   startPage: number
   endPage: number
   queryPageName?: string
+  resultName?: string
 }
 const Pagination = ({
   pageIndex: controlledPageIndex,
@@ -20,6 +21,7 @@ const Pagination = ({
   startPage,
   endPage,
   queryPageName,
+  resultName,
 }: PaginationProps) => {
   const router = useRouter()
 
@@ -59,9 +61,15 @@ const Pagination = ({
     <nav className="flex items-center justify-between py-6" aria-label="Pagination">
       <div>
         <p className="text-sm text-gray-700">
-          Showing <span className="font-medium">{startPage}</span> to{" "}
-          <span className="font-medium">{endPage}</span> of{" "}
-          <span className="font-medium">{totalCount}</span> results
+          {totalCount > 0 && (
+            <>
+              Showing <span className="font-medium">{startPage}</span> to{" "}
+              <span className="font-medium">{endPage}</span> of{" "}
+            </>
+          )}
+          <span className="font-medium">{totalCount === 0 ? "No" : totalCount}</span>{" "}
+          {resultName || "result"}
+          {totalCount !== 1 && "s"}
         </p>
       </div>
       <div className="flex-1 flex justify-end">

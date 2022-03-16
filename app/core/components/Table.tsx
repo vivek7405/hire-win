@@ -16,7 +16,9 @@ type TableProps = {
   startPage: any
   endPage: any
   noMarginRight?: boolean
+  noSearch?: boolean
   noPagination?: boolean
+  resultName?: string
 }
 
 const Table = ({
@@ -31,7 +33,9 @@ const Table = ({
   startPage,
   endPage,
   noMarginRight,
+  noSearch,
   noPagination,
+  resultName,
 }: TableProps) => {
   const router = useRouter()
   const { getTableProps, getTableBodyProps, headerGroups, prepareRow, page } = useTable(
@@ -68,17 +72,19 @@ const Table = ({
   return (
     <div>
       <div className="flex mb-2">
-        <input
-          placeholder="Search"
-          type="text"
-          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 ${
-            !noMarginRight && `mr-2`
-          } lg:w-1/4 px-2 py-2 w-full rounded`}
-          onChange={(e) => {
-            execDebouncer(e)
-          }}
-        />
+        {!noSearch && (
+          <input
+            placeholder="Search"
+            type="text"
+            defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+            className={`border border-gray-300 ${
+              !noMarginRight && `mr-2`
+            } lg:w-1/4 px-2 py-2 w-full rounded`}
+            onChange={(e) => {
+              execDebouncer(e)
+            }}
+          />
+        )}
       </div>
 
       <div className="flex flex-col overflow-auto">
@@ -129,6 +135,7 @@ const Table = ({
           pageIndex={controlledPageIndex}
           startPage={startPage}
           totalCount={totalCount}
+          resultName={resultName}
         />
       )}
     </div>

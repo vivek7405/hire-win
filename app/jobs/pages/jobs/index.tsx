@@ -195,6 +195,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
       totalCount={count}
       startPage={startPage}
       endPage={endPage}
+      resultName="job"
     />
   )
 }

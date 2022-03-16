@@ -177,6 +177,7 @@ const Jobs = ({ user }) => {
       startPage={startPage}
       endPage={endPage}
       noMarginRight={true}
+      resultName="opening"
     />
   )
 }
