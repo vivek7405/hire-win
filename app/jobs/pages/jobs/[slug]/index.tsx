@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react"
+import React, { Children, Suspense, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -11,6 +11,8 @@ import {
   useRouter,
   usePaginatedQuery,
   useMutation,
+  useQuery,
+  dynamic,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -26,6 +28,9 @@ import {
   ExtendedCandidate,
   ExtendedJob,
   ExtendedWorkflowStage,
+  KanbanBoardType,
+  KanbanCardType,
+  KanbanColumnType,
 } from "types"
 import { QuestionType } from "@prisma/client"
 import Skeleton from "react-loading-skeleton"
@@ -36,6 +41,12 @@ import LabeledReactSelectField from "app/core/components/LabeledReactSelectField
 import toast from "react-hot-toast"
 import updateCandidate from "app/jobs/mutations/updateCandidate"
 import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
+import * as ToggleSwitch from "@radix-ui/react-switch"
+import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
+import getCandidatesWOPagination from "app/jobs/queries/getCandidatesWOPagination"
+import Debouncer from "app/core/utils/debouncer"
+import Pagination from "app/core/components/Pagination"
+import KanbanBoard from "app/core/components/KanbanBoard"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -95,15 +106,42 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
+const getBoard = (job, candidates) => {
+  return {
+    columns: job?.workflow?.stages
+      ?.sort((a, b) => {
+        return a.order - b.order
+      })
+      .map((ws) => {
+        return {
+          id: ws.id,
+          title: ws.stage?.name,
+          cards: candidates
+            ?.filter((c) => c.workflowStageId === ws.id)
+            .map((c) => {
+              return {
+                id: c.id,
+                title: c.name,
+                description: c.email,
+                // renderContent: <div className="text-xl font-bold">{c.name}</div>
+              }
+            }) as KanbanCardType[],
+        }
+      }) as KanbanColumnType[],
+  } as KanbanBoardType
+}
+
 type CandidateProps = {
   job: ExtendedJob
+  isKanban: Boolean
 }
 const Candidates = (props: CandidateProps) => {
-  const ITEMS_PER_PAGE = 12
+  const ITEMS_PER_PAGE = 25
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<ExtendedCandidate[]>([])
   const [query, setQuery] = useState({})
+  const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
 
   useEffect(() => {
     const search = router.query.search
@@ -128,8 +166,6 @@ const Candidates = (props: CandidateProps) => {
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
   })
-
-  // Use blitz guard to check if user can update
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
   let endPage = startPage - 1 + ITEMS_PER_PAGE
@@ -253,43 +289,7 @@ const Candidates = (props: CandidateProps) => {
               })}
               onChange={async (e) => {
                 const selectedWorkflowStageId = e.target.value || ("" as string)
-                const selectedStageName =
-                  stages.find((ws) => ws.id === selectedWorkflowStageId)?.stage?.name || ""
-                const toastId = toast.loading(() => (
-                  <span>
-                    <b>Setting stage as {selectedStageName}</b>
-                    <br />
-                    for candidate - {candidate?.name}
-                  </span>
-                ))
-                try {
-                  await updateCandidateStageMutation({
-                    where: { id: candidate?.id },
-                    data: { workflowStageId: selectedWorkflowStageId },
-                  })
-                  const candidateData = data.find((c) => c.id === candidate.id)
-                  if (candidateData) {
-                    candidateData.workflowStageId = selectedWorkflowStageId
-                    candidateData.workflowStage =
-                      stages.find((ws) => ws.id === selectedWorkflowStageId) || null
-                    setData([...data])
-                  }
-                  toast.success(
-                    () => (
-                      <span>
-                        <b>Stage changed successfully</b>
-                        <br />
-                        for candidate - {candidate?.name}
-                      </span>
-                    ),
-                    { id: toastId }
-                  )
-                } catch (error) {
-                  toast.error(
-                    "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                    { id: toastId }
-                  )
-                }
+                updateCandidateStg(candidate, selectedWorkflowStageId)
               }}
             />
           </Form>
@@ -351,7 +351,62 @@ const Candidates = (props: CandidateProps) => {
     },
   })
 
-  return (
+  const [board, setBoard] = useState(getBoard(props.job, candidates) as KanbanBoardType)
+  useEffect(() => {
+    setBoard(getBoard(props.job, data))
+  }, [props.job, data])
+
+  const updateCandidateStg = async (candidate, selectedWorkflowStageId) => {
+    const selectedStageName =
+      props.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId)?.stage?.name ||
+      ""
+
+    const toastId = toast.loading(() => (
+      <span>
+        <b>Setting stage as {selectedStageName}</b>
+        <br />
+        for candidate - {candidate?.name}
+      </span>
+    ))
+
+    try {
+      await updateCandidateStageMutation({
+        where: { id: candidate?.id },
+        data: { workflowStageId: selectedWorkflowStageId },
+      })
+      const candidateData = data.find((c) => c.id === candidate?.id)
+      if (candidateData) {
+        candidateData.workflowStageId = selectedWorkflowStageId
+        candidateData.workflowStage =
+          props.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId) || null
+        setData([...data])
+      }
+      toast.success(
+        () => (
+          <span>
+            <b>Stage changed successfully</b>
+            <br />
+            for candidate - {candidate?.name}
+          </span>
+        ),
+        { id: toastId }
+      )
+    } catch (error) {
+      toast.error("Sorry, we had an unexpected error. Please try again. - " + error.toString(), {
+        id: toastId,
+      })
+    }
+  }
+
+  const updateCandidate = async (source, destination, candidateId) => {
+    if (source?.droppableId !== destination?.droppableId) {
+      const candidate = candidates.find((c) => c.id === candidateId)
+      const selectedWorkflowStageId = destination?.droppableId || ("" as string)
+      updateCandidateStg(candidate, selectedWorkflowStageId)
+    }
+  }
+
+  return !props.isKanban ? (
     <Table
       columns={columns}
       data={data}
@@ -364,6 +419,32 @@ const Candidates = (props: CandidateProps) => {
       startPage={startPage}
       endPage={endPage}
     />
+  ) : (
+    <KanbanBoard
+      board={board}
+      setBoard={setBoard}
+      mutateCardDropDB={updateCandidate}
+      pageIndex={tablePage}
+      hasNext={hasMore}
+      hasPrevious={tablePage !== 0}
+      totalCount={count}
+      startPage={startPage}
+      endPage={endPage}
+    />
+  )
+}
+
+type CandidateCardProps = {
+  candidate: ExtendedCandidate
+  dragging: boolean
+}
+const CandidateCard = ({ candidate, dragging }: CandidateCardProps) => {
+  return (
+    <div className={`react-kanban-card ${dragging && `react-kanban-card--dragging`}`}>
+      <h3 className="font-bold">{candidate?.name}</h3>
+      <hr />
+      <h6 className="">{candidate?.email}</h6>
+    </div>
   )
 }
 
@@ -373,6 +454,8 @@ const SingleJobPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [isKanban, setKanban] = useState(false)
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -396,10 +479,28 @@ const SingleJobPage = ({
           </a>
         </Link>
       )}
+      <div className="float-right text-theme-600 py-2">
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <LabeledToggleSwitch
+            name="toggleKanbanLayout"
+            label="Kanban Board"
+            flex={true}
+            value={isKanban}
+            onChange={(switchState) => {
+              setKanban(switchState)
+            }}
+          />
+        </Form>
+      </div>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Candidates job={job as any} />
+        <Candidates job={job as any} isKanban={isKanban} />
       </Suspense>
     </AuthLayout>
   )

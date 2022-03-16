@@ -71,6 +71,7 @@ const Table = ({
         <input
           placeholder="Search"
           type="text"
+          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
           className={`border border-gray-300 ${
             !noMarginRight && `mr-2`
           } lg:w-1/4 px-2 py-2 w-full rounded`}

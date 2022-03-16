@@ -16,6 +16,21 @@ export type Plan = {
   features: string[]
 }
 
+export type KanbanCardType = {
+  id: string
+  title: string
+  description: string
+  renderContent: any
+}
+export type KanbanColumnType = {
+  id: string
+  title: string
+  cards: KanbanCardType[]
+}
+export type KanbanBoardType = {
+  columns: KanbanColumnType[]
+}
+
 declare module "blitz" {
   export interface Ctx extends DefaultCtx {
     session: SessionContext
@@ -38,15 +53,8 @@ export type ExtendedJob = Prisma.JobGetPayload<{
   include: {
     memberships: true
     category: true
-    form: {
-      include: {
-        questions: {
-          include: {
-            question: true
-          }
-        }
-      }
-    }
+    workflow: { include: { stages: { include: { stage: true } } } }
+    form: { include: { questions: { include: { question: true } } } }
   }
 }>
 export type ExtendedCandidate = Prisma.CandidateGetPayload<{

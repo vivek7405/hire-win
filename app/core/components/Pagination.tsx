@@ -3,6 +3,15 @@ import { useTable, useFilters, useGlobalFilter, usePagination } from "react-tabl
 import "regenerator-runtime/runtime"
 import Debouncer from "app/core/utils/debouncer"
 
+type PaginationProps = {
+  pageIndex: number
+  hasNext: boolean
+  hasPrevious: boolean
+  totalCount: number
+  startPage: number
+  endPage: number
+  queryPageName?: string
+}
 const Pagination = ({
   pageIndex: controlledPageIndex,
   hasNext: controlledHasNext,
@@ -10,24 +19,39 @@ const Pagination = ({
   totalCount,
   startPage,
   endPage,
-}) => {
+  queryPageName,
+}: PaginationProps) => {
   const router = useRouter()
 
   const goToPreviousPage = () => {
+    const query = {
+      ...router.query,
+    }
+    try {
+      if (queryPageName) {
+        eval(`query.${queryPageName} = ${controlledPageIndex - 1}`)
+      } else {
+        eval(`query.page = ${controlledPageIndex - 1}`)
+      }
+    } catch {}
     router.push({
-      query: {
-        ...router.query,
-        page: controlledPageIndex - 1,
-      },
+      query,
     })
   }
 
   const goToNextPage = () => {
+    const query = {
+      ...router.query,
+    }
+    try {
+      if (queryPageName) {
+        eval(`query.${queryPageName} = ${controlledPageIndex + 1}`)
+      } else {
+        eval(`query.page = ${controlledPageIndex + 1}`)
+      }
+    } catch {}
     router.push({
-      query: {
-        ...router.query,
-        page: controlledPageIndex + 1,
-      },
+      query,
     })
   }
 

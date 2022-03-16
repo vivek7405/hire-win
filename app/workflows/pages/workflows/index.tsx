@@ -160,7 +160,7 @@ const WorkflowsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSid
 
       <Link href={Routes.StagesHome()} passHref>
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
-          Stage Pool
+          Stages
         </a>
       </Link>
 

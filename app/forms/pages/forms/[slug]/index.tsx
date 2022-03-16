@@ -502,7 +502,7 @@ const SingleFormPage = ({
 
               <Link href={Routes.QuestionsHome()} passHref>
                 <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
-                  Question Pool
+                  Questions
                 </a>
               </Link>
 

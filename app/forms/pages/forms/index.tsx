@@ -157,7 +157,7 @@ const FormsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSidePro
 
       <Link href={Routes.QuestionsHome()} passHref>
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
-          Question Pool
+          Questions
         </a>
       </Link>
 
