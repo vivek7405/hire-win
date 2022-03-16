@@ -149,7 +149,11 @@ const JobApplicationLayout = ({
         </div>
 
         <footer>
-          <div className="text-neutral-50 flex flex-col space-y-3 justify-center items-center bg-theme-600 h-32">
+          <div
+            className={`text-neutral-50 flex flex-col ${
+              !(isJobBoard && !user?.website) && "space-y-3"
+            } justify-center items-center bg-theme-600 h-32`}
+          >
             <div className="flex justify-center items-center">
               {!isJobBoard && (
                 <span className="hover:text-neutral-200">
@@ -166,7 +170,7 @@ const JobApplicationLayout = ({
                 )}
               </span>
             </div>
-            <hr />
+            {!(isJobBoard && !user?.website) && <hr />}
             <div className="flex justify-center items-center">
               <span>Powered by&nbsp;</span>
               <span className="underline hover:text-neutral-200">
