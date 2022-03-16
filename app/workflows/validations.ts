@@ -15,3 +15,9 @@ export const WorkflowStage = z.object({
   stageId: z.string(),
 })
 export type WorkflowStageInputType = z.infer<typeof WorkflowStage>
+
+export const WorkflowStages = z.object({
+  workflowId: z.string().optional(),
+  stageIds: z.string().array(),
+})
+export type WorkflowStagesInputType = z.infer<typeof WorkflowStages>

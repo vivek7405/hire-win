@@ -18,6 +18,7 @@ import Guard from "app/guard/ability"
 import Confirm from "app/core/components/Confirm"
 import { checkPlan } from "app/users/utils/checkPlan"
 import { Plan, PlanName } from "types"
+import { Candidate, Category } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -135,9 +136,19 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
       },
     },
     {
-      Header: "Candidates",
+      Header: "Category",
+      accessor: "category",
       Cell: (props) => {
-        return props.cell.row.original.candidates?.length
+        const category = props.value as Category
+        return category?.name
+      },
+    },
+    {
+      Header: "Candidates",
+      accessor: "candidates",
+      Cell: (props) => {
+        const candidates = props.value as Candidate[]
+        return candidates?.length
       },
     },
     {

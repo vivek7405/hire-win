@@ -163,7 +163,7 @@ const CandidateSettingsPage = ({
           try {
             await updateCandidateMutation({
               where: { id: candidate?.id },
-              initial: candidate!,
+              initial: candidate as any,
               data: {
                 id: candidate?.id,
                 jobId: candidate?.job?.id,
@@ -182,7 +182,7 @@ const CandidateSettingsPage = ({
               },
             })
             toast.success(() => <span>Candidate Updated</span>, { id: toastId })
-            router.push(Routes.CandidatesHome({ slug: candidate?.job?.slug! }))
+            router.push(Routes.SingleJobPage({ slug: candidate?.job?.slug! }))
           } catch (error) {
             toast.error(
               "Sorry, we had an unexpected error. Please try again. - " + error.toString()

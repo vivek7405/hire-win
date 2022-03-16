@@ -18,7 +18,15 @@ const getWorkflows = resolver.pipe(
       skip,
       take,
       count: () => db.workflow.count({ where }),
-      query: (paginateArgs) => db.workflow.findMany({ ...paginateArgs, where, orderBy }),
+      query: (paginateArgs) =>
+        db.workflow.findMany({
+          ...paginateArgs,
+          where,
+          orderBy,
+          include: {
+            stages: true,
+          },
+        }),
     })
 
     return {

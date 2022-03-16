@@ -207,6 +207,8 @@ model Stage {
   name String
   slug String @unique
 
+  allowEdit Boolean @default(true)
+
   workflows WorkflowStage[]
 
   user   User @relation(fields: [userId], references: [id])
@@ -227,6 +229,8 @@ model WorkflowStage {
 
   stage   Stage  @relation(fields: [stageId], references: [id])
   stageId String
+
+  candidates Candidate[]
 
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
@@ -304,8 +308,9 @@ model FormQuestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order     Int
-  behaviour FormQuestionBehaviour @default(OPTIONAL)
+  order              Int
+  behaviour          FormQuestionBehaviour @default(OPTIONAL)
+  allowBehaviourEdit Boolean               @default(true)
 
   form   Form   @relation(fields: [formId], references: [id])
   formId String
@@ -348,6 +353,9 @@ model Candidate {
   name   String
   email  String
   resume Json?
+
+  workflowStage   WorkflowStage? @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String?
 
   slug String @unique
 

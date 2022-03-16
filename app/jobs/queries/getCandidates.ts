@@ -24,16 +24,14 @@ const getCandidates = resolver.pipe(
           where,
           orderBy,
           include: {
-            job: true,
-            answers: {
+            job: {
               include: {
-                question: {
-                  include: {
-                    options: true,
-                  },
-                },
+                form: { include: { questions: true } },
+                workflow: { include: { stages: { include: { stage: true } } } },
               },
             },
+            workflowStage: { include: { stage: true } },
+            answers: { include: { question: { include: { options: true } } } },
           },
         }),
     })

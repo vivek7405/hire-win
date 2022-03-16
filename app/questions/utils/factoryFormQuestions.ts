@@ -5,6 +5,7 @@ const factoryFormQuestions = [
   {
     order: 1,
     behaviour: FormQuestionBehaviour.REQUIRED,
+    allowBehaviourEdit: false,
     question: {
       name: "Name",
       type: QuestionType.Single_line_text,
@@ -14,6 +15,7 @@ const factoryFormQuestions = [
   {
     order: 2,
     behaviour: FormQuestionBehaviour.REQUIRED,
+    allowBehaviourEdit: false,
     question: {
       name: "Email",
       type: QuestionType.Email,
@@ -23,6 +25,7 @@ const factoryFormQuestions = [
   {
     order: 3,
     behaviour: FormQuestionBehaviour.REQUIRED,
+    allowBehaviourEdit: true,
     question: {
       name: "Resume",
       type: QuestionType.Attachment,

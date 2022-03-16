@@ -203,7 +203,7 @@ export const JobForm = (props: JobFormProps) => {
         </div>
 
         <div className="flex space-x-6">
-          <div className="w-1/2">
+          <div className="w-1/3">
             <LabeledReactSelectField
               name="categoryId"
               label="Category"
@@ -223,7 +223,7 @@ export const JobForm = (props: JobFormProps) => {
               }
             />
           </div>
-          {/* <div className="w-1/3">
+          <div className="w-1/3">
             <LabeledReactSelectField
               name="workflowId"
               label="Interview Workflow"
@@ -241,9 +241,10 @@ export const JobForm = (props: JobFormProps) => {
                     ]
                   : [{ label: props.workflow?.name!, value: props.workflow?.id! }]
               }
+              defaultValue={workflows.find((w) => w.name === "Default")?.id}
             />
-          </div> */}
-          <div className="w-1/2">
+          </div>
+          <div className="w-1/3">
             <LabeledReactSelectField
               name="formId"
               label="Application Form"

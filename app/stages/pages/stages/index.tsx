@@ -13,6 +13,7 @@ import path from "path"
 import getStages from "app/stages/queries/getStages"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
+import { Stage } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -64,6 +65,7 @@ export const Stages = ({ user }) => {
       userId: user?.id,
       ...query,
     },
+    orderBy: { allowEdit: "asc" },
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
   })
@@ -95,44 +97,40 @@ export const Stages = ({ user }) => {
 
   let columns = [
     {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
       Header: "Name",
       accessor: "name",
       Cell: (props) => {
-        return (
+        const stage = props.cell.row.original as Stage
+
+        return stage.allowEdit ? (
           <Link href={Routes.SingleStagePage({ slug: props.cell.row.original.slug })} passHref>
             <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
-              {props.cell.row.original.name}
+              {props.value}
             </a>
           </Link>
+        ) : (
+          props.value
         )
       },
     },
-    {
-      Header: "Slug",
-      accessor: "slug",
-    },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        return (
-          <>
-            {props.cell.row.original.canUpdate && (
-              <Link
-                href={Routes.StageSettingsPage({ slug: props.cell.row.original.slug })}
-                passHref
-              >
-                <a className="text-theme-600 hover:text-theme-900">Settings</a>
-              </Link>
-            )}
-          </>
-        )
-      },
-    },
+    // {
+    //   Header: "",
+    //   accessor: "action",
+    //   Cell: (props) => {
+    //     return (
+    //       <>
+    //         {props.cell.row.original.canUpdate && (
+    //           <Link
+    //             href={Routes.StageSettingsPage({ slug: props.cell.row.original.slug })}
+    //             passHref
+    //           >
+    //             <a className="text-theme-600 hover:text-theme-900">Settings</a>
+    //           </Link>
+    //         )}
+    //       </>
+    //     )
+    //   },
+    // },
   ]
 
   return (

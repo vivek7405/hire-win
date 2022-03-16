@@ -9,7 +9,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
     where,
     include: {
       category: true,
-      workflow: true,
+      workflow: { include: { stages: { include: { stage: true } } } },
       form: {
         include: {
           questions: {

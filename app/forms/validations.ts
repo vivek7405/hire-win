@@ -12,6 +12,7 @@ export const FormQuestion = z.object({
   id: z.string().optional(),
   order: z.number().optional(),
   behaviour: z.nativeEnum(FormQuestionBehaviour).optional(),
+  allowBehaviourEdit: z.boolean().optional(),
   formId: z.string().optional(),
   questionId: z.string().optional(),
 })
