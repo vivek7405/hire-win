@@ -107,7 +107,11 @@ const JobApplicationLayout = ({
             <span className="self-center cursor-pointer">
               {user?.slug && (
                 <Link href={Routes.JobBoard({ companySlug: user?.slug })}>
-                  <img src={logo?.Location} alt={`${user?.companyName} logo`} width={200} />
+                  {logo?.Location ? (
+                    <img src={logo?.Location} alt={`${user?.companyName} logo`} width={200} />
+                  ) : (
+                    <h1 className="text-3xl font-bold">{user?.companyName}</h1>
+                  )}
                 </Link>
               )}
             </span>
