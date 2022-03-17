@@ -7,6 +7,7 @@ import {
   useRouter,
   usePaginatedQuery,
   getSession,
+  useMutation,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -17,8 +18,15 @@ import Skeleton from "react-loading-skeleton"
 import Guard from "app/guard/ability"
 import Confirm from "app/core/components/Confirm"
 import { checkPlan } from "app/users/utils/checkPlan"
-import { Plan, PlanName } from "types"
+import { ExtendedJob, ExtendedWorkflowStage, Plan, PlanName } from "types"
 import { Candidate, Category } from "@prisma/client"
+import moment from "moment"
+import { Country, State } from "country-state-city"
+import { titleCase } from "app/core/utils/titleCase"
+import Form from "app/core/components/Form"
+import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
+import setJobHidden from "app/jobs/mutations/setJobHidden"
+import toast from "react-hot-toast"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -107,77 +115,245 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
     })
   }, [memberships, currentPlan])
 
+  // let columns = [
+  //   {
+  //     Header: "Title",
+  //     accessor: "title",
+  //     Cell: (props) => {
+  //       return (
+  //         // <Link href={Routes.SingleJobPage({ slug: props.cell.row.original.slug })} passHref>
+  //         <a
+  //           data-testid={`joblink`}
+  //           className="cursor-pointer text-theme-600 hover:text-theme-900"
+  //           onClick={(e) => {
+  //             e.preventDefault()
+  //             if (props.cell.row.original.hasByPassedPlanLimit) {
+  //               setConfirmMessage(
+  //                 "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
+  //               )
+  //               setOpenConfirm(true)
+  //             } else {
+  //               router.push(Routes.SingleJobPage({ slug: props.cell.row.original.slug }))
+  //             }
+  //           }}
+  //         >
+  //           {props.value}
+  //         </a>
+  //         // </Link>
+  //       )
+  //     },
+  //   },
+  //   {
+  //     Header: "Category",
+  //     accessor: "category",
+  //     Cell: (props) => {
+  //       const category = props.value as Category
+  //       return category?.name
+  //     },
+  //   },
+  //   {
+  //     Header: "Candidates",
+  //     accessor: "candidates",
+  //     Cell: (props) => {
+  //       const candidates = props.value as Candidate[]
+  //       return candidates?.length
+  //     },
+  //   },
+  //   {
+  //     Header: "",
+  //     accessor: "action",
+  //     Cell: (props) => {
+  //       return (
+  //         <>
+  //           {props.cell.row.original.canUpdate && (
+  //             // <Link href={Routes.JobSettingsPage({ slug: props.cell.row.original.slug })} passHref>
+  //             <a
+  //               className="cursor-pointer text-theme-600 hover:text-theme-900"
+  //               onClick={(e) => {
+  //                 e.preventDefault()
+  //                 if (props.cell.row.original.hasByPassedPlanLimit) {
+  //                   setConfirmMessage(
+  //                     "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
+  //                   )
+  //                   setOpenConfirm(true)
+  //                 } else {
+  //                   router.push(Routes.JobSettingsPage({ slug: props.cell.row.original.slug }))
+  //                 }
+  //               }}
+  //             >
+  //               Settings
+  //             </a>
+  //             // </Link>
+  //           )}
+  //         </>
+  //       )
+  //     },
+  //   },
+  // ]
+
+  const [setJobHiddenMutation] = useMutation(setJobHidden)
+
   let columns = [
     {
-      Header: "Title",
-      accessor: "title",
+      Header: "All Jobs",
       Cell: (props) => {
+        const job: ExtendedJob = props.cell.row.original
+        const stages: ExtendedWorkflowStage[] =
+          job?.workflow?.stages?.sort((a, b) => {
+            return a?.order - b?.order
+          }) || []
+
         return (
-          // <Link href={Routes.SingleJobPage({ slug: props.cell.row.original.slug })} passHref>
-          <a
-            data-testid={`joblink`}
-            className="cursor-pointer text-theme-600 hover:text-theme-900"
-            onClick={(e) => {
-              e.preventDefault()
-              if (props.cell.row.original.hasByPassedPlanLimit) {
-                setConfirmMessage(
-                  "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
-                )
-                setOpenConfirm(true)
-              } else {
-                router.push(Routes.SingleJobPage({ slug: props.cell.row.original.slug }))
-              }
-            }}
-          >
-            {props.value}
-          </a>
-          // </Link>
-        )
-      },
-    },
-    {
-      Header: "Category",
-      accessor: "category",
-      Cell: (props) => {
-        const category = props.value as Category
-        return category?.name
-      },
-    },
-    {
-      Header: "Candidates",
-      accessor: "candidates",
-      Cell: (props) => {
-        const candidates = props.value as Candidate[]
-        return candidates?.length
-      },
-    },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        return (
-          <>
-            {props.cell.row.original.canUpdate && (
-              // <Link href={Routes.JobSettingsPage({ slug: props.cell.row.original.slug })} passHref>
-              <a
-                className="cursor-pointer text-theme-600 hover:text-theme-900"
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (props.cell.row.original.hasByPassedPlanLimit) {
-                    setConfirmMessage(
-                      "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
-                    )
-                    setOpenConfirm(true)
-                  } else {
-                    router.push(Routes.JobSettingsPage({ slug: props.cell.row.original.slug }))
-                  }
-                }}
-              >
-                Settings
-              </a>
-              // </Link>
-            )}
-          </>
+          <div className="bg-gray-50 w-full rounded">
+            <div className="flex items-center justify-between flex-wrap px-6 py-4">
+              <div className="w-full md:w-2/3 lg:w-4/5">
+                <div className="font-bold text-xl text-theme-900 whitespace-normal">
+                  <a
+                    data-testid={`joblink`}
+                    className="cursor-pointer text-theme-600 hover:text-theme-800"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (props.cell.row.original.hasByPassedPlanLimit) {
+                        setConfirmMessage(
+                          "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
+                        )
+                        setOpenConfirm(true)
+                      } else {
+                        router.push(Routes.SingleJobPage({ slug: props.cell.row.original.slug }))
+                      }
+                    }}
+                  >
+                    {job?.title}
+                  </a>
+                </div>
+                <p className="text-gray-500 text-sm">
+                  Created{" "}
+                  {moment(job.createdAt || undefined)
+                    .local()
+                    .fromNow()}
+                  , expires in{" "}
+                  {moment(job.validThrough || undefined)
+                    .local()
+                    .fromNow()}
+                </p>
+              </div>
+              <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-6 mt-6 md:mt-0 lg:mt-0">
+                <a
+                  className="cursor-pointer text-theme-600 hover:text-theme-800"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (props.cell.row.original.hasByPassedPlanLimit) {
+                      setConfirmMessage(
+                        "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
+                      )
+                      setOpenConfirm(true)
+                    } else {
+                      router.push(Routes.JobSettingsPage({ slug: props.cell.row.original.slug }))
+                    }
+                  }}
+                >
+                  Job Settings
+                </a>
+
+                <Form
+                  noFormatting={true}
+                  onSubmit={(value) => {
+                    return value
+                  }}
+                >
+                  <LabeledToggleSwitch
+                    name="toggleJobHidden"
+                    label="Hidden"
+                    flex={true}
+                    height={4}
+                    width={3}
+                    value={job?.hidden}
+                    defaultChecked={job?.hidden}
+                    onChange={async (switchState: boolean) => {
+                      const toastId = toast.loading(() => (
+                        <span>
+                          <b>Hiding job - {job?.title} from Job Board</b>
+                        </span>
+                      ))
+
+                      try {
+                        await setJobHiddenMutation({
+                          where: { slug: job?.slug! },
+                          hidden: switchState,
+                        })
+                        job.hidden = switchState
+
+                        toast.success(
+                          () => (
+                            <span>
+                              <b>
+                                {job?.title} job {switchState ? "hidden" : "unhidden"} successfully
+                              </b>
+                            </span>
+                          ),
+                          { id: toastId }
+                        )
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          {
+                            id: toastId,
+                          }
+                        )
+                      }
+                    }}
+                  />
+                </Form>
+              </div>
+            </div>
+
+            <div className="px-6 py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
+              <div className="text-xl text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                {job?.candidates?.length} candidates
+              </div>
+              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                {stages?.map((ws) => {
+                  return (
+                    <div
+                      key={ws.id}
+                      className="p-3 rounded-lg border-2 border-neutral-400 bg-gray-100 w-32 flex flex-col items-center justify-center"
+                    >
+                      <div className="overflow-hidden text-neutral-600">{ws.stage?.name}</div>
+                      <div className="text-neutral-600">
+                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="px-6 pt-4 pb-2 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
+              <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                <span>{job?.city},&nbsp;</span>
+                <span>
+                  {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name},&nbsp;
+                </span>
+                <span>{Country.getCountryByCode(job?.country!)?.name}</span>
+              </span>
+              {job?.category && (
+                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                  {job.category?.name}
+                </span>
+              )}
+              {job?.employmentType && (
+                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                  {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
+                </span>
+              )}
+              {job?.remote && (
+                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                  {job?.remote && "Remote"}
+                </span>
+              )}
+            </div>
+          </div>
         )
       },
     },

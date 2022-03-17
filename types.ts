@@ -55,6 +55,7 @@ export type ExtendedJob = Prisma.JobGetPayload<{
     category: true
     workflow: { include: { stages: { include: { stage: true } } } }
     form: { include: { questions: { include: { question: true } } } }
+    candidates: true
   }
 }>
 export type ExtendedCandidate = Prisma.CandidateGetPayload<{

@@ -80,6 +80,7 @@ const Jobs = ({ user }) => {
   const [{ memberships, hasMore, count }] = usePaginatedQuery(getJobs, {
     where: {
       userId: user?.id,
+      job: { hidden: false },
       ...query,
     },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -112,7 +113,6 @@ const Jobs = ({ user }) => {
   let columns = [
     {
       Header: "Job Openings",
-      accessor: "title",
       Cell: (props) => {
         const job: ExtendedJob = props.cell.row.original
         return (
@@ -125,12 +125,16 @@ const Jobs = ({ user }) => {
           >
             <div className="bg-gray-50 cursor-pointer w-full rounded overflow-hidden hover:shadow hover:drop-shadow">
               <div className="px-6 py-4">
-                <div className="font-bold text-xl text-theme-900 whitespace-normal">
+                <div className="font-bold text-xl text-theme-700 whitespace-normal">
                   {job?.title}
                 </div>
                 <p className="text-gray-500 text-sm">
                   Posted{" "}
                   {moment(job.createdAt || undefined)
+                    .local()
+                    .fromNow()}
+                  , expires in{" "}
+                  {moment(job.validThrough || undefined)
                     .local()
                     .fromNow()}
                 </p>
@@ -153,11 +157,13 @@ const Jobs = ({ user }) => {
                     {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
                   </span>
                 )}
+                {job?.remote && (
+                  <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                    {job?.remote && "Remote"}
+                  </span>
+                )}
               </div>
             </div>
-            {/* <a data-testid={`joblink`} className="text-theme-600 hover:text-theme-900">
-              {props.value}
-            </a> */}
           </Link>
         )
       },

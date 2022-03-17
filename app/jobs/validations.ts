@@ -22,6 +22,7 @@ export const Job = z.object({
   city: z.string(),
 
   remote: z.boolean(),
+  hidden: z.boolean().optional(),
 
   currency: z.string(),
   minSalary: z.number(),
