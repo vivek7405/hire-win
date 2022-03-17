@@ -122,6 +122,7 @@ model Job {
   city    String
 
   remote Boolean
+  hidden Boolean @default(false)
 
   currency   String
   minSalary  Int

@@ -157,11 +157,17 @@ export const Stages = ({ user, workflow }) => {
         const workflowStage: ExtendedWorkflowStage = props.cell.row.original
 
         return (
-          <Link href={Routes.StageSettingsPage({ slug: workflowStage.stage.slug })} passHref>
-            <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
-              {workflowStage.stage.name}
-            </a>
-          </Link>
+          <>
+            {workflowStage.stage.allowEdit ? (
+              <Link href={Routes.SingleStagePage({ slug: workflowStage.stage.slug })} passHref>
+                <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
+                  {workflowStage.stage.name}
+                </a>
+              </Link>
+            ) : (
+              <span>{workflowStage.stage.name}</span>
+            )}
+          </>
         )
       },
     },
