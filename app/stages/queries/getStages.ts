@@ -18,7 +18,13 @@ const getStages = resolver.pipe(
       skip,
       take,
       count: () => db.stage.count({ where }),
-      query: (paginateArgs) => db.stage.findMany({ ...paginateArgs, where, orderBy }),
+      query: (paginateArgs) =>
+        db.stage.findMany({
+          ...paginateArgs,
+          where,
+          orderBy,
+          include: { workflows: true },
+        }),
     })
 
     return {

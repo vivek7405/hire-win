@@ -317,7 +317,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                   return (
                     <div
                       key={ws.id}
-                      className="p-3 rounded-lg border-2 border-neutral-400 bg-gray-100 w-32 flex flex-col items-center justify-center"
+                      className="p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
                     >
                       <div className="overflow-hidden text-neutral-600">{ws.stage?.name}</div>
                       <div className="text-neutral-600">

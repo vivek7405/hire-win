@@ -23,9 +23,7 @@ const getWorkflows = resolver.pipe(
           ...paginateArgs,
           where,
           orderBy,
-          include: {
-            stages: true,
-          },
+          include: { stages: { include: { stage: true } } },
         }),
     })
 

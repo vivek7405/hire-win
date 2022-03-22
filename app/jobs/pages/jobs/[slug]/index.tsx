@@ -29,7 +29,7 @@ import {
   ExtendedJob,
   ExtendedWorkflowStage,
   KanbanBoardType,
-  KanbanCardType,
+  CardType,
   KanbanColumnType,
 } from "types"
 import { QuestionType } from "@prisma/client"
@@ -125,7 +125,7 @@ const getBoard = (job, candidates) => {
                 description: c.email,
                 // renderContent: <div className="text-xl font-bold">{c.name}</div>
               }
-            }) as KanbanCardType[],
+            }) as CardType[],
         }
       }) as KanbanColumnType[],
   } as KanbanBoardType

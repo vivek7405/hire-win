@@ -6,6 +6,7 @@ import {
   Link,
   useRouter,
   usePaginatedQuery,
+  useQuery,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -14,6 +15,10 @@ import getCategories from "app/categories/queries/getCategories"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 import { Job } from "@prisma/client"
+import { CardType, DragDirection, ExtendedCategory } from "types"
+import Debouncer from "app/core/utils/debouncer"
+import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
+import Cards from "app/core/components/Cards"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -42,7 +47,7 @@ const Categories = ({ user }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
+  const [data, setData] = useState<ExtendedCategory[]>([])
   const [query, setQuery] = useState({})
 
   useEffect(() => {
@@ -60,26 +65,34 @@ const Categories = ({ user }) => {
     setQuery(search)
   }, [router.query])
 
-  const [{ categories, hasMore, count }] = usePaginatedQuery(getCategories, {
+  // const [{ categories, hasMore, count }] = usePaginatedQuery(getCategories, {
+  //   where: {
+  //     userId: user?.id,
+  //     ...query,
+  //   },
+  //   skip: ITEMS_PER_PAGE * Number(tablePage),
+  //   take: ITEMS_PER_PAGE,
+  // })
+
+  // // Use blitz guard to check if user can update t
+
+  // let startPage = tablePage * ITEMS_PER_PAGE + 1
+  // let endPage = startPage - 1 + ITEMS_PER_PAGE
+
+  // if (endPage > count) {
+  //   endPage = count
+  // }
+
+  // alert(JSON.stringify(query))
+  const [categories] = useQuery(getCategoriesWOPagination, {
     where: {
       userId: user?.id,
       ...query,
     },
-    skip: ITEMS_PER_PAGE * Number(tablePage),
-    take: ITEMS_PER_PAGE,
   })
 
-  // Use blitz guard to check if user can update t
-
-  let startPage = tablePage * ITEMS_PER_PAGE + 1
-  let endPage = startPage - 1 + ITEMS_PER_PAGE
-
-  if (endPage > count) {
-    endPage = count
-  }
-
   useMemo(async () => {
-    let data: {}[] = []
+    let data: ExtendedCategory[] = []
 
     await categories.forEach((category) => {
       data = [
@@ -87,49 +100,94 @@ const Categories = ({ user }) => {
         {
           ...category,
           canUpdate: category.userId === user.id,
-        },
+        } as any,
       ]
 
       setData(data)
     })
   }, [categories, user.id])
 
-  let columns = [
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: (props) => {
-        return (
-          <Link href={Routes.SingleCategoryPage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`categorylink`} className="text-theme-600 hover:text-theme-900">
-              {props.cell.row.original.name}
-            </a>
-          </Link>
-        )
-      },
-    },
-    {
-      Header: "Jobs",
-      accessor: "jobs",
-      Cell: (props) => {
-        const jobs = props.value as Job[]
-        return <p>{jobs?.length}</p>
-      },
-    },
-  ]
+  const getCards = (categories) => {
+    return categories.map((c) => {
+      return {
+        id: c.id,
+        title: c.name,
+        description: `${c.jobs?.length} ${c.jobs?.length === 1 ? "Job" : "Jobs"}`,
+        renderContent: (
+          <>
+            <div>
+              <span>
+                <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
+                  <Link href={Routes.SingleCategoryPage({ slug: c.slug })} passHref>
+                    <a data-testid={`categorylink`} className="text-theme-600 hover:text-theme-800">
+                      {c.name}
+                    </a>
+                  </Link>
+                </div>
+              </span>
+              <div className="pt-2.5">
+                {`${c.jobs?.length} ${c.jobs?.length === 1 ? "Job" : "Jobs"}`}
+              </div>
+            </div>
+          </>
+        ),
+      }
+    }) as CardType[]
+  }
+
+  const [cards, setCards] = useState(getCards(data))
+  useEffect(() => {
+    setCards(getCards(data))
+  }, [data])
+
+  // let columns = [
+  //   {
+  //     Header: "Name",
+  //     accessor: "name",
+  //     Cell: (props) => {
+  //       return (
+  //         <Link href={Routes.SingleCategoryPage({ slug: props.cell.row.original.slug })} passHref>
+  //           <a data-testid={`categorylink`} className="text-theme-600 hover:text-theme-900">
+  //             {props.cell.row.original.name}
+  //           </a>
+  //         </Link>
+  //       )
+  //     },
+  //   },
+  //   {
+  //     Header: "Jobs",
+  //     accessor: "jobs",
+  //     Cell: (props) => {
+  //       const jobs = props.value as Job[]
+  //       return <p>{jobs?.length}</p>
+  //     },
+  //   },
+  // ]
+
+  // return (
+  //   <Table
+  //     columns={columns}
+  //     data={data}
+  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+  //     pageIndex={tablePage}
+  //     pageSize={ITEMS_PER_PAGE}
+  //     hasNext={hasMore}
+  //     hasPrevious={tablePage !== 0}
+  //     totalCount={count}
+  //     startPage={startPage}
+  //     endPage={endPage}
+  //   />
+  // )
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-      pageIndex={tablePage}
-      pageSize={ITEMS_PER_PAGE}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
+    <Cards
+      cards={cards}
+      setCards={setCards}
+      noPagination={true}
+      mutateCardDropDB={(source, destination, draggableId) => {}}
+      droppableName="categories"
+      isDragDisabled={true}
+      direction={DragDirection.HORIZONTAL}
     />
   )
 }

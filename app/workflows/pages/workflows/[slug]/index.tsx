@@ -446,7 +446,7 @@ const SingleWorkflowPage = ({
             <div className="space-x-8 flex flex-row justify-between">
               <Link href={Routes.StagesHome()} passHref>
                 <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
-                  Stages
+                  Stage Pool
                 </a>
               </Link>
 
@@ -462,7 +462,7 @@ const SingleWorkflowPage = ({
 
             <div className="flex flex-row justify-between space-x-3">
               <Modal
-                header="Add Existing Stages"
+                header="Add Stages from Pool"
                 open={openAddExistingStage}
                 setOpen={setOpenAddExistingStage}
               >
@@ -499,7 +499,7 @@ const SingleWorkflowPage = ({
                 data-testid={`open-addStage-modal`}
                 className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
               >
-                Add Existing Stages
+                Add Stages from Pool
               </button>
 
               <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
