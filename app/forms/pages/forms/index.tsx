@@ -13,6 +13,9 @@ import path from "path"
 import getForms from "app/forms/queries/getForms"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
+import Cards from "app/core/components/Cards"
+import { CardType, DragDirection } from "types"
+import { CogIcon } from "@heroicons/react/outline"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -93,55 +96,113 @@ const Forms = ({ user }) => {
     })
   }, [forms, user.id])
 
-  let columns = [
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: (props) => {
-        return (
-          <Link href={Routes.SingleFormPage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-900">
-              {props.cell.row.original.name}
-            </a>
-          </Link>
-        )
-      },
-    },
-    {
-      Header: "Questions",
-      Cell: (props) => {
-        return props.cell.row.original.questions.length
-      },
-    },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        return (
+  // let columns = [
+  //   {
+  //     Header: "Name",
+  //     accessor: "name",
+  //     Cell: (props) => {
+  //       return (
+  //         <Link href={Routes.SingleFormPage({ slug: props.cell.row.original.slug })} passHref>
+  //           <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-900">
+  //             {props.cell.row.original.name}
+  //           </a>
+  //         </Link>
+  //       )
+  //     },
+  //   },
+  //   {
+  //     Header: "Questions",
+  //     Cell: (props) => {
+  //       return props.cell.row.original.questions.length
+  //     },
+  //   },
+  //   {
+  //     Header: "",
+  //     accessor: "action",
+  //     Cell: (props) => {
+  //       return (
+  //         <>
+  //           {props.cell.row.original.canUpdate && (
+  //             <Link href={Routes.FormSettingsPage({ slug: props.cell.row.original.slug })} passHref>
+  //               <a className="text-theme-600 hover:text-theme-900">Settings</a>
+  //             </Link>
+  //           )}
+  //         </>
+  //       )
+  //     },
+  //   },
+  // ]
+
+  // return (
+  //   <Table
+  //     columns={columns}
+  //     data={data}
+  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+  //     pageIndex={tablePage}
+  //     pageSize={ITEMS_PER_PAGE}
+  //     hasNext={hasMore}
+  //     hasPrevious={tablePage !== 0}
+  //     totalCount={count}
+  //     startPage={startPage}
+  //     endPage={endPage}
+  //   />
+  // )
+
+  const getCards = (forms) => {
+    return forms.map((f) => {
+      return {
+        id: f.id,
+        title: f.name,
+        description: `${f.questions?.length} ${
+          f.questions?.length === 1 ? "Question" : "Questions"
+        }`,
+        renderContent: (
           <>
-            {props.cell.row.original.canUpdate && (
-              <Link href={Routes.FormSettingsPage({ slug: props.cell.row.original.slug })} passHref>
-                <a className="text-theme-600 hover:text-theme-900">Settings</a>
-              </Link>
-            )}
+            <div>
+              <span>
+                <div className="w-full relative">
+                  <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
+                    <Link href={Routes.SingleFormPage({ slug: f.slug })} passHref>
+                      <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-800">
+                        {f.name}
+                      </a>
+                    </Link>
+                  </div>
+                  <div className="absolute top-0.5 right-0">
+                    {f.canUpdate && (
+                      <Link href={Routes.FormSettingsPage({ slug: f.slug })} passHref>
+                        <a className="float-right text-theme-600 hover:text-theme-800">
+                          <CogIcon className="h-5 w-5" />
+                        </a>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </span>
+              <div className="pt-2.5">
+                {`${f.questions?.length} ${f.questions?.length === 1 ? "Question" : "Questions"}`}
+              </div>
+            </div>
           </>
-        )
-      },
-    },
-  ]
+        ),
+      }
+    }) as CardType[]
+  }
+
+  const [cards, setCards] = useState(getCards(data))
+  useEffect(() => {
+    setCards(getCards(data))
+  }, [data])
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-      pageIndex={tablePage}
-      pageSize={ITEMS_PER_PAGE}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
+    <Cards
+      cards={cards}
+      setCards={setCards}
+      noPagination={true}
+      mutateCardDropDB={(source, destination, draggableId) => {}}
+      droppableName="categories"
+      isDragDisabled={true}
+      direction={DragDirection.HORIZONTAL}
     />
   )
 }

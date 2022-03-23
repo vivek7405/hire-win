@@ -64,7 +64,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
     }
 
     return (
-      <div className="w-full lg:w-1/2" {...outerProps}>
+      <div className="w-full" {...outerProps}>
         <Controller
           name={`${props.name}` as const}
           defaultValue={defaultValue || { Key: "", Location: "" }}

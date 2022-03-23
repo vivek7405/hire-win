@@ -26,6 +26,7 @@ export type CardType = {
   title: string
   description: string
   renderContent: any
+  isDragDisabled?: boolean
 }
 export type KanbanColumnType = {
   id: string

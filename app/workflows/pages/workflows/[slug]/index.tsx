@@ -27,8 +27,8 @@ import toast from "react-hot-toast"
 import createWorkflowStage from "app/workflows/mutations/createWorkflowStage"
 import { WorkflowStages } from "app/workflows/validations"
 
-import { ArrowUpIcon, ArrowDownIcon, XCircleIcon } from "@heroicons/react/outline"
-import { ExtendedWorkflowStage, ShiftDirection } from "types"
+import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon } from "@heroicons/react/outline"
+import { CardType, DragDirection, ExtendedWorkflowStage, ShiftDirection } from "types"
 import shiftWorkflowStage from "app/workflows/mutations/shiftWorkflowStage"
 import Confirm from "app/core/components/Confirm"
 import removeStageFromWorkflow from "app/workflows/mutations/removeStageFromWorkflow"
@@ -39,6 +39,7 @@ import AddExistingStagesForm from "app/workflows/components/AddExistingStagesFor
 import createStage from "app/stages/mutations/createStage"
 import addNewStageToWorkflow from "app/workflows/mutations/addNewStageToWorkflow"
 import Debouncer from "app/core/utils/debouncer"
+import Cards from "app/core/components/Cards"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -123,7 +124,7 @@ export const Stages = ({ user, workflow }) => {
     setQuery(search)
   }, [router.query])
 
-  const [workflowStages] = usePaginatedQuery(getWorkflowStagesWOPagination, {
+  const [workflowStages] = useQuery(getWorkflowStagesWOPagination, {
     where: {
       workflowId: workflow?.id,
       ...query,
@@ -136,7 +137,6 @@ export const Stages = ({ user, workflow }) => {
 
     await workflowStages.forEach((workflowStage) => {
       data = [...data, { ...workflowStage }]
-
       setData(data)
     })
   }, [workflowStages])
@@ -363,6 +363,62 @@ export const Stages = ({ user, workflow }) => {
     return debouncer.execute(e)
   }
 
+  const getCards = (workflowStages) => {
+    return workflowStages.map((ws) => {
+      return {
+        id: ws?.id,
+        title: ws.stage?.name,
+        description: "",
+        isDragDisabled: !ws.stage.allowEdit,
+        renderContent: (
+          <>
+            <div className="flex flex-col space-y-2">
+              <div className="w-full relative">
+                <div className="font-bold flex justify-between">
+                  {ws.stage.allowEdit ? (
+                    <Link href={Routes.SingleStagePage({ slug: ws.stage.slug })} passHref>
+                      <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
+                        {ws.stage.name}
+                      </a>
+                    </Link>
+                  ) : (
+                    ws.stage.name
+                  )}
+                </div>
+                {ws.stage.allowEdit && (
+                  <div className="absolute top-0.5 right-0">
+                    {/* <Link href={Routes.FormSettingsPage({ slug: fq.slug })} passHref>
+                      <a className="float-right text-red-600 hover:text-red-800">
+                        <TrashIcon className="h-5 w-5" />
+                      </a>
+                    </Link> */}
+                    <button
+                      className="float-right text-red-600 hover:text-red-800"
+                      title="Remove Question"
+                      onClick={async (e) => {
+                        e.preventDefault()
+
+                        setWorkflowStageToRemove(ws)
+                        setOpenConfirm(true)
+                      }}
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ),
+      }
+    }) as CardType[]
+  }
+
+  const [cards, setCards] = useState(getCards(data))
+  useEffect(() => {
+    setCards(getCards(data))
+  }, [data])
+
   return (
     <>
       <div className="flex mb-2">
@@ -377,27 +433,49 @@ export const Stages = ({ user, workflow }) => {
         />
       </div>
       <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
-        {data
-          ?.sort((a, b) => {
-            return a.order - b.order
-          })
-          .map((ws) => {
-            return (
-              <div
-                key={ws.id}
-                className="overflow-auto p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
-              >
-                <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
-                  {ws.stage?.name}
-                </div>
-                {/* <div className="text-neutral-600">
+        {data?.map((ws) => {
+          return (
+            <div
+              key={ws.id}
+              className="overflow-auto p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
+            >
+              <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
+                {ws.stage?.name}
+              </div>
+              {/* <div className="text-neutral-600">
                         {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
                       </div> */}
-              </div>
-            )
-          })}
+            </div>
+          )
+        })}
       </div>
-      <Table
+      <div className="p-3 border-2 border-neutral-400 rounded">
+        <Cards
+          noSearch={true}
+          cards={cards}
+          setCards={() => {}}
+          noPagination={true}
+          mutateCardDropDB={(source, destination, draggableId) => {
+            if (!(source && destination)) return
+
+            // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
+            if (destination.index === 0 || destination.index === data.length - 1) return
+
+            const workflowStage = data?.find((ws) => ws.id === draggableId)
+            if (workflowStage) {
+              data?.splice(source?.index, 1)
+              data?.splice(destination?.index, 0, workflowStage)
+            }
+
+            setData([...data])
+          }}
+          droppableName="stages"
+          isDragDisabled={false}
+          direction={DragDirection.VERTICAL}
+          isFull={true}
+        />
+      </div>
+      {/* <Table
         noSearch={true}
         noMarginRight={true}
         columns={columns}
@@ -411,7 +489,7 @@ export const Stages = ({ user, workflow }) => {
         startPage={1}
         endPage={1}
         noPagination={true}
-      />
+      /> */}
     </>
   )
 }

@@ -23,6 +23,8 @@ type CardsProps = {
   direction?: DragDirection
   isFull?: boolean
 
+  noSearch?: boolean
+
   pageIndex?: any
   hasNext?: any
   hasPrevious?: any
@@ -68,6 +70,8 @@ const Cards = ({
   isDragDisabled,
   direction,
   isFull,
+
+  noSearch,
 
   pageIndex: controlledPageIndex,
   hasNext: controlledHasNext,
@@ -128,19 +132,21 @@ const Cards = ({
 
   return (
     <div>
-      <div className="flex mb-2">
-        <input
-          placeholder="Search"
-          type="text"
-          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 ${
-            !noMarginRight && `mr-2`
-          } lg:w-1/4 px-2 py-2 w-full rounded`}
-          onChange={(e) => {
-            execDebouncer(e)
-          }}
-        />
-      </div>
+      {!noSearch && (
+        <div className="flex mb-2">
+          <input
+            placeholder="Search"
+            type="text"
+            defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+            className={`border border-gray-300 ${
+              !noMarginRight && `mr-2`
+            } lg:w-1/4 px-2 py-2 w-full rounded`}
+            onChange={(e) => {
+              execDebouncer(e)
+            }}
+          />
+        </div>
+      )}
 
       {/* {noPagination && <br />} */}
 
@@ -167,7 +173,7 @@ const Cards = ({
                   key={card.id}
                   draggableId={card.id}
                   index={index}
-                  isDragDisabled={isDragDisabled}
+                  isDragDisabled={card.isDragDisabled || isDragDisabled}
                 >
                   {(provided, { isDragging }) => {
                     return (
@@ -175,7 +181,7 @@ const Cards = ({
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className={`m-2 w-full ${
+                        className={`my-2 md:mx-2 lg:mx-2 w-full ${
                           isFull ? "md:w-full lg:w-full" : "md:w-60 lg:w-60"
                         }`}
                       >

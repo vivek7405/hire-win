@@ -175,7 +175,7 @@ const Workflows = ({ user }) => {
                     </a>
                   </Link>
                 </div>
-                <div className="absolute top-0 right-0">
+                <div className="absolute top-0.5 right-0">
                   {w.canUpdate && (
                     <Link href={Routes.WorkflowSettingsPage({ slug: w.slug })} passHref>
                       <a className="float-right text-theme-600 hover:text-theme-800">

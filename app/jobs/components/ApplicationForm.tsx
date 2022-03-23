@@ -4,7 +4,7 @@ import { Form } from "app/core/components/Form"
 import { QuestionInputType, QuestionOption } from "app/questions/validations"
 import { Job, QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import DynamicTextFields from "app/core/components/DynamicTextFields"
 import { useQuery } from "blitz"
@@ -24,12 +24,15 @@ type ApplicationFormProps = {
   subHeader: string
   formId: string
   preview: boolean
+  formQuestions?: ExtendedFormQuestion[]
 }
 
 export const ApplicationForm = (props: ApplicationFormProps) => {
-  const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
+  const [queryFormQuestions] = useQuery(getFormQuestionsWOPagination, {
     where: { formId: props.formId },
   })
+
+  const formQuestions = props.formQuestions || queryFormQuestions
 
   const getZodType = (fq: ExtendedFormQuestion, zodType) => {
     return fq.behaviour === "REQUIRED"
