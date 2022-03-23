@@ -25,6 +25,7 @@ type CardsProps = {
 
   noSearch?: boolean
 
+  paginationBottom?: boolean
   pageIndex?: any
   hasNext?: any
   hasPrevious?: any
@@ -73,6 +74,7 @@ const Cards = ({
 
   noSearch,
 
+  paginationBottom,
   pageIndex: controlledPageIndex,
   hasNext: controlledHasNext,
   hasPrevious: controlledHasPrevious,
@@ -150,7 +152,7 @@ const Cards = ({
 
       {/* {noPagination && <br />} */}
 
-      {!noPagination && (
+      {!noPagination && !paginationBottom && (
         <Pagination
           endPage={endPage}
           hasNext={controlledHasNext}
@@ -230,6 +232,18 @@ const Cards = ({
           {/* {renderColumnAdder()} */}
         </DragDropContext>
       </div>
+
+      {!noPagination && paginationBottom && (
+        <Pagination
+          endPage={endPage}
+          hasNext={controlledHasNext}
+          hasPrevious={controlledHasPrevious}
+          pageIndex={controlledPageIndex}
+          startPage={startPage}
+          totalCount={totalCount}
+          resultName={resultName}
+        />
+      )}
     </div>
   )
 }

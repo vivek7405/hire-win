@@ -670,7 +670,7 @@ export const Questions = ({ user, form }) => {
           /> */}
         </div>
         <div className="w-full lg:w-2/5 hidden lg:flex justify-end">
-          <div className="max-h-screen border-8 border-neutral-400 rounded-3xl sticky top-0">
+          <div className="bg-white min-h-screen max-h-screen border-8 border-neutral-400 rounded-3xl sticky top-0">
             {/* <div className="bg-neutral-400 rounded-b-2xl h-8 w-1/2 absolute left-1/4 top-0" /> */}
             {/* <div className="border-2 border-neutral-400 rounded-2xl h-2 w-1/3 absolute left-1/3 top-2" /> */}
             <div className="w-full h-full overflow-auto rounded-3xl">

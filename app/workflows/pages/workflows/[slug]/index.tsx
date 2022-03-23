@@ -426,13 +426,44 @@ export const Stages = ({ user, workflow }) => {
           placeholder="Search"
           type="text"
           defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+          className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
           onChange={(e) => {
             execDebouncer(e)
           }}
         />
       </div>
-      <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={
+          Object.entries(workflowStageToRemove).length
+            ? `Remove Stage - ${workflowStageToRemove.stage.name}?`
+            : "Remove Stage?"
+        }
+        onSuccess={async () => {
+          const toastId = toast.loading(() => (
+            <span>Removing Stage {workflowStageToRemove.stage.name}</span>
+          ))
+          try {
+            await removeStageFromWorkflowMutation({
+              workflowId: workflowStageToRemove.workflowId,
+              order: workflowStageToRemove.order,
+            })
+            toast.success(() => <span>Stage removed - {workflowStageToRemove.stage.name}</span>, {
+              id: toastId,
+            })
+          } catch (error) {
+            toast.error(
+              "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+              { id: toastId }
+            )
+          }
+          router.reload()
+        }}
+      >
+        Are you sure you want to remove this stage from the workflow?
+      </Confirm>
+      <div className="sticky top-0 z-10 hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
         {data?.map((ws) => {
           return (
             <div
@@ -449,31 +480,33 @@ export const Stages = ({ user, workflow }) => {
           )
         })}
       </div>
-      <div className="p-3 border-2 border-neutral-400 rounded">
-        <Cards
-          noSearch={true}
-          cards={cards}
-          setCards={() => {}}
-          noPagination={true}
-          mutateCardDropDB={(source, destination, draggableId) => {
-            if (!(source && destination)) return
+      <div className="w-full flex items-center justify-center">
+        <div className="w-full md:w-1/2 lg:w-1/2 p-3 border-2 border-neutral-400 rounded">
+          <Cards
+            noSearch={true}
+            cards={cards}
+            setCards={() => {}}
+            noPagination={true}
+            mutateCardDropDB={(source, destination, draggableId) => {
+              if (!(source && destination)) return
 
-            // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
-            if (destination.index === 0 || destination.index === data.length - 1) return
+              // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
+              if (destination.index === 0 || destination.index === data.length - 1) return
 
-            const workflowStage = data?.find((ws) => ws.id === draggableId)
-            if (workflowStage) {
-              data?.splice(source?.index, 1)
-              data?.splice(destination?.index, 0, workflowStage)
-            }
+              const workflowStage = data?.find((ws) => ws.id === draggableId)
+              if (workflowStage) {
+                data?.splice(source?.index, 1)
+                data?.splice(destination?.index, 0, workflowStage)
+              }
 
-            setData([...data])
-          }}
-          droppableName="stages"
-          isDragDisabled={false}
-          direction={DragDirection.VERTICAL}
-          isFull={true}
-        />
+              setData([...data])
+            }}
+            droppableName="stages"
+            isDragDisabled={false}
+            direction={DragDirection.VERTICAL}
+            isFull={true}
+          />
+        </div>
       </div>
       {/* <Table
         noSearch={true}
