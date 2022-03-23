@@ -21,7 +21,7 @@ type CardsProps = {
   mutateCardDropDB: any
   isDragDisabled?: boolean
   direction?: DragDirection
-  cardWidth?: string
+  isFull?: boolean
 
   pageIndex?: any
   hasNext?: any
@@ -67,7 +67,7 @@ const Cards = ({
   mutateCardDropDB,
   isDragDisabled,
   direction,
-  cardWidth,
+  isFull,
 
   pageIndex: controlledPageIndex,
   hasNext: controlledHasNext,
@@ -142,7 +142,7 @@ const Cards = ({
         />
       </div>
 
-      {noPagination && <br />}
+      {/* {noPagination && <br />} */}
 
       {!noPagination && (
         <Pagination
@@ -175,7 +175,9 @@ const Cards = ({
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className={`m-2 w-full md:w-${cardWidth || "60"} lg:w-${cardWidth || "60"}`}
+                        className={`m-2 w-full ${
+                          isFull ? "md:w-full lg:w-full" : "md:w-60 lg:w-60"
+                        }`}
                       >
                         <div className="inline-block whitespace-normal w-full">
                           <div
@@ -213,7 +215,7 @@ const Cards = ({
             ) : (
               <div
                 // className='react-kanban-card-skeleton'
-                className={`box-border w-${cardWidth || "60"}`}
+                className={`box-border ${isFull ? "w-full" : "w-60"}`}
               />
             )}
           </DroppableColumn>

@@ -9,7 +9,10 @@ const getWorkflowsWOPagination = resolver.pipe(
   async ({ where }: GetWorkflowsInput) => {
     const workflows = await db.workflow.findMany({
       where,
-      include: { stages: { include: { stage: true } } },
+      include: {
+        stages: { include: { stage: true } },
+        jobs: true,
+      },
     })
     return workflows
   }

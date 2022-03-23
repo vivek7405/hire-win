@@ -312,7 +312,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
               <div className="text-xl text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
                 {job?.candidates?.length} candidates
               </div>
-              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+              {/* <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {stages?.map((ws) => {
                   return (
                     <div
@@ -320,6 +320,23 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                       className="p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
                     >
                       <div className="overflow-hidden text-neutral-600">{ws.stage?.name}</div>
+                      <div className="text-neutral-600">
+                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div> */}
+              <div className="hidden md:flex lg:flex flex-wrap mt-2 items-center md:justify-center lg:justify-center">
+                {stages?.map((ws) => {
+                  return (
+                    <div
+                      key={ws.id}
+                      className="p-1 m-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
+                    >
+                      <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
+                        {ws.stage?.name}
+                      </div>
                       <div className="text-neutral-600">
                         {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
                       </div>

@@ -11,6 +11,7 @@ import {
   usePaginatedQuery,
   useRouter,
   useMutation,
+  useQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -22,11 +23,9 @@ import getWorkflow from "app/workflows/queries/getWorkflow"
 import Skeleton from "react-loading-skeleton"
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
-import getWorkflowStages from "app/workflows/queries/getWorkflowStages"
-// import AddStageWorkflow from "app/workflows/components/AddStageWorkflow"
 import toast from "react-hot-toast"
 import createWorkflowStage from "app/workflows/mutations/createWorkflowStage"
-import { WorkflowStage, WorkflowStages } from "app/workflows/validations"
+import { WorkflowStages } from "app/workflows/validations"
 
 import { ArrowUpIcon, ArrowDownIcon, XCircleIcon } from "@heroicons/react/outline"
 import { ExtendedWorkflowStage, ShiftDirection } from "types"
@@ -37,17 +36,14 @@ import getWorkflowStagesWOPagination from "app/workflows/queries/getWorkflowStag
 import StageForm from "app/stages/components/StageForm"
 import addExistingWorkflowStages from "app/workflows/mutations/addExistingWorkflowStages"
 import AddExistingStagesForm from "app/workflows/components/AddExistingStagesForm"
-import createQuestion from "app/questions/mutations/createQuestion"
 import createStage from "app/stages/mutations/createStage"
 import addNewStageToWorkflow from "app/workflows/mutations/addNewStageToWorkflow"
+import Debouncer from "app/core/utils/debouncer"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
-  // https://github.com/blitz-js/blitz/issues/794
   path.resolve("next.config.js")
   path.resolve("blitz.config.js")
   path.resolve(".next/__db.js")
-  // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
@@ -101,7 +97,7 @@ export const Stages = ({ user, workflow }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
+  const [data, setData] = useState<ExtendedWorkflowStage[]>([])
   const [query, setQuery] = useState({})
   const [shiftWorkflowStageMutation] = useMutation(shiftWorkflowStage)
   const [removeStageFromWorkflowMutation] = useMutation(removeStageFromWorkflow)
@@ -350,20 +346,73 @@ export const Stages = ({ user, workflow }) => {
     },
   ]
 
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.push({
+      query: {
+        ...router.query,
+        page: 0,
+        ...searchQuery,
+      },
+    })
+  }
+
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
+
   return (
-    <Table
-      columns={columns}
-      data={data}
-      pageCount={Math.ceil(workflowStages.length / ITEMS_PER_PAGE)}
-      pageIndex={tablePage}
-      pageSize={ITEMS_PER_PAGE}
-      hasNext={false}
-      hasPrevious={false}
-      totalCount={workflowStages.length}
-      startPage={1}
-      endPage={1}
-      noPagination={true}
-    />
+    <>
+      <div className="flex mb-2">
+        <input
+          placeholder="Search"
+          type="text"
+          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+          className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+          onChange={(e) => {
+            execDebouncer(e)
+          }}
+        />
+      </div>
+      <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+        {data
+          ?.sort((a, b) => {
+            return a.order - b.order
+          })
+          .map((ws) => {
+            return (
+              <div
+                key={ws.id}
+                className="overflow-auto p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
+              >
+                <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
+                  {ws.stage?.name}
+                </div>
+                {/* <div className="text-neutral-600">
+                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
+                      </div> */}
+              </div>
+            )
+          })}
+      </div>
+      <Table
+        noSearch={true}
+        noMarginRight={true}
+        columns={columns}
+        data={data}
+        pageCount={Math.ceil(workflowStages.length / ITEMS_PER_PAGE)}
+        pageIndex={tablePage}
+        pageSize={ITEMS_PER_PAGE}
+        hasNext={false}
+        hasPrevious={false}
+        totalCount={workflowStages.length}
+        startPage={1}
+        endPage={1}
+        noPagination={true}
+      />
+    </>
   )
 }
 
@@ -389,7 +438,7 @@ const SingleWorkflowPage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs />
-      <br />
+      <br className="block md:hidden lg:hidden" />
       {/* {canUpdate && (
         <>
           <Link href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })} passHref>

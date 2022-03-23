@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, Suspense } from "react"
+import { useEffect, useState, useMemo, Suspense, ReactNode } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -17,6 +17,7 @@ import Skeleton from "react-loading-skeleton"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection } from "types"
+import { CogIcon } from "@heroicons/react/outline"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -178,25 +179,7 @@ const Workflows = ({ user }) => {
                   {w.canUpdate && (
                     <Link href={Routes.WorkflowSettingsPage({ slug: w.slug })} passHref>
                       <a className="float-right text-theme-600 hover:text-theme-800">
-                        <svg
-                          className="h-6 w-6"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
+                        <CogIcon className="h-6 w-6" />
                       </a>
                     </Link>
                   )}
@@ -204,7 +187,9 @@ const Workflows = ({ user }) => {
               </div>
               <div className="border-b-2 border-gray-50 w-full"></div>
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                {`${w.stages?.length} ${w.stages?.length === 1 ? "Stage" : "Stages"}`}
+                {`${w.stages?.length} ${w.stages?.length === 1 ? "Stage" : "Stages"} · ${
+                  w.jobs?.length
+                } ${w.jobs?.length === 1 ? "Job" : "Jobs"}`}
               </div>
               <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {w.stages
@@ -215,9 +200,9 @@ const Workflows = ({ user }) => {
                     return (
                       <div
                         key={ws.id}
-                        className="p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
+                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
                       >
-                        <div className="overflow-hidden text-sm text-neutral-600">
+                        <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
                           {ws.stage?.name}
                         </div>
                         {/* <div className="text-neutral-600">
@@ -248,7 +233,7 @@ const Workflows = ({ user }) => {
       droppableName="categories"
       isDragDisabled={true}
       direction={DragDirection.VERTICAL}
-      cardWidth="full"
+      isFull={true}
     />
   )
 }

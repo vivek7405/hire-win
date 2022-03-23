@@ -162,7 +162,10 @@ export const Stages = ({ user }) => {
               <div className="text-lg font-bold flex md:justify-center lg:justify:center">
                 {s.allowEdit ? (
                   <Link href={Routes.SingleStagePage({ slug: s.slug })} passHref>
-                    <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-800">
+                    <a
+                      data-testid={`stagelink`}
+                      className="text-theme-600 hover:text-theme-800 overflow-hidden whitespace-nowrap"
+                    >
                       {s.name}
                     </a>
                   </Link>
@@ -170,7 +173,9 @@ export const Stages = ({ user }) => {
                   <span>{s.name}</span>
                 )}
               </div>
+
               <div className="border-b-2 border-gray-50 w-full"></div>
+
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
                 Used in{" "}
                 {`${s.workflows?.length} ${s.workflows?.length === 1 ? "Workflow" : "Workflows"}`}
@@ -195,7 +200,6 @@ export const Stages = ({ user }) => {
       droppableName="categories"
       isDragDisabled={true}
       direction={DragDirection.HORIZONTAL}
-      cardWidth="60"
       pageIndex={tablePage}
       hasNext={hasMore}
       hasPrevious={tablePage !== 0}
