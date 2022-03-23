@@ -8,7 +8,13 @@ const getFormsWOPagination = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetFormsInput) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const forms = await db.form.findMany({ where })
+    const forms = await db.form.findMany({
+      where,
+      include: {
+        questions: { include: { question: true } },
+        jobs: true,
+      },
+    })
     return forms
   }
 )

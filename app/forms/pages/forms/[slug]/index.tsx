@@ -744,7 +744,7 @@ const SingleFormPage = ({
 
               <Link href={Routes.QuestionsHome()} passHref>
                 <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
-                  Questions
+                  Question Pool
                 </a>
               </Link>
 
@@ -760,7 +760,7 @@ const SingleFormPage = ({
 
             <div className="flex flex-row justify-between space-x-3">
               <Modal
-                header="Add Existing Questions"
+                header="Add Questions from Pool"
                 open={openAddExistingQuestions}
                 setOpen={setOpenAddExistingQuestions}
               >
@@ -797,7 +797,7 @@ const SingleFormPage = ({
                 data-testid={`open-addQuestion-modal`}
                 className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
               >
-                Add Existing Questions
+                Add Questions from Pool
               </button>
 
               <Modal

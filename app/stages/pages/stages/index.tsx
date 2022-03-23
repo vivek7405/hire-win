@@ -159,12 +159,13 @@ export const Stages = ({ user }) => {
         renderContent: (
           <>
             <div className="space-y-2">
-              <div className="text-lg font-bold flex md:justify-center lg:justify:center">
+              <div className="font-bold flex md:justify-center lg:justify:center">
                 {s.allowEdit ? (
                   <Link href={Routes.SingleStagePage({ slug: s.slug })} passHref>
                     <a
                       data-testid={`stagelink`}
                       className="text-theme-600 hover:text-theme-800 overflow-hidden whitespace-nowrap"
+                      title={s.name}
                     >
                       {s.name}
                     </a>

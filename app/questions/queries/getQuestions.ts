@@ -18,7 +18,15 @@ const getQuestions = resolver.pipe(
       skip,
       take,
       count: () => db.question.count({ where }),
-      query: (paginateArgs) => db.question.findMany({ ...paginateArgs, where, orderBy }),
+      query: (paginateArgs) =>
+        db.question.findMany({
+          ...paginateArgs,
+          where,
+          orderBy,
+          include: {
+            forms: { include: { form: true } },
+          },
+        }),
     })
 
     return {

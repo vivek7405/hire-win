@@ -115,21 +115,46 @@ const Categories = ({ user }) => {
         description: `${c.jobs?.length} ${c.jobs?.length === 1 ? "Job" : "Jobs"}`,
         renderContent: (
           <>
-            <div>
-              <span>
-                <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
+            <div className="space-y-2">
+              <div className="font-bold flex md:justify-center lg:justify:center">
+                {c.canUpdate ? (
                   <Link href={Routes.SingleCategoryPage({ slug: c.slug })} passHref>
-                    <a data-testid={`categorylink`} className="text-theme-600 hover:text-theme-800">
+                    <a
+                      data-testid={`stagelink`}
+                      className="text-theme-600 hover:text-theme-800 overflow-hidden whitespace-nowrap"
+                      title={c.name}
+                    >
                       {c.name}
                     </a>
                   </Link>
-                </div>
-              </span>
-              <div className="pt-2.5">
+                ) : (
+                  <span>{c.name}</span>
+                )}
+              </div>
+
+              <div className="border-b-2 border-gray-50 w-full"></div>
+
+              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
                 {`${c.jobs?.length} ${c.jobs?.length === 1 ? "Job" : "Jobs"}`}
               </div>
             </div>
           </>
+          // <>
+          //   <div>
+          //     <span>
+          //       <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
+          //         <Link href={Routes.SingleCategoryPage({ slug: c.slug })} passHref>
+          //           <a data-testid={`categorylink`} className="text-theme-600 hover:text-theme-800">
+          //             {c.name}
+          //           </a>
+          //         </Link>
+          //       </div>
+          //     </span>
+          //     <div className="pt-2.5">
+          //       {`${c.jobs?.length} ${c.jobs?.length === 1 ? "Job" : "Jobs"}`}
+          //     </div>
+          //   </div>
+          // </>
         ),
       }
     }) as CardType[]

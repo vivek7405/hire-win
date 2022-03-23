@@ -13,6 +13,8 @@ import path from "path"
 import getQuestions from "app/questions/queries/getQuestions"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
+import Cards from "app/core/components/Cards"
+import { CardType, DragDirection } from "types"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -91,43 +93,109 @@ export const Questions = ({ user }) => {
     })
   }, [questions, user.id])
 
-  let columns = [
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: (props) => {
-        return !props.cell.row.original.factory ? (
-          <Link href={Routes.SingleQuestionPage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
-              {props.cell.row.original.name}
-            </a>
-          </Link>
-        ) : (
-          props.cell.row.original.name
-        )
-      },
-    },
-    {
-      Header: "Type",
-      accessor: "type",
-      Cell: (props) => {
-        return props.cell.row.original.type?.replaceAll("_", " ")
-      },
-    },
-  ]
+  // let columns = [
+  //   {
+  //     Header: "Name",
+  //     accessor: "name",
+  //     Cell: (props) => {
+  //       return !props.cell.row.original.factory ? (
+  //         <Link href={Routes.SingleQuestionPage({ slug: props.cell.row.original.slug })} passHref>
+  //           <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
+  //             {props.cell.row.original.name}
+  //           </a>
+  //         </Link>
+  //       ) : (
+  //         props.cell.row.original.name
+  //       )
+  //     },
+  //   },
+  //   {
+  //     Header: "Type",
+  //     accessor: "type",
+  //     Cell: (props) => {
+  //       return props.cell.row.original.type?.replaceAll("_", " ")
+  //     },
+  //   },
+  // ]
+
+  // return (
+  //   <Table
+  //     columns={columns}
+  //     data={data}
+  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+  //     pageIndex={tablePage}
+  //     pageSize={ITEMS_PER_PAGE}
+  //     hasNext={hasMore}
+  //     hasPrevious={tablePage !== 0}
+  //     totalCount={count}
+  //     startPage={startPage}
+  //     endPage={endPage}
+  //   />
+  // )
+
+  const getCards = (questions) => {
+    return questions.map((q) => {
+      return {
+        id: q.id,
+        title: q.name,
+        description: `${q.forms?.length} ${q.forms?.length === 1 ? "Form" : "Forms"}`,
+        renderContent: (
+          <>
+            <div className="space-y-2">
+              <div className="font-bold flex md:justify-center lg:justify:center">
+                {!q.factory ? (
+                  <Link href={Routes.SingleQuestionPage({ slug: q.slug })} passHref>
+                    <a
+                      data-testid={`questionlink`}
+                      className="text-theme-600 hover:text-theme-800 overflow-hidden whitespace-nowrap"
+                      title={q.name}
+                    >
+                      {q.name}
+                    </a>
+                  </Link>
+                ) : (
+                  <span>{q.name}</span>
+                )}
+              </div>
+
+              <div className="border-b-2 border-gray-50 w-full"></div>
+
+              <div className="text-neutral-600 flex md:justify-center lg:justify-center">
+                {q.type?.replaceAll("_", " ")}
+              </div>
+
+              <div className="border-b-2 border-gray-50 w-full"></div>
+
+              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                Used in {`${q.forms?.length} ${q.forms?.length === 1 ? "Form" : "Forms"}`}
+              </div>
+            </div>
+          </>
+        ),
+      }
+    }) as CardType[]
+  }
+
+  const [cards, setCards] = useState(getCards(data))
+  useEffect(() => {
+    setCards(getCards(data))
+  }, [data])
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+    <Cards
+      cards={cards}
+      setCards={setCards}
+      mutateCardDropDB={(source, destination, draggableId) => {}}
+      droppableName="categories"
+      isDragDisabled={true}
+      direction={DragDirection.HORIZONTAL}
       pageIndex={tablePage}
-      pageSize={ITEMS_PER_PAGE}
       hasNext={hasMore}
       hasPrevious={tablePage !== 0}
       totalCount={count}
       startPage={startPage}
       endPage={endPage}
+      resultName="stage"
     />
   )
 }

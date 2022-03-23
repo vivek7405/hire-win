@@ -24,7 +24,8 @@ const getForms = resolver.pipe(
           where,
           orderBy,
           include: {
-            questions: true,
+            questions: { include: { question: true } },
+            jobs: true,
           },
         }),
     })

@@ -231,7 +231,13 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                   {moment(job.createdAt || undefined)
                     .local()
                     .fromNow()}
-                  , expires in{" "}
+                  ,{" "}
+                  {moment(job.validThrough || undefined)
+                    .local()
+                    .fromNow()
+                    .includes("ago")
+                    ? "expired"
+                    : "expires"}{" "}
                   {moment(job.validThrough || undefined)
                     .local()
                     .fromNow()}
