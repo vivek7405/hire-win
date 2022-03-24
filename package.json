@@ -24,8 +24,8 @@
     "generate:admin": "blitz install app/admin/utils/generateAdmin.ts"
   },
   "engines": {
-    "node": "16.14.2",
-    "npm": "8.5.0"
+    "node": "16.x",
+    "npm": "8.x"
   },
   "prisma": {
     "schema": "db/schema.prisma"
