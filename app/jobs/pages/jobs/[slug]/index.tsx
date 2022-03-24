@@ -283,7 +283,7 @@ const Candidates = (props: CandidateProps) => {
             <LabeledSelectField
               name={`candidate-${candidate?.id}-stage`}
               defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
-              value={workflowStage.id}
+              value={workflowStage?.id}
               options={stages.map((ws) => {
                 return { label: ws?.stage?.name, value: ws?.id }
               })}

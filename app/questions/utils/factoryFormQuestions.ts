@@ -10,6 +10,7 @@ const factoryFormQuestions = [
       name: "Name",
       type: QuestionType.Single_line_text,
       placeholder: "Enter your name",
+      factory: true,
     } as Question,
   } as ExtendedFormQuestion,
   {
@@ -20,6 +21,7 @@ const factoryFormQuestions = [
       name: "Email",
       type: QuestionType.Email,
       placeholder: "Enter your email",
+      factory: true,
     } as Question,
   } as ExtendedFormQuestion,
   {
@@ -31,6 +33,7 @@ const factoryFormQuestions = [
       type: QuestionType.Attachment,
       acceptedFiles: "application/pdf",
       placeholder: "Upload your resume",
+      factory: true,
     } as Question,
   } as ExtendedFormQuestion,
 ]
