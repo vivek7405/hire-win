@@ -195,7 +195,7 @@ export const Questions = ({ user }) => {
       totalCount={count}
       startPage={startPage}
       endPage={endPage}
-      resultName="stage"
+      resultName="question"
     />
   )
 }
