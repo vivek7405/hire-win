@@ -200,9 +200,9 @@ const Workflows = ({ user }) => {
                     return (
                       <div
                         key={ws.id}
-                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
+                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
                       >
-                        <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
+                        <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
                           {ws.stage?.name}
                         </div>
                         {/* <div className="text-neutral-600">

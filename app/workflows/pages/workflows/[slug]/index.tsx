@@ -468,20 +468,20 @@ export const Stages = ({ user, workflow }) => {
           return (
             <div
               key={ws.id}
-              className="overflow-auto p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
+              className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
             >
-              <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
+              <div className="overflow-hidden text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
                 {ws.stage?.name}
               </div>
               {/* <div className="text-neutral-600">
-                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
-                      </div> */}
+                {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
+              </div> */}
             </div>
           )
         })}
       </div>
       <div className="w-full flex items-center justify-center">
-        <div className="w-full md:w-1/2 lg:w-1/2 p-3 border-2 border-neutral-400 rounded">
+        <div className="w-full md:w-1/2 lg:w-1/2 p-3 border-2 border-neutral-300 rounded">
           <Cards
             noSearch={true}
             cards={cards}

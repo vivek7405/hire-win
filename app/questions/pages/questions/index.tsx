@@ -160,14 +160,14 @@ export const Questions = ({ user }) => {
 
               <div className="border-b-2 border-gray-50 w-full"></div>
 
-              <div className="text-neutral-600 flex md:justify-center lg:justify-center">
+              <div className="text-neutral-500 text-sm font-semibold flex md:justify-center lg:justify-center">
                 {q.type?.replaceAll("_", " ")}
               </div>
 
               <div className="border-b-2 border-gray-50 w-full"></div>
 
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                Used in {`${q.forms?.length} ${q.forms?.length === 1 ? "Form" : "Forms"}`}
+                {`${q.forms?.length} ${q.forms?.length === 1 ? "Form" : "Forms"}`}
               </div>
             </div>
           </>

@@ -178,7 +178,6 @@ export const Stages = ({ user }) => {
               <div className="border-b-2 border-gray-50 w-full"></div>
 
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                Used in{" "}
                 {`${s.workflows?.length} ${s.workflows?.length === 1 ? "Workflow" : "Workflows"}`}
               </div>
             </div>
