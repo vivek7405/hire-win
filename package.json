@@ -23,6 +23,9 @@
     "test:e2e:open": "cross-env NODE_ENV=test start-server-and-test test:server http://localhost:3000 cy:open",
     "generate:admin": "blitz install app/admin/utils/generateAdmin.ts"
   },
+  "engines": {
+    "node": "16.14.2"
+  },
   "prisma": {
     "schema": "db/schema.prisma"
   },
