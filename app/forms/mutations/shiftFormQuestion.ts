@@ -2,15 +2,16 @@ import { Ctx } from "blitz"
 import db from "db"
 import Guard from "app/guard/ability"
 import { ShiftDirection } from "types"
+import range from "app/core/utils/range"
 
 type ShiftFormQuestionInput = {
   formId: string
-  order: number
-  shiftDirection: ShiftDirection
+  sourceOrder: number
+  destOrder: number
 }
 
 async function shiftFormQuestion(
-  { formId, order, shiftDirection }: ShiftFormQuestionInput,
+  { formId, sourceOrder, destOrder }: ShiftFormQuestionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
@@ -19,15 +20,24 @@ async function shiftFormQuestion(
     where: {
       formId: formId,
       order: {
-        in: shiftDirection === ShiftDirection.UP ? [order, order - 1] : [order, order + 1],
+        in:
+          sourceOrder < destOrder
+            ? range(sourceOrder, destOrder, 1)
+            : range(destOrder, sourceOrder, 1),
       },
     },
     orderBy: { order: "asc" },
   })
 
-  if (formQuestions?.length === 2) {
-    formQuestions[0]!.order += 1
-    formQuestions[1]!.order -= 1
+  const shiftDirection = sourceOrder < destOrder ? ShiftDirection.DOWN : ShiftDirection.UP
+  if (formQuestions?.length === Math.abs(sourceOrder - destOrder) + 1) {
+    formQuestions.forEach((fq) => {
+      if (fq.order === sourceOrder) {
+        fq.order = destOrder
+      } else {
+        shiftDirection === ShiftDirection.UP ? (fq.order += 1) : (fq.order -= 1)
+      }
+    })
 
     const updateFormQuestions = await db.form.update({
       where: { id: formId },

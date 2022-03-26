@@ -2,15 +2,16 @@ import { Ctx } from "blitz"
 import db from "db"
 import Guard from "app/guard/ability"
 import { ShiftDirection } from "types"
+import range from "app/core/utils/range"
 
 type ShiftWorkflowStageInput = {
   workflowId: string
-  order: number
-  shiftDirection: ShiftDirection
+  sourceOrder: number
+  destOrder: number
 }
 
 async function shiftWorkflowStage(
-  { workflowId, order, shiftDirection }: ShiftWorkflowStageInput,
+  { workflowId, sourceOrder, destOrder }: ShiftWorkflowStageInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
@@ -19,21 +20,30 @@ async function shiftWorkflowStage(
     where: {
       workflowId: workflowId,
       order: {
-        in: shiftDirection === ShiftDirection.UP ? [order, order - 1] : [order, order + 1],
+        in:
+          sourceOrder < destOrder
+            ? range(sourceOrder, destOrder, 1)
+            : range(destOrder, sourceOrder, 1),
       },
     },
     orderBy: { order: "asc" },
   })
 
-  if (workflowStages?.length === 2) {
-    workflowStages[0]!.order += 1
-    workflowStages[1]!.order -= 1
+  const shiftDirection = sourceOrder < destOrder ? ShiftDirection.DOWN : ShiftDirection.UP
+  if (workflowStages?.length === Math.abs(sourceOrder - destOrder) + 1) {
+    workflowStages.forEach((fq) => {
+      if (fq.order === sourceOrder) {
+        fq.order = destOrder
+      } else {
+        shiftDirection === ShiftDirection.UP ? (fq.order += 1) : (fq.order -= 1)
+      }
+    })
 
     const updateWorkflowStages = await db.workflow.update({
       where: { id: workflowId },
       data: {
         stages: {
-          update: workflowStages?.map((ws) => {
+          updateMany: workflowStages?.map((ws) => {
             return {
               where: {
                 id: ws.id,

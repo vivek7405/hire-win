@@ -8,7 +8,6 @@ import createStage from "app/stages/mutations/createStage"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import shiftWorkflowStage from "./shiftWorkflowStage"
-import { ShiftDirection } from "types"
 
 async function addNewStageToWorkflow(data: StageInputType, ctx: Ctx) {
   ctx.session.$authorize()
@@ -58,7 +57,7 @@ async function addNewStageToWorkflow(data: StageInputType, ctx: Ctx) {
 
   // After adding stage to the last position, shift it up
   await shiftWorkflowStage(
-    { workflowId: workflowId!, order, shiftDirection: ShiftDirection.UP },
+    { workflowId: workflowId!, sourceOrder: order, destOrder: order - 1 },
     ctx
   )
 

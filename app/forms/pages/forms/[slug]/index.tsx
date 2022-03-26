@@ -167,273 +167,273 @@ export const Questions = ({ user, form }) => {
     })
   }, [formQuestions])
 
-  let columns = [
-    {
-      Header: "Order",
-      accessor: "order",
-    },
-    {
-      Header: "Name",
-      accessor: "question.name",
-      Cell: (props) => {
-        const formQuestion: ExtendedFormQuestion = props.cell.row.original
+  // let columns = [
+  //   {
+  //     Header: "Order",
+  //     accessor: "order",
+  //   },
+  //   {
+  //     Header: "Name",
+  //     accessor: "question.name",
+  //     Cell: (props) => {
+  //       const formQuestion: ExtendedFormQuestion = props.cell.row.original
 
-        return (
-          <>
-            {!formQuestion.question.factory ? (
-              <Link href={Routes.SingleQuestionPage({ slug: formQuestion.question.slug })} passHref>
-                <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
-                  {formQuestion.question.name}
-                </a>
-              </Link>
-            ) : (
-              formQuestion.question.name
-            )}
-          </>
-        )
-      },
-    },
-    {
-      Header: "Type",
-      accessor: "question.type",
-      Cell: (props) => {
-        return props.value.toString().replaceAll("_", " ")
-      },
-    },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        const formQuestion: ExtendedFormQuestion = props.cell.row.original
+  //       return (
+  //         <>
+  //           {!formQuestion.question.factory ? (
+  //             <Link href={Routes.SingleQuestionPage({ slug: formQuestion.question.slug })} passHref>
+  //               <a data-testid={`questionlink`} className="text-theme-600 hover:text-theme-900">
+  //                 {formQuestion.question.name}
+  //               </a>
+  //             </Link>
+  //           ) : (
+  //             formQuestion.question.name
+  //           )}
+  //         </>
+  //       )
+  //     },
+  //   },
+  //   {
+  //     Header: "Type",
+  //     accessor: "question.type",
+  //     Cell: (props) => {
+  //       return props.value.toString().replaceAll("_", " ")
+  //     },
+  //   },
+  //   {
+  //     Header: "",
+  //     accessor: "action",
+  //     Cell: (props) => {
+  //       const formQuestion: ExtendedFormQuestion = props.cell.row.original
 
-        return (
-          <>
-            <div className="flex space-x-8">
-              {formQuestion.allowBehaviourEdit && (
-                <Form noFormatting={true} onSubmit={async (values) => {}}>
-                  <LabeledToggleGroupField
-                    name={`formQuestion-${formQuestion.id}-behaviour`}
-                    paddingX={3}
-                    paddingY={1}
-                    defaultValue={formQuestion?.behaviour || FormQuestionBehaviour.OPTIONAL}
-                    value={formQuestion?.behaviour}
-                    options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
-                      return { label: formQuestionBehaviour, value: formQuestionBehaviour }
-                    })}
-                    onChange={async (value) => {
-                      const toastId = toast.loading(() => (
-                        <span>
-                          <b>Setting behaviour as {value}</b>
-                          <br />
-                          for question - {formQuestion.question.name}
-                        </span>
-                      ))
-                      try {
-                        await updateFormQuestionMutation({
-                          where: { id: formQuestion?.id },
-                          data: {
-                            order: formQuestion.order,
-                            behaviour: value,
-                          },
-                        })
-                        toast.success(
-                          () => (
-                            <span>
-                              <b>Behaviour changed successfully</b>
-                              <br />
-                              for question - {formQuestion?.question?.name}
-                            </span>
-                          ),
-                          { id: toastId }
-                        )
-                        formQuestion.behaviour = value
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          { id: toastId }
-                        )
-                      }
-                    }}
-                  />
-                </Form>
-              )}
+  //       return (
+  //         <>
+  //           <div className="flex space-x-8">
+  //             {formQuestion.allowBehaviourEdit && (
+  //               <Form noFormatting={true} onSubmit={async (values) => {}}>
+  //                 <LabeledToggleGroupField
+  //                   name={`formQuestion-${formQuestion.id}-behaviour`}
+  //                   paddingX={3}
+  //                   paddingY={1}
+  //                   defaultValue={formQuestion?.behaviour || FormQuestionBehaviour.OPTIONAL}
+  //                   value={formQuestion?.behaviour}
+  //                   options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
+  //                     return { label: formQuestionBehaviour, value: formQuestionBehaviour }
+  //                   })}
+  //                   onChange={async (value) => {
+  //                     const toastId = toast.loading(() => (
+  //                       <span>
+  //                         <b>Setting behaviour as {value}</b>
+  //                         <br />
+  //                         for question - {formQuestion.question.name}
+  //                       </span>
+  //                     ))
+  //                     try {
+  //                       await updateFormQuestionMutation({
+  //                         where: { id: formQuestion?.id },
+  //                         data: {
+  //                           order: formQuestion.order,
+  //                           behaviour: value,
+  //                         },
+  //                       })
+  //                       toast.success(
+  //                         () => (
+  //                           <span>
+  //                             <b>Behaviour changed successfully</b>
+  //                             <br />
+  //                             for question - {formQuestion?.question?.name}
+  //                           </span>
+  //                         ),
+  //                         { id: toastId }
+  //                       )
+  //                       formQuestion.behaviour = value
+  //                     } catch (error) {
+  //                       toast.error(
+  //                         "Sorry, we had an unexpected error. Please try again. - " +
+  //                           error.toString(),
+  //                         { id: toastId }
+  //                       )
+  //                     }
+  //                   }}
+  //                 />
+  //               </Form>
+  //             )}
 
-              {!formQuestion.question.factory && (
-                <>
-                  <Confirm
-                    open={openConfirm}
-                    setOpen={setOpenConfirm}
-                    header={
-                      Object.entries(formQuestionToRemove).length
-                        ? `Remove Question - ${formQuestionToRemove.question.name}?`
-                        : "Remove Question?"
-                    }
-                    onSuccess={async () => {
-                      const toastId = toast.loading(() => (
-                        <span>Removing Question {formQuestionToRemove.question.name}</span>
-                      ))
-                      try {
-                        await removeQuestionFromFormMutation({
-                          formId: formQuestionToRemove.formId,
-                          order: formQuestionToRemove.order,
-                        })
-                        toast.success(
-                          () => (
-                            <span>Question removed - {formQuestionToRemove.question.name}</span>
-                          ),
-                          {
-                            id: toastId,
-                          }
-                        )
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          { id: toastId }
-                        )
-                      }
-                      router.reload()
-                    }}
-                  >
-                    Are you sure you want to remove this question from the form?
-                  </Confirm>
-                  {!formQuestion.question.factory && (
-                    <button
-                      title="Remove Question"
-                      className="align-middle rounded-full"
-                      onClick={async (e) => {
-                        e.preventDefault()
+  //             {!formQuestion.question.factory && (
+  //               <>
+  //                 <Confirm
+  //                   open={openConfirm}
+  //                   setOpen={setOpenConfirm}
+  //                   header={
+  //                     Object.entries(formQuestionToRemove).length
+  //                       ? `Remove Question - ${formQuestionToRemove.question.name}?`
+  //                       : "Remove Question?"
+  //                   }
+  //                   onSuccess={async () => {
+  //                     const toastId = toast.loading(() => (
+  //                       <span>Removing Question {formQuestionToRemove.question.name}</span>
+  //                     ))
+  //                     try {
+  //                       await removeQuestionFromFormMutation({
+  //                         formId: formQuestionToRemove.formId,
+  //                         order: formQuestionToRemove.order,
+  //                       })
+  //                       toast.success(
+  //                         () => (
+  //                           <span>Question removed - {formQuestionToRemove.question.name}</span>
+  //                         ),
+  //                         {
+  //                           id: toastId,
+  //                         }
+  //                       )
+  //                     } catch (error) {
+  //                       toast.error(
+  //                         "Sorry, we had an unexpected error. Please try again. - " +
+  //                           error.toString(),
+  //                         { id: toastId }
+  //                       )
+  //                     }
+  //                     router.reload()
+  //                   }}
+  //                 >
+  //                   Are you sure you want to remove this question from the form?
+  //                 </Confirm>
+  //                 {!formQuestion.question.factory && (
+  //                   <button
+  //                     title="Remove Question"
+  //                     className="align-middle rounded-full"
+  //                     onClick={async (e) => {
+  //                       e.preventDefault()
 
-                        setFormQuestionToRemove(formQuestion)
-                        setOpenConfirm(true)
-                      }}
-                    >
-                      <XCircleIcon className="w-6 h-auto text-red-500 hover:text-red-600" />
-                    </button>
-                  )}
+  //                       setFormQuestionToRemove(formQuestion)
+  //                       setOpenConfirm(true)
+  //                     }}
+  //                   >
+  //                     <XCircleIcon className="w-6 h-auto text-red-500 hover:text-red-600" />
+  //                   </button>
+  //                 )}
 
-                  <div className="flex">
-                    <button
-                      disabled={formQuestion.order === formQuestions.length}
-                      title="Move Down"
-                      className="align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
-                      onClick={async (e) => {
-                        const toastId = toast.loading(() => (
-                          <span>Changing question order for {formQuestion.question.name}</span>
-                        ))
-                        try {
-                          await shiftFormQuestionMutation({
-                            formId: formQuestion.formId,
-                            order: formQuestion.order,
-                            shiftDirection: ShiftDirection.DOWN,
-                          })
-                          toast.success(
-                            () => (
-                              <span>
-                                Order changed from {formQuestion.order} to {formQuestion.order + 1}{" "}
-                                for Question {formQuestion.question.name}
-                              </span>
-                            ),
-                            { id: toastId }
-                          )
-                          const x = formQuestion.order
-                          const y = formQuestion.order - 1
-                          if (x <= formQuestions.length - 1 && y <= formQuestions.length - 1) {
-                            const row = formQuestions[x]!
-                            formQuestions[x] = {
-                              ...formQuestions[y]!,
-                              order: formQuestion.order + 1,
-                            }
-                            formQuestions[y] = { ...row, order: formQuestion.order }
-                            setData(formQuestions)
-                          } else {
-                            toast.error("Index out of range")
-                          }
-                        } catch (error) {
-                          toast.error(
-                            "Sorry, we had an unexpected error. Please try again. - " +
-                              error.toString(),
-                            { id: toastId }
-                          )
-                        }
-                      }}
-                    >
-                      {!(formQuestion.order === formQuestions.length) && (
-                        <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
-                      )}
+  //                 <div className="flex">
+  //                   <button
+  //                     disabled={formQuestion.order === formQuestions.length}
+  //                     title="Move Down"
+  //                     className="align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
+  //                     onClick={async (e) => {
+  //                       const toastId = toast.loading(() => (
+  //                         <span>Changing question order for {formQuestion.question.name}</span>
+  //                       ))
+  //                       try {
+  //                         await shiftFormQuestionMutation({
+  //                           formId: formQuestion.formId,
+  //                           order: formQuestion.order,
+  //                           shiftDirection: ShiftDirection.DOWN,
+  //                         })
+  //                         toast.success(
+  //                           () => (
+  //                             <span>
+  //                               Order changed from {formQuestion.order} to {formQuestion.order + 1}{" "}
+  //                               for Question {formQuestion.question.name}
+  //                             </span>
+  //                           ),
+  //                           { id: toastId }
+  //                         )
+  //                         const x = formQuestion.order
+  //                         const y = formQuestion.order - 1
+  //                         if (x <= formQuestions.length - 1 && y <= formQuestions.length - 1) {
+  //                           const row = formQuestions[x]!
+  //                           formQuestions[x] = {
+  //                             ...formQuestions[y]!,
+  //                             order: formQuestion.order + 1,
+  //                           }
+  //                           formQuestions[y] = { ...row, order: formQuestion.order }
+  //                           setData(formQuestions)
+  //                         } else {
+  //                           toast.error("Index out of range")
+  //                         }
+  //                       } catch (error) {
+  //                         toast.error(
+  //                           "Sorry, we had an unexpected error. Please try again. - " +
+  //                             error.toString(),
+  //                           { id: toastId }
+  //                         )
+  //                       }
+  //                     }}
+  //                   >
+  //                     {!(formQuestion.order === formQuestions.length) && (
+  //                       <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+  //                     )}
 
-                      {formQuestion.order === formQuestions.length && (
-                        <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />
-                      )}
-                    </button>
+  //                     {formQuestion.order === formQuestions.length && (
+  //                       <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />
+  //                     )}
+  //                   </button>
 
-                    <button
-                      disabled={
-                        formQuestion.order === 1 ||
-                        formQuestion.order === factoryFormQuestions.length + 1
-                      }
-                      title="Move Up"
-                      className="ml-2 align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
-                      onClick={async (e) => {
-                        const toastId = toast.loading(() => (
-                          <span>Changing question order for {formQuestion.question.name}</span>
-                        ))
-                        try {
-                          await shiftFormQuestionMutation({
-                            formId: formQuestion.formId,
-                            order: formQuestion.order,
-                            shiftDirection: ShiftDirection.UP,
-                          })
-                          toast.success(
-                            () => (
-                              <span>
-                                Order changed from {formQuestion.order} to {formQuestion.order - 1}{" "}
-                                for Question {formQuestion.question.name}
-                              </span>
-                            ),
-                            { id: toastId }
-                          )
-                          const x = formQuestion.order - 1
-                          const y = formQuestion.order - 2
-                          if (x <= formQuestions.length - 1 && y <= formQuestions.length - 1) {
-                            const row = formQuestions[x]!
-                            formQuestions[x] = { ...formQuestions[y]!, order: formQuestion.order }
-                            formQuestions[y] = { ...row, order: formQuestion.order - 1 }
-                            setData(formQuestions)
-                          } else {
-                            toast.error("Index out of range")
-                          }
-                        } catch (error) {
-                          toast.error(
-                            "Sorry, we had an unexpected error. Please try again. - " +
-                              error.toString(),
-                            { id: toastId }
-                          )
-                        }
-                      }}
-                    >
-                      {!(
-                        formQuestion.order === 1 ||
-                        formQuestion.order === factoryFormQuestions.length + 1
-                      ) && (
-                        <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
-                      )}
+  //                   <button
+  //                     disabled={
+  //                       formQuestion.order === 1 ||
+  //                       formQuestion.order === factoryFormQuestions.length + 1
+  //                     }
+  //                     title="Move Up"
+  //                     className="ml-2 align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
+  //                     onClick={async (e) => {
+  //                       const toastId = toast.loading(() => (
+  //                         <span>Changing question order for {formQuestion.question.name}</span>
+  //                       ))
+  //                       try {
+  //                         await shiftFormQuestionMutation({
+  //                           formId: formQuestion.formId,
+  //                           order: formQuestion.order,
+  //                           shiftDirection: ShiftDirection.UP,
+  //                         })
+  //                         toast.success(
+  //                           () => (
+  //                             <span>
+  //                               Order changed from {formQuestion.order} to {formQuestion.order - 1}{" "}
+  //                               for Question {formQuestion.question.name}
+  //                             </span>
+  //                           ),
+  //                           { id: toastId }
+  //                         )
+  //                         const x = formQuestion.order - 1
+  //                         const y = formQuestion.order - 2
+  //                         if (x <= formQuestions.length - 1 && y <= formQuestions.length - 1) {
+  //                           const row = formQuestions[x]!
+  //                           formQuestions[x] = { ...formQuestions[y]!, order: formQuestion.order }
+  //                           formQuestions[y] = { ...row, order: formQuestion.order - 1 }
+  //                           setData(formQuestions)
+  //                         } else {
+  //                           toast.error("Index out of range")
+  //                         }
+  //                       } catch (error) {
+  //                         toast.error(
+  //                           "Sorry, we had an unexpected error. Please try again. - " +
+  //                             error.toString(),
+  //                           { id: toastId }
+  //                         )
+  //                       }
+  //                     }}
+  //                   >
+  //                     {!(
+  //                       formQuestion.order === 1 ||
+  //                       formQuestion.order === factoryFormQuestions.length + 1
+  //                     ) && (
+  //                       <ArrowUpIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
+  //                     )}
 
-                      {(formQuestion.order === 1 ||
-                        formQuestion.order === factoryFormQuestions.length + 1) && (
-                        <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />
-                      )}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </>
-        )
-      },
-    },
-  ]
+  //                     {(formQuestion.order === 1 ||
+  //                       formQuestion.order === factoryFormQuestions.length + 1) && (
+  //                       <ArrowUpIcon className="h-5 cursor-not-allowed text-gray-300" />
+  //                     )}
+  //                   </button>
+  //                 </div>
+  //               </>
+  //             )}
+  //           </div>
+  //         </>
+  //       )
+  //     },
+  //   },
+  // ]
 
   const getCards = (formQuestions) => {
     return formQuestions.map((fq) => {
@@ -461,11 +461,6 @@ export const Questions = ({ user, form }) => {
                 </div>
                 {!fq.question.factory && (
                   <div className="absolute top-0.5 right-0">
-                    {/* <Link href={Routes.FormSettingsPage({ slug: fq.slug })} passHref>
-                      <a className="float-right text-red-600 hover:text-red-800">
-                        <TrashIcon className="h-5 w-5" />
-                      </a>
-                    </Link> */}
                     <button
                       className="float-right text-red-600 hover:text-red-800"
                       title="Remove Question"
@@ -478,18 +473,6 @@ export const Questions = ({ user, form }) => {
                     >
                       <TrashIcon className="h-5 w-5" />
                     </button>
-                    {/* <button
-                    title="Remove Question"
-                    className=""
-                    onClick={async (e) => {
-                      e.preventDefault()
-
-                      setFormQuestionToRemove(fq)
-                      setOpenConfirm(true)
-                    }}
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </button> */}
                   </div>
                 )}
               </div>
@@ -634,10 +617,16 @@ export const Questions = ({ user, form }) => {
           <Cards
             noSearch={true}
             cards={cards}
-            setCards={setCards}
+            setCards={() => {}}
             noPagination={true}
-            mutateCardDropDB={(source, destination, draggableId) => {
+            mutateCardDropDB={async (source, destination, draggableId) => {
               if (!(source && destination)) return
+
+              // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
+              if (destination.index < factoryFormQuestions.length) {
+                toast.error("Order for Factory Questions can't be changed")
+                return
+              }
 
               const formQuestion = data?.find((fq) => fq.id === draggableId)
 
@@ -647,6 +636,32 @@ export const Questions = ({ user, form }) => {
               }
 
               setData([...data])
+
+              const toastId = toast.loading(() => (
+                <span>Changing question order for {formQuestion?.question.name}</span>
+              ))
+              try {
+                await shiftFormQuestionMutation({
+                  formId: formQuestion?.formId!,
+                  sourceOrder: source?.index + 1,
+                  destOrder: destination?.index + 1,
+                })
+
+                toast.success(
+                  () => (
+                    <span>
+                      Order changed from {source?.index + 1} to {destination?.index + 1} for
+                      Question {formQuestion?.question.name}
+                    </span>
+                  ),
+                  { id: toastId }
+                )
+              } catch (error) {
+                toast.error(
+                  "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+                  { id: toastId }
+                )
+              }
             }}
             droppableName="questions"
             isDragDisabled={false}
@@ -685,7 +700,7 @@ export const Questions = ({ user, form }) => {
                 formQuestions={data}
               />
             </div>
-            <div className="bg-neutral-400 rounded-2xl h-1 w-1/2 absolute left-1/4 bottom-2" />
+            <div className="bg-neutral-300 rounded-2xl h-1 w-1/2 absolute left-1/4 bottom-2" />
           </div>
         </div>
       </div>
