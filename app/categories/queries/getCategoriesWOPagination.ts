@@ -7,9 +7,7 @@ interface GetCategoriesInput extends Pick<Prisma.CategoryFindManyArgs, "where"> 
 const getCategoriesWOPagination = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetCategoriesInput) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const categories = await db.category.findMany({ where })
-
+    const categories = await db.category.findMany({ where, include: { jobs: true } })
     return categories
   }
 )

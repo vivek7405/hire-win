@@ -66,7 +66,7 @@ async function createFormWithFactoryFormQuestions(formName: string, userId: numb
                   placeholder: fq.question.placeholder || "",
                   acceptedFiles: fq.question.acceptedFiles || "",
                   slug: fq.question.slug || "",
-                  factory: true,
+                  factory: fq.question.factory || false,
                   user: {
                     connect: {
                       id: userId,

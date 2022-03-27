@@ -14,6 +14,8 @@ import getStages from "app/stages/queries/getStages"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 import { Stage } from "@prisma/client"
+import { CardType, DragDirection } from "types"
+import Cards from "app/core/components/Cards"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -70,8 +72,6 @@ export const Stages = ({ user }) => {
     take: ITEMS_PER_PAGE,
   })
 
-  // Use blitz guard to check if user can update t
-
   let startPage = tablePage * ITEMS_PER_PAGE + 1
   let endPage = startPage - 1 + ITEMS_PER_PAGE
 
@@ -95,56 +95,118 @@ export const Stages = ({ user }) => {
     })
   }, [stages, user.id])
 
-  let columns = [
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: (props) => {
-        const stage = props.cell.row.original as Stage
+  // let columns = [
+  //   {
+  //     Header: "Name",
+  //     accessor: "name",
+  //     Cell: (props) => {
+  //       const stage = props.cell.row.original as Stage
 
-        return stage.allowEdit ? (
-          <Link href={Routes.SingleStagePage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
-              {props.value}
-            </a>
-          </Link>
-        ) : (
-          props.value
-        )
-      },
-    },
-    // {
-    //   Header: "",
-    //   accessor: "action",
-    //   Cell: (props) => {
-    //     return (
-    //       <>
-    //         {props.cell.row.original.canUpdate && (
-    //           <Link
-    //             href={Routes.StageSettingsPage({ slug: props.cell.row.original.slug })}
-    //             passHref
-    //           >
-    //             <a className="text-theme-600 hover:text-theme-900">Settings</a>
-    //           </Link>
-    //         )}
-    //       </>
-    //     )
-    //   },
-    // },
-  ]
+  //       return stage.allowEdit ? (
+  //         <Link href={Routes.SingleStagePage({ slug: props.cell.row.original.slug })} passHref>
+  //           <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
+  //             {props.value}
+  //           </a>
+  //         </Link>
+  //       ) : (
+  //         props.value
+  //       )
+  //     },
+  //   },
+  //   // {
+  //   //   Header: "",
+  //   //   accessor: "action",
+  //   //   Cell: (props) => {
+  //   //     return (
+  //   //       <>
+  //   //         {props.cell.row.original.canUpdate && (
+  //   //           <Link
+  //   //             href={Routes.StageSettingsPage({ slug: props.cell.row.original.slug })}
+  //   //             passHref
+  //   //           >
+  //   //             <a className="text-theme-600 hover:text-theme-900">Settings</a>
+  //   //           </Link>
+  //   //         )}
+  //   //       </>
+  //   //     )
+  //   //   },
+  //   // },
+  // ]
+
+  // return (
+  //   <Table
+  //     columns={columns}
+  //     data={data}
+  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+  //     pageIndex={tablePage}
+  //     pageSize={ITEMS_PER_PAGE}
+  //     hasNext={hasMore}
+  //     hasPrevious={tablePage !== 0}
+  //     totalCount={count}
+  //     startPage={startPage}
+  //     endPage={endPage}
+  //   />
+  // )
+
+  const getCards = (stages) => {
+    return stages.map((s) => {
+      return {
+        id: s.id,
+        title: s.name,
+        description: `${s.workflows?.length} ${
+          s.workflows?.length === 1 ? "Workflow" : "Workflows"
+        }`,
+        renderContent: (
+          <>
+            <div className="space-y-2">
+              <div className="font-bold flex md:justify-center lg:justify:center">
+                {s.allowEdit ? (
+                  <Link href={Routes.SingleStagePage({ slug: s.slug })} passHref>
+                    <a
+                      data-testid={`stagelink`}
+                      className="text-theme-600 hover:text-theme-800 overflow-hidden whitespace-nowrap"
+                      title={s.name}
+                    >
+                      {s.name}
+                    </a>
+                  </Link>
+                ) : (
+                  <span>{s.name}</span>
+                )}
+              </div>
+
+              <div className="border-b-2 border-gray-50 w-full"></div>
+
+              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                {`${s.workflows?.length} ${s.workflows?.length === 1 ? "Workflow" : "Workflows"}`}
+              </div>
+            </div>
+          </>
+        ),
+      }
+    }) as CardType[]
+  }
+
+  const [cards, setCards] = useState(getCards(data))
+  useEffect(() => {
+    setCards(getCards(data))
+  }, [data])
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+    <Cards
+      cards={cards}
+      setCards={setCards}
+      mutateCardDropDB={(source, destination, draggableId) => {}}
+      droppableName="categories"
+      isDragDisabled={true}
+      direction={DragDirection.HORIZONTAL}
       pageIndex={tablePage}
-      pageSize={ITEMS_PER_PAGE}
       hasNext={hasMore}
       hasPrevious={tablePage !== 0}
       totalCount={count}
       startPage={startPage}
       endPage={endPage}
+      resultName="stage"
     />
   )
 }

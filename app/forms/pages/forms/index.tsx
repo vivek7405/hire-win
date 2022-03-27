@@ -6,6 +6,7 @@ import {
   Link,
   useRouter,
   usePaginatedQuery,
+  useQuery,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -13,6 +14,10 @@ import path from "path"
 import getForms from "app/forms/queries/getForms"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
+import Cards from "app/core/components/Cards"
+import { CardType, DragDirection } from "types"
+import { CogIcon } from "@heroicons/react/outline"
+import getFormsWOPagination from "app/forms/queries/getFormsWOPagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -59,23 +64,28 @@ const Forms = ({ user }) => {
     setQuery(search)
   }, [router.query])
 
-  const [{ forms, hasMore, count }] = usePaginatedQuery(getForms, {
+  // const [{ forms, hasMore, count }] = usePaginatedQuery(getForms, {
+  //   where: {
+  //     userId: user?.id,
+  //     ...query,
+  //   },
+  //   skip: ITEMS_PER_PAGE * Number(tablePage),
+  //   take: ITEMS_PER_PAGE,
+  // })
+
+  // let startPage = tablePage * ITEMS_PER_PAGE + 1
+  // let endPage = startPage - 1 + ITEMS_PER_PAGE
+
+  // if (endPage > count) {
+  //   endPage = count
+  // }
+
+  const [forms] = useQuery(getFormsWOPagination, {
     where: {
       userId: user?.id,
       ...query,
     },
-    skip: ITEMS_PER_PAGE * Number(tablePage),
-    take: ITEMS_PER_PAGE,
   })
-
-  // Use blitz guard to check if user can update t
-
-  let startPage = tablePage * ITEMS_PER_PAGE + 1
-  let endPage = startPage - 1 + ITEMS_PER_PAGE
-
-  if (endPage > count) {
-    endPage = count
-  }
 
   useMemo(async () => {
     let data: {}[] = []
@@ -93,55 +103,163 @@ const Forms = ({ user }) => {
     })
   }, [forms, user.id])
 
-  let columns = [
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: (props) => {
-        return (
-          <Link href={Routes.SingleFormPage({ slug: props.cell.row.original.slug })} passHref>
-            <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-900">
-              {props.cell.row.original.name}
-            </a>
-          </Link>
-        )
-      },
-    },
-    {
-      Header: "Questions",
-      Cell: (props) => {
-        return props.cell.row.original.questions.length
-      },
-    },
-    {
-      Header: "",
-      accessor: "action",
-      Cell: (props) => {
-        return (
+  // let columns = [
+  //   {
+  //     Header: "Name",
+  //     accessor: "name",
+  //     Cell: (props) => {
+  //       return (
+  //         <Link href={Routes.SingleFormPage({ slug: props.cell.row.original.slug })} passHref>
+  //           <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-900">
+  //             {props.cell.row.original.name}
+  //           </a>
+  //         </Link>
+  //       )
+  //     },
+  //   },
+  //   {
+  //     Header: "Questions",
+  //     Cell: (props) => {
+  //       return props.cell.row.original.questions.length
+  //     },
+  //   },
+  //   {
+  //     Header: "",
+  //     accessor: "action",
+  //     Cell: (props) => {
+  //       return (
+  //         <>
+  //           {props.cell.row.original.canUpdate && (
+  //             <Link href={Routes.FormSettingsPage({ slug: props.cell.row.original.slug })} passHref>
+  //               <a className="text-theme-600 hover:text-theme-900">Settings</a>
+  //             </Link>
+  //           )}
+  //         </>
+  //       )
+  //     },
+  //   },
+  // ]
+
+  // return (
+  //   <Table
+  //     columns={columns}
+  //     data={data}
+  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+  //     pageIndex={tablePage}
+  //     pageSize={ITEMS_PER_PAGE}
+  //     hasNext={hasMore}
+  //     hasPrevious={tablePage !== 0}
+  //     totalCount={count}
+  //     startPage={startPage}
+  //     endPage={endPage}
+  //   />
+  // )
+
+  const getCards = (forms) => {
+    return forms.map((f) => {
+      return {
+        id: f.id,
+        title: f.name,
+        description: `${f.questions?.length} ${
+          f.questions?.length === 1 ? "Question" : "Questions"
+        }`,
+        renderContent: (
           <>
-            {props.cell.row.original.canUpdate && (
-              <Link href={Routes.FormSettingsPage({ slug: props.cell.row.original.slug })} passHref>
-                <a className="text-theme-600 hover:text-theme-900">Settings</a>
-              </Link>
-            )}
+            <div className="space-y-2">
+              <div className="w-full relative">
+                <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
+                  <Link href={Routes.SingleFormPage({ slug: f.slug })} passHref>
+                    <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-800">
+                      {f.name}
+                    </a>
+                  </Link>
+                </div>
+                <div className="absolute top-0.5 right-0">
+                  {f.canUpdate && (
+                    <Link href={Routes.FormSettingsPage({ slug: f.slug })} passHref>
+                      <a className="float-right text-theme-600 hover:text-theme-800">
+                        <CogIcon className="h-6 w-6" />
+                      </a>
+                    </Link>
+                  )}
+                </div>
+              </div>
+              <div className="border-b-2 border-gray-50 w-full"></div>
+              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                {`${f.questions?.length} ${
+                  f.questions?.length === 1 ? "Question" : "Questions"
+                } · ${f.jobs?.length} ${f.jobs?.length === 1 ? "Job" : "Jobs"}`}
+              </div>
+              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                {f.questions
+                  ?.sort((a, b) => {
+                    return a.order - b.order
+                  })
+                  .map((fq) => {
+                    return (
+                      <div
+                        key={fq.id}
+                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
+                      >
+                        <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                          {fq.question?.name}
+                        </div>
+                        {/* <div className="text-neutral-600">
+                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
+                      </div> */}
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
           </>
-        )
-      },
-    },
-  ]
+          // <>
+          //   <div>
+          //     <span>
+          //       <div className="w-full relative">
+          //         <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
+          //           <Link href={Routes.SingleFormPage({ slug: f.slug })} passHref>
+          //             <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-800">
+          //               {f.name}
+          //             </a>
+          //           </Link>
+          //         </div>
+          //         <div className="absolute top-0.5 right-0">
+          //           {f.canUpdate && (
+          //             <Link href={Routes.FormSettingsPage({ slug: f.slug })} passHref>
+          //               <a className="float-right text-theme-600 hover:text-theme-800">
+          //                 <CogIcon className="h-5 w-5" />
+          //               </a>
+          //             </Link>
+          //           )}
+          //         </div>
+          //       </div>
+          //     </span>
+          //     <div className="pt-2.5">
+          //       {`${f.questions?.length} ${f.questions?.length === 1 ? "Question" : "Questions"}`}
+          //     </div>
+          //   </div>
+          // </>
+        ),
+      }
+    }) as CardType[]
+  }
+
+  const [cards, setCards] = useState(getCards(data))
+  useEffect(() => {
+    setCards(getCards(data))
+  }, [data])
 
   return (
-    <Table
-      columns={columns}
-      data={data}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-      pageIndex={tablePage}
-      pageSize={ITEMS_PER_PAGE}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
+    <Cards
+      cards={cards}
+      setCards={setCards}
+      noPagination={true}
+      mutateCardDropDB={(source, destination, draggableId) => {}}
+      droppableName="forms"
+      isDragDisabled={true}
+      direction={DragDirection.VERTICAL}
+      isFull={true}
     />
   )
 }
@@ -157,7 +275,7 @@ const FormsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSidePro
 
       <Link href={Routes.QuestionsHome()} passHref>
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
-          Questions
+          Question Pool
         </a>
       </Link>
 

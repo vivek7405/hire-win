@@ -220,7 +220,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return category?.userId === ctx.session.userId
       })
       can("readAll", "category", async (args) => {
-        const category = await db.membership.findMany({
+        const category = await db.category.findMany({
           where: args.where,
         })
 

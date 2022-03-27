@@ -7,8 +7,13 @@ interface GetWorkflowsInput extends Pick<Prisma.WorkflowFindManyArgs, "where"> {
 const getWorkflowsWOPagination = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetWorkflowsInput) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const workflows = await db.workflow.findMany({ where })
+    const workflows = await db.workflow.findMany({
+      where,
+      include: {
+        stages: { include: { stage: true } },
+        jobs: true,
+      },
+    })
     return workflows
   }
 )

@@ -71,8 +71,8 @@ const Table = ({
 
   return (
     <div>
-      <div className="flex mb-2">
-        {!noSearch && (
+      {!noSearch && (
+        <div className="flex mb-2">
           <input
             placeholder="Search"
             type="text"
@@ -84,8 +84,8 @@ const Table = ({
               execDebouncer(e)
             }}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="flex flex-col overflow-auto">
         <table className="table min-w-full border border-gray-200" {...getTableProps()}>

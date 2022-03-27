@@ -6,6 +6,11 @@ export enum PlanName {
   PRO,
 }
 
+export enum DragDirection {
+  HORIZONTAL = "horizontal",
+  VERTICAL = "vertical",
+}
+
 export type Plan = {
   name: PlanName
   priceId: string
@@ -16,16 +21,17 @@ export type Plan = {
   features: string[]
 }
 
-export type KanbanCardType = {
+export type CardType = {
   id: string
   title: string
   description: string
   renderContent: any
+  isDragDisabled?: boolean
 }
 export type KanbanColumnType = {
   id: string
   title: string
-  cards: KanbanCardType[]
+  cards: CardType[]
 }
 export type KanbanBoardType = {
   columns: KanbanColumnType[]

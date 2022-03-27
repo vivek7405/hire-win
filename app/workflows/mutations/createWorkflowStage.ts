@@ -3,7 +3,6 @@ import db from "db"
 import { WorkflowStage, WorkflowStageInputType } from "app/workflows/validations"
 import Guard from "app/guard/ability"
 import shiftWorkflowStage from "./shiftWorkflowStage"
-import { ShiftDirection } from "types"
 
 async function createWorkflowStage(data: WorkflowStageInputType, ctx: Ctx) {
   ctx.session.$authorize()
@@ -25,7 +24,7 @@ async function createWorkflowStage(data: WorkflowStageInputType, ctx: Ctx) {
 
   // After adding stage to the last position, shift it up
   await shiftWorkflowStage(
-    { workflowId: workflowId!, order, shiftDirection: ShiftDirection.UP },
+    { workflowId: workflowId!, sourceOrder: order, destOrder: order - 1 },
     ctx
   )
 

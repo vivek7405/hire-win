@@ -29,7 +29,7 @@ import {
   ExtendedJob,
   ExtendedWorkflowStage,
   KanbanBoardType,
-  KanbanCardType,
+  CardType,
   KanbanColumnType,
 } from "types"
 import { QuestionType } from "@prisma/client"
@@ -125,7 +125,7 @@ const getBoard = (job, candidates) => {
                 description: c.email,
                 // renderContent: <div className="text-xl font-bold">{c.name}</div>
               }
-            }) as KanbanCardType[],
+            }) as CardType[],
         }
       }) as KanbanColumnType[],
   } as KanbanBoardType
@@ -283,7 +283,7 @@ const Candidates = (props: CandidateProps) => {
             <LabeledSelectField
               name={`candidate-${candidate?.id}-stage`}
               defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
-              value={workflowStage.id}
+              value={workflowStage?.id}
               options={stages.map((ws) => {
                 return { label: ws?.stage?.name, value: ws?.id }
               })}
