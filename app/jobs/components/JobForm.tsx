@@ -7,7 +7,7 @@ import { Category, Workflow, Form, SalaryType, EmploymentType } from "@prisma/cl
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import getFormsWOPagination from "app/forms/queries/getFormsWOPagination"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { Country, State, City } from "country-state-city"
 import CheckboxField from "app/core/components/CheckboxField"
 import { titleCase } from "app/core/utils/titleCase"
@@ -17,6 +17,7 @@ import toast from "react-hot-toast"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import MultiStepForm from "app/core/components/MultiStepForm"
 import { FormStep } from "types"
+import { LoadingIndicator } from "react-select/dist/declarations/src/components/indicators"
 
 const Step1 = () => {
   return (
@@ -415,14 +416,16 @@ export const JobForm = (props: JobFormProps) => {
   const steps = [stp1, stp2, stp3, stp4, stp5, stp6]
 
   return (
-    <MultiStepForm
-      steps={steps}
-      initialValues={props.initialValues}
-      onSubmit={props.onSubmit}
-      schema={Job}
-      header={props.header}
-      subHeader={props.subHeader}
-    />
+    <Suspense fallback="Loading...">
+      <MultiStepForm
+        steps={steps}
+        initialValues={props.initialValues}
+        onSubmit={props.onSubmit}
+        schema={Job}
+        header={props.header}
+        subHeader={props.subHeader}
+      />
+    </Suspense>
   )
 }
 
