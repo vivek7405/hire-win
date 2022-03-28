@@ -17,7 +17,6 @@ import toast from "react-hot-toast"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import MultiStepForm from "app/core/components/MultiStepForm"
 import { FormStep } from "types"
-import { LoadingIndicator } from "react-select/dist/declarations/src/components/indicators"
 
 const Step1 = () => {
   return (
