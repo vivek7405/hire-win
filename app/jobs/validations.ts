@@ -17,20 +17,20 @@ export const Job = z.object({
   formId: z.string().optional(),
   slug: z.string().optional(),
 
-  country: z.string(),
-  state: z.string(),
-  city: z.string(),
+  country: z.string().optional(),
+  state: z.string().optional(),
+  city: z.string().optional(),
 
   remote: z.boolean(),
   hidden: z.boolean().optional(),
 
-  currency: z.string(),
-  minSalary: z.number(),
-  maxSalary: z.number(),
-  salaryType: z.nativeEnum(SalaryType),
+  currency: z.string().optional(),
+  minSalary: z.number().optional(),
+  maxSalary: z.number().optional(),
+  salaryType: z.nativeEnum(SalaryType).optional(),
 
-  employmentType: z.array(z.nativeEnum(EmploymentType)),
-  validThrough: z.date(),
+  employmentType: z.array(z.nativeEnum(EmploymentType)).optional(),
+  validThrough: z.date().optional(),
 })
 export type JobInputType = z.infer<typeof Job>
 

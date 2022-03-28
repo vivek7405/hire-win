@@ -48,7 +48,7 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
         <JobForm
           user={user}
           header="Create A New Job"
-          subHeader="Enter your job details."
+          subHeader="Enter job details"
           initialValues={{
             name: "",
           }}

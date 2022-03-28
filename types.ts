@@ -21,6 +21,11 @@ export type Plan = {
   features: string[]
 }
 
+export type FormStep = {
+  name: string
+  renderComponent: any
+}
+
 export type CardType = {
   id: string
   title: string
