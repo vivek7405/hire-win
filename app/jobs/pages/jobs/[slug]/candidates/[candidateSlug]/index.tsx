@@ -18,6 +18,8 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getCandidate from "app/jobs/queries/getCandidate"
+import { AttachmentObject } from "types"
+import axios from "axios"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -77,6 +79,25 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
+const parseResume = async (resume) => {
+  if (resume) {
+    const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/resume/parse`
+    const config = {
+      headers: {
+        "content-type": "application/json",
+      },
+    }
+    await axios
+      .post(url, resume, config)
+      .then((response) => {
+        console.log(response?.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+}
+
 const SingleCandidatePage = ({
   user,
   candidate,
@@ -85,6 +106,13 @@ const SingleCandidatePage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
+
+  const resume = candidate?.resume as AttachmentObject
+  try {
+    parseResume(resume)
+  } catch (error) {
+    console.log(error)
   }
 
   return (
@@ -105,6 +133,7 @@ const SingleCandidatePage = ({
       <br />
       <br />
       <h3 className="font-bold text-5xl">{candidate?.name}</h3>
+      <h2>{candidate?.resume && JSON.stringify(candidate?.resume)}</h2>
     </AuthLayout>
   )
 }

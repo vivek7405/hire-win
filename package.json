@@ -57,6 +57,7 @@
     "aws-sdk": "2.1035.0",
     "axios": "0.24.0",
     "blitz": "0.45.3",
+    "cheerio": "1.0.0-rc.10",
     "country-state-city": "3.0.1",
     "draft-js": "0.11.7",
     "draftjs-to-html": "0.9.1",
