@@ -15,7 +15,7 @@ import FormData from "form-data"
 
 export const config = {
   api: {
-    bodyParser: true,
+    bodyParser: false,
   },
 }
 
