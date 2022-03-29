@@ -14,6 +14,7 @@ import createJob from "app/jobs/mutations/createJob"
 import path from "path"
 import { convertToRaw } from "draft-js"
 import { Category } from "@prisma/client"
+import moment from "moment"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -51,6 +52,7 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
           subHeader="Enter job details"
           initialValues={{
             name: "",
+            validThrough: new Date(moment().add(1, "months").toISOString()),
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Creating Job</span>)

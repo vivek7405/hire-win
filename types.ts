@@ -24,6 +24,7 @@ export type Plan = {
 export type FormStep = {
   name: string
   renderComponent: any
+  validationSchema: any
 }
 
 export type CardType = {

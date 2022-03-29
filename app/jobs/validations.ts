@@ -10,27 +10,29 @@ import { z } from "zod"
 
 export const Job = z.object({
   id: z.string().optional(),
-  title: z.string().nonempty({ message: "Required" }),
-  description: z.any(),
-  categoryId: z.string().optional(),
-  workflowId: z.string().optional(),
-  formId: z.string().optional(),
   slug: z.string().optional(),
-
-  country: z.string().optional(),
-  state: z.string().optional(),
-  city: z.string().optional(),
-
-  remote: z.boolean(),
   hidden: z.boolean().optional(),
 
-  currency: z.string().optional(),
-  minSalary: z.number().optional(),
-  maxSalary: z.number().optional(),
-  salaryType: z.nativeEnum(SalaryType).optional(),
+  title: z.string().nonempty({ message: "Required" }),
+  remote: z.boolean(),
+  description: z.any(),
 
-  employmentType: z.array(z.nativeEnum(EmploymentType)).optional(),
-  validThrough: z.date().optional(),
+  categoryId: z.string().optional(),
+  employmentType: z.array(z.nativeEnum(EmploymentType)),
+  validThrough: z.date(),
+
+  country: z.string(),
+  state: z.string(),
+  city: z.string(),
+
+  currency: z.string(),
+  minSalary: z.number(),
+  maxSalary: z.number(),
+  salaryType: z.nativeEnum(SalaryType),
+
+  workflowId: z.string().optional(),
+
+  formId: z.string().optional(),
 })
 export type JobInputType = z.infer<typeof Job>
 

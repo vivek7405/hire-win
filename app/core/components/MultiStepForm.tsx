@@ -6,19 +6,18 @@ type MultiStepFormProps = {
   steps: FormStep[]
   initialValues?: any
   onSubmit: any
-  schema: any
   header: string
   subHeader: string
 }
 const MultiStepForm = (props: MultiStepFormProps) => {
-  const { steps, schema } = props
+  const { steps } = props
   const [step, setStep] = useState(1)
 
   return (
     <Form
       submitText={step === steps.length ? "Submit" : "Next"}
       isSubmitTop={true}
-      schema={schema}
+      schema={steps[step - 1]?.validationSchema}
       initialValues={props.initialValues}
       onSubmit={async (values) => {
         if (step < steps.length) setStep(step + 1)

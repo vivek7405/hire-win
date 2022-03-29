@@ -17,8 +17,9 @@ import toast from "react-hot-toast"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import MultiStepForm from "app/core/components/MultiStepForm"
 import { FormStep } from "types"
+import { z } from "zod"
 
-const Step1 = () => {
+const Step1Basic = () => {
   return (
     <>
       <div className="w-full">
@@ -43,11 +44,11 @@ const Step1 = () => {
   )
 }
 
-type Step2Props = {
+type Step2ExtraProps = {
   category?: Category // Need to be provided while editing the form
   user: any
 }
-const Step2 = (props: Step2Props) => {
+const Step2Extra = (props: Step2ExtraProps) => {
   const [categories] = useQuery(getCategoriesWOPagination, { where: { userId: props.user?.id } })
 
   return (
@@ -86,6 +87,9 @@ const Step2 = (props: Step2Props) => {
                 value: employmentType,
               }
             })}
+            defaultValue={[
+              Object.keys(EmploymentType).find((employmentType) => employmentType === "FULL_TIME"),
+            ]}
           />
         </div>
         <div className="w-full md:w-1/3 lg:w-1/3">
@@ -101,12 +105,13 @@ const Step2 = (props: Step2Props) => {
   )
 }
 
-type Step3Props = {
+type Step3LocationProps = {
   initialValues?: any
 }
-const Step3 = (props: Step3Props) => {
+const Step3Location = (props: Step3LocationProps) => {
   const [countryCode, setCountryCode] = useState(props.initialValues.country || "")
   const [stateCode, setStateCode] = useState(props.initialValues.state || "")
+  const [city, setCity] = useState(props.initialValues.city || "")
 
   return (
     <>
@@ -124,7 +129,9 @@ const Step3 = (props: Step3Props) => {
             ]}
             onChange={(val: any) => {
               setCountryCode(val)
+              props.initialValues.country = val
             }}
+            defaultValue={countryCode}
           />
         </div>
 
@@ -142,7 +149,9 @@ const Step3 = (props: Step3Props) => {
             ]}
             onChange={(val: any) => {
               setStateCode(val)
+              props.initialValues.state = val
             }}
+            defaultValue={stateCode}
           />
         </div>
 
@@ -159,8 +168,10 @@ const Step3 = (props: Step3Props) => {
               }),
             ]}
             onChange={(val: any) => {
-              setStateCode(val)
+              setCity(val)
+              props.initialValues.city = val
             }}
+            defaultValue={city}
           />
         </div>
       </div>
@@ -168,7 +179,7 @@ const Step3 = (props: Step3Props) => {
   )
 }
 
-const Step4 = () => {
+const Step4Salary = () => {
   return (
     <>
       <div className="flex flex-col space-y-6 w-full items-center">
@@ -246,11 +257,11 @@ const Step4 = () => {
   )
 }
 
-type Step5Props = {
+type Step5WorkflowProps = {
   workflow?: Workflow // Need to be provided while editing the form
   user: any
 }
-const Step5 = (props: Step5Props) => {
+const Step5Workflow = (props: Step5WorkflowProps) => {
   const [workflows] = useQuery(getWorkflowsWOPagination, { where: { userId: props.user.id } })
   const [selectedWorkflowId, setSelectedWorkflowId] = useState(
     workflows.find((w) => w.name === "Default")?.id
@@ -306,14 +317,14 @@ const Step5 = (props: Step5Props) => {
   )
 }
 
-type Step6Props = {
+type Step6FormProps = {
   initialValues?: any
   user: any
   category?: Category // Need to be provided while editing the form
   workflow?: Workflow // Need to be provided while editing the form
   form?: Form // Need to be provided while editing the form
 }
-const Step6 = (props: Step6Props) => {
+const Step6Form = (props: Step6FormProps) => {
   const [forms] = useQuery(getFormsWOPagination, { where: { userId: props.user?.id } })
   const [selectedFormId, setSelectedFormId] = useState(forms.find((f) => f.name === "Default")?.id)
   const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
@@ -326,11 +337,11 @@ const Step6 = (props: Step6Props) => {
       <div className="flex flex-col space-y-6 w-full items-center">
         <div className="w-full md:w-1/3 lg:w-1/3">
           <div className="invisible w-0 h-0 overflow-hidden">
-            <Step1 />
-            <Step2 user={props.user} category={props.category} />
-            <Step3 initialValues={props.initialValues} />
-            <Step4 />
-            <Step5 user={props.user} workflow={props.workflow} />
+            <Step1Basic />
+            <Step2Extra user={props.user} category={props.category} />
+            <Step3Location initialValues={props.initialValues} />
+            <Step4Salary />
+            <Step5Workflow user={props.user} workflow={props.workflow} />
           </div>
           <LabeledReactSelectField
             name="formId"
@@ -386,24 +397,64 @@ type JobFormProps = {
   form?: Form // Need to be provided while editing the form
 }
 export const JobForm = (props: JobFormProps) => {
-  const stp1: FormStep = { name: "Basic", renderComponent: <Step1 /> }
+  const stp1: FormStep = {
+    name: "Basic",
+    renderComponent: <Step1Basic />,
+    validationSchema: z.object({
+      id: z.string().optional(),
+      slug: z.string().optional(),
+      title: z.string().nonempty({ message: "Required" }),
+      remote: z.boolean(),
+      description: z.any(),
+    }),
+  }
   const stp2: FormStep = {
     name: "Extra",
-    renderComponent: <Step2 user={props.user} category={props.category} />,
+    renderComponent: <Step2Extra user={props.user} category={props.category} />,
+    validationSchema: z.object({
+      id: z.string().optional(),
+      slug: z.string().optional(),
+      categoryId: z.string().optional(),
+      employmentType: z.array(z.nativeEnum(EmploymentType)),
+      validThrough: z.date(),
+    }),
   }
   const stp3: FormStep = {
     name: "Location",
-    renderComponent: <Step3 initialValues={props.initialValues} />,
+    renderComponent: <Step3Location initialValues={props.initialValues} />,
+    validationSchema: z.object({
+      id: z.string().optional(),
+      slug: z.string().optional(),
+      country: z.string(),
+      state: z.string(),
+      city: z.string(),
+    }),
   }
-  const stp4: FormStep = { name: "Salary", renderComponent: <Step4 /> }
+  const stp4: FormStep = {
+    name: "Salary",
+    renderComponent: <Step4Salary />,
+    validationSchema: z.object({
+      id: z.string().optional(),
+      slug: z.string().optional(),
+      currency: z.string(),
+      minSalary: z.number(),
+      maxSalary: z.number(),
+      salaryType: z.nativeEnum(SalaryType),
+    }),
+  }
   const stp5: FormStep = {
     name: "Workflow",
-    renderComponent: <Step5 user={props.user} workflow={props.workflow} />,
+    renderComponent: <Step5Workflow user={props.user} workflow={props.workflow} />,
+    validationSchema: z.object({
+      id: z.string().optional(),
+      slug: z.string().optional(),
+      workflowId: z.string().optional(),
+    }),
   }
   const stp6: FormStep = {
     name: "Form",
     renderComponent: (
-      <Step6
+      <Step6Form
         initialValues={props.initialValues}
         user={props.user}
         category={props.category}
@@ -411,6 +462,7 @@ export const JobForm = (props: JobFormProps) => {
         form={props.form}
       />
     ),
+    validationSchema: Job,
   }
   const steps = [stp1, stp2, stp3, stp4, stp5, stp6]
 
@@ -420,7 +472,6 @@ export const JobForm = (props: JobFormProps) => {
         steps={steps}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
-        schema={Job}
         header={props.header}
         subHeader={props.subHeader}
       />
