@@ -17,6 +17,7 @@ export interface FormProps<S extends z.ZodType<any, any>>
   header?: string
   subHeader?: string
   noFormatting?: boolean
+  isSubmitTop?: boolean
 }
 
 interface OnSubmitResult {
@@ -33,6 +34,7 @@ export function Form<S extends z.ZodType<any, any>>({
   header,
   subHeader,
   noFormatting,
+  isSubmitTop,
   ...props
 }: FormProps<S>) {
   const ctx = useForm<z.infer<S>>({
@@ -60,17 +62,35 @@ export function Form<S extends z.ZodType<any, any>>({
       >
         <div className={!noFormatting ? `bg-white py-6 px-4 sm:p-6` : ``}>
           <div>
-            {(header || subHeader) && (
-              <div>
-                <h2 className="text-lg font-medium text-gray-900">{header}</h2>
-                <p className="mt-1 text-sm text-gray-500">{subHeader}</p>
+            <div className="flex items-center">
+              {(header || subHeader) && (
+                <div className="w-3/4">
+                  <h2 className="text-lg font-medium text-gray-900">{header}</h2>
+                  <p className="mt-1 text-sm text-gray-500">{subHeader}</p>
+                </div>
+              )}
+              <div className="w-1/4">
+                {isSubmitTop && submitText && (
+                  <div className="text-right">
+                    <button
+                      type="submit"
+                      disabled={submitDisabled || ctx.formState.isSubmitting}
+                      data-testid={`${props.testid && `${props.testid}-`}submitButton`}
+                      className={`${
+                        submitDisabled && "disabled:opacity-50 cursor-not-allowed"
+                      } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700`}
+                    >
+                      {submitText}
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
             <div className={!noFormatting ? `mt-6 space-y-5` : ``}>
               {/* Form fields supplied as children are rendered here */}
               {children}
             </div>
-            {submitText && (
+            {!isSubmitTop && submitText && (
               <div className="mt-4 text-right">
                 <button
                   type="submit"

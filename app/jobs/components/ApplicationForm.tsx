@@ -20,6 +20,7 @@ type ApplicationFormProps = {
   onSuccess?: () => void
   initialValues?: any
   onSubmit: any
+  submitDisabled?: boolean
   header: string
   subHeader: string
   formId: string
@@ -197,6 +198,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
     <>
       <Form
         submitText="Submit"
+        submitDisabled={props.submitDisabled}
         // submitDisabled={props.preview}
         schema={zodObj}
         initialValues={props.initialValues}
