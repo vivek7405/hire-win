@@ -26,7 +26,9 @@ const getCandidates = resolver.pipe(
           include: {
             job: {
               include: {
-                form: { include: { questions: true } },
+                form: {
+                  include: { questions: { include: { question: { include: { options: true } } } } },
+                },
                 workflow: { include: { stages: { include: { stage: true } } } },
               },
             },

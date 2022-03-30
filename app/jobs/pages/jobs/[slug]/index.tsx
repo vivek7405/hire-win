@@ -123,7 +123,24 @@ const getBoard = (job, candidates) => {
                 id: c.id,
                 title: c.name,
                 description: c.email,
-                // renderContent: <div className="text-xl font-bold">{c.name}</div>
+                renderContent: (
+                  <div>
+                    <span>
+                      <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
+                        <Link
+                          href={Routes.SingleCandidatePage({
+                            slug: c.job?.slug,
+                            candidateSlug: c.slug,
+                          })}
+                          passHref
+                        >
+                          <a className="text-theme-600 hover:text-theme-900">{c.name}</a>
+                        </Link>
+                      </div>
+                    </span>
+                    <div className="pt-2.5">{c.email}</div>
+                  </div>
+                ),
               }
             }) as CardType[],
         }
@@ -250,21 +267,21 @@ const Candidates = (props: CandidateProps) => {
     {
       Header: "Name",
       accessor: "name",
-      // Cell: (props) => {
-      //   return (
-      //     <>
-      //       <Link
-      //         href={Routes.SingleCandidatePage({
-      //           slug: props.cell.row.original.job?.slug,
-      //           candidateSlug: props.cell.row.original.slug,
-      //         })}
-      //         passHref
-      //       >
-      //         <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
-      //       </Link>
-      //     </>
-      //   )
-      // },
+      Cell: (props) => {
+        return (
+          <>
+            <Link
+              href={Routes.SingleCandidatePage({
+                slug: props.cell.row.original.job?.slug,
+                candidateSlug: props.cell.row.original.slug,
+              })}
+              passHref
+            >
+              <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
+            </Link>
+          </>
+        )
+      },
     },
     {
       Header: "Stage",

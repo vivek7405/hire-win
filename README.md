@@ -14,7 +14,7 @@ Create an `.env.local` file with all your key credentials.
 
 ```
 POSTMARK_TOKEN=
-SESSION_SECRET_KEY=
+SESSION_SECRET_KEY= [generate using openssl rand -hex 16]
 S3_BUCKET=hire-win
 S3_ENDPOINT=http://localhost:9000
 S3_SECRET_KEY=minioadmin

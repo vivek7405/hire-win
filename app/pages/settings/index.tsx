@@ -48,7 +48,7 @@ const UserSettingsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
       <UserSettingsLayout>
         <UserForm
           header="Profile"
-          subHeader="Update your profile details."
+          subHeader="Update your profile details"
           initialValues={{
             logo: user?.logo,
             companyName: user?.companyName || "",

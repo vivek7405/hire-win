@@ -11,25 +11,13 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
       job: {
         include: {
           form: {
-            include: {
-              questions: {
-                include: {
-                  question: true,
-                },
-              },
-            },
+            include: { questions: { include: { question: { include: { options: true } } } } },
           },
+          workflow: { include: { stages: { include: { stage: true } } } },
         },
       },
-      answers: {
-        include: {
-          question: {
-            include: {
-              options: true,
-            },
-          },
-        },
-      },
+      workflowStage: { include: { stage: true } },
+      answers: { include: { question: { include: { options: true } } } },
     },
   })
 
