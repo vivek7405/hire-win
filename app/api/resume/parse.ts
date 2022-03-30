@@ -1,5 +1,4 @@
-import randInt from "app/core/utils/randInt"
-import AWS from "aws-sdk"
+import axios from "axios"
 import cheerio from "cheerio"
 import FormData from "form-data"
 
@@ -8,14 +7,13 @@ import FormData from "form-data"
 //   return new Promise((resolve, reject) => {
 //     stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)))
 //     stream.on("error", (err) => reject(err))
-//     // stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
-//     stream.on("end", () => resolve(Buffer.concat(chunks)))
+//     stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
 //   })
 // }
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: true,
   },
 }
 
@@ -27,44 +25,47 @@ async function modFetch(url, option) {
 export default async (req, res) => {
   const body = req.body
 
-  const region = process.env.S3_BUCKET_REGION
-  const accessKeyId = process.env.S3_ACCESS_KEY
-  const secretAccessKey = process.env.S3_SECRET_KEY
+  // const region = process.env.S3_BUCKET_REGION
+  // const accessKeyId = process.env.S3_ACCESS_KEY
+  // const secretAccessKey = process.env.S3_SECRET_KEY
+  // const s3 = new AWS.S3({ region, accessKeyId, secretAccessKey })
+  // const params = {
+  //   Key: body.Key,
+  //   Bucket: process.env.S3_BUCKET ? process.env.S3_BUCKET : "hire.win",
+  // }
+  // const readStream = await s3.getObject(params).createReadStream()
+  // const resumeData = await s3.getObject(params).promise()
+  // const streamBuffer = await streamToBuffer(readStream)
 
-  const s3 = new AWS.S3({ region, accessKeyId, secretAccessKey })
-
-  const params = {
-    Key: body.Key,
-    Bucket: process.env.S3_BUCKET ? process.env.S3_BUCKET : "hire.win",
+  if (
+    !(
+      process.env.RESUME_PARSE_POSTINGS_URL &&
+      process.env.RESUME_PARSE_API_URL &&
+      process.env.RESUME_PARSE_ORIGIN_URL &&
+      process.env.RESUME_PARSE_REFERRER_URL
+    )
+  ) {
+    res.status(404).send("Env variables not set for Resume Parsing")
+    return
   }
 
-  // const stream = await s3.getObject(params).createReadStream()
-  // const streamBuffer = streamToBuffer(stream)
-  const resumeData = await s3.getObject(params).promise()
+  const readStream = (
+    (await axios({
+      method: "get",
+      url: body.Location,
+      responseType: "stream",
+    })) as any
+  )?.data
 
   const formData = new FormData()
-  formData.append("resume", resumeData?.Body?.toString("utf-8")!)
+  formData.append("resume", readStream)
 
-  // Lever has 350 posts in its demo
-  // const postingSkip = randInt(1, 350)
   const post = await modFetch(
-    `https://api.lever.co/v0/postings/leverdemo?skip=${Math.floor(
-      Math.random() * 20
-    )}&limit=1&mode=json`,
+    `${process.env.RESUME_PARSE_POSTINGS_URL}&skip=${Math.floor(Math.random() * 20)}`,
     "json"
   )
   if (!post) res.status(500).send({ message: "error" })
   const data = await modFetch(post[0]["applyUrl"], "text")
-  // const postingInfo = await (
-  //   await fetch(
-  //     `https://api.lever.co/v0/postings/leverdemo?skip=${Math.floor(
-  //       Math.random() * 20
-  //     )}&limit=1&mode=json`
-  //   )
-  // ).json()
-  // const postingURL = postingInfo[0]["applyUrl"]
-  // const posting = await (await fetch(postingURL))?.json()
-  // const $ = cheerio.load(posting?.text)
   const $ = cheerio.load(data)
   const csrf = $("#csrf-token")["0"]?.attribs.value as string
   const postingId = $("#posting-id")["0"]?.attribs.value as string
@@ -72,11 +73,11 @@ export default async (req, res) => {
   formData.append("csrf", csrf)
   formData.append("postingId", postingId)
 
-  await fetch("https://jobs.lever.co/parseResume", {
+  await fetch(process.env.RESUME_PARSE_API_URL, {
     method: "POST",
     headers: {
-      Origin: "https://jobs.lever.co",
-      Referer: "https://jobs.lever.co/parse",
+      Origin: process.env.RESUME_PARSE_ORIGIN_URL,
+      Referer: process.env.RESUME_PARSE_REFERRER_URL,
     },
     body: formData,
   })
@@ -84,7 +85,7 @@ export default async (req, res) => {
       if (!response.ok) {
         res
           .status(response.status)
-          .send(response.status == 500 ? "Could not parse resume" : "Could not connect to Lever")
+          .send(response.status == 500 ? "Could not parse resume" : "Could not connect")
 
         return
       }

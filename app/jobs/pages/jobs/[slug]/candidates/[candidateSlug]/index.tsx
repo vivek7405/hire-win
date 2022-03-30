@@ -10,6 +10,7 @@ import {
   getSession,
   useRouter,
   usePaginatedQuery,
+  dynamic,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -19,7 +20,6 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getCandidate from "app/jobs/queries/getCandidate"
 import { AttachmentObject } from "types"
-import axios from "axios"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -79,24 +79,24 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const parseResume = async (resume) => {
-  if (resume) {
-    const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/resume/parse`
-    const config = {
-      headers: {
-        "content-type": "application/json",
-      },
-    }
-    await axios
-      .post(url, resume, config)
-      .then((response) => {
-        console.log(response?.data)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }
-}
+// const parseResume = async (resume) => {
+//   if (resume) {
+//     const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/resume/parse`
+//     const config = {
+//       headers: {
+//         "content-type": "application/json",
+//       },
+//     }
+//     await axios
+//       .post(url, resume, config)
+//       .then((response) => {
+//         console.log(response?.data)
+//       })
+//       .catch((error) => {
+//         console.log(error)
+//       })
+//   }
+// }
 
 const SingleCandidatePage = ({
   user,
@@ -109,11 +109,11 @@ const SingleCandidatePage = ({
   }
 
   const resume = candidate?.resume as AttachmentObject
-  try {
-    parseResume(resume)
-  } catch (error) {
-    console.log(error)
-  }
+  // try {
+  //   parseResume(resume)
+  // } catch (error) {
+  //   console.log(error)
+  // }
 
   return (
     <AuthLayout user={user}>

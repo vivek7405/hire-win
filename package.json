@@ -76,6 +76,7 @@
     "react-hook-form": "7.20.2",
     "react-hot-toast": "2.1.1",
     "react-loading-skeleton": "3.0.1",
+    "react-pdf": "5.7.1",
     "react-phone-number-input": "3.1.44",
     "react-rating": "2.0.5",
     "react-select": "5.2.1",
