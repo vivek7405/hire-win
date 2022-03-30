@@ -19,7 +19,18 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getCandidate from "app/jobs/queries/getCandidate"
-import { AttachmentObject } from "types"
+import {
+  AttachmentObject,
+  CardType,
+  DragDirection,
+  ExtendedAnswer,
+  ExtendedCandidate,
+  ExtendedFormQuestion,
+} from "types"
+import axios from "axios"
+import PDFViewer from "app/core/components/PDFViewer"
+import { QuestionType } from "@prisma/client"
+import Cards from "app/core/components/Cards"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -98,17 +109,148 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 //   }
 // }
 
+const getResume = async (resume) => {
+  if (resume) {
+    const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/files/getFile`
+    const config = {
+      headers: {
+        "content-type": "application/json",
+      },
+    }
+    const response = await axios.post(url, resume, config)
+    return response
+  }
+}
+
+const getAnswer = (formQuestion: ExtendedFormQuestion, candidate: ExtendedCandidate) => {
+  const answer: ExtendedAnswer = candidate?.answers?.find(
+    (ans) => ans.question?.name === formQuestion?.question?.name
+  )!
+
+  if (answer) {
+    const val = answer.value
+    const type = answer?.question?.type
+
+    switch (type) {
+      case QuestionType.URL:
+        return (
+          <a
+            href={val}
+            className="text-theme-600 hover:text-theme-500"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {val}
+          </a>
+        )
+      case QuestionType.Multiple_select:
+        const answerSelectedOptionIds: String[] = JSON.parse(val)
+        const selectedOptions = answer?.question?.options
+          ?.filter((op) => answerSelectedOptionIds?.includes(op.id))
+          ?.map((op) => {
+            return op.text
+          })
+        return JSON.stringify(selectedOptions)
+      case QuestionType.Single_select:
+        return answer?.question?.options?.find((op) => val === op.id)?.text
+      case QuestionType.Attachment:
+        const attachmentObj: AttachmentObject = JSON.parse(val)
+        return (
+          <a
+            href={attachmentObj.Location}
+            className="text-theme-600 hover:text-theme-500"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {attachmentObj.Key}
+          </a>
+        )
+      case QuestionType.Long_text:
+        return <p className="max-w-md overflow-auto">{val}</p>
+      default:
+        return val
+    }
+  }
+
+  return ""
+}
+
+const getCards = (candidate: ExtendedCandidate) => {
+  return (
+    candidate?.job?.form?.questions
+      ?.sort((a, b) => {
+        return (a?.order || 0) - (b?.order || 0)
+      })
+      // ?.filter((q) => !q.question.factory)
+      ?.map((fq) => {
+        const answer = getAnswer(fq, candidate)
+        return {
+          id: fq.id,
+          title: fq.question.name,
+          description: answer,
+          // renderContent: (
+          //   <>
+          //     <div className="w-full flex flex-col space-y-2">
+          //       <div className="w-full relative">
+          //         <div className="font-semibold flex justify-between">
+          //           {!fq.question.factory ? (
+          //             <Link href={Routes.SingleQuestionPage({ slug: fq.question.slug })} passHref>
+          //               <a
+          //                 data-testid={`questionlink`}
+          //                 className="text-theme-600 hover:text-theme-900"
+          //               >
+          //                 {fq.question.name}
+          //               </a>
+          //             </Link>
+          //           ) : (
+          //             fq.question.name
+          //           )}
+          //         </div>
+          //       </div>
+
+          //       {/* <div className="border-b-2 border-neutral-50" />
+          //       <div className="text-sm text-neutral-500 font-semibold">
+          //         {fq.question?.type?.toString().replaceAll("_", " ")}
+          //       </div> */}
+
+          //       {answer && <div className="border-b-2 border-neutral-50" />}
+          //       {answer && (
+          //         <div className="text-lg font-bold">
+          //           {answer}
+          //         </div>
+          //       )}
+          //     </div>
+          //   </>
+          // ),
+        }
+      }) as CardType[]
+  )
+}
+
 const SingleCandidatePage = ({
   user,
   candidate,
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [file, setFile] = useState(null as any)
+  const [cards, setCards] = useState(getCards(candidate!))
+  useEffect(() => {
+    setCards(getCards(candidate!))
+  }, [candidate])
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
 
   const resume = candidate?.resume as AttachmentObject
+  if (!file) {
+    getResume(resume).then((response) => {
+      const file = response?.data?.Body
+      setFile(file)
+    })
+  }
+
   // try {
   //   parseResume(resume)
   // } catch (error) {
@@ -127,13 +269,29 @@ const SingleCandidatePage = ({
           })}
           passHref
         >
-          <a data-testid={`${candidate?.id}-settingsLink`}>Settings</a>
+          <a className="float-right" data-testid={`${candidate?.id}-settingsLink`}>
+            Settings
+          </a>
         </Link>
       )}
-      <br />
-      <br />
       <h3 className="font-bold text-5xl">{candidate?.name}</h3>
-      <h2>{candidate?.resume && JSON.stringify(candidate?.resume)}</h2>
+      <br />
+      <div className="flex">
+        <div className="w-1/4 mt-5">
+          <Cards
+            cards={cards}
+            setCards={setCards}
+            noPagination={true}
+            mutateCardDropDB={(source, destination, draggableId) => {}}
+            droppableName="answers"
+            isDragDisabled={true}
+            direction={DragDirection.VERTICAL}
+            noSearch={true}
+            isFull={true}
+          />
+        </div>
+        <div className="w-3/4">{file && <PDFViewer file={file} />}</div>
+      </div>
     </AuthLayout>
   )
 }
