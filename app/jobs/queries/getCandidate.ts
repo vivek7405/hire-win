@@ -17,15 +17,7 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
         },
       },
       workflowStage: { include: { stage: true } },
-      answers: {
-        include: {
-          question: {
-            include: {
-              options: true,
-            },
-          },
-        },
-      },
+      answers: { include: { question: { include: { options: true } } } },
     },
   })
 
