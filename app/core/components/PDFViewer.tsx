@@ -16,37 +16,41 @@ const PDFViewer = (props: PDFViewerProps) => {
   }
 
   return (
-    <div className="flex flex-col items-center space-y-1">
-      <div className="flex space-x-2">
-        <button
-          disabled={pageNumber === 1}
-          onClick={() => {
-            pageNumber > 1 && setPageNumber(pageNumber - 1)
-          }}
-        >
-          Previous
-        </button>
-        <p>
-          {pageNumber} of {numPages}
-        </p>
-        <button
-          disabled={numPages !== null && pageNumber === numPages}
-          onClick={() => {
-            numPages !== null && pageNumber < numPages && setPageNumber(pageNumber + 1)
-          }}
-        >
-          Next
-        </button>
+    <>
+      <div className="w-full flex flex-col items-center space-y-1">
+        <div className="w-full flex space-x-2 justify-center">
+          <button
+            disabled={pageNumber === 1}
+            onClick={() => {
+              pageNumber > 1 && setPageNumber(pageNumber - 1)
+            }}
+          >
+            Previous
+          </button>
+          <p>
+            {pageNumber} of {numPages}
+          </p>
+          <button
+            disabled={numPages !== null && pageNumber === numPages}
+            onClick={() => {
+              numPages !== null && pageNumber < numPages && setPageNumber(pageNumber + 1)
+            }}
+          >
+            Next
+          </button>
+        </div>
+        <div className="w-full flex justify-center">
+          <div className="overflow-auto">
+            <Document
+              file={props.fileURL ? { url: props.fileURL } : props.file}
+              onLoadSuccess={onDocumentLoadSuccess}
+            >
+              <Page class={`w-full`} pageNumber={pageNumber} />
+            </Document>
+          </div>
+        </div>
       </div>
-      <div className="flex justify-center">
-        <Document
-          file={props.fileURL ? { url: props.fileURL } : props.file}
-          onLoadSuccess={onDocumentLoadSuccess}
-        >
-          <Page width="750" pageNumber={pageNumber} />
-        </Document>
-      </div>
-    </div>
+    </>
   )
 }
 

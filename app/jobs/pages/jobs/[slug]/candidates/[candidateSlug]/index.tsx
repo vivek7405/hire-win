@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { Suspense, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -31,6 +31,7 @@ import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
 import { QuestionType } from "@prisma/client"
 import Cards from "app/core/components/Cards"
+import Skeleton from "react-loading-skeleton"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -260,7 +261,14 @@ const SingleCandidatePage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
+
       <br />
+
+      <Link href={Routes.JobsHome()} passHref>
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+          Add Comment
+        </a>
+      </Link>
       {canUpdate && (
         <Link
           href={Routes.CandidateSettingsPage({
@@ -269,29 +277,50 @@ const SingleCandidatePage = ({
           })}
           passHref
         >
-          <a className="float-right" data-testid={`${candidate?.id}-settingsLink`}>
+          <a
+            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+            data-testid={`${candidate?.id}-settingsLink`}
+          >
             Settings
           </a>
         </Link>
       )}
+
       <h3 className="font-bold text-5xl">{candidate?.name}</h3>
+
       <br />
-      <div className="flex">
-        <div className="w-1/4 mt-5">
-          <Cards
-            cards={cards}
-            setCards={setCards}
-            noPagination={true}
-            mutateCardDropDB={(source, destination, draggableId) => {}}
-            droppableName="answers"
-            isDragDisabled={true}
-            direction={DragDirection.VERTICAL}
-            noSearch={true}
-            isFull={true}
-          />
+
+      <Suspense
+        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
+      >
+        <div className="flex flex-col md:flex-row lg:flex-row space-y-2 md:space-y-0 lg:space-y-0 md:space-x-2 lg:space-x-2">
+          <div className="w-full md:w-1/2 lg:w-1/2 p-2 flex flex-col space-y-1 border-2 border-neutral-400 rounded-lg">
+            {file && <PDFViewer file={file} />}
+            <Cards
+              cards={cards}
+              setCards={setCards}
+              noPagination={true}
+              mutateCardDropDB={(source, destination, draggableId) => {}}
+              droppableName="answers"
+              isDragDisabled={true}
+              direction={DragDirection.HORIZONTAL}
+              noSearch={true}
+            />
+          </div>
+          <div className="w-full md:w-1/2 lg:w-1/2 p-2 border-2 border-neutral-400 rounded-lg">
+            <Cards
+              cards={cards}
+              setCards={setCards}
+              noPagination={true}
+              mutateCardDropDB={(source, destination, draggableId) => {}}
+              droppableName="comments"
+              isDragDisabled={true}
+              direction={DragDirection.HORIZONTAL}
+              noSearch={true}
+            />
+          </div>
         </div>
-        <div className="w-3/4">{file && <PDFViewer file={file} />}</div>
-      </div>
+      </Suspense>
     </AuthLayout>
   )
 }
