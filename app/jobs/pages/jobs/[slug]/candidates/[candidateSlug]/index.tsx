@@ -266,7 +266,7 @@ const SingleCandidatePage = ({
 
       <Link href={Routes.JobsHome()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
-          Add Comment
+          Add Score
         </a>
       </Link>
       {canUpdate && (
