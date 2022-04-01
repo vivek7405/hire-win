@@ -7,8 +7,7 @@ const DeleteQuestion = z.object({
 })
 
 export default resolver.pipe(resolver.zod(DeleteQuestion), resolver.authorize(), async ({ id }) => {
-  // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-  const stage = await db.stage.deleteMany({ where: { id } })
+  const question = await db.question.deleteMany({ where: { id } })
 
-  return stage
+  return question
 })

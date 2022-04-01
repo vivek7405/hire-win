@@ -127,6 +127,14 @@ export type ExtendedFormQuestion = Prisma.FormQuestionGetPayload<{
   }
 }>
 
+export type ExtendedCardQuestion = Prisma.CardQuestionGetPayload<{
+  include: { scoreCards: true }
+}>
+export type ExtendedScoreCard = Prisma.ScoreCardGetPayload<{ include: { cardQuestions: true } }>
+export type ExtendedScoreCardQuestion = Prisma.ScoreCardQuestionGetPayload<{
+  include: { cardQuestion: true }
+}>
+
 export type AttachmentObject = {
   Key: string
   Location: string

@@ -15,6 +15,9 @@ type ExtendedResourceTypes =
   | "formQuestion"
   | "form"
   | "candidate"
+  | "cardQuestion"
+  | "scoreCardQuestion"
+  | "scoreCard"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -291,6 +294,78 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return workflows.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "cardQuestion")
+      can("read", "cardQuestion", async (args) => {
+        const cardQuestion = await db.cardQuestion.findFirst({
+          where: args.where,
+        })
+
+        return cardQuestion?.userId === ctx.session.userId
+      })
+      can("update", "cardQuestion", async (args) => {
+        const cardQuestion = await db.cardQuestion.findFirst({
+          where: args.where,
+        })
+
+        return !cardQuestion?.factory && cardQuestion?.userId === ctx.session.userId
+      })
+      can("readAll", "cardQuestion", async (args) => {
+        const cardQuestions = await db.cardQuestion.findMany({
+          where: args.where,
+        })
+
+        return cardQuestions.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "scoreCardQuestion")
+      can("read", "scoreCardQuestion", async (args) => {
+        const scoreCardQuestion = await db.scoreCardQuestion.findFirst({
+          where: args.where,
+          include: {
+            scoreCard: true,
+          },
+        })
+
+        return scoreCardQuestion?.scoreCard.userId === ctx.session.userId
+      })
+      can("readAll", "scoreCardQuestion", async (args) => {
+        const scoreCardQuestions = await db.scoreCardQuestion.findMany({
+          where: args.where,
+          include: {
+            scoreCard: true,
+          },
+        })
+
+        return scoreCardQuestions.every((p) => p.scoreCard.userId === ctx.session.userId) === true
+      })
+      can("update", "scoreCardQuestion", async (args) => {
+        const scoreCardQuestion = await db.scoreCardQuestion.findFirst({
+          where: args.where,
+          include: {
+            scoreCard: true,
+          },
+        })
+
+        return scoreCardQuestion?.scoreCard.userId === ctx.session.userId
+      })
+
+      can("create", "scoreCard")
+      can("update", "scoreCard")
+      can("read", "scoreCard", async (args) => {
+        const scoreCard = await db.scoreCard.findFirst({
+          where: args.where,
+        })
+
+        return scoreCard?.userId === ctx.session.userId
+      })
+      can("readAll", "scoreCard", async (args) => {
+        const scoreCards = await db.scoreCard.findMany({
+          where: args.where,
+        })
+
+        return scoreCards.every((p) => p.userId === ctx.session.userId) === true
       })
 
       can("create", "question")
