@@ -5,7 +5,7 @@ const factoryScoreQuestions = [
   {
     order: 1,
     cardQuestion: {
-      name: "Name",
+      name: "Overall Score",
       factory: true,
     } as CardQuestion,
   } as ExtendedScoreCardQuestion,

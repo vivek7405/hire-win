@@ -108,7 +108,7 @@ const SingleCardQuestionPage = ({
               data: { ...values },
               initial: cardQuestion!,
             })
-            toast.success(() => <span>CardQuestion Updated</span>, { id: toastId })
+            toast.success(() => <span>Question Updated</span>, { id: toastId })
             router.push(Routes.CardQuestionsHome())
           } catch (error) {
             toast.error(

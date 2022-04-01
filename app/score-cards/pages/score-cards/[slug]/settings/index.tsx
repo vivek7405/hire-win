@@ -17,10 +17,10 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "app/guard/ability"
 
-import CardQuestionForm from "app/card-questions/components/CardQuestionForm"
+import ScoreCardForm from "app/score-cards/components/ScoreCardForm"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import updateCardQuestion from "app/card-questions/mutations/updateCardQuestion"
-import getCardQuestion from "app/card-questions/queries/getCardQuestion"
+import updateScoreCard from "app/score-cards/mutations/updateScoreCard"
+import getScoreCard from "app/score-cards/queries/getScoreCard"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -33,7 +33,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const { can: canUpdate } = await Guard.can(
     "update",
-    "cardQuestion",
+    "scoreCard",
     { session },
     { where: { slug: context?.params?.slug! } }
   )
@@ -41,8 +41,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user) {
     try {
       if (canUpdate) {
-        const cardQuestion = await invokeWithMiddleware(
-          getCardQuestion,
+        const scoreCard = await invokeWithMiddleware(
+          getScoreCard,
           { where: { slug: context?.params?.slug!, userId: user?.id } },
           { ...context }
         )
@@ -50,7 +50,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         return {
           props: {
             user: user,
-            cardQuestion: cardQuestion,
+            scoreCard: scoreCard,
             canUpdate,
           },
         }
@@ -81,7 +81,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=/cardQuestions/${context?.params?.slug}/settings`,
+        destination: `/login?next=/scoreCards/${context?.params?.slug}/settings`,
         permanent: false,
       },
       props: {},
@@ -89,13 +89,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const CardQuestionSettingsPage = ({
+const ScoreCardSettingsPage = ({
   user,
-  cardQuestion,
+  scoreCard,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [updateCardQuestionMutation] = useMutation(updateCardQuestion)
+  const [updateScoreCardMutation] = useMutation(updateScoreCard)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -104,23 +104,22 @@ const CardQuestionSettingsPage = ({
     <AuthLayout user={user}>
       <Breadcrumbs />
       <br />
-      <CardQuestionForm
-        header="CardQuestion Details"
-        subHeader="Update the cardQuestion details"
+      <ScoreCardForm
+        header="Score Card Details"
+        subHeader="Update score card details"
         initialValues={{
-          name: cardQuestion?.name,
+          name: scoreCard?.name,
         }}
-        editmode={true}
         onSubmit={async (values) => {
-          const toastId = toast.loading(() => <span>Updating CardQuestion</span>)
+          const toastId = toast.loading(() => <span>Updating ScoreCard</span>)
           try {
-            await updateCardQuestionMutation({
-              where: { slug: cardQuestion?.slug },
+            await updateScoreCardMutation({
+              where: { slug: scoreCard?.slug },
               data: { ...values },
-              initial: cardQuestion!,
+              initial: scoreCard!,
             })
-            toast.success(() => <span>Question Updated</span>, { id: toastId })
-            router.push(Routes.CardQuestionsHome())
+            toast.success(() => <span>Score Card Updated</span>, { id: toastId })
+            router.push(Routes.ScoreCardsHome())
           } catch (error) {
             toast.error(
               "Sorry, we had an unexpected error. Please try again. - " + error.toString()
@@ -132,4 +131,4 @@ const CardQuestionSettingsPage = ({
   )
 }
 
-export default CardQuestionSettingsPage
+export default ScoreCardSettingsPage
