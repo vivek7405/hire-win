@@ -245,7 +245,7 @@ const SingleCandidatePage = ({
   }
 
   const resume = candidate?.resume as AttachmentObject
-  if (!file) {
+  if (resume?.Key && !file) {
     getResume(resume).then((response) => {
       const file = response?.data?.Body
       setFile(file)

@@ -43,7 +43,7 @@ model User {
   forms     Form[]
   questions Question[]
 
-  scores        Score[]
+  scoreCards    ScoreCard[]
   cardQuestions CardQuestion[]
 }
 
@@ -148,6 +148,7 @@ model Job {
   form   Form?   @relation(fields: [formId], references: [id])
   formId String?
 
+  scoreCards ScoreCardJobWorkflowStage[]
   candidates Candidate[]
 }
 
@@ -234,6 +235,8 @@ model WorkflowStage {
   stage   Stage  @relation(fields: [stageId], references: [id])
   stageId String
 
+  scoreCards ScoreCardJobWorkflowStage[]
+
   candidates Candidate[]
 
   @@unique([workflowId, stageId])
@@ -281,7 +284,7 @@ model Question {
   @@unique([userId, name])
 }
 
-model Score {
+model ScoreCard {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -291,11 +294,10 @@ model Score {
 
   cardQuestions ScoreCardQuestion[]
 
+  jobWorkflowStages ScoreCardJobWorkflowStage[]
+
   user   User @relation(fields: [userId], references: [id])
   userId Int
-
-  candidate   Candidate @relation(fields: [candidateId], references: [id])
-  candidateId String
 
   @@unique([userId, name])
 }
@@ -313,8 +315,7 @@ model CardQuestion {
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
-  scores  ScoreCardQuestion[]
-  ratings Rating[]
+  scoreCards ScoreCardQuestion[]
 
   @@unique([userId, name])
 }
@@ -326,34 +327,53 @@ model ScoreCardQuestion {
 
   order Int
 
-  score   Score  @relation(fields: [scoreId], references: [id])
-  scoreId String
+  scoreCard   ScoreCard @relation(fields: [scoreCardId], references: [id])
+  scoreCardId String
 
   cardQuestion   CardQuestion @relation(fields: [cardQuestionId], references: [id])
   cardQuestionId String
 
-  @@unique([scoreId, cardQuestionId])
-  @@unique([scoreId, cardQuestionId, order])
+  evaluations Evaluation[]
+
+  @@unique([scoreCardId, cardQuestionId])
+  @@unique([scoreCardId, cardQuestionId, order])
 }
 
-model Rating {
+model ScoreCardJobWorkflowStage {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  value RatingValue
+  scoreCard   ScoreCard @relation(fields: [scoreCardId], references: [id])
+  scoreCardId String
 
-  cardQuestion   CardQuestion @relation(fields: [cardQuestionId], references: [id])
-  cardQuestionId String
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  @@unique([scoreCardId, jobId])
+}
+
+model Evaluation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  value EvaluationValue
+
+  scoreCardQuestion   ScoreCardQuestion @relation(fields: [scoreCardQuestionId], references: [id])
+  scoreCardQuestionId String
 
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  @@unique([candidateId, cardQuestionId])
-  @@unique([candidateId, cardQuestionId, value])
+  @@unique([candidateId, scoreCardQuestionId])
+  @@unique([candidateId, scoreCardQuestionId, value])
 }
 
-enum RatingValue {
+enum EvaluationValue {
   VERY_POOR
   POOR
   AVERAGE
@@ -443,9 +463,8 @@ model Candidate {
 
   slug String @unique
 
-  answers Answer[]
-  scores  Score[]
-  ratings Rating[]
+  answers     Answer[]
+  evaluations Evaluation[]
 
   source CandidateSource
 
