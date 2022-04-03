@@ -296,8 +296,8 @@ const SingleCandidatePage = ({
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <div className="flex flex-col md:flex-row lg:flex-row space-y-2 md:space-y-0 lg:space-y-0 md:space-x-2 lg:space-x-2">
-          <div className="w-full md:w-3/5 lg:w-3/5 p-2 flex flex-col space-y-1 border-2 border-neutral-300 rounded-lg">
-            {file && <PDFViewer file={file} />}
+          <div className="w-full md:w-2/3 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-neutral-300 rounded-lg">
+            {file && <PDFViewer file={file} scale={1.3} />}
             <Cards
               cards={cards}
               setCards={setCards}
@@ -309,7 +309,7 @@ const SingleCandidatePage = ({
               noSearch={true}
             />
           </div>
-          <div className="w-full md:w-2/5 lg:w-2/5 p-2 border-2 border-neutral-300 rounded-lg">
+          <div className="w-full md:w-1/3 lg:w-1/3 p-2 border-2 border-neutral-300 rounded-lg">
             <Cards
               cards={cards}
               setCards={setCards}

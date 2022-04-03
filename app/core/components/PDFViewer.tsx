@@ -6,6 +6,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 type PDFViewerProps = {
   fileURL?: string
   file?: any
+  scale?: number
 }
 const PDFViewer = (props: PDFViewerProps) => {
   const [numPages, setNumPages] = useState(null as any)
@@ -45,7 +46,11 @@ const PDFViewer = (props: PDFViewerProps) => {
               file={props.fileURL ? { url: props.fileURL } : props.file}
               onLoadSuccess={onDocumentLoadSuccess}
             >
-              <Page class={`w-full`} scale={1.2} pageNumber={pageNumber} />
+              <Page
+                class={`w-full`}
+                scale={props.scale && props.scale > 0 ? props.scale : 1}
+                pageNumber={pageNumber}
+              />
             </Document>
           </div>
         </div>
