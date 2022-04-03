@@ -1,3 +1,4 @@
+import { ScoreCardQuestionBehaviour } from "@prisma/client"
 import { z } from "zod"
 
 export const ScoreCardObj = z.object({
@@ -12,6 +13,8 @@ export const ScoreCardQuestion = z.object({
   order: z.number().optional(),
   scoreCardId: z.string().optional(),
   cardQuestionId: z.string().optional(),
+  behaviour: z.nativeEnum(ScoreCardQuestionBehaviour).optional(),
+  allowBehaviourEdit: z.boolean().optional(),
 })
 export type ScoreCardQuestionInputType = z.infer<typeof ScoreCardQuestion>
 

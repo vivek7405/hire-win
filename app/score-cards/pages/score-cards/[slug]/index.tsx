@@ -34,7 +34,7 @@ import { CardType, DragDirection, ExtendedScoreCardQuestion, ShiftDirection } fr
 import shiftScoreCardQuestion from "app/score-cards/mutations/shiftScoreCardQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeCardQuestionFromScoreCard from "app/score-cards/mutations/removeCardQuestionFromScoreCard"
-// import ApplicationScoreCard from "app/jobs/components/ApplicationScoreCard"
+import ScoreCard from "app/score-cards/components/ScoreCard"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
 import updateScoreCardQuestion from "app/score-cards/mutations/updateScoreCardQuestion"
@@ -46,6 +46,7 @@ import addExistingScoreCardQuestions from "app/score-cards/mutations/addExisting
 import addNewCardQuestionToScoreCard from "app/score-cards/mutations/addNewCardQuestionToScoreCard"
 import Cards from "app/core/components/Cards"
 import Debouncer from "app/core/utils/debouncer"
+import { ScoreCardQuestionBehaviour } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -437,33 +438,33 @@ export const CardQuestions = ({ user, scoreCard }) => {
   // ]
 
   const getCards = (scoreCardQuestions) => {
-    return scoreCardQuestions.map((fq) => {
+    return scoreCardQuestions.map((sq: ExtendedScoreCardQuestion) => {
       return {
-        id: fq?.id,
-        title: fq.cardQuestion?.name,
+        id: sq?.id,
+        title: sq.cardQuestion?.name,
         description: "",
         renderContent: (
           <>
             <div className="flex flex-col space-y-2">
               <div className="w-full relative">
                 <div className="font-bold flex justify-between">
-                  {!fq.cardQuestion.factory ? (
+                  {!sq.cardQuestion.factory ? (
                     <Link
-                      href={Routes.SingleCardQuestionPage({ slug: fq.cardQuestion.slug })}
+                      href={Routes.SingleCardQuestionPage({ slug: sq.cardQuestion.slug })}
                       passHref
                     >
                       <a
                         data-testid={`cardQuestionlink`}
                         className="text-theme-600 hover:text-theme-900"
                       >
-                        {fq.cardQuestion.name}
+                        {sq.cardQuestion.name}
                       </a>
                     </Link>
                   ) : (
-                    fq.cardQuestion.name
+                    sq.cardQuestion.name
                   )}
                 </div>
-                {!fq.cardQuestion.factory && (
+                {!sq.cardQuestion.factory && (
                   <div className="absolute top-0.5 right-0">
                     <button
                       className="float-right text-red-600 hover:text-red-800"
@@ -471,7 +472,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
                       onClick={async (e) => {
                         e.preventDefault()
 
-                        setScoreCardQuestionToRemove(fq)
+                        setScoreCardQuestionToRemove(sq)
                         setOpenConfirm(true)
                       }}
                     >
@@ -480,6 +481,65 @@ export const CardQuestions = ({ user, scoreCard }) => {
                   </div>
                 )}
               </div>
+
+              {sq.allowBehaviourEdit && <div className="border-b-2 border-neutral-50" />}
+              {sq.allowBehaviourEdit && (
+                <div>
+                  <Form noFormatting={true} onSubmit={async (values) => {}}>
+                    <LabeledToggleGroupField
+                      name={`scoreCardQuestion-${sq.id}-behaviour`}
+                      paddingX={3}
+                      paddingY={1}
+                      defaultValue={sq?.behaviour || ScoreCardQuestionBehaviour.OPTIONAL}
+                      value={sq?.behaviour}
+                      options={Object.keys(ScoreCardQuestionBehaviour).map(
+                        (scoreCardQuestionBehaviour) => {
+                          return {
+                            label: scoreCardQuestionBehaviour,
+                            value: scoreCardQuestionBehaviour,
+                          }
+                        }
+                      )}
+                      onChange={async (value) => {
+                        const toastId = toast.loading(() => (
+                          <span>
+                            <b>Setting behaviour as {value}</b>
+                            <br />
+                            for question - {sq.cardQuestion.name}
+                          </span>
+                        ))
+                        try {
+                          await updateScoreCardQuestionMutation({
+                            where: { id: sq?.id },
+                            data: {
+                              order: sq.order,
+                              behaviour: value,
+                            },
+                          })
+                          toast.success(
+                            () => (
+                              <span>
+                                <b>Behaviour changed successfully</b>
+                                <br />
+                                for question - {sq?.cardQuestion?.name}
+                              </span>
+                            ),
+                            { id: toastId }
+                          )
+                          sq.behaviour = value
+                          setData([...scoreCardQuestions])
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString(),
+                            { id: toastId }
+                          )
+                        }
+                      }}
+                    />
+                  </Form>
+                </div>
+              )}
             </div>
           </>
         ),
@@ -558,8 +618,8 @@ export const CardQuestions = ({ user, scoreCard }) => {
       >
         Are you sure you want to remove this cardQuestion from the scoreCard?
       </Confirm>
-      <div className="w-full flex flex-wrap md:flex-nowrap lg:flex-nowrap">
-        <div className="w-full lg:w-3/5 p-3 border-2 border-neutral-300 rounded">
+      <div className="w-full flex flex-wrap md:flex-nowrap lg:flex-nowrap space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
+        <div className="w-full lg:w-3/5 p-3 border-2 border-theme-200 rounded">
           <Cards
             noSearch={true}
             cards={cards}
@@ -569,7 +629,10 @@ export const CardQuestions = ({ user, scoreCard }) => {
               if (!(source && destination)) return
 
               // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
-              if (destination.index < factoryScoreCardQuestions.length) {
+              if (
+                source.index < factoryScoreCardQuestions.length ||
+                destination.index < factoryScoreCardQuestions.length
+              ) {
                 toast.error("Order for Factory Questions can't be changed")
                 return
               }
@@ -597,7 +660,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
                   () => (
                     <span>
                       Order changed from {source?.index + 1} to {destination?.index + 1} for
-                      CardQuestion {scoreCardQuestion?.cardQuestion.name}
+                      Question {scoreCardQuestion?.cardQuestion.name}
                     </span>
                   ),
                   { id: toastId }
@@ -630,23 +693,24 @@ export const CardQuestions = ({ user, scoreCard }) => {
             noMarginRight={true}
           /> */}
         </div>
-        <div className="w-full lg:w-2/5 hidden lg:flex justify-end">
-          <div className="bg-white min-h-screen max-h-screen border-8 border-neutral-300 rounded-3xl sticky top-0">
-            {/* <div className="bg-neutral-400 rounded-b-2xl h-8 w-1/2 absolute left-1/4 top-0" /> */}
-            {/* <div className="border-2 border-neutral-400 rounded-2xl h-2 w-1/3 absolute left-1/3 top-2" /> */}
-            <div className="w-full h-full overflow-auto rounded-3xl">
-              {/* <ApplicationScoreCard
-                header="Job Application ScoreCard"
+        <div className="w-full lg:w-2/5 flex justify-end">
+          <div
+            className={`w-full bg-white ${
+              data?.length > 1 ? "max-h-48" : ""
+            } border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-200 rounded-3xl sticky top-0`}
+          >
+            <div className="w-full h-full overflow-auto rounded-2xl">
+              <ScoreCard
+                header="Score Card"
                 subHeader="Preview"
                 scoreCardId={scoreCard?.id!}
                 preview={true}
                 onSubmit={async (values) => {
-                  toast.error("Can't submit the scoreCard in preview mode")
+                  toast.error("Can't submit the score in preview mode")
                 }}
                 scoreCardQuestions={data}
-              /> */}
+              />
             </div>
-            <div className="bg-neutral-300 rounded-2xl h-1 w-1/2 absolute left-1/4 bottom-2" />
           </div>
         </div>
       </div>
@@ -682,7 +746,7 @@ const SingleScoreCardPage = ({
           <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
             <div className="space-x-8 flex flex-row justify-between">
               {/* <Modal header="Preview ScoreCard" open={openPreviewScoreCard} setOpen={setOpenPreviewScoreCard}>
-                <ApplicationScoreCard
+                <ScoreCard
                   header="Job Application ScoreCard"
                   subHeader="Preview"
                   scoreCardId={scoreCard?.id!}

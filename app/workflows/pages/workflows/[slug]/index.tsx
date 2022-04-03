@@ -491,7 +491,12 @@ export const Stages = ({ user, workflow }) => {
               if (!(source && destination)) return
 
               // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
-              if (destination.index === 0 || destination.index === data.length - 1) {
+              if (
+                source.index === 0 ||
+                source.index === data.length - 1 ||
+                destination.index === 0 ||
+                destination.index === data.length - 1
+              ) {
                 toast.error("The first and last stages cannot be changed")
                 return
               }

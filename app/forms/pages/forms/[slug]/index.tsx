@@ -623,7 +623,10 @@ export const Questions = ({ user, form }) => {
               if (!(source && destination)) return
 
               // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
-              if (destination.index < factoryFormQuestions.length) {
+              if (
+                source.index < factoryFormQuestions.length ||
+                destination.index < factoryFormQuestions.length
+              ) {
                 toast.error("Order for Factory Questions can't be changed")
                 return
               }

@@ -45,7 +45,7 @@ const PDFViewer = (props: PDFViewerProps) => {
               file={props.fileURL ? { url: props.fileURL } : props.file}
               onLoadSuccess={onDocumentLoadSuccess}
             >
-              <Page class={`w-full`} pageNumber={pageNumber} />
+              <Page class={`w-full`} scale={1.2} pageNumber={pageNumber} />
             </Document>
           </div>
         </div>

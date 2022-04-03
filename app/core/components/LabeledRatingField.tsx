@@ -12,6 +12,7 @@ export interface LabeledRatingFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   testid?: string
   disabled?: boolean
   defaultValue?: any
+  onChange?: any
 }
 
 export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFieldProps>(
@@ -54,7 +55,10 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
                   emptySymbol={<StarIconOutline className="h-6 w-auto" />}
                   fullSymbol={<StarIconSolid className="h-6 w-auto" />}
                   initialRating={value}
-                  onChange={onChange}
+                  onChange={(val) => {
+                    onChange(val)
+                    props.onChange && props.onChange({ name, value: val })
+                  }}
                 />
               )
             }}

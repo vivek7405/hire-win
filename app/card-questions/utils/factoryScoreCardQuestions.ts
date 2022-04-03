@@ -1,9 +1,11 @@
-import { CardQuestion } from "@prisma/client"
+import { CardQuestion, ScoreCardQuestionBehaviour } from "@prisma/client"
 import { ExtendedScoreCardQuestion } from "types"
 
 const factoryScoreQuestions = [
   {
     order: 1,
+    behaviour: ScoreCardQuestionBehaviour.REQUIRED,
+    allowBehaviourEdit: false,
     cardQuestion: {
       name: "Overall Score",
       factory: true,

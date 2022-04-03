@@ -325,7 +325,9 @@ model ScoreCardQuestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  order Int
+  order              Int
+  behaviour          ScoreCardQuestionBehaviour @default(OPTIONAL)
+  allowBehaviourEdit Boolean                    @default(true)
 
   scoreCard   ScoreCard @relation(fields: [scoreCardId], references: [id])
   scoreCardId String
@@ -337,6 +339,12 @@ model ScoreCardQuestion {
 
   @@unique([scoreCardId, cardQuestionId])
   @@unique([scoreCardId, cardQuestionId, order])
+}
+
+enum ScoreCardQuestionBehaviour {
+  REQUIRED
+  OPTIONAL
+  OFF
 }
 
 model ScoreCardJobWorkflowStage {

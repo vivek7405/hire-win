@@ -12,7 +12,10 @@ interface GetScoreCardInput extends Pick<Prisma.ScoreCardFindFirstArgs, "where">
 const getScoreCard = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetScoreCardInput, ctx: Ctx) => {
-    const scoreCard = await db.scoreCard.findFirst({ where, include: { cardQuestions: true } })
+    const scoreCard = await db.scoreCard.findFirst({
+      where,
+      include: { cardQuestions: { include: { cardQuestion: true } } },
+    })
 
     if (!scoreCard) throw new NotFoundError()
 

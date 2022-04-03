@@ -32,6 +32,8 @@ import PDFViewer from "app/core/components/PDFViewer"
 import { QuestionType } from "@prisma/client"
 import Cards from "app/core/components/Cards"
 import Skeleton from "react-loading-skeleton"
+import ScoreCard from "app/score-cards/components/ScoreCard"
+import toast from "react-hot-toast"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -294,7 +296,7 @@ const SingleCandidatePage = ({
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <div className="flex flex-col md:flex-row lg:flex-row space-y-2 md:space-y-0 lg:space-y-0 md:space-x-2 lg:space-x-2">
-          <div className="w-full md:w-1/2 lg:w-1/2 p-2 flex flex-col space-y-1 border-2 border-neutral-300 rounded-lg">
+          <div className="w-full md:w-3/5 lg:w-3/5 p-2 flex flex-col space-y-1 border-2 border-neutral-300 rounded-lg">
             {file && <PDFViewer file={file} />}
             <Cards
               cards={cards}
@@ -307,7 +309,7 @@ const SingleCandidatePage = ({
               noSearch={true}
             />
           </div>
-          <div className="w-full md:w-1/2 lg:w-1/2 p-2 border-2 border-neutral-300 rounded-lg">
+          <div className="w-full md:w-2/5 lg:w-2/5 p-2 border-2 border-neutral-300 rounded-lg">
             <Cards
               cards={cards}
               setCards={setCards}

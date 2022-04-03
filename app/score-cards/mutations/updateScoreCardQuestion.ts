@@ -11,12 +11,13 @@ type UpdateScoreCardQuestionInput = Pick<Prisma.ScoreCardQuestionUpdateArgs, "wh
 async function updateScoreCardQuestion({ where, data }: UpdateScoreCardQuestionInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { order } = ScoreCardQuestion.parse(data)
+  const { order, behaviour } = ScoreCardQuestion.parse(data)
 
   const scoreCardQuestion = await db.scoreCardQuestion.update({
     where,
     data: {
       order,
+      behaviour,
     },
   })
 
