@@ -14,6 +14,13 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
             include: { questions: { include: { question: { include: { options: true } } } } },
           },
           workflow: { include: { stages: { include: { stage: true } } } },
+          scoreCards: {
+            include: {
+              scoreCard: {
+                include: { cardQuestions: { include: { cardQuestion: true, evaluations: true } } },
+              },
+            },
+          },
         },
       },
       workflowStage: { include: { stage: true } },

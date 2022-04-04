@@ -26,6 +26,7 @@ import {
   ExtendedAnswer,
   ExtendedCandidate,
   ExtendedFormQuestion,
+  ExtendedScoreCardQuestion,
 } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
@@ -34,6 +35,7 @@ import Cards from "app/core/components/Cards"
 import Skeleton from "react-loading-skeleton"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
+import { titleCase } from "app/core/utils/titleCase"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -260,6 +262,10 @@ const SingleCandidatePage = ({
   //   console.log(error)
   // }
 
+  const scoreCard = candidate?.job?.scoreCards?.find(
+    (sc) => sc.workflowStageId === candidate?.workflowStageId
+  )
+
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
@@ -295,9 +301,9 @@ const SingleCandidatePage = ({
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <div className="flex flex-col md:flex-row lg:flex-row space-y-2 md:space-y-0 lg:space-y-0 md:space-x-2 lg:space-x-2">
-          <div className="w-full md:w-2/3 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-neutral-300 rounded-lg">
-            {file && <PDFViewer file={file} scale={1.3} />}
+        <div className="flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
+          <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-300 rounded-lg">
+            {file && <PDFViewer file={file} scale={1.29} />}
             <Cards
               cards={cards}
               setCards={setCards}
@@ -309,17 +315,25 @@ const SingleCandidatePage = ({
               noSearch={true}
             />
           </div>
-          <div className="w-full md:w-1/3 lg:w-1/3 p-2 border-2 border-neutral-300 rounded-lg">
-            <Cards
-              cards={cards}
-              setCards={setCards}
-              noPagination={true}
-              mutateCardDropDB={(source, destination, draggableId) => {}}
-              droppableName="comments"
-              isDragDisabled={true}
-              direction={DragDirection.HORIZONTAL}
-              noSearch={true}
-            />
+          <div className="w-full md:w-1/2 lg:w-1/3">
+            <div
+              className={`w-full bg-white max-h-screen border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-300 rounded-3xl sticky top-0`}
+            >
+              <div className="w-full overflow-auto rounded-2xl">
+                <ScoreCard
+                  header={`${titleCase(candidate?.name)}'s Score`}
+                  subHeader={`${candidate?.workflowStage?.stage?.name || ""} Stage`}
+                  scoreCardId={scoreCard?.scoreCardId!}
+                  preview={true}
+                  onSubmit={async (values) => {
+                    toast.error("Can't submit the score in preview mode")
+                  }}
+                  scoreCardQuestions={
+                    scoreCard?.scoreCard?.cardQuestions as any as ExtendedScoreCardQuestion[]
+                  }
+                />
+              </div>
+            </div>
           </div>
         </div>
       </Suspense>

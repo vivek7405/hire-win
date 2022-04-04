@@ -42,10 +42,14 @@ export const ScoreCard = (props: ScoreCardProps) => {
   useMemo(async () => {
     let data: ExtendedScoreCardQuestion[] = []
 
-    await scoreCardQuestions.forEach((sq) => {
-      data = [...data, { ...sq }]
-      setData(data)
-    })
+    await scoreCardQuestions
+      ?.sort((a, b) => {
+        return a?.order - b?.order
+      })
+      .forEach((sq) => {
+        data = [...data, { ...sq }]
+        setData(data)
+      })
   }, [scoreCardQuestions])
 
   const getZodType = (sq: ExtendedScoreCardQuestion, zodType) => {

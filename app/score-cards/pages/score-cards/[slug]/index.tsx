@@ -619,7 +619,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
         Are you sure you want to remove this cardQuestion from the scoreCard?
       </Confirm>
       <div className="w-full flex flex-wrap md:flex-nowrap lg:flex-nowrap space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
-        <div className="w-full lg:w-3/5 p-3 border-2 border-theme-200 rounded">
+        <div className="w-full md:w-1/2 lg:w-2/3 p-3 border-2 border-theme-300 rounded">
           <Cards
             noSearch={true}
             cards={cards}
@@ -693,11 +693,9 @@ export const CardQuestions = ({ user, scoreCard }) => {
             noMarginRight={true}
           /> */}
         </div>
-        <div className="w-full lg:w-2/5 flex justify-end">
+        <div className="w-full md:w-1/2 lg:w-1/3 flex justify-end">
           <div
-            className={`w-full bg-white ${
-              data?.length > 1 ? "max-h-48" : ""
-            } border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-200 rounded-3xl sticky top-0`}
+            className={`w-full bg-white max-h-screen border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-300 rounded-3xl sticky top-0`}
           >
             <div className="w-full h-full overflow-auto rounded-2xl">
               <ScoreCard
