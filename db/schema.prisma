@@ -361,7 +361,7 @@ model ScoreCardJobWorkflowStage {
   workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
   workflowStageId String
 
-  @@unique([scoreCardId, jobId])
+  @@unique([scoreCardId, jobId, workflowStageId])
 }
 
 model Evaluation {
