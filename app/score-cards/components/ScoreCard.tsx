@@ -98,7 +98,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
               {!sq.showNote && (
                 <span title="Add Note">
                   <PlusCircleIcon
-                    className="h-5 w-auto float-right cursor-pointer"
+                    className="h-5 w-auto float-right cursor-pointer text-theme-600"
                     onClick={() => {
                       sq.showNote = true
                       setData([...data])
@@ -109,7 +109,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
               {sq.showNote && (
                 <span title="Hide Note">
                   <XCircleIcon
-                    className="h-5 w-auto float-right cursor-pointer"
+                    className="h-5 w-auto float-right cursor-pointer text-red-600"
                     onClick={() => {
                       sq.showNote = false
                       setData([...data])

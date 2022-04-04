@@ -348,7 +348,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
           router.reload()
         }}
       >
-        Are you sure you want to remove this cardQuestion from the scoreCard?
+        Are you sure you want to remove this Question from the scoreCard?
       </Confirm>
       <div className="w-full flex flex-wrap md:flex-nowrap lg:flex-nowrap space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
         <div className="w-full md:w-1/2 lg:w-2/3 p-3 border-2 border-theme-400 rounded">

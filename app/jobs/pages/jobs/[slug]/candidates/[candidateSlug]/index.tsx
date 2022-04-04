@@ -36,6 +36,8 @@ import Skeleton from "react-loading-skeleton"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
 import { titleCase } from "app/core/utils/titleCase"
+import Form from "app/core/components/Form"
+import LabeledRatingField from "app/core/components/LabeledRatingField"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -301,7 +303,21 @@ const SingleCandidatePage = ({
         </Link>
       )}
 
-      <h3 className="font-bold text-5xl text-theme-600">{candidate?.name}</h3>
+      <div className="flex items-center space-x-4">
+        <h3 className="font-bold text-5xl text-theme-600">{candidate?.name}</h3>
+        <Form
+          noFormatting={true}
+          onSubmit={async () => {
+            return
+          }}
+        >
+          <LabeledRatingField
+            name="candidateAverageRating"
+            ratingClass="!flex items-center"
+            height={8}
+          />
+        </Form>
+      </div>
 
       <br />
 
