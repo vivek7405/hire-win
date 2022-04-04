@@ -301,7 +301,7 @@ const SingleCandidatePage = ({
         </Link>
       )}
 
-      <h3 className="font-bold text-5xl">{candidate?.name}</h3>
+      <h3 className="font-bold text-5xl text-theme-600">{candidate?.name}</h3>
 
       <br />
 
@@ -309,7 +309,7 @@ const SingleCandidatePage = ({
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
-          <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-300 rounded-lg">
+          <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-400 rounded-lg">
             {file && <PDFViewer file={file} scale={1.29} />}
             <Cards
               cards={cards}
@@ -324,7 +324,7 @@ const SingleCandidatePage = ({
           </div>
           <div className="w-full md:w-1/2 lg:w-1/3">
             <div
-              className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-300 rounded-3xl sticky top-0`}
+              className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
             >
               <div className="w-full h-full rounded-2xl">
                 <ScoreCard
