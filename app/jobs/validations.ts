@@ -43,6 +43,14 @@ export const Answer = z.object({
 })
 export type AnswerInputType = z.infer<typeof Answer>
 
+export const Score = z.object({
+  id: z.string().nullable().optional(),
+  rating: z.number(),
+  note: z.string().nullable().optional(),
+  scoreCardQuestionId: z.string(),
+})
+export type ScoreInputType = z.infer<typeof Score>
+
 export const Candidate = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -55,6 +63,7 @@ export const Candidate = z.object({
     .nullable(),
   slug: z.string().optional(),
   answers: z.array(Answer),
+  scores: z.array(Score).optional(),
   jobId: z.string().optional(),
   source: z.nativeEnum(CandidateSource),
   workflowStageId: z.string().optional(),

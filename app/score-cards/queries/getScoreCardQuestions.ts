@@ -26,6 +26,8 @@ async function getScoreCardQuestions(
         orderBy: { order: "asc" },
         include: {
           cardQuestion: true,
+          scoreCard: { include: { jobWorkflowStages: true } },
+          scores: { include: { candidate: true } },
         },
       }),
   })

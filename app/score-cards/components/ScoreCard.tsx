@@ -16,6 +16,7 @@ import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreC
 import { ExtendedScoreCardQuestion, ExtendedCardQuestion } from "types"
 import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline"
 import getScoreCard from "../queries/getScoreCard"
+import { Candidate } from "@prisma/client"
 
 type ScoreCardProps = {
   onSuccess?: () => void
@@ -29,6 +30,7 @@ type ScoreCardProps = {
   scoreCardQuestions?: ExtendedScoreCardQuestion[]
   onChange?: any
   userId: number
+  candidate?: Candidate
 }
 
 export const ScoreCard = (props: ScoreCardProps) => {
@@ -66,7 +68,11 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
   const getValidationObj = (sq: ExtendedScoreCardQuestion) => {
     const q = sq.cardQuestion
-    return { [q.name]: getZodType(sq, z.number()), [`${q.name} Note`]: z.string().optional() }
+    return {
+      [q.name]: getZodType(sq, z.number()),
+      [`${q.name} Note`]: z.string().optional(),
+      [`${q.name} ScoreId`]: z.string().optional(),
+    }
   }
 
   let validationObj = {}
@@ -89,13 +95,25 @@ export const ScoreCard = (props: ScoreCardProps) => {
         subHeader={props.subHeader}
       >
         {data.map((sq) => {
-          const q = sq.cardQuestion
           if (sq.behaviour === "OFF") {
             return
           }
+
+          const q = sq.cardQuestion
+
+          const existingScore = sq.scores.find(
+            (score) =>
+              score.candidateId === (props.candidate?.id || "0") &&
+              sq.scoreCard.jobWorkflowStages.findIndex(
+                (jws) =>
+                  jws.workflowStageId === (props.candidate?.workflowStageId || "0") &&
+                  jws.jobId === (props.candidate?.jobId || "0")
+              ) >= 0
+          )
+
           return (
             <div key={q.id}>
-              {!sq.showNote && (
+              {!(sq.showNote || existingScore?.note) && (
                 <span title="Add Note">
                   <PlusCircleIcon
                     className="h-5 w-auto float-right cursor-pointer text-theme-600"
@@ -106,7 +124,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
                   />
                 </span>
               )}
-              {sq.showNote && (
+              {!existingScore?.note && sq.showNote && (
                 <span title="Hide Note">
                   <XCircleIcon
                     className="h-5 w-auto float-right cursor-pointer text-red-600"
@@ -117,8 +135,26 @@ export const ScoreCard = (props: ScoreCardProps) => {
                   />
                 </span>
               )}
-              <LabeledRatingField name={q.name} label={q.name} onChange={props.onChange} />
-              {sq.showNote && <LabeledTextAreaField name={`${q.name} Note`} />}
+
+              <LabeledRatingField
+                defaultValue={existingScore?.rating}
+                name={q.name}
+                label={q.name}
+                onChange={props.onChange}
+              />
+
+              {(sq.showNote || existingScore?.note) && (
+                <LabeledTextAreaField
+                  defaultValue={existingScore?.note || ""}
+                  name={`${q.name} Note`}
+                />
+              )}
+
+              <LabeledTextField
+                type="hidden"
+                name={`${q.name} ScoreId`}
+                value={existingScore?.id}
+              />
             </div>
           )
         })}

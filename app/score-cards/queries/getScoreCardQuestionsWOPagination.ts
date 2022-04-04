@@ -8,7 +8,11 @@ async function getScoreCardQuestionsWOPagination({ where }: GetScoreCardQuestion
   const scoreCardQuestions = db.scoreCardQuestion.findMany({
     where,
     orderBy: { order: "asc" },
-    include: { cardQuestion: true },
+    include: {
+      cardQuestion: true,
+      scoreCard: { include: { jobWorkflowStages: true } },
+      scores: { include: { candidate: true } },
+    },
   })
 
   return scoreCardQuestions

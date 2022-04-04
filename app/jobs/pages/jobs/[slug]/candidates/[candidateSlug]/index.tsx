@@ -11,6 +11,7 @@ import {
   useRouter,
   usePaginatedQuery,
   dynamic,
+  useMutation,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -38,6 +39,7 @@ import toast from "react-hot-toast"
 import { titleCase } from "app/core/utils/titleCase"
 import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
+import updateCandidateScores from "app/jobs/mutations/updateCandidateScores"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -246,6 +248,8 @@ const SingleCandidatePage = ({
     setCards(getCards(candidate!))
   }, [candidate])
 
+  const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -344,14 +348,58 @@ const SingleCandidatePage = ({
             >
               <div className="w-full h-full rounded-2xl">
                 <ScoreCard
+                  candidate={candidate}
                   header={`${titleCase(candidate?.name)}'s Score`}
                   subHeader={`${candidate?.workflowStage?.stage?.name || ""} Stage`}
                   scoreCardId={scoreCard?.scoreCardId!}
-                  preview={true}
-                  onSubmit={async (values) => {
-                    toast.error("Can't submit the score in preview mode")
-                  }}
+                  preview={false}
                   userId={user?.id || 0}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Updating Candidate</span>)
+                    try {
+                      await updateCandidateScoresMutation({
+                        where: { id: candidate?.id },
+                        initial: candidate as any,
+                        data: {
+                          id: candidate?.id,
+                          jobId: candidate?.job?.id,
+                          name: candidate?.name,
+                          email: candidate?.email,
+                          source: candidate?.source,
+                          resume: candidate?.resume || undefined,
+                          answers: candidate?.answers || ([] as any),
+                          scores:
+                            scoreCard?.scoreCard?.cardQuestions
+                              ?.map((sq) => {
+                                const rating = values[sq.cardQuestion?.name] || 0
+                                const note = values[`${sq.cardQuestion?.name} Note`]
+                                const scoreId = values[`${sq.cardQuestion?.name} ScoreId`]
+
+                                return {
+                                  scoreCardQuestionId: sq.id,
+                                  rating: rating ? parseInt(rating) : 0,
+                                  note: note,
+                                  id: scoreId || null,
+                                }
+                              })
+                              ?.filter((score) => score.rating > 0) || ([] as any),
+                        },
+                      })
+                      toast.success(
+                        () => (
+                          <span>
+                            Candidate Score Card Updated for stage{" "}
+                            {candidate?.workflowStage?.stage?.name}
+                          </span>
+                        ),
+                        { id: toastId }
+                      )
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                      )
+                    }
+                  }}
                   // scoreCardQuestions={
                   //   scoreCard?.scoreCard?.cardQuestions as any as ExtendedScoreCardQuestion[]
                   // }

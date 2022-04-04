@@ -14,7 +14,15 @@ const getScoreCard = resolver.pipe(
   async ({ where }: GetScoreCardInput, ctx: Ctx) => {
     const scoreCard = await db.scoreCard.findFirst({
       where,
-      include: { cardQuestions: { include: { cardQuestion: true } } },
+      include: {
+        cardQuestions: {
+          include: {
+            cardQuestion: true,
+            scoreCard: { include: { jobWorkflowStages: true } },
+            scores: { include: { candidate: true } },
+          },
+        },
+      },
     })
 
     if (!scoreCard) throw new NotFoundError()

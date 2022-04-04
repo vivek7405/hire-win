@@ -370,7 +370,7 @@ model Score {
   updatedAt DateTime @updatedAt
 
   rating Int
-  note   String
+  note   String?
 
   scoreCardQuestion   ScoreCardQuestion @relation(fields: [scoreCardQuestionId], references: [id])
   scoreCardQuestionId String

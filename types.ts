@@ -137,9 +137,23 @@ export type ExtendedFormQuestion = Prisma.FormQuestionGetPayload<{
 export type ExtendedCardQuestion = Prisma.CardQuestionGetPayload<{
   include: { scoreCards: true }
 }>
-export type ExtendedScoreCard = Prisma.ScoreCardGetPayload<{ include: { cardQuestions: true } }>
+export type ExtendedScoreCard = Prisma.ScoreCardGetPayload<{
+  include: {
+    cardQuestions: {
+      include: {
+        cardQuestion: true
+        scoreCard: { include: { jobWorkflowStages: true } }
+        scores: { include: { candidate: true } }
+      }
+    }
+  }
+}>
 export type ExtendedScoreCardQuestion = Prisma.ScoreCardQuestionGetPayload<{
-  include: { cardQuestion: true }
+  include: {
+    scoreCard: { include: { jobWorkflowStages: true } }
+    cardQuestion: true
+    scores: { include: { candidate: true } }
+  }
 }> & { showNote: boolean }
 
 export type AttachmentObject = {
