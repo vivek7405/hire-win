@@ -695,9 +695,9 @@ export const CardQuestions = ({ user, scoreCard }) => {
         </div>
         <div className="w-full md:w-1/2 lg:w-1/3 flex justify-end">
           <div
-            className={`w-full bg-white max-h-screen border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-300 rounded-3xl sticky top-0`}
+            className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-300 rounded-3xl sticky top-0`}
           >
-            <div className="w-full h-full overflow-auto rounded-2xl">
+            <div className="w-full h-full rounded-2xl">
               <ScoreCard
                 header="Score Card"
                 subHeader="Preview"
@@ -707,6 +707,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
                   toast.error("Can't submit the score in preview mode")
                 }}
                 scoreCardQuestions={data}
+                userId={user?.id || 0}
               />
             </div>
           </div>

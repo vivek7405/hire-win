@@ -15,6 +15,7 @@ import { z } from "zod"
 import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreCardQuestionsWOPagination"
 import { ExtendedScoreCardQuestion, ExtendedCardQuestion } from "types"
 import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline"
+import getScoreCard from "../queries/getScoreCard"
 
 type ScoreCardProps = {
   onSuccess?: () => void
@@ -27,11 +28,16 @@ type ScoreCardProps = {
   preview: boolean
   scoreCardQuestions?: ExtendedScoreCardQuestion[]
   onChange?: any
+  userId: number
 }
 
 export const ScoreCard = (props: ScoreCardProps) => {
+  const [defaultScoreCard] = useQuery(getScoreCard, {
+    where: { userId: props.userId, name: "Default" },
+  })
+
   const [queryScoreCardQuestions] = useQuery(getScoreCardQuestionsWOPagination, {
-    where: { scoreCardId: props.scoreCardId },
+    where: { scoreCardId: props.scoreCardId || defaultScoreCard?.id },
   })
 
   const [data, setData] = useState<ExtendedScoreCardQuestion[]>([])

@@ -274,9 +274,16 @@ const SingleCandidatePage = ({
 
       <Link href={Routes.JobsHome()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
-          Add Score
+          Send Email
         </a>
       </Link>
+
+      <Link href={Routes.JobsHome()} passHref>
+        <a className="float-right text-white bg-theme-600 mx-6 px-4 py-2 rounded-sm hover:bg-theme-700">
+          Schedule Meeting
+        </a>
+      </Link>
+
       {canUpdate && (
         <Link
           href={Routes.CandidateSettingsPage({
@@ -286,7 +293,7 @@ const SingleCandidatePage = ({
           passHref
         >
           <a
-            className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
+            className="float-right underline text-theme-600 py-2 hover:text-theme-800"
             data-testid={`${candidate?.id}-settingsLink`}
           >
             Settings
@@ -301,7 +308,7 @@ const SingleCandidatePage = ({
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <div className="flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
+        <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
           <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-300 rounded-lg">
             {file && <PDFViewer file={file} scale={1.29} />}
             <Cards
@@ -317,9 +324,9 @@ const SingleCandidatePage = ({
           </div>
           <div className="w-full md:w-1/2 lg:w-1/3">
             <div
-              className={`w-full bg-white max-h-screen border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-300 rounded-3xl sticky top-0`}
+              className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-300 rounded-3xl sticky top-0`}
             >
-              <div className="w-full overflow-auto rounded-2xl">
+              <div className="w-full h-full rounded-2xl">
                 <ScoreCard
                   header={`${titleCase(candidate?.name)}'s Score`}
                   subHeader={`${candidate?.workflowStage?.stage?.name || ""} Stage`}
@@ -328,9 +335,10 @@ const SingleCandidatePage = ({
                   onSubmit={async (values) => {
                     toast.error("Can't submit the score in preview mode")
                   }}
-                  scoreCardQuestions={
-                    scoreCard?.scoreCard?.cardQuestions as any as ExtendedScoreCardQuestion[]
-                  }
+                  userId={user?.id || 0}
+                  // scoreCardQuestions={
+                  //   scoreCard?.scoreCard?.cardQuestions as any as ExtendedScoreCardQuestion[]
+                  // }
                 />
               </div>
             </div>

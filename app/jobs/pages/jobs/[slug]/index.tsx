@@ -195,7 +195,7 @@ const Candidates = (props: CandidateProps) => {
     let data: ExtendedCandidate[] = []
 
     await candidates.forEach((candidate) => {
-      data = [...data, { ...candidate }]
+      data = [...data, { ...(candidate as any) }]
       setData(data)
     })
   }, [candidates])
