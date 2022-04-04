@@ -133,7 +133,7 @@ export type ExtendedCardQuestion = Prisma.CardQuestionGetPayload<{
 export type ExtendedScoreCard = Prisma.ScoreCardGetPayload<{ include: { cardQuestions: true } }>
 export type ExtendedScoreCardQuestion = Prisma.ScoreCardQuestionGetPayload<{
   include: { cardQuestion: true }
-}>
+}> & { showNote: boolean }
 
 export type AttachmentObject = {
   Key: string

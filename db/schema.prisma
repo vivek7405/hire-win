@@ -369,7 +369,8 @@ model Evaluation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  value EvaluationValue
+  rating Int
+  note   String
 
   scoreCardQuestion   ScoreCardQuestion @relation(fields: [scoreCardQuestionId], references: [id])
   scoreCardQuestionId String
@@ -378,15 +379,6 @@ model Evaluation {
   candidateId String
 
   @@unique([candidateId, scoreCardQuestionId])
-  @@unique([candidateId, scoreCardQuestionId, value])
-}
-
-enum EvaluationValue {
-  VERY_POOR
-  POOR
-  AVERAGE
-  GOOD
-  VERY_GOOD
 }
 
 model QuestionOption {

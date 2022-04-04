@@ -164,7 +164,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
     let data: ExtendedScoreCardQuestion[] = []
 
     await scoreCardQuestions.forEach((scoreCardQuestion) => {
-      data = [...data, { ...scoreCardQuestion }]
+      data = [...data, { ...(scoreCardQuestion as any) }]
       setData(data)
     })
   }, [scoreCardQuestions])

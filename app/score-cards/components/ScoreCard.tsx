@@ -3,7 +3,7 @@ import { LabeledTextAreaField } from "app/core/components/LabeledTextAreaField"
 import { Form } from "app/core/components/Form"
 import { CardQuestionInputType } from "app/card-questions/validations"
 import CheckboxField from "app/core/components/CheckboxField"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import DynamicTextFields from "app/core/components/DynamicTextFields"
 import { useQuery } from "blitz"
@@ -14,6 +14,7 @@ import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
 import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreCardQuestionsWOPagination"
 import { ExtendedScoreCardQuestion, ExtendedCardQuestion } from "types"
+import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline"
 
 type ScoreCardProps = {
   onSuccess?: () => void
@@ -33,7 +34,19 @@ export const ScoreCard = (props: ScoreCardProps) => {
     where: { scoreCardId: props.scoreCardId },
   })
 
-  const scoreCardQuestions = props.scoreCardQuestions || queryScoreCardQuestions
+  const [data, setData] = useState<ExtendedScoreCardQuestion[]>([])
+
+  const scoreCardQuestions = (props.scoreCardQuestions ||
+    queryScoreCardQuestions) as any as ExtendedScoreCardQuestion[]
+
+  useMemo(async () => {
+    let data: ExtendedScoreCardQuestion[] = []
+
+    await scoreCardQuestions.forEach((sq) => {
+      data = [...data, { ...sq }]
+      setData(data)
+    })
+  }, [scoreCardQuestions])
 
   const getZodType = (sq: ExtendedScoreCardQuestion, zodType) => {
     return sq.behaviour === "REQUIRED"
@@ -45,12 +58,12 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
   const getValidationObj = (sq: ExtendedScoreCardQuestion) => {
     const q = sq.cardQuestion
-    return { [q.name]: getZodType(sq, z.number()) }
+    return { [q.name]: getZodType(sq, z.number()), [`${q.name} Note`]: z.string().optional() }
   }
 
   let validationObj = {}
-  scoreCardQuestions.forEach((fq) => {
-    validationObj = { ...validationObj, ...getValidationObj(fq as any) }
+  scoreCardQuestions.forEach((sq) => {
+    validationObj = { ...validationObj, ...getValidationObj(sq as any) }
   })
   let zodObj = z.object(validationObj)
 
@@ -67,13 +80,38 @@ export const ScoreCard = (props: ScoreCardProps) => {
         header={props.header}
         subHeader={props.subHeader}
       >
-        {scoreCardQuestions.map((sq) => {
+        {data.map((sq) => {
           const q = sq.cardQuestion
           if (sq.behaviour === "OFF") {
             return
           }
           return (
-            <LabeledRatingField key={q.id} name={q.name} label={q.name} onChange={props.onChange} />
+            <div key={q.id}>
+              {!sq.showNote && (
+                <span title="Add Note">
+                  <PlusCircleIcon
+                    className="h-5 w-auto float-right cursor-pointer"
+                    onClick={() => {
+                      sq.showNote = true
+                      setData([...data])
+                    }}
+                  />
+                </span>
+              )}
+              {sq.showNote && (
+                <span title="Hide Note">
+                  <XCircleIcon
+                    className="h-5 w-auto float-right cursor-pointer"
+                    onClick={() => {
+                      sq.showNote = false
+                      setData([...data])
+                    }}
+                  />
+                </span>
+              )}
+              <LabeledRatingField name={q.name} label={q.name} onChange={props.onChange} />
+              {sq.showNote && <LabeledTextAreaField name={`${q.name} Note`} />}
+            </div>
           )
         })}
       </Form>
