@@ -79,7 +79,7 @@ export type ExtendedCandidate = Prisma.CandidateGetPayload<{
         scoreCards: {
           include: {
             scoreCard: {
-              include: { cardQuestions: { include: { cardQuestion: true; evaluations: true } } }
+              include: { cardQuestions: { include: { cardQuestion: true; scores: true } } }
             }
           }
         }

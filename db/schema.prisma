@@ -335,7 +335,7 @@ model ScoreCardQuestion {
   cardQuestion   CardQuestion @relation(fields: [cardQuestionId], references: [id])
   cardQuestionId String
 
-  evaluations Evaluation[]
+  scores Score[]
 
   @@unique([scoreCardId, cardQuestionId])
   @@unique([scoreCardId, cardQuestionId, order])
@@ -364,7 +364,7 @@ model ScoreCardJobWorkflowStage {
   @@unique([scoreCardId, jobId, workflowStageId])
 }
 
-model Evaluation {
+model Score {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -463,8 +463,8 @@ model Candidate {
 
   slug String @unique
 
-  answers     Answer[]
-  evaluations Evaluation[]
+  answers Answer[]
+  scores  Score[]
 
   source CandidateSource
 

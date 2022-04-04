@@ -17,7 +17,7 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
           scoreCards: {
             include: {
               scoreCard: {
-                include: { cardQuestions: { include: { cardQuestion: true, evaluations: true } } },
+                include: { cardQuestions: { include: { cardQuestion: true, scores: true } } },
               },
             },
           },
