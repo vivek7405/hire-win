@@ -27,11 +27,12 @@ import {
   ExtendedAnswer,
   ExtendedCandidate,
   ExtendedFormQuestion,
+  ExtendedScoreCard,
   ExtendedScoreCardQuestion,
 } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { QuestionType } from "@prisma/client"
+import { QuestionType, ScoreCardJobWorkflowStage } from "@prisma/client"
 import Cards from "app/core/components/Cards"
 import Skeleton from "react-loading-skeleton"
 import ScoreCard from "app/score-cards/components/ScoreCard"
@@ -40,6 +41,7 @@ import { titleCase } from "app/core/utils/titleCase"
 import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import updateCandidateScores from "app/jobs/mutations/updateCandidateScores"
+import linkScoreCardWithJobWorkflowStage from "app/jobs/mutations/linkScoreCardWithJobWorkflowStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -249,6 +251,7 @@ const SingleCandidatePage = ({
   }, [candidate])
 
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
+  const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -355,8 +358,16 @@ const SingleCandidatePage = ({
                   preview={false}
                   userId={user?.id || 0}
                   onSubmit={async (values) => {
+                    debugger
                     const toastId = toast.loading(() => <span>Updating Candidate</span>)
                     try {
+                      let linkedScoreCard: ExtendedScoreCard | null = null
+                      if (candidate && !scoreCard?.scoreCardId) {
+                        linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
+                          jobId: candidate?.jobId || "0",
+                          workflowStageId: candidate?.workflowStageId || "0",
+                        })
+                      }
                       await updateCandidateScoresMutation({
                         where: { id: candidate?.id },
                         initial: candidate as any,
@@ -369,7 +380,7 @@ const SingleCandidatePage = ({
                           resume: candidate?.resume || undefined,
                           answers: candidate?.answers || ([] as any),
                           scores:
-                            scoreCard?.scoreCard?.cardQuestions
+                            (scoreCard?.scoreCard || linkedScoreCard)?.cardQuestions
                               ?.map((sq) => {
                                 const rating = values[sq.cardQuestion?.name] || 0
                                 const note = values[`${sq.cardQuestion?.name} Note`]
