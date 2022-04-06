@@ -97,11 +97,10 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
                       ...base,
                       borderWidth: state.isFocused ? "2px" : "1px",
                       padding: state.isFocused ? "0px" : "1px",
-                      borderColor: state.isFocused ? "var(--theme-600)" : "#d1d5db", // gray-300 = #d1d5db
-                      // border: `1px solid lightgray`,
+                      borderColor: state.isFocused ? "var(--theme-500)" : "#d1d5db", // gray-300 = #d1d5db
                       boxShadow: "none !important",
                       "&:hover": {
-                        borderColor: state.isFocused ? "var(--theme-600)" : "#d1d5db", // gray-300 = #d1d5db
+                        borderColor: state.isFocused ? "var(--theme-500)" : "#d1d5db", // gray-300 = #d1d5db
                       },
                     }),
                     option: (provided, state) => ({
