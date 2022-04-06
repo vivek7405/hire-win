@@ -14,6 +14,8 @@ import { Suspense, useEffect } from "react"
 import { Toaster } from "react-hot-toast"
 import ProgressBar from "@badrap/bar-of-progress"
 import "app/core/styles/index.css"
+import "react-phone-number-input/style.css"
+import "app/core/styles/react-phone-number-input.css"
 import { IdProvider } from "@radix-ui/react-id"
 import LoginPage from "app/auth/pages/login"
 

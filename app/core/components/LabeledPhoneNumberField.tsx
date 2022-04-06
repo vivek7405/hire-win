@@ -2,7 +2,6 @@ import { forwardRef, PropsWithoutRef, useMemo } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
 import PhoneInputWithCountrySelect from "react-phone-number-input"
-import "react-phone-number-input/style.css"
 
 export interface LabeledPhoneNumberFieldProps
   extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
