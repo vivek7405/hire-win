@@ -104,6 +104,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
           const existingScore = sq.scores.find(
             (score) =>
               score.candidateId === (props.candidate?.id || "0") &&
+              score.workflowStageId === props.candidate?.workflowStageId &&
               sq.scoreCard.jobWorkflowStages.findIndex(
                 (jws) =>
                   jws.workflowStageId === (props.candidate?.workflowStageId || "0") &&

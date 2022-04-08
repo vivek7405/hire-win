@@ -32,6 +32,7 @@ async function updateCandidateScores(
             rating: score.rating,
             note: score.note,
             scoreCardQuestionId: score.scoreCardQuestionId!,
+            workflowStageId: score.workflowStageId,
           }
         }),
       update: scores
@@ -39,15 +40,17 @@ async function updateCandidateScores(
         ?.map((score) => {
           return {
             where: {
-              candidateId_scoreCardQuestionId: {
+              candidateId_scoreCardQuestionId_workflowStageId: {
                 candidateId: id!,
                 scoreCardQuestionId: score.scoreCardQuestionId!,
+                workflowStageId: score.workflowStageId,
               },
             },
             data: {
               rating: score.rating,
               note: score.note,
               scoreCardQuestionId: score.scoreCardQuestionId!,
+              workflowStageId: score.workflowStageId,
             },
           }
         }),

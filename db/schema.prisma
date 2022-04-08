@@ -236,6 +236,7 @@ model WorkflowStage {
   stageId String
 
   scoreCards ScoreCardJobWorkflowStage[]
+  scores     Score[]
 
   candidates Candidate[]
 
@@ -378,7 +379,10 @@ model Score {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  @@unique([candidateId, scoreCardQuestionId])
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  @@unique([candidateId, scoreCardQuestionId, workflowStageId])
 }
 
 model QuestionOption {

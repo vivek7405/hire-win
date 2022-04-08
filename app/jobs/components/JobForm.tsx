@@ -1,13 +1,25 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
-import { Job } from "app/jobs/validations"
+import {
+  Job,
+  ScoreCardJobWorkflowStageObj,
+  ScoreCardJobWorkflowStageObjInputType,
+} from "app/jobs/validations"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { useQuery } from "blitz"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
-import { Category, Workflow, Form, SalaryType, EmploymentType } from "@prisma/client"
+import {
+  Category,
+  Workflow,
+  Form,
+  SalaryType,
+  EmploymentType,
+  ScoreCardJobWorkflowStage,
+  ScoreCard,
+} from "@prisma/client"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import getFormsWOPagination from "app/forms/queries/getFormsWOPagination"
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Country, State, City } from "country-state-city"
 import CheckboxField from "app/core/components/CheckboxField"
 import { titleCase } from "app/core/utils/titleCase"
@@ -16,8 +28,11 @@ import ApplicationForm from "./ApplicationForm"
 import toast from "react-hot-toast"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import MultiStepForm from "app/core/components/MultiStepForm"
-import { FormStep } from "types"
+import { ExtendedWorkflow, FormStep } from "types"
 import { z } from "zod"
+import { ArrowSmDownIcon } from "@heroicons/react/outline"
+import getScoreCardsWOPagination from "app/score-cards/queries/getScoreCardsWOPagination"
+import { useFormContext } from "react-hook-form"
 
 const Step1Basic = () => {
   return (
@@ -258,14 +273,47 @@ const Step4Salary = () => {
 }
 
 type Step5WorkflowProps = {
-  workflow?: Workflow // Need to be provided while editing the form
+  workflow?: ExtendedWorkflow // Need to be provided while editing the form
+  jobId?: string // Need to be provided while editing the form
   user: any
 }
 const Step5Workflow = (props: Step5WorkflowProps) => {
+  const { getValues, setValue, register } = useFormContext()
+
   const [workflows] = useQuery(getWorkflowsWOPagination, { where: { userId: props.user.id } })
+  const defaultWorkflow = workflows.find((w) => w.name === "Default")
   const [selectedWorkflowId, setSelectedWorkflowId] = useState(
-    workflows.find((w) => w.name === "Default")?.id
+    getValues("workflowId") || props.workflow?.id || defaultWorkflow?.id
   )
+
+  const [scoreCards] = useQuery(getScoreCardsWOPagination, { where: { userId: props.user.id } })
+  const defaultScoreCard = scoreCards.find((w) => w.name === "Default")
+
+  useEffect(() => {
+    const scoreCardsValue: ScoreCardJobWorkflowStageObjInputType[] =
+      workflows
+        .find((w) => w.id === selectedWorkflowId)
+        ?.stages?.map((ws) => {
+          const scoreCardJobWorkflowStage = ws?.scoreCards?.find(
+            (sc) => sc.workflowStageId === ws.id && sc.jobId === props.jobId
+          )
+          const currentScoreCardValueForWorkflowStage: ScoreCardJobWorkflowStageObjInputType =
+            getValues("scoreCards")?.find((value) => value?.workflowStageId === ws.id)
+
+          return {
+            id: scoreCardJobWorkflowStage?.id || "",
+            // scoreCardId will be auto set since it is registered as input name for LabeledReactSelectField
+            scoreCardId:
+              currentScoreCardValueForWorkflowStage?.scoreCardId ||
+              scoreCardJobWorkflowStage?.scoreCardId ||
+              defaultScoreCard?.id ||
+              "",
+            jobId: props.jobId || "",
+            workflowStageId: scoreCardJobWorkflowStage?.workflowStageId || ws.id || "",
+          }
+        }) || []
+    setValue("scoreCards", scoreCardsValue)
+  }, [selectedWorkflowId, workflows, setValue, getValues, defaultScoreCard, props.jobId])
 
   return (
     <>
@@ -280,7 +328,6 @@ const Step5Workflow = (props: Step5WorkflowProps) => {
             options={
               !props.workflow || workflows.find((w) => w.id === props.workflow?.id)
                 ? [
-                    // { label: "Default", value: "" },
                     ...workflows.map((w) => {
                       return { label: w.name!, value: w.id! }
                     }),
@@ -288,8 +335,23 @@ const Step5Workflow = (props: Step5WorkflowProps) => {
                 : [{ label: props.workflow?.name!, value: props.workflow?.id! }]
             }
             defaultValue={selectedWorkflowId}
-            onChange={(value) => {
-              setSelectedWorkflowId(value as any)
+            value={selectedWorkflowId}
+            onChange={(selectedWorkflowId) => {
+              getValues("scoreCards")?.forEach((value) => {
+                const selectedWorkflow = workflows.find(
+                  (w) => w.id === (selectedWorkflowId as any as string)
+                )
+                if (value?.workflowStageId) {
+                  const workflowStage = selectedWorkflow?.stages?.find(
+                    (ws) => ws.id == value?.workflowStageId
+                  )
+                  const scoreCardJobWorkflowStage = workflowStage?.scoreCards?.find(
+                    (sc) => sc.workflowStageId === workflowStage?.id && sc.jobId === props.jobId
+                  )
+                  value.scoreCardId = scoreCardJobWorkflowStage?.id
+                }
+              })
+              setSelectedWorkflowId(selectedWorkflowId as any)
             }}
           />
         </div>
@@ -299,14 +361,51 @@ const Step5Workflow = (props: Step5WorkflowProps) => {
             ?.stages?.sort((a, b) => {
               return a.order - b.order
             })
-            .map((ws) => {
+            .map((ws, index) => {
+              const existingScoreCardJobWorkflowStage = ws.scoreCards?.find(
+                (sc) => sc.workflowStageId === ws.id && sc.jobId === props.jobId
+              )
+              const existingScoreCard: ScoreCard | null | undefined = scoreCards.find(
+                (sc) => sc.id === existingScoreCardJobWorkflowStage?.scoreCardId
+              )
+
               return (
-                <div
-                  key={ws.id}
-                  className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
-                >
-                  <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                    {ws.stage?.name}
+                <div key={ws.id}>
+                  <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
+                    <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                      {ws.stage?.name}
+                    </div>
+                  </div>
+
+                  <div className="w-32 my-2 flex flex-col items-center justify-center">
+                    <ArrowSmDownIcon className="h-6 w-auto text-neutral-500" />
+                  </div>
+
+                  <div className="w-32 flex flex-col items-center justify-center">
+                    <LabeledReactSelectField
+                      name={`scoreCards.${index}.scoreCardId`}
+                      // {...register(`scoreCards.${index}.scoreCardId`)}
+                      placeholder={`Score Card for ${ws.stage?.name}`}
+                      testid={`scoreCard-${ws.id}`}
+                      disabled={existingScoreCardJobWorkflowStage && !existingScoreCard}
+                      options={
+                        !existingScoreCardJobWorkflowStage || existingScoreCard
+                          ? [
+                              ...scoreCards.map((sc) => {
+                                return { label: sc.name!, value: sc.id! }
+                              }),
+                            ]
+                          : [
+                              {
+                                label: (existingScoreCard as ScoreCard | null | undefined)?.name!,
+                                value: (existingScoreCard as ScoreCard | null | undefined)?.id!,
+                              },
+                            ]
+                      }
+                      defaultValue={
+                        existingScoreCardJobWorkflowStage?.scoreCardId || defaultScoreCard?.id
+                      }
+                    />
                   </div>
                 </div>
               )
@@ -321,8 +420,9 @@ type Step6FormProps = {
   initialValues?: any
   user: any
   category?: Category // Need to be provided while editing the form
-  workflow?: Workflow // Need to be provided while editing the form
+  workflow?: ExtendedWorkflow // Need to be provided while editing the form
   form?: Form // Need to be provided while editing the form
+  jobId?: string // Need to be provided while editing the form
 }
 const Step6Form = (props: Step6FormProps) => {
   const [forms] = useQuery(getFormsWOPagination, { where: { userId: props.user?.id } })
@@ -341,7 +441,7 @@ const Step6Form = (props: Step6FormProps) => {
             <Step2Extra user={props.user} category={props.category} />
             <Step3Location initialValues={props.initialValues} />
             <Step4Salary />
-            <Step5Workflow user={props.user} workflow={props.workflow} />
+            <Step5Workflow user={props.user} workflow={props.workflow} jobId={props.jobId} />
           </div>
           <LabeledReactSelectField
             name="formId"
@@ -393,8 +493,9 @@ type JobFormProps = {
   subHeader: string
   user: any
   category?: Category // Need to be provided while editing the form
-  workflow?: Workflow // Need to be provided while editing the form
+  workflow?: ExtendedWorkflow // Need to be provided while editing the form
   form?: Form // Need to be provided while editing the form
+  jobId?: string // Need to be provided while editing the form
 }
 export const JobForm = (props: JobFormProps) => {
   const stp1: FormStep = {
@@ -444,11 +545,14 @@ export const JobForm = (props: JobFormProps) => {
   }
   const stp5: FormStep = {
     name: "Workflow",
-    renderComponent: <Step5Workflow user={props.user} workflow={props.workflow} />,
+    renderComponent: (
+      <Step5Workflow user={props.user} workflow={props.workflow} jobId={props.jobId} />
+    ),
     validationSchema: z.object({
       id: z.string().optional(),
       slug: z.string().optional(),
       workflowId: z.string().optional(),
+      scoreCards: z.array(ScoreCardJobWorkflowStageObj).optional(),
     }),
   }
   const stp6: FormStep = {
@@ -460,6 +564,7 @@ export const JobForm = (props: JobFormProps) => {
         category={props.category}
         workflow={props.workflow}
         form={props.form}
+        jobId={props.jobId}
       />
     ),
     validationSchema: Job,

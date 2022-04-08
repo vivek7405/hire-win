@@ -271,7 +271,7 @@ const SingleCandidatePage = ({
   //   console.log(error)
   // }
 
-  const scoreCard = candidate?.job?.scoreCards?.find(
+  const scoreCardJobWorkflowStage = candidate?.job?.scoreCards?.find(
     (sc) => sc.workflowStageId === candidate?.workflowStageId
   )
 
@@ -354,7 +354,7 @@ const SingleCandidatePage = ({
                   candidate={candidate}
                   header={`${titleCase(candidate?.name)}'s Score`}
                   subHeader={`${candidate?.workflowStage?.stage?.name || ""} Stage`}
-                  scoreCardId={scoreCard?.scoreCardId!}
+                  scoreCardId={scoreCardJobWorkflowStage?.scoreCardId!}
                   preview={false}
                   userId={user?.id || 0}
                   onSubmit={async (values) => {
@@ -362,7 +362,7 @@ const SingleCandidatePage = ({
                     const toastId = toast.loading(() => <span>Updating Candidate</span>)
                     try {
                       let linkedScoreCard: ExtendedScoreCard | null = null
-                      if (candidate && !scoreCard?.scoreCardId) {
+                      if (candidate && !scoreCardJobWorkflowStage?.scoreCardId) {
                         linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
                           jobId: candidate?.jobId || "0",
                           workflowStageId: candidate?.workflowStageId || "0",
@@ -380,7 +380,7 @@ const SingleCandidatePage = ({
                           resume: candidate?.resume || undefined,
                           answers: candidate?.answers || ([] as any),
                           scores:
-                            (scoreCard?.scoreCard || linkedScoreCard)?.cardQuestions
+                            (scoreCardJobWorkflowStage?.scoreCard || linkedScoreCard)?.cardQuestions
                               ?.map((sq) => {
                                 const rating = values[sq.cardQuestion?.name] || 0
                                 const note = values[`${sq.cardQuestion?.name} Note`]
@@ -391,6 +391,7 @@ const SingleCandidatePage = ({
                                   rating: rating ? parseInt(rating) : 0,
                                   note: note,
                                   id: scoreId || null,
+                                  workflowStageId: candidate?.workflowStageId || "",
                                 }
                               })
                               ?.filter((score) => score.rating > 0) || ([] as any),

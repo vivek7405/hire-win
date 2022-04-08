@@ -25,6 +25,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     salaryType,
     employmentType,
     validThrough,
+    scoreCards,
   } = Job.parse(data)
 
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
@@ -75,10 +76,10 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       },
       scoreCards: {
         createMany: {
-          data: workflow?.stages?.map((ws) => {
+          data: scoreCards?.map((scoreCardJobWorkflowStage) => {
             return {
-              scoreCardId: defaultScoreCard?.id!,
-              workflowStageId: ws.id!,
+              scoreCardId: scoreCardJobWorkflowStage?.scoreCardId,
+              workflowStageId: scoreCardJobWorkflowStage?.workflowStageId!,
             }
           })!,
         },
