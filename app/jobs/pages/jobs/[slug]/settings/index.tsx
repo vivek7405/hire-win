@@ -143,6 +143,7 @@ const JobSettingsPage = ({
             categoryId: job?.category?.id,
             workflowId: job?.workflow?.id,
             formId: job?.form?.id,
+            scoreCards: job?.scoreCards,
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating Job</span>)
