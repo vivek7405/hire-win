@@ -149,7 +149,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
               <LabeledRatingField
                 disabled={disabled}
-                value={existingScore?.rating}
+                defaultValue={existingScore?.rating}
                 name={`${q.name}`}
                 label={q.name}
                 onChange={props.onChange}

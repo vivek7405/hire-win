@@ -84,6 +84,34 @@ async function updateCandidateScores(
   const candidate = await db.candidate.update({
     where,
     data: updateData,
+    include: {
+      job: {
+        include: {
+          form: {
+            include: { questions: { include: { question: { include: { options: true } } } } },
+          },
+          workflow: { include: { stages: { include: { stage: true } } } },
+          scoreCards: {
+            include: {
+              scoreCard: {
+                include: {
+                  cardQuestions: { include: { cardQuestion: true, scores: true } },
+                  jobWorkflowStages: {
+                    include: {
+                      scoreCard: {
+                        include: { cardQuestions: { include: { cardQuestion: true } } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      workflowStage: { include: { stage: true } },
+      answers: { include: { question: { include: { options: true } } } },
+    },
   })
 
   return candidate

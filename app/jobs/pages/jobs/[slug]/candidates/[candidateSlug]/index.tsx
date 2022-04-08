@@ -244,12 +244,9 @@ const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageIdForScore
   )
 }
 
-const SingleCandidatePage = ({
-  user,
-  candidate,
-  error,
-  canUpdate,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const { user, error, canUpdate } = props
+  const [candidate, setCandidate] = useState(props.candidate)
   const [selectedWorkflowStageIdForScoreCard, setSelectedWorkflowStageIdForScoreCard] = useState(
     candidate?.workflowStageId || ""
   )
@@ -400,9 +397,9 @@ const SingleCandidatePage = ({
                     })}
                 </div>
                 <ScoreCard
-                  // submitDisabled={
-                  //   selectedWorkflowStageIdForScoreCard !== candidate?.workflowStageId
-                  // }
+                  submitDisabled={
+                    selectedWorkflowStageIdForScoreCard !== candidate?.workflowStageId
+                  }
                   key={selectedWorkflowStageIdForScoreCard}
                   candidate={candidate}
                   header={`${titleCase(candidate?.name)}'s Score`}
@@ -428,7 +425,7 @@ const SingleCandidatePage = ({
                             "0",
                         })
                       }
-                      await updateCandidateScoresMutation({
+                      const updatedCandidate = await updateCandidateScoresMutation({
                         where: { id: candidate?.id },
                         initial: candidate as any,
                         data: {
@@ -464,6 +461,7 @@ const SingleCandidatePage = ({
                               ?.filter((score) => score.rating > 0) || ([] as any),
                         },
                       })
+                      setCandidate({ ...updatedCandidate })
                       toast.success(
                         () => (
                           <span>

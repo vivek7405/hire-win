@@ -24,11 +24,14 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
     const {
       control,
       setValue,
+      getValues,
       formState: { isSubmitting, errors },
     } = useFormContext()
 
     useEffect(() => {
-      setValue(name, value)
+      if (name && value) {
+        setValue(name, value)
+      }
     }, [name, value, setValue])
 
     useMemo(() => {
@@ -75,7 +78,7 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
                       } w-auto ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     />
                   }
-                  initialRating={value}
+                  initialRating={value || defaultValue}
                   onChange={(val) => {
                     onChange(val)
                     props.onChange && props.onChange({ name, value: val })
