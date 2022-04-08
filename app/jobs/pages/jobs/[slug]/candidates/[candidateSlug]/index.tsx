@@ -238,12 +238,35 @@ const getCards = (candidate: ExtendedCandidate) => {
   )
 }
 
+const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageIdForScoreCard) => {
+  return candidate?.job?.scoreCards?.find(
+    (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard || candidate?.workflowStageId
+  )
+}
+
 const SingleCandidatePage = ({
   user,
   candidate,
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [selectedWorkflowStageIdForScoreCard, setSelectedWorkflowStageIdForScoreCard] = useState(
+    candidate?.workflowStageId || ""
+  )
+  // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStageIdForScoreCard)?.scoreCardId || ""
+  const [scoreCardId, setScoreCardId] = useState(
+    candidate?.job?.scoreCards?.find(
+      (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
+    )?.scoreCardId || ""
+  )
+  useEffect(() => {
+    setScoreCardId(
+      candidate?.job?.scoreCards?.find(
+        (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
+      )?.scoreCardId || ""
+    )
+  }, [candidate, selectedWorkflowStageIdForScoreCard])
+
   const [file, setFile] = useState(null as any)
   const [cards, setCards] = useState(getCards(candidate!))
   useEffect(() => {
@@ -253,16 +276,19 @@ const SingleCandidatePage = ({
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
 
-  if (error) {
-    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
-  }
-
   const resume = candidate?.resume as AttachmentObject
-  if (resume?.Key && !file) {
+
+  useMemo(() => {
+    // if (resume?.Key && !file) {
     getResume(resume).then((response) => {
       const file = response?.data?.Body
       setFile(file)
     })
+    // }
+  }, [resume])
+
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
 
   // try {
@@ -270,10 +296,6 @@ const SingleCandidatePage = ({
   // } catch (error) {
   //   console.log(error)
   // }
-
-  const scoreCardJobWorkflowStage = candidate?.job?.scoreCards?.find(
-    (sc) => sc.workflowStageId === candidate?.workflowStageId
-  )
 
   return (
     <AuthLayout user={user}>
@@ -350,22 +372,61 @@ const SingleCandidatePage = ({
               className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
             >
               <div className="w-full h-full rounded-2xl">
+                <div className="flex w-full max-w-full overflow-auto bg-theme-50 justify-between sticky top-0">
+                  {candidate?.job?.workflow?.stages
+                    ?.sort((a, b) => {
+                      return a?.order - b?.order
+                    })
+                    ?.map((ws, index) => {
+                      return (
+                        <div
+                          key={`${ws.stage?.name}${index}`}
+                          className={`${index > 0 ? "border-l-2" : ""} ${
+                            index < (candidate?.job?.workflow?.stages?.length || 0) - 1
+                              ? "border-r-2"
+                              : ""
+                          } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
+                            selectedWorkflowStageIdForScoreCard === ws.id
+                              ? "!bg-theme-500 !text-white"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            setSelectedWorkflowStageIdForScoreCard(ws.id)
+                            // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
+                          }}
+                        >
+                          {ws.stage?.name}
+                        </div>
+                      )
+                    })}
+                </div>
                 <ScoreCard
+                  submitDisabled={
+                    selectedWorkflowStageIdForScoreCard !== candidate?.workflowStageId
+                  }
+                  key={selectedWorkflowStageIdForScoreCard}
                   candidate={candidate}
                   header={`${titleCase(candidate?.name)}'s Score`}
-                  subHeader={`${candidate?.workflowStage?.stage?.name || ""} Stage`}
-                  scoreCardId={scoreCardJobWorkflowStage?.scoreCardId!}
+                  subHeader={`${
+                    candidate?.job?.workflow?.stages?.find(
+                      (ws) => ws.id === selectedWorkflowStageIdForScoreCard
+                    )?.stage?.name
+                  } Stage`}
+                  scoreCardId={scoreCardId}
                   preview={false}
                   userId={user?.id || 0}
+                  workflowStageId={selectedWorkflowStageIdForScoreCard}
                   onSubmit={async (values) => {
-                    debugger
                     const toastId = toast.loading(() => <span>Updating Candidate</span>)
                     try {
                       let linkedScoreCard: ExtendedScoreCard | null = null
-                      if (candidate && !scoreCardJobWorkflowStage?.scoreCardId) {
+                      if (candidate && !scoreCardId) {
                         linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
                           jobId: candidate?.jobId || "0",
-                          workflowStageId: candidate?.workflowStageId || "0",
+                          workflowStageId:
+                            selectedWorkflowStageIdForScoreCard ||
+                            candidate?.workflowStageId ||
+                            "0",
                         })
                       }
                       await updateCandidateScoresMutation({
@@ -380,7 +441,11 @@ const SingleCandidatePage = ({
                           resume: candidate?.resume || undefined,
                           answers: candidate?.answers || ([] as any),
                           scores:
-                            (scoreCardJobWorkflowStage?.scoreCard || linkedScoreCard)?.cardQuestions
+                            (
+                              candidate?.job?.scoreCards?.find(
+                                (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
+                              )?.scoreCard || linkedScoreCard
+                            )?.cardQuestions
                               ?.map((sq) => {
                                 const rating = values[sq.cardQuestion?.name] || 0
                                 const note = values[`${sq.cardQuestion?.name} Note`]
@@ -391,7 +456,10 @@ const SingleCandidatePage = ({
                                   rating: rating ? parseInt(rating) : 0,
                                   note: note,
                                   id: scoreId || null,
-                                  workflowStageId: candidate?.workflowStageId || "",
+                                  workflowStageId:
+                                    selectedWorkflowStageIdForScoreCard ||
+                                    candidate?.workflowStageId ||
+                                    "",
                                 }
                               })
                               ?.filter((score) => score.rating > 0) || ([] as any),
@@ -413,7 +481,7 @@ const SingleCandidatePage = ({
                     }
                   }}
                   // scoreCardQuestions={
-                  //   scoreCard?.scoreCard?.cardQuestions as any as ExtendedScoreCardQuestion[]
+                  //   scoreCardJobWorkflowStage.scoreCard.cardQuestions as any as ExtendedScoreCardQuestion[]
                   // }
                 />
               </div>

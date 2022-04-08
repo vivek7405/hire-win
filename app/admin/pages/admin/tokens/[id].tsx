@@ -53,9 +53,7 @@ const SingleTokenAdminPage = ({
         <Form
           submitText="Update"
           initialValues={foundToken}
-          onSubmit={async (values) => {
-            console.log(values)
-          }}
+          onSubmit={async (values) => {}}
           header={`${foundToken?.id}`}
           subHeader={``}
         >

@@ -148,7 +148,6 @@ const JobSettingsPage = ({
             const toastId = toast.loading(() => <span>Updating Job</span>)
             try {
               values.description = convertToRaw(values?.description?.getCurrentContent() || {})
-              console.log(values)
 
               await updateJobMutation({
                 where: { id: job?.id },

@@ -44,7 +44,7 @@ export const LabeledTextAreaField = forwardRef<HTMLTextAreaElement, LabeledTextA
             {...register(`${name}` as const)}
             {...props}
             data-testid={`${props.testid && `${props.testid}-`}input`}
-            className="border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded"
+            className="border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
       </div>

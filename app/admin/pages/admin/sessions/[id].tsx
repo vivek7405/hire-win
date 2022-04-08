@@ -53,9 +53,7 @@ const SingleSessionAdminPage = ({
         <Form
           submitText="Update"
           initialValues={foundSession}
-          onSubmit={async (values) => {
-            console.log(values)
-          }}
+          onSubmit={async (values) => {}}
           header={`${foundSession?.id}`}
           subHeader={``}
         >

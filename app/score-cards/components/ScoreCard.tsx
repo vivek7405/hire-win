@@ -31,6 +31,7 @@ type ScoreCardProps = {
   onChange?: any
   userId: number
   candidate?: Candidate
+  workflowStageId?: string
 }
 
 export const ScoreCard = (props: ScoreCardProps) => {
@@ -103,41 +104,51 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
           const existingScore = sq.scores.find(
             (score) =>
-              score.candidateId === (props.candidate?.id || "0") &&
-              score.workflowStageId === props.candidate?.workflowStageId &&
-              sq.scoreCard.jobWorkflowStages.findIndex(
-                (jws) =>
-                  jws.workflowStageId === (props.candidate?.workflowStageId || "0") &&
-                  jws.jobId === (props.candidate?.jobId || "0")
-              ) >= 0
+              (score.candidateId === (props.candidate?.id || "0") &&
+                score.workflowStageId === props.workflowStageId) ||
+              props.candidate?.workflowStageId ||
+              ("0" &&
+                sq.scoreCard.jobWorkflowStages.findIndex(
+                  (jws) =>
+                    jws.workflowStageId ===
+                      (props.workflowStageId || props.candidate?.workflowStageId || "0") &&
+                    jws.jobId === (props.candidate?.jobId || "0")
+                ) >= 0)
           )
+
+          const disabled = props.workflowStageId !== props.candidate?.workflowStageId
 
           return (
             <div key={q.id}>
               {!(sq.showNote || existingScore?.note) && (
-                <span title="Add Note">
-                  <PlusCircleIcon
-                    className="h-5 w-auto float-right cursor-pointer text-theme-600"
-                    onClick={() => {
-                      sq.showNote = true
-                      setData([...data])
-                    }}
-                  />
-                </span>
+                <button
+                  disabled={disabled}
+                  title="Add Note"
+                  onClick={() => {
+                    sq.showNote = true
+                    setData([...data])
+                  }}
+                  className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <PlusCircleIcon className="h-5 w-auto text-theme-600" />
+                </button>
               )}
               {!existingScore?.note && sq.showNote && (
-                <span title="Hide Note">
-                  <XCircleIcon
-                    className="h-5 w-auto float-right cursor-pointer text-red-600"
-                    onClick={() => {
-                      sq.showNote = false
-                      setData([...data])
-                    }}
-                  />
-                </span>
+                <button
+                  disabled={disabled}
+                  title="Hide Note"
+                  onClick={() => {
+                    sq.showNote = false
+                    setData([...data])
+                  }}
+                  className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <XCircleIcon className="h-5 w-auto text-red-600" />
+                </button>
               )}
 
               <LabeledRatingField
+                disabled={disabled}
                 defaultValue={existingScore?.rating}
                 name={q.name}
                 label={q.name}
@@ -146,6 +157,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
               {(sq.showNote || existingScore?.note) && (
                 <LabeledTextAreaField
+                  disabled={disabled}
                   defaultValue={existingScore?.note || ""}
                   name={`${q.name} Note`}
                 />

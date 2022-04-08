@@ -55,18 +55,19 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
             render={({ field: { onChange, value } }) => {
               return (
                 <Rating
+                  readonly={disabled}
                   emptySymbol={
                     <StarIconOutline
                       className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
                         !isBlack ? "text-theme-600" : ""
-                      } w-auto`}
+                      } w-auto ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     />
                   }
                   fullSymbol={
                     <StarIconSolid
                       className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
                         !isBlack ? "text-theme-600" : ""
-                      } w-auto`}
+                      } w-auto ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     />
                   }
                   initialRating={value}
