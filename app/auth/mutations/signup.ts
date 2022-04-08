@@ -7,6 +7,7 @@ import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWi
 import { UserRole } from "@prisma/client"
 import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
 import createFactoryCategories from "app/categories/mutations/createFactoryCategories"
+import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
 
 export default resolver.pipe(
   resolver.zod(Signup),
@@ -31,6 +32,7 @@ export default resolver.pipe(
     })
 
     await createFormWithFactoryFormQuestions("Default", user?.id)
+    await createScoreCardWithFactoryScoreCardQuestions("Default", user?.id)
     await createWorkflowWithFactoryWorkflowStages("Default", user?.id)
     await createFactoryCategories(user?.id)
 

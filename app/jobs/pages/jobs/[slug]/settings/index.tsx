@@ -122,6 +122,7 @@ const JobSettingsPage = ({
           user={user}
           category={job?.category!}
           workflow={job?.workflow!}
+          jobId={job?.id}
           header="Job Details"
           subHeader="Update job details"
           initialValues={{
@@ -147,6 +148,8 @@ const JobSettingsPage = ({
             const toastId = toast.loading(() => <span>Updating Job</span>)
             try {
               values.description = convertToRaw(values?.description?.getCurrentContent() || {})
+              console.log(values)
+
               await updateJobMutation({
                 where: { id: job?.id },
                 data: { ...values },

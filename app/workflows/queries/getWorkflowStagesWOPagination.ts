@@ -13,6 +13,7 @@ async function getWorkflowStagesWOPagination({ where, orderBy }: GetWorkflowStag
     orderBy,
     include: {
       stage: true,
+      scoreCards: { include: { scoreCard: true } },
     },
   })
 

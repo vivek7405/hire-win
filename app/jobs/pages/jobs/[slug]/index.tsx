@@ -195,7 +195,7 @@ const Candidates = (props: CandidateProps) => {
     let data: ExtendedCandidate[] = []
 
     await candidates.forEach((candidate) => {
-      data = [...data, { ...candidate }]
+      data = [...data, { ...(candidate as any) }]
       setData(data)
     })
   }, [candidates])
@@ -435,6 +435,7 @@ const Candidates = (props: CandidateProps) => {
       totalCount={count}
       startPage={startPage}
       endPage={endPage}
+      resultName="candidate"
     />
   ) : (
     <KanbanBoard

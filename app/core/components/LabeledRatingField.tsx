@@ -12,10 +12,14 @@ export interface LabeledRatingFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   testid?: string
   disabled?: boolean
   defaultValue?: any
+  onChange?: any
+  height?: number
+  ratingClass?: string
+  isBlack?: boolean
 }
 
 export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFieldProps>(
-  ({ label, outerProps, name, defaultValue, disabled, ...props }, ref) => {
+  ({ label, outerProps, name, defaultValue, disabled, height, isBlack, ...props }, ref) => {
     const {
       control,
       // setValue,
@@ -51,10 +55,26 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
             render={({ field: { onChange, value } }) => {
               return (
                 <Rating
-                  emptySymbol={<StarIconOutline className="h-6 w-auto" />}
-                  fullSymbol={<StarIconSolid className="h-6 w-auto" />}
+                  emptySymbol={
+                    <StarIconOutline
+                      className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
+                        !isBlack ? "text-theme-600" : ""
+                      } w-auto`}
+                    />
+                  }
+                  fullSymbol={
+                    <StarIconSolid
+                      className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
+                        !isBlack ? "text-theme-600" : ""
+                      } w-auto`}
+                    />
+                  }
                   initialRating={value}
-                  onChange={onChange}
+                  onChange={(val) => {
+                    onChange(val)
+                    props.onChange && props.onChange({ name, value: val })
+                  }}
+                  className={props.ratingClass ? props.ratingClass : ""}
                 />
               )
             }}

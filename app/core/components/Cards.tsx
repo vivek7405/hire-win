@@ -205,7 +205,7 @@ const Cards = ({
                                 </span>
                                 <div
                                   // className='react-kanban-card__description'
-                                  className="pt-2.5"
+                                  className="pt-2.5 overflow-auto"
                                 >
                                   {card.description}
                                 </div>

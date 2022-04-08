@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { Suspense, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -11,6 +11,7 @@ import {
   useRouter,
   usePaginatedQuery,
   dynamic,
+  useMutation,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -26,11 +27,21 @@ import {
   ExtendedAnswer,
   ExtendedCandidate,
   ExtendedFormQuestion,
+  ExtendedScoreCard,
+  ExtendedScoreCardQuestion,
 } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { QuestionType } from "@prisma/client"
+import { QuestionType, ScoreCardJobWorkflowStage } from "@prisma/client"
 import Cards from "app/core/components/Cards"
+import Skeleton from "react-loading-skeleton"
+import ScoreCard from "app/score-cards/components/ScoreCard"
+import toast from "react-hot-toast"
+import { titleCase } from "app/core/utils/titleCase"
+import Form from "app/core/components/Form"
+import LabeledRatingField from "app/core/components/LabeledRatingField"
+import updateCandidateScores from "app/jobs/mutations/updateCandidateScores"
+import linkScoreCardWithJobWorkflowStage from "app/jobs/mutations/linkScoreCardWithJobWorkflowStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -239,12 +250,15 @@ const SingleCandidatePage = ({
     setCards(getCards(candidate!))
   }, [candidate])
 
+  const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
+  const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
 
   const resume = candidate?.resume as AttachmentObject
-  if (!file) {
+  if (resume?.Key && !file) {
     getResume(resume).then((response) => {
       const file = response?.data?.Body
       setFile(file)
@@ -257,10 +271,28 @@ const SingleCandidatePage = ({
   //   console.log(error)
   // }
 
+  const scoreCardJobWorkflowStage = candidate?.job?.scoreCards?.find(
+    (sc) => sc.workflowStageId === candidate?.workflowStageId
+  )
+
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
+
       <br />
+
+      <Link href={Routes.JobsHome()} passHref>
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+          Send Email
+        </a>
+      </Link>
+
+      <Link href={Routes.JobsHome()} passHref>
+        <a className="float-right text-white bg-theme-600 mx-6 px-4 py-2 rounded-sm hover:bg-theme-700">
+          Schedule Meeting
+        </a>
+      </Link>
+
       {canUpdate && (
         <Link
           href={Routes.CandidateSettingsPage({
@@ -269,29 +301,126 @@ const SingleCandidatePage = ({
           })}
           passHref
         >
-          <a className="float-right" data-testid={`${candidate?.id}-settingsLink`}>
+          <a
+            className="float-right underline text-theme-600 py-2 hover:text-theme-800"
+            data-testid={`${candidate?.id}-settingsLink`}
+          >
             Settings
           </a>
         </Link>
       )}
-      <h3 className="font-bold text-5xl">{candidate?.name}</h3>
-      <br />
-      <div className="flex">
-        <div className="w-1/4 mt-5">
-          <Cards
-            cards={cards}
-            setCards={setCards}
-            noPagination={true}
-            mutateCardDropDB={(source, destination, draggableId) => {}}
-            droppableName="answers"
-            isDragDisabled={true}
-            direction={DragDirection.VERTICAL}
-            noSearch={true}
-            isFull={true}
+
+      <div className="flex items-center space-x-4">
+        <h3 className="font-bold text-5xl text-theme-600">{candidate?.name}</h3>
+        <Form
+          noFormatting={true}
+          onSubmit={async () => {
+            return
+          }}
+        >
+          <LabeledRatingField
+            name="candidateAverageRating"
+            ratingClass="!flex items-center"
+            height={8}
           />
-        </div>
-        <div className="w-3/4">{file && <PDFViewer file={file} />}</div>
+        </Form>
       </div>
+
+      <br />
+
+      <Suspense
+        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
+      >
+        <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
+          <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-400 rounded-lg">
+            {file && <PDFViewer file={file} scale={1.29} />}
+            <Cards
+              cards={cards}
+              setCards={setCards}
+              noPagination={true}
+              mutateCardDropDB={(source, destination, draggableId) => {}}
+              droppableName="answers"
+              isDragDisabled={true}
+              direction={DragDirection.HORIZONTAL}
+              noSearch={true}
+            />
+          </div>
+          <div className="w-full md:w-1/2 lg:w-1/3">
+            <div
+              className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
+            >
+              <div className="w-full h-full rounded-2xl">
+                <ScoreCard
+                  candidate={candidate}
+                  header={`${titleCase(candidate?.name)}'s Score`}
+                  subHeader={`${candidate?.workflowStage?.stage?.name || ""} Stage`}
+                  scoreCardId={scoreCardJobWorkflowStage?.scoreCardId!}
+                  preview={false}
+                  userId={user?.id || 0}
+                  onSubmit={async (values) => {
+                    debugger
+                    const toastId = toast.loading(() => <span>Updating Candidate</span>)
+                    try {
+                      let linkedScoreCard: ExtendedScoreCard | null = null
+                      if (candidate && !scoreCardJobWorkflowStage?.scoreCardId) {
+                        linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
+                          jobId: candidate?.jobId || "0",
+                          workflowStageId: candidate?.workflowStageId || "0",
+                        })
+                      }
+                      await updateCandidateScoresMutation({
+                        where: { id: candidate?.id },
+                        initial: candidate as any,
+                        data: {
+                          id: candidate?.id,
+                          jobId: candidate?.job?.id,
+                          name: candidate?.name,
+                          email: candidate?.email,
+                          source: candidate?.source,
+                          resume: candidate?.resume || undefined,
+                          answers: candidate?.answers || ([] as any),
+                          scores:
+                            (scoreCardJobWorkflowStage?.scoreCard || linkedScoreCard)?.cardQuestions
+                              ?.map((sq) => {
+                                const rating = values[sq.cardQuestion?.name] || 0
+                                const note = values[`${sq.cardQuestion?.name} Note`]
+                                const scoreId = values[`${sq.cardQuestion?.name} ScoreId`]
+
+                                return {
+                                  scoreCardQuestionId: sq.id,
+                                  rating: rating ? parseInt(rating) : 0,
+                                  note: note,
+                                  id: scoreId || null,
+                                  workflowStageId: candidate?.workflowStageId || "",
+                                }
+                              })
+                              ?.filter((score) => score.rating > 0) || ([] as any),
+                        },
+                      })
+                      toast.success(
+                        () => (
+                          <span>
+                            Candidate Score Card Updated for stage{" "}
+                            {candidate?.workflowStage?.stage?.name}
+                          </span>
+                        ),
+                        { id: toastId }
+                      )
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                      )
+                    }
+                  }}
+                  // scoreCardQuestions={
+                  //   scoreCard?.scoreCard?.cardQuestions as any as ExtendedScoreCardQuestion[]
+                  // }
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Suspense>
     </AuthLayout>
   )
 }

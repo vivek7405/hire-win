@@ -14,6 +14,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const {
+    id,
     title,
     description,
     categoryId,
@@ -29,6 +30,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     salaryType,
     employmentType,
     validThrough,
+    scoreCards,
   } = Job.parse(data)
 
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
@@ -59,6 +61,18 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
       salaryType,
       employmentType,
       validThrough,
+      scoreCards: {
+        delete: initial?.scoreCards?.map((sc) => {
+          return { id: sc.id }
+        }),
+        upsert: scoreCards?.map((sc) => {
+          return {
+            create: { scoreCardId: sc.scoreCardId, workflowStageId: sc.workflowStageId },
+            update: { scoreCardId: sc.scoreCardId, workflowStageId: sc.workflowStageId },
+            where: { id: sc.id || "" },
+          }
+        }),
+      },
     },
   })
 

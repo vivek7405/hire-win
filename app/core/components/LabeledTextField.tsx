@@ -5,7 +5,7 @@ import toast from "react-hot-toast"
 export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   name: string
   label?: string
-  type?: "text" | "password" | "email" | "number" | "date" | "url"
+  type?: "text" | "password" | "email" | "number" | "date" | "url" | "hidden"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
 }

@@ -330,9 +330,7 @@ const CandidatesHome = ({
         </Link>
       )}
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <Candidates job={job as any} />
       </Suspense>
     </AuthLayout>
