@@ -244,6 +244,10 @@ const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageIdForScore
   )
 }
 
+const getScoreAverage = (ratingsArray: number[]) => {
+  return ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length
+}
+
 const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { user, error, canUpdate } = props
   const [candidate, setCandidate] = useState(props.candidate)
@@ -282,6 +286,15 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     })
     // }
   }, [resume])
+
+  let ratingsArray = [] as number[]
+  candidate?.job?.scoreCards?.forEach((scoreCardJobWorkflowStage) => {
+    scoreCardJobWorkflowStage.scoreCard?.cardQuestions?.forEach((cq) => {
+      cq.scores?.forEach((score) => {
+        ratingsArray.push(score.rating)
+      })
+    })
+  })
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -340,6 +353,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             name="candidateAverageRating"
             ratingClass="!flex items-center"
             height={8}
+            value={Math.round(getScoreAverage(ratingsArray))}
+            disabled={true}
           />
         </Form>
       </div>
@@ -461,7 +476,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                               ?.filter((score) => score.rating > 0) || ([] as any),
                         },
                       })
-                      setCandidate({ ...updatedCandidate })
+                      // Stop resume by reloading by assigning previous value since resume won't be changed by this mutation
+                      setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
                       toast.success(
                         () => (
                           <span>

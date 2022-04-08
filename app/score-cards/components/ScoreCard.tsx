@@ -114,7 +114,6 @@ export const ScoreCard = (props: ScoreCardProps) => {
                   jws.jobId === (props.candidate?.jobId || "0")
               ) >= 0
           )
-          console.log(existingScore)
 
           const disabled = props.workflowStageId !== props.candidate?.workflowStageId
 
