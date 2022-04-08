@@ -16,44 +16,68 @@ async function updateCandidateScores(
 
   const { id, scores } = Candidate.parse(data)
 
-  const alreadyExists = await db.score.findMany({
+  const scoresToDelete = await db.score.findMany({
     where: {
       candidateId: id,
-      id: { in: scores?.map((score) => score.id || "0") },
+      workflowStageId: scores && scores.length > 0 ? scores[0]?.workflowStageId : "0",
     },
   })
 
   let updateData = {
+    // scores: {
+    //   create: scores
+    //     ?.filter((score) => !alreadyExists.map((sc) => sc.id).includes(score.id || "0"))
+    //     ?.map((score) => {
+    //       return {
+    //         rating: score.rating,
+    //         note: score.note,
+    //         scoreCardQuestionId: score.scoreCardQuestionId!,
+    //         workflowStageId: score.workflowStageId,
+    //       }
+    //     }),
+    //   update: scores
+    //     ?.filter((score) => alreadyExists.map((sc) => sc.id).includes(score.id || "0"))
+    //     ?.map((score) => {
+    //       return {
+    //         where: {
+    //           candidateId_scoreCardQuestionId_workflowStageId: {
+    //             candidateId: id!,
+    //             scoreCardQuestionId: score.scoreCardQuestionId!,
+    //             workflowStageId: score.workflowStageId,
+    //           },
+    //         },
+    //         data: {
+    //           rating: score.rating,
+    //           note: score.note,
+    //           scoreCardQuestionId: score.scoreCardQuestionId!,
+    //           workflowStageId: score.workflowStageId,
+    //         },
+    //       }
+    //     }),
+    // },
     scores: {
-      create: scores
-        ?.filter((score) => !alreadyExists.map((sc) => sc.id).includes(score.id || "0"))
-        ?.map((score) => {
-          return {
+      delete: scoresToDelete?.map((op) => {
+        return { id: op.id }
+      }),
+      upsert: scores?.map((score) => {
+        return {
+          create: {
             rating: score.rating,
             note: score.note,
             scoreCardQuestionId: score.scoreCardQuestionId!,
             workflowStageId: score.workflowStageId,
-          }
-        }),
-      update: scores
-        ?.filter((score) => alreadyExists.map((sc) => sc.id).includes(score.id || "0"))
-        ?.map((score) => {
-          return {
-            where: {
-              candidateId_scoreCardQuestionId_workflowStageId: {
-                candidateId: id!,
-                scoreCardQuestionId: score.scoreCardQuestionId!,
-                workflowStageId: score.workflowStageId,
-              },
-            },
-            data: {
-              rating: score.rating,
-              note: score.note,
-              scoreCardQuestionId: score.scoreCardQuestionId!,
-              workflowStageId: score.workflowStageId,
-            },
-          }
-        }),
+          },
+          update: {
+            rating: score.rating,
+            note: score.note,
+            scoreCardQuestionId: score.scoreCardQuestionId!,
+            workflowStageId: score.workflowStageId,
+          },
+          where: {
+            id: "0",
+          },
+        }
+      }),
     },
   }
 

@@ -277,7 +277,6 @@ const SingleCandidatePage = ({
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
 
   const resume = candidate?.resume as AttachmentObject
-
   useMemo(() => {
     // if (resume?.Key && !file) {
     getResume(resume).then((response) => {
@@ -372,7 +371,7 @@ const SingleCandidatePage = ({
               className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
             >
               <div className="w-full h-full rounded-2xl">
-                <div className="flex w-full max-w-full overflow-auto bg-theme-50 justify-between sticky top-0">
+                <div className="z-10 flex w-full max-w-full overflow-auto bg-theme-50 justify-between sticky top-0">
                   {candidate?.job?.workflow?.stages
                     ?.sort((a, b) => {
                       return a?.order - b?.order
@@ -401,9 +400,9 @@ const SingleCandidatePage = ({
                     })}
                 </div>
                 <ScoreCard
-                  submitDisabled={
-                    selectedWorkflowStageIdForScoreCard !== candidate?.workflowStageId
-                  }
+                  // submitDisabled={
+                  //   selectedWorkflowStageIdForScoreCard !== candidate?.workflowStageId
+                  // }
                   key={selectedWorkflowStageIdForScoreCard}
                   candidate={candidate}
                   header={`${titleCase(candidate?.name)}'s Score`}
@@ -459,7 +458,7 @@ const SingleCandidatePage = ({
                                   workflowStageId:
                                     selectedWorkflowStageIdForScoreCard ||
                                     candidate?.workflowStageId ||
-                                    "",
+                                    "0",
                                 }
                               })
                               ?.filter((score) => score.rating > 0) || ([] as any),

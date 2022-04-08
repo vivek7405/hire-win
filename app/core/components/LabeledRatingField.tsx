@@ -1,6 +1,6 @@
 import { StarIcon as StarIconOutline } from "@heroicons/react/outline"
 import { StarIcon as StarIconSolid } from "@heroicons/react/solid"
-import { forwardRef, PropsWithoutRef, useMemo } from "react"
+import { forwardRef, PropsWithoutRef, useEffect, useMemo } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
 import Rating from "react-rating"
@@ -11,20 +11,25 @@ export interface LabeledRatingFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   disabled?: boolean
-  defaultValue?: any
+  defaultValue?: number
   onChange?: any
   height?: number
   ratingClass?: string
   isBlack?: boolean
+  value?: number
 }
 
 export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFieldProps>(
-  ({ label, outerProps, name, defaultValue, disabled, height, isBlack, ...props }, ref) => {
+  ({ label, outerProps, name, defaultValue, value, disabled, height, isBlack, ...props }, ref) => {
     const {
       control,
-      // setValue,
+      setValue,
       formState: { isSubmitting, errors },
     } = useFormContext()
+
+    useEffect(() => {
+      setValue(name, value)
+    }, [name, value, setValue])
 
     useMemo(() => {
       const error = Array.isArray(errors[name])

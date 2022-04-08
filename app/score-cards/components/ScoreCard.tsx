@@ -104,17 +104,17 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
           const existingScore = sq.scores.find(
             (score) =>
-              (score.candidateId === (props.candidate?.id || "0") &&
-                score.workflowStageId === props.workflowStageId) ||
-              props.candidate?.workflowStageId ||
-              ("0" &&
-                sq.scoreCard.jobWorkflowStages.findIndex(
-                  (jws) =>
-                    jws.workflowStageId ===
-                      (props.workflowStageId || props.candidate?.workflowStageId || "0") &&
-                    jws.jobId === (props.candidate?.jobId || "0")
-                ) >= 0)
+              score.candidateId === props.candidate?.id &&
+              score.workflowStageId ===
+                (props.workflowStageId || props.candidate?.workflowStageId || "0") &&
+              sq.scoreCard.jobWorkflowStages.findIndex(
+                (jws) =>
+                  jws.workflowStageId ===
+                    (props.workflowStageId || props.candidate?.workflowStageId || "0") &&
+                  jws.jobId === (props.candidate?.jobId || "0")
+              ) >= 0
           )
+          console.log(existingScore)
 
           const disabled = props.workflowStageId !== props.candidate?.workflowStageId
 
@@ -149,8 +149,8 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
               <LabeledRatingField
                 disabled={disabled}
-                defaultValue={existingScore?.rating}
-                name={q.name}
+                value={existingScore?.rating}
+                name={`${q.name}`}
                 label={q.name}
                 onChange={props.onChange}
               />
