@@ -18,6 +18,34 @@ async function updateCandidateStage({ where, data }: UpdateCandidateStageInput, 
     data: {
       workflowStageId,
     },
+    include: {
+      job: {
+        include: {
+          form: {
+            include: { questions: { include: { question: { include: { options: true } } } } },
+          },
+          workflow: { include: { stages: { include: { stage: true } } } },
+          scoreCards: {
+            include: {
+              scoreCard: {
+                include: {
+                  cardQuestions: { include: { cardQuestion: true, scores: true } },
+                  jobWorkflowStages: {
+                    include: {
+                      scoreCard: {
+                        include: { cardQuestions: { include: { cardQuestion: true } } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      workflowStage: { include: { stage: true } },
+      answers: { include: { question: { include: { options: true } } } },
+    },
   })
 
   return candidate

@@ -24,6 +24,30 @@ async function updateCandidateScores(
   })
 
   let updateData = {
+    scores: {
+      delete: scoresToDelete?.map((op) => {
+        return { id: op.id }
+      }),
+      upsert: scores?.map((score) => {
+        return {
+          create: {
+            rating: score.rating,
+            note: score.note,
+            scoreCardQuestionId: score.scoreCardQuestionId!,
+            workflowStageId: score.workflowStageId,
+          },
+          update: {
+            rating: score.rating,
+            note: score.note,
+            scoreCardQuestionId: score.scoreCardQuestionId!,
+            workflowStageId: score.workflowStageId,
+          },
+          where: {
+            id: "0",
+          },
+        }
+      }),
+    },
     // scores: {
     //   create: scores
     //     ?.filter((score) => !alreadyExists.map((sc) => sc.id).includes(score.id || "0"))
@@ -55,30 +79,6 @@ async function updateCandidateScores(
     //       }
     //     }),
     // },
-    scores: {
-      delete: scoresToDelete?.map((op) => {
-        return { id: op.id }
-      }),
-      upsert: scores?.map((score) => {
-        return {
-          create: {
-            rating: score.rating,
-            note: score.note,
-            scoreCardQuestionId: score.scoreCardQuestionId!,
-            workflowStageId: score.workflowStageId,
-          },
-          update: {
-            rating: score.rating,
-            note: score.note,
-            scoreCardQuestionId: score.scoreCardQuestionId!,
-            workflowStageId: score.workflowStageId,
-          },
-          where: {
-            id: "0",
-          },
-        }
-      }),
-    },
   }
 
   const candidate = await db.candidate.update({

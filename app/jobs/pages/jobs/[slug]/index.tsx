@@ -387,17 +387,21 @@ const Candidates = (props: CandidateProps) => {
     ))
 
     try {
-      await updateCandidateStageMutation({
+      const updatedCandidate: ExtendedCandidate = await updateCandidateStageMutation({
         where: { id: candidate?.id },
         data: { workflowStageId: selectedWorkflowStageId },
       })
-      const candidateData = data.find((c) => c.id === candidate?.id)
-      if (candidateData) {
-        candidateData.workflowStageId = selectedWorkflowStageId
-        candidateData.workflowStage =
-          props.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId) || null
-        setData([...data])
-      }
+      const candidateDataIndex = data.findIndex((c) => c.id === candidate?.id)
+      let newArr = [...data]
+      newArr[candidateDataIndex] = updatedCandidate
+      setData(newArr)
+      // const candidateData = data.find((c) => c.id === candidate?.id)
+      // if (candidateData) {
+      //   candidateData.workflowStageId = selectedWorkflowStageId
+      //   candidateData.workflowStage =
+      //     props.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId) || null
+      //   setData([...data])
+      // }
       toast.success(
         () => (
           <span>
