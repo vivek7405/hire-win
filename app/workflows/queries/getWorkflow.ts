@@ -14,7 +14,12 @@ const getWorkflow = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetWorkflowInput, ctx) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const workflow = await db.workflow.findFirst({ where, include: { stages: true } })
+    const workflow = await db.workflow.findFirst({
+      where,
+      include: {
+        stages: { include: { stage: true, scoreCards: { include: { scoreCard: true } } } },
+      },
+    })
 
     if (!workflow) throw new NotFoundError()
 

@@ -121,7 +121,9 @@ export type ExtendedStage = Prisma.StageGetPayload<{ include: { workflows: true 
 export type ExtendedWorkflow = Prisma.WorkflowGetPayload<{
   include: { stages: { include: { stage: true; scoreCards: { include: { scoreCard: true } } } } }
 }>
-export type ExtendedWorkflowStage = Prisma.WorkflowStageGetPayload<{ include: { stage: true } }>
+export type ExtendedWorkflowStage = Prisma.WorkflowStageGetPayload<{
+  include: { stage: true; scoreCards: { include: { scoreCard: true } } }
+}>
 
 export type ExtendedQuestion = Prisma.QuestionGetPayload<{
   include: { forms: true; options: true }
