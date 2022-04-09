@@ -359,6 +359,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
             noPagination={true}
             mutateCardDropDB={async (source, destination, draggableId) => {
               if (!(source && destination)) return
+              if (source.index === destination.index) return
 
               // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
               if (

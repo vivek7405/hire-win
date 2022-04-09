@@ -478,7 +478,13 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                           where: { slug: job?.slug! },
                           hidden: switchState,
                         })
-                        job.hidden = switchState
+
+                        let newArr = [...data] as any
+                        const updateIndex = newArr.findIndex((j) => j.id === job?.id)
+                        if (updateIndex >= 0 && newArr[updateIndex]) {
+                          newArr[updateIndex].hidden = switchState
+                          setData(newArr)
+                        }
 
                         toast.success(
                           () => (

@@ -392,9 +392,11 @@ const Candidates = (props: CandidateProps) => {
         data: { workflowStageId: selectedWorkflowStageId },
       })
       const candidateDataIndex = data.findIndex((c) => c.id === candidate?.id)
-      let newArr = [...data]
-      newArr[candidateDataIndex] = updatedCandidate
-      setData(newArr)
+      if (candidateDataIndex >= 0) {
+        let newArr = [...data]
+        newArr[candidateDataIndex] = updatedCandidate
+        setData(newArr)
+      }
       // const candidateData = data.find((c) => c.id === candidate?.id)
       // if (candidateData) {
       //   candidateData.workflowStageId = selectedWorkflowStageId
