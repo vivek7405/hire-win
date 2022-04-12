@@ -1,0 +1,123 @@
+import getSchedules from "app/scheduling/schedules/queries/getSchedules"
+import { useQuery, useMutation, invalidateQuery } from "blitz"
+import React, { useState } from "react"
+// import { Card, Col, ListGroup, Row, Button, Alert } from "react-bootstrap"
+import deleteScheduleMutation from "../mutations/deleteSchedule"
+
+const AllSchedules = () => {
+  const [schedules] = useQuery(getSchedules, null)
+  const [deleteMeeting] = useMutation(deleteScheduleMutation)
+  const [activeSchedule, setActiveSchedule] = useState(0)
+  const [message, setMessage] = useState("")
+
+  const submitDeletion = async (scheduleId: number) => {
+    const result = await deleteMeeting(scheduleId)
+    if (result === "error") {
+      setActiveSchedule(scheduleId)
+      setMessage("There are still meetings with this schedule")
+    } else {
+      invalidateQuery(getSchedules)
+    }
+  }
+
+  return (
+    <>
+      {schedules.map((schedule) => {
+        return (
+          <div key={schedule.id}>
+            <label>{schedule.name}</label>
+            {schedule.dailySchedules.map((dailySchedule) => {
+              return (
+                <div key={dailySchedule.day}>
+                  <b>{dailySchedule.day.charAt(0).toUpperCase() + dailySchedule.day.slice(1)}: </b>
+                  <br />
+                  {dailySchedule.startTime === dailySchedule.endTime
+                    ? "blocked"
+                    : dailySchedule.startTime + " - " + dailySchedule.endTime}
+                </div>
+              )
+            })}
+            <b>Timezone</b>
+            <label>{schedule.timezone}</label>
+            {activeSchedule === schedule.id && message !== "" && { message }}
+            <button
+              id={"delete-" + schedule.name}
+              onClick={() => {
+                submitDeletion(schedule.id)
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        )
+      })}
+      {/* <Row>
+        {schedules.map((schedule) => {
+          return (
+            <Col md={4} className="m-5" key={schedule.id}>
+              <Card>
+                <Card.Header className="text-center">{schedule.name}</Card.Header>
+                <ListGroup variant="flush">
+                  {schedule.dailySchedules.map((dailySchedule) => {
+                    return (
+                      <ListGroup.Item key={dailySchedule.day}>
+                        <Row>
+                          <Col sm={6}>
+                            <b>
+                              {dailySchedule.day.charAt(0).toUpperCase() +
+                                dailySchedule.day.slice(1)}
+                              :{" "}
+                            </b>
+                          </Col>
+                          <Col sm={6}>
+                            {dailySchedule.startTime === dailySchedule.endTime
+                              ? "blocked"
+                              : dailySchedule.startTime + " - " + dailySchedule.endTime}
+                          </Col>
+                        </Row>
+                      </ListGroup.Item>
+                    )
+                  })}
+                  <ListGroup.Item>
+                    <Row>
+                      <Col sm={6}>
+                        <b>Timezone</b>
+                      </Col>
+                      <Col sm={6}>{schedule.timezone}</Col>
+                    </Row>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <Row>
+                      <Col className="d-flex justify-content-center">
+                        {activeSchedule === schedule.id && message !== "" && (
+                          <Alert variant="danger" className="mt-2">
+                            {message}
+                          </Alert>
+                        )}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="d-flex justify-content-center">
+                        <Button
+                          id={"delete-" + schedule.name}
+                          variant="outline-danger"
+                          onClick={() => {
+                            submitDeletion(schedule.id)
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+                </ListGroup>
+              </Card>
+            </Col>
+          )
+        })}
+      </Row> */}
+    </>
+  )
+}
+
+export default AllSchedules
