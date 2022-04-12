@@ -1,4 +1,4 @@
-import { checkEnvVariable } from "utils/checkEnvVariables"
+import { checkEnvVariable } from "app/core/utils/checkEnvVariables"
 
 export const constants = {
   get client_id() {

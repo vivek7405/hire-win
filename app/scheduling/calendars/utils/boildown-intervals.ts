@@ -14,20 +14,22 @@ export function boilDownIntervals(arr: Interval[]): Interval[] {
 
   const resultingIntervals: Interval[] = []
 
-  let lastStart = arr[0].start
-  let lastEnd = arr[0].end
+  let lastStart = arr[0]?.start || 0
+  let lastEnd = arr[0]?.end || 0
   for (let i = 1; i < arr.length; i++) {
     const v = arr[i]
-    if (v.start <= lastEnd && v.end >= lastEnd) {
-      lastEnd = v.end
-    } else if (v.start > lastEnd) {
-      resultingIntervals.push({
-        start: lastStart,
-        end: lastEnd,
-      })
+    if (v) {
+      if (v.start <= lastEnd && v.end >= lastEnd) {
+        lastEnd = v.end
+      } else if (v.start > lastEnd) {
+        resultingIntervals.push({
+          start: lastStart,
+          end: lastEnd,
+        })
 
-      lastStart = v.start
-      lastEnd = v.end
+        lastStart = v.start
+        lastEnd = v.end
+      }
     }
   }
 

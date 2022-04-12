@@ -1,12 +1,12 @@
-import { CalendarService, CreateEventBooking } from "app/calendar/calendar-service"
+import { CalendarService, CreateEventBooking } from "app/scheduling/calendars/calendar-service"
 import {
   AuthorizationHeader,
   getAuthorizationHeader,
-} from "app/calendar/outlookcalendar/helper/getAuthorizationHeader"
+} from "app/scheduling/calendars/outlookcalendar/helper/getAuthorizationHeader"
 import { addMinutes } from "date-fns"
 import { ConnectedCalendar } from "db"
-import { boilDownTimeIntervals } from "app/calendar/utils/boildown-intervals"
-import makeRequestTo from "app/calendar/outlookcalendar/helper/callMicrosoftAPI"
+import { boilDownTimeIntervals } from "app/scheduling/calendars/utils/boildown-intervals"
+import makeRequestTo from "app/scheduling/calendars/outlookcalendar/helper/callMicrosoftAPI"
 import { zonedTimeToUtc } from "date-fns-tz"
 
 export class OutlookCalendarService implements CalendarService {
