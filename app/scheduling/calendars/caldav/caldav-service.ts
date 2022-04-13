@@ -55,6 +55,7 @@ async function makeRequestTo(
 interface ConnectionDetailsVerificationFailure {
   fail: "unauthorized" | "other" | "wrong_url" | "wrong_protocol" | "no_caldav_support"
   error?: any
+  connectionDetails: null
 }
 
 interface ConnectionVerificationSuccess {
@@ -120,11 +121,11 @@ export async function verifyConnectionDetails(
     }
 
     if (response === "no_caldav_support") {
-      return { fail: "no_caldav_support" }
+      return { fail: "no_caldav_support", connectionDetails: null }
     }
 
     if (response === "unauthorized") {
-      return { fail: "unauthorized" }
+      return { fail: "unauthorized", connectionDetails: null }
     }
 
     const supportedDavFeatures = (response.headers.dav ?? "")
@@ -133,7 +134,7 @@ export async function verifyConnectionDetails(
       .map((v) => v.trim())
 
     if (!supportedDavFeatures.includes("calendar-access")) {
-      return { fail: "no_caldav_support" }
+      return { fail: "no_caldav_support", connectionDetails: null }
     }
 
     return {
@@ -149,14 +150,14 @@ export async function verifyConnectionDetails(
     }
   } catch (error) {
     if (error.code === "ENOTFOUND") {
-      return { fail: "wrong_url" }
+      return { fail: "wrong_url", connectionDetails: null }
     }
 
     if (error.code === "EPROTO") {
-      return { fail: "wrong_protocol" }
+      return { fail: "wrong_protocol", connectionDetails: null }
     }
 
-    return { fail: "other", error }
+    return { fail: "other", error, connectionDetails: null }
   }
 }
 
