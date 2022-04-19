@@ -18,6 +18,7 @@ type ExtendedResourceTypes =
   | "cardQuestion"
   | "scoreCardQuestion"
   | "scoreCard"
+  | "schedule"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
 
@@ -366,6 +367,23 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return scoreCards.every((p) => p.userId === ctx.session.userId) === true
+      })
+
+      can("create", "schedule")
+      can("update", "schedule")
+      can("read", "schedule", async (args) => {
+        const schedule = await db.schedule.findFirst({
+          where: args.where,
+        })
+
+        return schedule?.ownerId === ctx.session.userId
+      })
+      can("readAll", "schedule", async (args) => {
+        const schedules = await db.schedule.findMany({
+          where: args.where,
+        })
+
+        return schedules.every((p) => p.ownerId === ctx.session.userId) === true
       })
 
       can("create", "question")

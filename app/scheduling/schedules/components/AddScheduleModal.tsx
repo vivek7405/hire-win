@@ -14,11 +14,7 @@ import LabeledTextField from "app/core/components/LabeledTextField"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import Form from "app/core/components/Form"
 import CheckboxField from "app/core/components/CheckboxField"
-
-interface AddScheduleProps {
-  show: boolean
-  setVisibility: (value: boolean) => void
-}
+import getSchedulesWOPagination from "../queries/getSchedulesWOPagination"
 
 const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const
 type Schedules = Record<typeof days[number], { start: string; end: string }>
@@ -79,7 +75,7 @@ const initialSchedule = {
   sunday: { blocked: true, start: "09:00", end: "17:00" },
 }
 
-const AddSchedule = (props: AddScheduleProps) => {
+const AddSchedule = () => {
   const [createScheduleMutation] = useMutation(addSchedule)
   const [schedule, setSchedule] = useState(initialSchedule)
   const [name, setName] = useState("")
@@ -103,7 +99,7 @@ const AddSchedule = (props: AddScheduleProps) => {
     setName("")
     setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)
     setSchedule(initialSchedule)
-    props.setVisibility(false)
+    setOpenAddSchedule(false)
   }
 
   const submit = async () => {
@@ -127,8 +123,9 @@ const AddSchedule = (props: AddScheduleProps) => {
           blocked ? { startTime: "00:00", endTime: "00:00" } : { startTime: start, endTime: end }
         ),
       })
-      await invalidateQuery(getSchedules)
+      // await invalidateQuery(getSchedules)
       await invalidateQuery(getScheduleNames)
+      await invalidateQuery(getSchedulesWOPagination)
       closeModal()
     } catch (error) {
       setError({ error: true, message: error })
@@ -139,7 +136,7 @@ const AddSchedule = (props: AddScheduleProps) => {
 
   return (
     <>
-      <Modal header="Add Questions from Pool" open={openAddSchedule} setOpen={setOpenAddSchedule}>
+      <Modal header="Add a new Schedule" open={openAddSchedule} setOpen={setOpenAddSchedule}>
         {/* <AddScheduleForm
           header=""
           subHeader=""
@@ -156,8 +153,8 @@ const AddSchedule = (props: AddScheduleProps) => {
             submit()
           }}
           testid="addScheduleForm"
-          header=""
-          subHeader=""
+          header="New Schedule"
+          subHeader="Add a new Schedule"
         >
           <LabeledTextField
             type="text"
@@ -221,7 +218,7 @@ const AddSchedule = (props: AddScheduleProps) => {
           setOpenAddSchedule(true)
         }}
       >
-        Add a new Schedule
+        New Schedule
       </button>
     </>
     // <Modal show={props.show} onHide={() => closeModal()}>
