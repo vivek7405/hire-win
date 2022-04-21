@@ -21,9 +21,9 @@ services:
       #   MYSQLPASSWORD: ${MYSQLPASSWORD}
     ports:
       - 5232:80
-    volumes:
-      - ./cal/baikal/config:/var/www/baikal/config
-      - ./cal/baikal/Specific:/var/www/baikal/Specific
+    # volumes:
+    #   - ./cal/baikal/config:/var/www/baikal/config
+    #   - ./cal/baikal/Specific:/var/www/baikal/Specific
 
   # baikal:
   #   image: ckulka/baikal:0.7.2-nginx

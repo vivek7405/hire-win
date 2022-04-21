@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// change prisma schema path in package.json to operate this prisma file using blitz prisma command
+
+datasource db {
+  provider = "mysql"
+  url      = env("MYSQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// --------------------------------------
+
+model addressbookchanges {
+  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  uri           Bytes   @db.VarBinary(200)
+  synctoken     Int     @db.UnsignedInt
+  addressbookid Int     @db.UnsignedInt
+  operation     Boolean
+
+  @@index([addressbookid, synctoken], map: "addressbookid_synctoken")
+}
+
+model addressbooks {
+  id           Int     @id @default(autoincrement()) @db.UnsignedInt
+  principaluri Bytes?  @db.VarBinary(255)
+  displayname  String? @db.VarChar(255)
+  uri          Bytes?  @db.VarBinary(200)
+  description  String? @db.Text
+  synctoken    Int     @default(1) @db.UnsignedInt
+}
+
+model calendarchanges {
+  id         Int     @id @default(autoincrement()) @db.UnsignedInt
+  uri        Bytes   @db.VarBinary(200)
+  synctoken  Int     @db.UnsignedInt
+  calendarid Int     @db.UnsignedInt
+  operation  Boolean
+
+  @@index([calendarid, synctoken], map: "calendarid_synctoken")
+}
+
+model calendarinstances {
+  id                 Int     @id @default(autoincrement()) @db.UnsignedInt
+  calendarid         Int     @db.UnsignedInt
+  principaluri       Bytes?  @db.VarBinary(100)
+  access             Boolean @default(true)
+  displayname        String? @db.VarChar(100)
+  uri                Bytes?  @db.VarBinary(200)
+  description        String? @db.Text
+  calendarorder      Int     @default(0) @db.UnsignedInt
+  calendarcolor      Bytes?  @db.VarBinary(10)
+  timezone           String? @db.Text
+  transparent        Boolean @default(false)
+  share_href         Bytes?  @db.VarBinary(100)
+  share_displayname  String? @db.VarChar(100)
+  share_invitestatus Int     @default(2) @db.TinyInt
+
+  @@unique([calendarid, principaluri], map: "calendarid")
+  @@unique([calendarid, share_href], map: "calendarid_2")
+  @@unique([principaluri, uri], map: "principaluri")
+}
+
+model calendarobjects {
+  id             Int    @id @default(autoincrement()) @db.UnsignedInt
+  calendardata   Bytes? @db.MediumBlob
+  uri            Bytes? @db.VarBinary(200)
+  calendarid     Int    @db.UnsignedInt
+  lastmodified   Int?   @db.UnsignedInt
+  etag           Bytes? @db.VarBinary(32)
+  size           Int    @db.UnsignedInt
+  componenttype  Bytes? @db.VarBinary(8)
+  firstoccurence Int?   @db.UnsignedInt
+  lastoccurence  Int?   @db.UnsignedInt
+  uid            Bytes? @db.VarBinary(200)
+
+  @@unique([calendarid, uri], map: "calendarid")
+}
+
+model calendars {
+  id         Int    @id @default(autoincrement()) @db.UnsignedInt
+  synctoken  Int    @default(1) @db.UnsignedInt
+  components Bytes? @db.VarBinary(21)
+}
+
+model calendarsubscriptions {
+  id               Int      @id @default(autoincrement()) @db.UnsignedInt
+  uri              Bytes    @db.VarBinary(200)
+  principaluri     Bytes    @db.VarBinary(100)
+  source           String?  @db.Text
+  displayname      String?  @db.VarChar(100)
+  refreshrate      String?  @db.VarChar(10)
+  calendarorder    Int      @default(0) @db.UnsignedInt
+  calendarcolor    Bytes?   @db.VarBinary(10)
+  striptodos       Boolean?
+  stripalarms      Boolean?
+  stripattachments Boolean?
+  lastmodified     Int?     @db.UnsignedInt
+
+  @@unique([principaluri, uri], map: "principaluri")
+}
+
+model cards {
+  id            Int    @id @default(autoincrement()) @db.UnsignedInt
+  addressbookid Int    @db.UnsignedInt
+  carddata      Bytes? @db.MediumBlob
+  uri           Bytes? @db.VarBinary(200)
+  lastmodified  Int?   @db.UnsignedInt
+  etag          Bytes? @db.VarBinary(32)
+  size          Int    @db.UnsignedInt
+}
+
+model groupmembers {
+  id           Int @id @default(autoincrement()) @db.UnsignedInt
+  principal_id Int @db.UnsignedInt
+  member_id    Int @db.UnsignedInt
+
+  @@unique([principal_id, member_id], map: "principal_id")
+}
+
+model locks {
+  id      Int     @id @default(autoincrement()) @db.UnsignedInt
+  owner   String? @db.VarChar(100)
+  timeout Int?    @db.UnsignedInt
+  created Int?
+  token   Bytes?  @db.VarBinary(100)
+  scope   Int?    @db.TinyInt
+  depth   Int?    @db.TinyInt
+  uri     Bytes?  @db.VarBinary(1000)
+
+  @@index([token], map: "token")
+}
+
+model principals {
+  id          Int     @id @default(autoincrement()) @db.UnsignedInt
+  uri         Bytes   @unique(map: "uri") @db.VarBinary(200)
+  email       Bytes?  @db.VarBinary(80)
+  displayname String? @db.VarChar(80)
+}
+
+model propertystorage {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  path      Bytes  @db.VarBinary(1024)
+  name      Bytes  @db.VarBinary(100)
+  valuetype Int?   @db.UnsignedInt
+  value     Bytes? @db.MediumBlob
+}
+
+model schedulingobjects {
+  id           Int    @id @default(autoincrement()) @db.UnsignedInt
+  principaluri Bytes? @db.VarBinary(255)
+  calendardata Bytes? @db.MediumBlob
+  uri          Bytes? @db.VarBinary(200)
+  lastmodified Int?   @db.UnsignedInt
+  etag         Bytes? @db.VarBinary(32)
+  size         Int    @db.UnsignedInt
+}
+
+model users {
+  id       Int    @id @default(autoincrement()) @db.UnsignedInt
+  username Bytes? @unique(map: "username") @db.VarBinary(50)
+  digesta1 Bytes? @db.VarBinary(32)
+}
