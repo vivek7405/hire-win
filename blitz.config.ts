@@ -25,13 +25,16 @@ const config: BlitzConfig = {
   // experimental: {
   //   esmExternals: false,
   // },
-  /* Uncomment this to customize the webpack config
+  /* Uncomment this to customize the webpack config */
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config
     // Important: return the modified config
+    if (isServer) {
+      config.externals.push("_http_common")
+      // config.externals.push('encoding');
+    }
     return config
   },
-  */
 }
 module.exports = config
