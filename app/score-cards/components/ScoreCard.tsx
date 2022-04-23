@@ -16,7 +16,7 @@ import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreC
 import { ExtendedScoreCardQuestion, ExtendedCardQuestion } from "types"
 import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline"
 import getScoreCard from "../queries/getScoreCard"
-import { Candidate } from "@prisma/client"
+import { Candidate } from ".prisma1/client"
 
 type ScoreCardProps = {
   onSuccess?: () => void

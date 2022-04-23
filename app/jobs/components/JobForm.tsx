@@ -15,7 +15,7 @@ import {
   EmploymentType,
   ScoreCardJobWorkflowStage,
   ScoreCard,
-} from "@prisma/client"
+} from ".prisma1/client"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import getFormsWOPagination from "app/forms/queries/getFormsWOPagination"

@@ -1,6 +1,6 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
-import { Prisma, UserRole } from "@prisma/client"
+import { Prisma, UserRole } from ".prisma1/client"
 
 export enum PlanName {
   PRO,

@@ -32,7 +32,7 @@ import {
   CardType,
   KanbanColumnType,
 } from "types"
-import { QuestionType } from "@prisma/client"
+import { QuestionType } from ".prisma1/client"
 import Skeleton from "react-loading-skeleton"
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
 import Form from "app/core/components/Form"

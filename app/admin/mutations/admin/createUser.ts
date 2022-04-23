@@ -4,7 +4,7 @@ import { adminNewUserMailer } from "mailers/adminNewUserMailer"
 import crypto from "crypto"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { UserRole } from "@prisma/client"
+import { UserRole } from ".prisma1/client"
 
 const generatePassword = (
   length = 20,

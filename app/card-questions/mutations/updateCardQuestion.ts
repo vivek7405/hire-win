@@ -4,7 +4,7 @@ import { CardQuestion as CardQuestionObj } from "app/card-questions/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { CardQuestion } from "@prisma/client"
+import { CardQuestion } from ".prisma1/client"
 
 type UpdateCardQuestionInput = Pick<Prisma.CardQuestionUpdateArgs, "where" | "data"> & {
   initial: CardQuestion

@@ -1,4 +1,4 @@
-import { CardQuestion, ScoreCardQuestionBehaviour } from "@prisma/client"
+import { CardQuestion, ScoreCardQuestionBehaviour } from ".prisma1/client"
 import { ExtendedScoreCardQuestion } from "types"
 
 const factoryScoreQuestions = [

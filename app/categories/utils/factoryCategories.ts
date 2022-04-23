@@ -1,4 +1,4 @@
-import { Category } from "@prisma/client"
+import { Category } from ".prisma1/client"
 
 const factoryCategories = [
   { name: "Engineering" } as Category,

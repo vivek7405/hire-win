@@ -1,4 +1,4 @@
-import { CandidateSource, EmploymentType, SalaryType } from "@prisma/client"
+import { CandidateSource, EmploymentType, SalaryType } from ".prisma1/client"
 import { z } from "zod"
 
 // type Literal = boolean | null | number | string

@@ -46,7 +46,7 @@ import addExistingScoreCardQuestions from "app/score-cards/mutations/addExisting
 import addNewCardQuestionToScoreCard from "app/score-cards/mutations/addNewCardQuestionToScoreCard"
 import Cards from "app/core/components/Cards"
 import Debouncer from "app/core/utils/debouncer"
-import { ScoreCardQuestionBehaviour } from "@prisma/client"
+import { ScoreCardQuestionBehaviour } from ".prisma1/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

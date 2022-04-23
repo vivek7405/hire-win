@@ -4,7 +4,7 @@ import slugify from "slugify"
 import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { MembershipRole, ScoreCard } from "@prisma/client"
+import { MembershipRole, ScoreCard } from ".prisma1/client"
 
 async function createJob(data: JobInputType, ctx: Ctx) {
   ctx.session.$authorize()

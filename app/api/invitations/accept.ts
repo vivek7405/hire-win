@@ -1,7 +1,7 @@
 import db from "db"
 import { hash256, BlitzApiRequest, BlitzApiResponse } from "blitz"
 import stripe from "app/core/utils/stripe"
-import { UserRole } from "@prisma/client"
+import { UserRole } from ".prisma1/client"
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {

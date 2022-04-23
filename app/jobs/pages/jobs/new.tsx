@@ -13,7 +13,7 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import createJob from "app/jobs/mutations/createJob"
 import path from "path"
 import { convertToRaw } from "draft-js"
-import { Category } from "@prisma/client"
+import { Category } from ".prisma1/client"
 import moment from "moment"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {

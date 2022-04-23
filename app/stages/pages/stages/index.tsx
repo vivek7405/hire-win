@@ -13,7 +13,7 @@ import path from "path"
 import getStages from "app/stages/queries/getStages"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
-import { Stage } from "@prisma/client"
+import { Stage } from ".prisma1/client"
 import { CardType, DragDirection } from "types"
 import Cards from "app/core/components/Cards"
 

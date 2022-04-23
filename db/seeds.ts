@@ -4,7 +4,7 @@ import seedData from "./seedData.json"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { Job } from "app/jobs/validations"
-import { MembershipRole, UserRole } from "@prisma/client"
+import { MembershipRole, UserRole } from ".prisma1/client"
 
 /*
  * This seed function is executed when you run `blitz db seed`.

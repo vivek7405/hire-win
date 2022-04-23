@@ -1,4 +1,4 @@
-import { ScoreCardQuestionBehaviour } from "@prisma/client"
+import { ScoreCardQuestionBehaviour } from ".prisma1/client"
 import { z } from "zod"
 
 export const ScoreCardObj = z.object({

@@ -1,4 +1,4 @@
-import { FormQuestionBehaviour } from "@prisma/client"
+import { FormQuestionBehaviour } from ".prisma1/client"
 import { z } from "zod"
 
 export const FormObj = z.object({

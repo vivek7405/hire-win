@@ -1,4 +1,4 @@
-import { FormQuestionBehaviour, Question, QuestionType } from "@prisma/client"
+import { FormQuestionBehaviour, Question, QuestionType } from ".prisma1/client"
 import { ExtendedFormQuestion } from "types"
 
 const factoryFormQuestions = [

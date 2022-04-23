@@ -1,4 +1,4 @@
-import { Stage } from "@prisma/client"
+import { Stage } from ".prisma1/client"
 import { ExtendedWorkflowStage } from "types"
 
 const factoryWorkflowStages = [
