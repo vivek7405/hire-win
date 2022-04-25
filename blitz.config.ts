@@ -34,6 +34,10 @@ const config: BlitzConfig = {
       config.externals.push("_http_common")
       // config.externals.push('encoding');
     }
+    config.resolve.fallback = {
+      stream: false,
+      util: false,
+    }
     return config
   },
 }
