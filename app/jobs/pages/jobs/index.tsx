@@ -513,7 +513,8 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
 
             <div className="px-6 py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
               <div className="text-lg text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                {job?.candidates?.length} candidates
+                {job?.candidates?.length}{" "}
+                {job?.candidates?.length === 1 ? "candidate" : "candidates"}
               </div>
               {/* <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {stages?.map((ws) => {

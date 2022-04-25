@@ -37,6 +37,7 @@ const config: BlitzConfig = {
     config.resolve.fallback = {
       stream: false,
       util: false,
+      diagnostics_channel: false,
     }
     return config
   },
