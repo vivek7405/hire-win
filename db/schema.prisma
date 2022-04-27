@@ -47,6 +47,8 @@ model User {
   scoreCards    ScoreCard[]
   cardQuestions CardQuestion[]
 
+  assignedStagesForInterviews InterviewerJobWorkflowStage[]
+
   calendars        ConnectedCalendar[]
   meetings         Meeting[]
   schedules        Schedule[]
@@ -155,7 +157,26 @@ model Job {
   formId String?
 
   scoreCards ScoreCardJobWorkflowStage[]
-  candidates Candidate[]
+
+  interviewers InterviewerJobWorkflowStage[]
+  candidates   Candidate[]
+}
+
+model InterviewerJobWorkflowStage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  interviewer   User @relation(fields: [interviewerId], references: [id])
+  interviewerId Int
+
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  @@unique([interviewerId, jobId, workflowStageId])
 }
 
 enum MembershipRole {
@@ -244,7 +265,8 @@ model WorkflowStage {
   scoreCards ScoreCardJobWorkflowStage[]
   scores     Score[]
 
-  candidates Candidate[]
+  interviewers InterviewerJobWorkflowStage[]
+  candidates   Candidate[]
 
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])

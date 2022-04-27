@@ -9,6 +9,7 @@ import {
   ErrorComponent,
   getSession,
   Routes,
+  useQuery,
 } from "blitz"
 import path from "path"
 
@@ -25,11 +26,15 @@ import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
 import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
-import { XCircleIcon } from "@heroicons/react/outline"
+import { ArrowSmDownIcon, XCircleIcon } from "@heroicons/react/outline"
 
-import { MembershipRole } from "db"
+import { MembershipRole, User } from "db"
 import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/users/utils/checkPlan"
+import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
+import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
+import Form from "app/core/components/Form"
+import assignInterviewerToJobStage from "app/jobs/mutations/assignInterviewerToJobStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -127,6 +132,7 @@ const JobSettingsMembersPage = ({
   const [removeFromJobMutation] = useMutation(removeFromJob)
   const [changePermissionMutation] = useMutation(updateMemberRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
+  const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -228,7 +234,7 @@ const JobSettingsMembersPage = ({
                           ) : (
                             <select
                               value={m.role}
-                              className="border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded"
+                              className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
                               onChange={async (e) => {
                                 const toastId = toast.loading(() => (
                                   <span>Updating member permission</span>
@@ -295,7 +301,7 @@ const JobSettingsMembersPage = ({
 
                               <button
                                 data-testid={`remove-${m.user.email}-fromJob`}
-                                className="bg-red-500 rounded-full"
+                                className="bg-red-500 rounded-full flex flex-col justify-center items-center"
                                 onClick={async (e) => {
                                   e.preventDefault()
                                   setOpenConfirmDelete(true)
@@ -311,6 +317,103 @@ const JobSettingsMembersPage = ({
                   })}
                 </tbody>
               </table>
+
+              <div className="mt-10 mb-6 flex flex-col justify-center items-center">
+                <h3 className="font-semibold text-lg">Interviewers</h3>
+                <div className="mt-5 w-full flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-2 lg:space-y-0 lg:space-x-2">
+                  {job?.workflow?.stages
+                    ?.sort((a, b) => {
+                      return a.order - b.order
+                    })
+                    .map((ws, index) => {
+                      const existingInterviewerJobWorkflowStage = ws.interviewers?.find(
+                        (int) => int.workflowStageId === ws.id && int.jobId === job.id
+                      )
+                      const existingInterviewer: User | null | undefined = job?.memberships?.find(
+                        (member) =>
+                          member?.userId === existingInterviewerJobWorkflowStage?.interviewerId
+                      )?.user
+
+                      return (
+                        <div key={ws.id}>
+                          <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
+                            <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                              {ws.stage?.name}
+                            </div>
+                          </div>
+
+                          <div className="w-32 my-2 flex flex-col items-center justify-center">
+                            <ArrowSmDownIcon className="h-6 w-auto text-neutral-500" />
+                          </div>
+
+                          <div className="w-32 flex flex-col items-center justify-center">
+                            <select
+                              className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
+                              name={`interviewers.${index}.interviewerId`}
+                              placeholder={`Interviewer for ${ws.stage?.name}`}
+                              disabled={existingInterviewerJobWorkflowStage && !existingInterviewer}
+                              defaultValue={
+                                existingInterviewerJobWorkflowStage?.interviewerId?.toString() ||
+                                job?.memberships
+                                  ?.find((member) => member?.role === "OWNER")
+                                  ?.userId?.toString()
+                              }
+                              onChange={async (e) => {
+                                const selectedInterviewerId = e.target.value
+                                const toastId = toast.loading(() => (
+                                  <span>Updating Interviewer</span>
+                                ))
+                                try {
+                                  await assignInterviewerToJobStageMutation({
+                                    jobId: job?.id,
+                                    workflowStageId: ws.id,
+                                    interviewerId: parseInt(selectedInterviewerId || "0"),
+                                  })
+                                  toast.success(() => <span>Interviewer assigned to stage</span>, {
+                                    id: toastId,
+                                  })
+                                } catch (error) {
+                                  toast.error(
+                                    "Sorry, we had an unexpected error. Please try again. - " +
+                                      error.toString()
+                                  )
+                                }
+                              }}
+                            >
+                              {!existingInterviewerJobWorkflowStage || existingInterviewer ? (
+                                job?.memberships?.map((member) => {
+                                  return (
+                                    <option
+                                      key={member?.userId?.toString()!}
+                                      value={member?.userId?.toString()!}
+                                    >
+                                      {member?.user?.email!}
+                                    </option>
+                                  )
+                                })
+                              ) : (
+                                <option
+                                  key={
+                                    (
+                                      existingInterviewer as User | null | undefined
+                                    )?.id?.toString()!
+                                  }
+                                  value={
+                                    (
+                                      existingInterviewer as User | null | undefined
+                                    )?.id?.toString()!
+                                  }
+                                >
+                                  {(existingInterviewer as User | null | undefined)?.email!}
+                                </option>
+                              )}
+                            </select>
+                          </div>
+                        </div>
+                      )
+                    })}
+                </div>
+              </div>
             </div>
           </div>
         </div>
