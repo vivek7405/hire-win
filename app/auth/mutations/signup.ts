@@ -9,8 +9,10 @@ import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/cre
 import createFactoryCategories from "app/categories/mutations/createFactoryCategories"
 import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
 import createBaikalUserWithDefaultCalendar from "app/scheduling/mutations/createBaikalUserWithDefaultCalendar"
-import { baikalUserDefaultEncryptedPassword } from "app/scheduling/constants"
+import { baikalUserDefaultEncryptedPassword, initialSchedule } from "app/scheduling/constants"
 import addConnectedCalendar from "app/scheduling/mutations/addConnectedCalendar"
+import addSchedule from "app/scheduling/schedules/mutations/addSchedule"
+import { mapValues } from "app/core/utils/map-values"
 
 export default resolver.pipe(
   resolver.zod(Signup),
@@ -41,6 +43,18 @@ export default resolver.pipe(
 
     await ctx.session.$create({ userId: user.id, role: user.role as UserRole })
 
+    await addSchedule(
+      {
+        name: "Default",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        schedule: mapValues(initialSchedule, ({ blocked, start, end }) =>
+          blocked
+            ? { startTime: "00:00", endTime: "00:00" }
+            : { startTime: "09:00", endTime: "17:00" }
+        ),
+      },
+      ctx
+    )
     await createBaikalUserWithDefaultCalendar(
       newSlug,
       baikalUserDefaultEncryptedPassword,

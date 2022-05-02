@@ -15,6 +15,7 @@ import LabeledReactSelectField from "app/core/components/LabeledReactSelectField
 import Form from "app/core/components/Form"
 import CheckboxField from "app/core/components/CheckboxField"
 import getSchedulesWOPagination from "../queries/getSchedulesWOPagination"
+import { initialSchedule } from "app/scheduling/constants"
 
 const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const
 type Schedules = Record<typeof days[number], { start: string; end: string }>
@@ -63,16 +64,6 @@ export const parseTime = (time: string): [start: number, end: number] | null => 
   } else {
     return [0, 0]
   }
-}
-
-const initialSchedule = {
-  monday: { blocked: false, start: "09:00", end: "17:00" },
-  tuesday: { blocked: false, start: "09:00", end: "17:00" },
-  wednesday: { blocked: false, start: "09:00", end: "17:00" },
-  thursday: { blocked: false, start: "09:00", end: "17:00" },
-  friday: { blocked: false, start: "09:00", end: "17:00" },
-  saturday: { blocked: true, start: "09:00", end: "17:00" },
-  sunday: { blocked: true, start: "09:00", end: "17:00" },
 }
 
 const AddSchedule = () => {
