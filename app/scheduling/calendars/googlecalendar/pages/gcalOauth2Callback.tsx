@@ -2,7 +2,8 @@ import addGoogleCalendarCredentialsMutation from "app/scheduling/calendars/googl
 import AuthLayout from "app/core/layouts/AuthLayout"
 import { BlitzPage, Link, useMutation, useRouterQuery } from "blitz"
 import { Suspense, useState } from "react"
-import AddCalendarForm from "../../components/AddCalendarForm"
+import Form from "app/core/components/Form"
+import LabeledTextField from "app/core/components/LabeledTextField"
 
 /**
  * This gets a code as a query parameter. This code needs to be sent to googleapi which returns a refresh_token. The refresh_token is used to generate a session_access_token.
@@ -59,8 +60,8 @@ function OAuthCallbackPage() {
   }
   return (
     <>
-      <h1>Your Authentication was succesful.</h1>
-      <h3>Last step. Please choose a name for your new Calendar.</h3>
+      {/* <h1>Your Authentication was succesful.</h1>
+      <h3>Last step. Please choose a name for your new Calendar.</h3> */}
       {/* <Form>
         <Form.Group controlId="formGoogleCalendarName">
           <Form.Label>Calendar Name</Form.Label>
@@ -77,16 +78,21 @@ function OAuthCallbackPage() {
       <Button variant="primary" onClick={handleOAuthCode}>
         Add Calendar
       </Button> */}
-      <AddCalendarForm
+      <Form
+        submitText="Submit"
         header="Your Authentication was succesful"
-        subHeader="Last step. Please choose a name for your new Calendar. This name helps you to recognize the calendar. For example 'Private' or 'My project with Alice'."
+        subHeader="Last step. Please choose a name for your new Calendar."
         onSubmit={async (values) => {
-          if (values && values.name) {
-            setCalendarName(values.name)
-          }
           handleOAuthCode()
         }}
-      />
+      >
+        <LabeledTextField
+          name="name"
+          label="Calendar Name"
+          placeholder="Enter a name you'd like for your calendar"
+          onChange={(e) => setCalendarName(e.target.value)}
+        />
+      </Form>
     </>
   )
 }

@@ -556,4 +556,5 @@ const SingleJobPage = ({
   )
 }
 
+SingleJobPage.authenticate = true
 export default SingleJobPage

@@ -28,6 +28,7 @@ import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
 import setJobHidden from "app/jobs/mutations/setJobHidden"
 import toast from "react-hot-toast"
 import Cards from "app/core/components/Cards"
+import { ExternalLinkIcon } from "@heroicons/react/outline"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -669,21 +670,8 @@ const JobsHome = ({
           rel="noopener noreferrer"
           className="flex items-center float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
         >
-          <span className="mr-1">View Careers Page</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
+          <span>View Careers Page</span>
+          <ExternalLinkIcon className="w-4 h-4 ml-1" />
         </a>
       </Link>
 

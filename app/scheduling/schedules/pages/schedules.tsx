@@ -24,6 +24,7 @@ import getSchedulesWOPagination from "../queries/getSchedulesWOPagination"
 import Modal from "app/core/components/Modal"
 import Card from "app/core/components/Card"
 import { TrashIcon } from "@heroicons/react/outline"
+import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

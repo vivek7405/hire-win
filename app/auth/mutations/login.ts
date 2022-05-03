@@ -7,7 +7,7 @@ import createBaikalUserWithDefaultCalendar from "app/scheduling/mutations/create
 import { baikalUserDefaultEncryptedPassword } from "app/scheduling/constants"
 // import baikalDB from "cal/baikal/db"
 import { PrismaClient } from ".prisma2/client"
-import addConnectedCalendar from "app/scheduling/mutations/addConnectedCalendar"
+import addConnectedCalendar from "app/scheduling/calendars/mutations/addConnectedCalendar"
 const baikalDB = new PrismaClient()
 
 export const authenticateUser = async (rawEmail: string, rawPassword: string) => {

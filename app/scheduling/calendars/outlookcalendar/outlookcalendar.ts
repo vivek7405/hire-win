@@ -39,7 +39,7 @@ export class OutlookCalendarService implements CalendarService {
       Subject: booking.meeting.name + " with " + booking.inviteeEmail,
       Body: {
         ContentType: "HTML",
-        Content: "This meeting was booked via kalle.app",
+        Content: "This meeting was booked via hire.win",
       },
       Start: {
         DateTime: startDate,

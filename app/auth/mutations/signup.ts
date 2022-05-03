@@ -10,7 +10,7 @@ import createFactoryCategories from "app/categories/mutations/createFactoryCateg
 import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
 import createBaikalUserWithDefaultCalendar from "app/scheduling/mutations/createBaikalUserWithDefaultCalendar"
 import { baikalUserDefaultEncryptedPassword, initialSchedule } from "app/scheduling/constants"
-import addConnectedCalendar from "app/scheduling/mutations/addConnectedCalendar"
+import addConnectedCalendar from "app/scheduling/calendars/mutations/addConnectedCalendar"
 import addSchedule from "app/scheduling/schedules/mutations/addSchedule"
 import { mapValues } from "app/core/utils/map-values"
 

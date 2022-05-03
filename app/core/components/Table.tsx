@@ -7,14 +7,14 @@ import Pagination from "./Pagination"
 type TableProps = {
   columns: any
   data: any
-  pageCount: any
-  pageIndex: any
-  pageSize: any
-  hasNext: any
-  hasPrevious: any
-  totalCount: any
-  startPage: any
-  endPage: any
+  pageCount?: any
+  pageIndex?: any
+  pageSize?: any
+  hasNext?: any
+  hasPrevious?: any
+  totalCount?: any
+  startPage?: any
+  endPage?: any
   noMarginRight?: boolean
   noSearch?: boolean
   noPagination?: boolean

@@ -1,7 +1,8 @@
+import Form from "app/core/components/Form"
+import LabeledTextField from "app/core/components/LabeledTextField"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import { BlitzPage, Link, useRouterQuery, invoke } from "blitz"
 import { Suspense, useState } from "react"
-import AddCalendarForm from "../../components/AddCalendarForm"
 import handleOAuthCode from "../mutations/handleOAuthCode"
 
 /**
@@ -39,7 +40,7 @@ function OAuthCallbackPage() {
           <h1>An error has occurred</h1>
           <p>
             Please try again. Notice that this Microsoft Calendar might already be connected to
-            Kalle. If so please edit or delete it in the calendar settings.
+            hire-win. If so please edit or delete it in the calendar settings.
           </p>
           <SettingsLink />
         </>
@@ -50,8 +51,8 @@ function OAuthCallbackPage() {
         </>
       ) : (
         <>
-          <h1>Your Authentication was succesful.</h1>
-          <h3>Last step. Please choose a name for your new Calendar.</h3>
+          {/* <h1>Your Authentication was succesful.</h1>
+          <h3>Last step. Please choose a name for your new Calendar.</h3> */}
           {/* <Form>
             <Form.Group controlId="formGoogleCalendarName">
               <Form.Label>Calendar Name</Form.Label>
@@ -75,17 +76,22 @@ function OAuthCallbackPage() {
           >
             Add Calendar
           </Button> */}
-          <AddCalendarForm
+          <Form
+            submitText="Submit"
             header="Your Authentication was succesful"
-            subHeader="Last step. Please choose a name for your new Calendar. This name helps you to recognize the calendar. For example 'Private' or 'My project with Alice'."
+            subHeader="Last step. Please choose a name for your new Calendar."
             onSubmit={async (values) => {
-              if (values && values.name) {
-                setCalendarName(values.name)
-              }
               await handleCode()
               if (!isError) setIsCalenderAdded(true)
             }}
-          />
+          >
+            <LabeledTextField
+              name="name"
+              label="Calendar Name"
+              placeholder="Enter a name you'd like for your calendar"
+              onChange={(e) => setCalendarName(e.target.value)}
+            />
+          </Form>
         </>
       )}
     </>

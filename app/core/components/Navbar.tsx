@@ -24,6 +24,7 @@ const Navbar = ({ user }: NavbarProps) => {
     { name: "Forms", href: "/forms", current: router.route === "/forms" },
     { name: "Score Cards", href: "/score-cards", current: router.route === "/score-cards" },
     { name: "Schedules", href: "/schedules", current: router.route === "/schedules" },
+    { name: "Calendars", href: "/calendars", current: router.route === "/calendars" },
   ]
   let dropDownNav = [
     {

@@ -1,3 +1,4 @@
+import { ExternalLinkIcon } from "@heroicons/react/outline"
 import { useQuery } from "blitz"
 import { PropsWithChildren } from "react"
 import getCcalOAuthUrl from "../queries/createConnection"
@@ -10,8 +11,9 @@ export const ConnectGoogleCalendarButton = (
   const [url] = useQuery(getCcalOAuthUrl, null)
 
   return (
-    <a id={props.id} href={url}>
-      {props.children}
+    <a className="text-theme-600 underline flex items-center" id={props.id} href={url}>
+      <span>{props.children}</span>
+      <ExternalLinkIcon className="w-4 h-4 ml-1" />
     </a>
   )
 }
