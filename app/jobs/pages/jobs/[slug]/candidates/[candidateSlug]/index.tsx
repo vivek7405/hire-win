@@ -238,9 +238,9 @@ const getCards = (candidate: ExtendedCandidate) => {
   )
 }
 
-const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageIdForScoreCard) => {
+const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageId) => {
   return candidate?.job?.scoreCards?.find(
-    (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard || candidate?.workflowStageId
+    (sc) => sc.workflowStageId === selectedWorkflowStageId || candidate?.workflowStageId
   )
 }
 
@@ -251,22 +251,18 @@ const getScoreAverage = (ratingsArray: number[]) => {
 const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { user, error, canUpdate } = props
   const [candidate, setCandidate] = useState(props.candidate)
-  const [selectedWorkflowStageIdForScoreCard, setSelectedWorkflowStageIdForScoreCard] = useState(
-    candidate?.workflowStageId || ""
-  )
-  // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStageIdForScoreCard)?.scoreCardId || ""
+  const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
+  // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
   const [scoreCardId, setScoreCardId] = useState(
-    candidate?.job?.scoreCards?.find(
-      (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
-    )?.scoreCardId || ""
+    candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
+      ?.scoreCardId || ""
   )
   useEffect(() => {
     setScoreCardId(
-      candidate?.job?.scoreCards?.find(
-        (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
-      )?.scoreCardId || ""
+      candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
+        ?.scoreCardId || ""
     )
-  }, [candidate, selectedWorkflowStageIdForScoreCard])
+  }, [candidate, selectedWorkflowStage?.id])
 
   const [file, setFile] = useState(null as any)
   const [cards, setCards] = useState(getCards(candidate!))
@@ -392,17 +388,15 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                       return (
                         <div
                           key={`${ws.stage?.name}${index}`}
-                          className={`${index > 0 ? "border-l-2" : ""} ${
+                          className={`${index > 0 ? "border-l-2 rounded-bl-md" : ""} ${
                             index < (candidate?.job?.workflow?.stages?.length || 0) - 1
-                              ? "border-r-2"
+                              ? "border-r-2 rounded-br-md"
                               : ""
                           } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
-                            selectedWorkflowStageIdForScoreCard === ws.id
-                              ? "!bg-theme-500 !text-white"
-                              : ""
+                            selectedWorkflowStage?.id === ws.id ? "!bg-theme-500 !text-white" : ""
                           }`}
                           onClick={() => {
-                            setSelectedWorkflowStageIdForScoreCard(ws.id)
+                            setSelectedWorkflowStage(ws)
                             // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
                           }}
                         >
@@ -413,20 +407,22 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                 </div>
                 <ScoreCard
                   submitDisabled={
-                    selectedWorkflowStageIdForScoreCard !== candidate?.workflowStageId
+                    selectedWorkflowStage?.interviewDetails?.find(
+                      (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                    )?.interviewerId !== user?.id
                   }
-                  key={selectedWorkflowStageIdForScoreCard}
+                  key={selectedWorkflowStage?.id}
                   candidate={candidate}
                   header={`${titleCase(candidate?.name)}'s Score`}
                   subHeader={`${
                     candidate?.job?.workflow?.stages?.find(
-                      (ws) => ws.id === selectedWorkflowStageIdForScoreCard
+                      (ws) => ws.id === selectedWorkflowStage?.id
                     )?.stage?.name
                   } Stage`}
                   scoreCardId={scoreCardId}
                   preview={false}
                   userId={user?.id || 0}
-                  workflowStageId={selectedWorkflowStageIdForScoreCard}
+                  workflowStage={selectedWorkflowStage as any}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Updating Candidate</span>)
                     try {
@@ -435,9 +431,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                         linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
                           jobId: candidate?.jobId || "0",
                           workflowStageId:
-                            selectedWorkflowStageIdForScoreCard ||
-                            candidate?.workflowStageId ||
-                            "0",
+                            selectedWorkflowStage?.id || candidate?.workflowStageId || "0",
                         })
                       }
                       const updatedCandidate = await updateCandidateScoresMutation({
@@ -454,7 +448,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                           scores:
                             (
                               candidate?.job?.scoreCards?.find(
-                                (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
+                                (sc) => sc.workflowStageId === selectedWorkflowStage?.id
                               )?.scoreCard || linkedScoreCard
                             )?.cardQuestions
                               ?.map((sq) => {
@@ -468,9 +462,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                                   note: note,
                                   id: scoreId || null,
                                   workflowStageId:
-                                    selectedWorkflowStageIdForScoreCard ||
-                                    candidate?.workflowStageId ||
-                                    "0",
+                                    selectedWorkflowStage?.id || candidate?.workflowStageId || "0",
                                 }
                               })
                               ?.filter((score) => score.rating > 0) || ([] as any),

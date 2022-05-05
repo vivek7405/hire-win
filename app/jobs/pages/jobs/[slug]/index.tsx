@@ -489,21 +489,21 @@ const SingleJobPage = ({
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
       <Link href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
-        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3">
           New Candidate
         </a>
       </Link>
       {canUpdate && (
         <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
           <a
-            className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
+            className="float-right underline text-theme-600 ml-3 py-2 hover:text-theme-800"
             data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
           >
             Job Settings
           </a>
         </Link>
       )}
-      <div className="float-right text-theme-600 py-2">
+      <div className="float-right text-theme-600 py-2 ml-3">
         <Form
           noFormatting={true}
           onSubmit={(value) => {
@@ -528,7 +528,7 @@ const SingleJobPage = ({
         <a
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
+          className="flex items-center float-right underline text-theme-600 ml-3 py-2 hover:text-theme-800"
         >
           <span className="mr-1">View Job Listing</span>
           <svg
