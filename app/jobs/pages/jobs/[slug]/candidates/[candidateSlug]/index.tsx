@@ -32,7 +32,7 @@ import {
 } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { QuestionType, ScoreCardJobWorkflowStage } from ".prisma1/client"
+import { QuestionType, ScoreCardJobWorkflowStage } from "@prisma/client"
 import Cards from "app/core/components/Cards"
 import Skeleton from "react-loading-skeleton"
 import ScoreCard from "app/score-cards/components/ScoreCard"

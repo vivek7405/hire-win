@@ -208,6 +208,7 @@ const AddSchedule = () => {
           e.preventDefault()
           setOpenAddSchedule(true)
         }}
+        className="whitespace-nowrap"
       >
         New Schedule
       </button>

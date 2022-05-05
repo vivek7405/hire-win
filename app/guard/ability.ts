@@ -390,14 +390,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       can("create", "calendar")
       can("update", "calendar")
       can("read", "calendar", async (args) => {
-        const calendar = await db.connectedCalendar.findFirst({
+        const calendar = await db.calendar.findFirst({
           where: args.where,
         })
 
         return calendar?.ownerId === ctx.session.userId
       })
       can("readAll", "calendar", async (args) => {
-        const calendars = await db.connectedCalendar.findMany({
+        const calendars = await db.calendar.findMany({
           where: args.where,
         })
 

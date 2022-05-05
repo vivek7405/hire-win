@@ -7,7 +7,7 @@ import type {
   CreateEventBooking,
   ExternalEvent,
 } from "app/scheduling/calendars/calendar-service"
-import { ConnectedCalendar } from "db"
+import { Calendar } from "db"
 import passwordEncryptor from "app/core/utils/password-encryptor"
 import { addMinutes } from "date-fns"
 
@@ -263,7 +263,7 @@ async function icsFreeBusyToInternalFreeBusy(ics: string): Promise<ExternalEvent
 export class CaldavService implements CalendarService {
   constructor(private readonly calendar: CalendarConnectionDetails) {}
 
-  public static async fromConnectedCalendar(calendar: ConnectedCalendar) {
+  public static async fromCalendar(calendar: Calendar) {
     if (!calendar.encryptedPassword || !calendar.caldavAddress || !calendar.username) {
       throw new Error("Some credentials for your calendar are missing.")
     }
@@ -306,7 +306,7 @@ export class CaldavService implements CalendarService {
 
   public async createEvent(booking: CreateEventBooking) {
     const start = booking.startDateUTC
-    const end = addMinutes(booking.startDateUTC, booking.meeting.duration)
+    const end = addMinutes(booking.startDateUTC, booking.interviewDetail.duration)
 
     const dateNow = new Date()
     const uid = uuidv4()
@@ -323,8 +323,8 @@ X-MICROSOFT-CDO-BUSYSTATUS:BUSY
 LAST-MODIFIED:${formatDateAsICS(dateNow)}
 DTSTAMP:${formatDateAsICS(dateNow)}
 CREATED:${formatDateAsICS(dateNow)}
-LOCATION:${booking.meeting.location}
-SUMMARY:${booking.meeting.name}
+LOCATION:${``}
+SUMMARY:${`Interview with ${booking.inviteeEmail}`}
 CLASS:PUBLIC
 END:VEVENT
 END:VCALENDAR\r\n`.trimLeft()

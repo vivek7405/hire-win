@@ -1,12 +1,10 @@
-import { Booking, ConnectedCalendar, Meeting, User } from "db"
+import { Booking, Calendar, InterviewDetail, Prisma, User } from "db"
 import { CaldavService } from "./caldav"
 import { GoogleCalendarService } from "./googlecalendar/googlecalendar"
 import { OutlookCalendarService } from "./outlookcalendar/outlookcalendar"
 
 export type CreateEventBooking = Pick<Booking, "startDateUTC" | "inviteeEmail"> & {
-  meeting: Pick<Meeting, "duration" | "location" | "name" | "description"> & {
-    owner: Pick<User, "email">
-  }
+  interviewDetail: Pick<InterviewDetail, "duration" | "jobId" | "workflowStageId" | "interviewerId">
 }
 
 export interface ExternalEvent {
@@ -20,18 +18,16 @@ export interface CalendarService {
   getTakenTimeSlots(start: Date, end: Date): Promise<ExternalEvent[]>
 }
 
-export async function getCalendarService(
-  connectedCalendar: ConnectedCalendar
-): Promise<CalendarService> {
-  switch (connectedCalendar.type) {
+export async function getCalendarService(calendar: Calendar): Promise<CalendarService> {
+  switch (calendar.type) {
     case "CaldavBasic":
     case "CaldavDigest":
-      return await CaldavService.fromConnectedCalendar(connectedCalendar)
+      return await CaldavService.fromCalendar(calendar)
     case "GoogleCalendar":
-      return new GoogleCalendarService(connectedCalendar)
+      return new GoogleCalendarService(calendar)
     case "OutlookCalendar":
-      return await OutlookCalendarService.getOutlookCalendarService(connectedCalendar)
+      return await OutlookCalendarService.getOutlookCalendarService(calendar)
     default:
-      throw new Error("Unknown Calendar Type: " + connectedCalendar.type)
+      throw new Error("Unknown Calendar Type: " + calendar.type)
   }
 }

@@ -1,6 +1,6 @@
-import addConnectedCalendarMutation from "../mutations/addConnectedCalendar"
+import addCalendarMutation from "../mutations/addCalendar"
 import { invalidateQuery, useMutation, Link } from "blitz"
-import getConnectedCalendars from "../queries/getConnectedCalendars"
+import getCalendars from "../queries/getCalendars"
 import styles from "./AddCalendar.module.css"
 import { useState } from "react"
 import { ConnectGoogleCalendarButton } from "app/scheduling/calendars/googlecalendar/components/ConnectGoogleCalendarButton"
@@ -15,7 +15,7 @@ interface AddCalendarProps {
   onClose?: any
 }
 const AddCalendarForm = (props: AddCalendarProps) => {
-  const [createCalendar] = useMutation(addConnectedCalendarMutation)
+  const [createCalendar] = useMutation(addCalendarMutation)
   const [calendarType, setCalendarType] = useState("caldav")
   const [error, setError] = useState({ error: false, message: "" })
   const [message, setMessage] = useState("")
@@ -66,7 +66,7 @@ const AddCalendarForm = (props: AddCalendarProps) => {
             return
           } else {
             setError({ error: false, message: "" })
-            await invalidateQuery(getConnectedCalendars)
+            await invalidateQuery(getCalendars)
             await invalidateQuery(getDefaultCalendarByUser)
             props.onClose && props.onClose()
           }

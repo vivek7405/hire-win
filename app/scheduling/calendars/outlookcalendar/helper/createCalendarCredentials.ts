@@ -11,13 +11,12 @@ export default resolver.pipe(
   ),
   resolver.authorize(),
   async ({ name, refreshToken }, ctx) => {
-    await db.connectedCalendar.create({
+    await db.calendar.create({
       data: {
         name: name,
         owner: {
           connect: { id: ctx.session.userId },
         },
-        status: "active",
         type: "OutlookCalendar",
         refreshToken: refreshToken,
       },

@@ -4,7 +4,7 @@ import seedData from "./seedData.json"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { Job } from "app/jobs/validations"
-import { MembershipRole, UserRole } from ".prisma1/client"
+import { MembershipRole, UserRole } from "@prisma/client"
 
 /*
  * This seed function is executed when you run `blitz db seed`.
@@ -27,6 +27,7 @@ async function createUsers() {
 
       const createdUser = await db.user.create({
         data: {
+          name: user.name,
           email: user.email,
           companyName: user.companyName,
           slug: newSlug,

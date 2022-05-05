@@ -4,7 +4,7 @@ import { adminNewUserMailer } from "mailers/adminNewUserMailer"
 import crypto from "crypto"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { UserRole } from ".prisma1/client"
+import { UserRole } from "@prisma/client"
 
 const generatePassword = (
   length = 20,
@@ -17,7 +17,7 @@ const generatePassword = (
 const RESET_PASSWORD_TOKEN_EXPIRATION_IN_HOURS = 4
 export default resolver.pipe(
   resolver.authorize("ADMIN"),
-  async ({ email, companyName, companyInfo, website }, ctx: Ctx) => {
+  async ({ name, email, companyName, companyInfo, website }, ctx: Ctx) => {
     // 1. Create User
     const hashedPassword = await SecurePassword.hash(generatePassword().trim())
 
@@ -29,6 +29,7 @@ export default resolver.pipe(
 
     const user = await db.user.create({
       data: {
+        name,
         email: email.toLowerCase().trim(),
         companyName,
         companyInfo,

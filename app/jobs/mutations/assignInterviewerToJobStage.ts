@@ -1,41 +1,58 @@
 import { AuthenticationError, Ctx } from "blitz"
-import db, { InterviewerJobWorkflowStage, Prisma } from "db"
+import db, { InterviewDetail, Prisma } from "db"
 import { Job } from "app/jobs/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
 import { ExtendedJob } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
-type AssignInterviewerInputProps = {
+type InterviewDetailInputProps = {
   jobId: string
   workflowStageId: string
   interviewerId: number
 }
 
 async function assignInterviewerToJobStage(
-  { jobId, workflowStageId, interviewerId }: AssignInterviewerInputProps,
+  { jobId, workflowStageId, interviewerId }: InterviewDetailInputProps,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const existingInterviewer = await db.interviewerJobWorkflowStage.findFirst({
-    where: { jobId, workflowStageId },
+  const interviewer = await db.user.findFirst({
+    where: { id: interviewerId },
+    include: { defaultCalendars: true, schedules: true },
   })
 
-  if (existingInterviewer) {
-    // update
-    const updatedInterviewer = await db.interviewerJobWorkflowStage.update({
-      where: { id: existingInterviewer.id },
-      data: { interviewerId },
+  if (interviewer) {
+    const existingInterviewDetail = await db.interviewDetail.findFirst({
+      where: { jobId, workflowStageId },
     })
 
-    return updatedInterviewer
-  } else {
-    // create
-    const createdInterviewer = await db.interviewerJobWorkflowStage.create({
-      data: { jobId, workflowStageId, interviewerId },
-    })
-    return createdInterviewer
+    const scheduleId = interviewer.schedules.find((sch) => sch.name === "Default")?.id || 0
+    const calendarId =
+      interviewer.defaultCalendars.find((cal) => cal.userId === interviewerId)?.calendarId || null
+
+    if (existingInterviewDetail) {
+      // update
+      const updatedInterviewDetail = await db.interviewDetail.update({
+        where: { id: existingInterviewDetail.id },
+        data: { interviewerId, scheduleId, calendarId }, // assign default schedule and default calendar when an interviewer is updated
+      })
+
+      return updatedInterviewDetail
+    } else {
+      const duration = 30
+
+      // create
+      if (jobId && workflowStageId && interviewerId && scheduleId && calendarId) {
+        const createdInterviewDetail = await db.interviewDetail.create({
+          data: { jobId, workflowStageId, interviewerId, scheduleId, calendarId, duration },
+        })
+        return createdInterviewDetail
+      }
+    }
+
+    return null
   }
 }
 

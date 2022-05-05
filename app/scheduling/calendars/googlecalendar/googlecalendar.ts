@@ -1,6 +1,6 @@
 import { google, calendar_v3 } from "googleapis"
 import { createAuthenticatedGoogleOauth } from "./helpers/GoogleClient"
-import { ConnectedCalendar } from "db"
+import db, { Calendar } from "db"
 import { CalendarService, CreateEventBooking } from "app/scheduling/calendars/calendar-service"
 import { addMinutes } from "date-fns"
 import { boilDownTimeIntervals } from "../utils/boildown-intervals"
@@ -8,7 +8,7 @@ import { boilDownTimeIntervals } from "../utils/boildown-intervals"
 export class GoogleCalendarService implements CalendarService {
   private calendar: calendar_v3.Calendar
 
-  constructor(calendar: ConnectedCalendar) {
+  constructor(calendar: Calendar) {
     if (!calendar.refreshToken) {
       throw new Error("refreshToken missing!")
     }
@@ -21,14 +21,18 @@ export class GoogleCalendarService implements CalendarService {
 
   public async createEvent(booking: CreateEventBooking) {
     const startDate = booking.startDateUTC
-    const endDate = addMinutes(booking.startDateUTC, booking.meeting.duration)
+    const endDate = addMinutes(booking.startDateUTC, booking.interviewDetail.duration)
+
+    const interviewer = await db.user.findFirst({
+      where: { id: booking?.interviewDetail.interviewerId },
+    })
 
     await this.calendar.events.insert({
       calendarId: "primary",
       requestBody: {
-        summary: booking.meeting.name,
-        location: booking.meeting.location ?? "",
-        description: booking.meeting.description,
+        summary: `Interview with ${booking.inviteeEmail}`,
+        location: "",
+        description: `Interview with ${booking.inviteeEmail}`,
         start: {
           dateTime: startDate.toISOString(),
           timeZone: "Etc/UTC",
@@ -36,7 +40,7 @@ export class GoogleCalendarService implements CalendarService {
         end: {
           dateTime: endDate.toISOString(),
         },
-        attendees: [{ email: booking.meeting.owner.email }, { email: booking.inviteeEmail }],
+        attendees: [{ email: interviewer?.email }, { email: booking.inviteeEmail }],
         reminders: {
           useDefault: true,
         },

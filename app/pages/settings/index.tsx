@@ -50,6 +50,7 @@ const UserSettingsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
           header="Profile"
           subHeader="Update your profile details"
           initialValues={{
+            name: user?.name || "",
             logo: user?.logo,
             companyName: user?.companyName || "",
             companyInfo: user?.companyInfo

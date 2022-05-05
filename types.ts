@@ -1,6 +1,6 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
-import { Prisma, UserRole } from ".prisma1/client"
+import { Prisma, UserRole } from "@prisma/client"
 
 export enum PlanName {
   PRO,
@@ -65,11 +65,11 @@ export type ExtendedJob = Prisma.JobGetPayload<{
   include: {
     memberships: true
     category: true
-    workflow: { include: { stages: { include: { stage: true; interviewers: true } } } }
+    workflow: { include: { stages: { include: { stage: true; interviewDetails: true } } } }
     form: { include: { questions: { include: { question: true } } } }
     candidates: true
     scoreCards: { include: { scoreCard: true } }
-    interviewers: true
+    interviewDetails: true
   }
 }>
 export type ExtendedCandidate = Prisma.CandidateGetPayload<{

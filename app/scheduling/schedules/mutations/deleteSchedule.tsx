@@ -3,11 +3,11 @@ import { resolver } from "blitz"
 import * as z from "zod"
 
 export default resolver.pipe(resolver.zod(z.number()), resolver.authorize(), async (scheduleId) => {
-  const meetingsDependingOnSchedule = await db.meeting.count({
+  const interviewsDependingOnSchedule = await db.interviewDetail.count({
     where: { scheduleId: scheduleId },
   })
 
-  if (meetingsDependingOnSchedule > 0) {
+  if (interviewsDependingOnSchedule > 0) {
     return "error"
   }
 

@@ -25,6 +25,12 @@ export const UserForm = (props: UserFormProps) => {
         onSubmit={props.onSubmit}
       >
         <LabeledTextField
+          name="name"
+          label="Name"
+          placeholder="Enter your name"
+          testid="userUpdateName"
+        />
+        <LabeledTextField
           type="text"
           name="companyName"
           label="Company Name"

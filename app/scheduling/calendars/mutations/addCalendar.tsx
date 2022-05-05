@@ -1,4 +1,4 @@
-import db, { ConnectedCalendarType } from "db"
+import db, { CalendarType } from "db"
 import { resolver } from "blitz"
 import passwordEncryptor from "app/core/utils/password-encryptor"
 import { verifyConnectionDetails } from "app/scheduling/calendars/caldav"
@@ -9,7 +9,7 @@ export default resolver.pipe(
     z.object({
       name: z.string(),
       url: z.string(),
-      type: z.nativeEnum(ConnectedCalendarType),
+      type: z.nativeEnum(CalendarType),
       username: z.string(),
       password: z.string(),
     })
@@ -29,11 +29,10 @@ export default resolver.pipe(
 
     const encryptedPassword = await passwordEncryptor.encrypt(calendarCreate.password)
 
-    const calendar = await db.connectedCalendar.create({
+    const calendar = await db.calendar.create({
       data: {
         name: calendarCreate.name,
         caldavAddress: calendarCreate.url,
-        status: "active",
         type:
           calendarCreate.type === "CaldavDigest" || calendarCreate.type === "CaldavBasic"
             ? connectionDetails?.auth?.digest

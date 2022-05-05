@@ -27,6 +27,9 @@
     "node": "16.x",
     "npm": "8.x"
   },
+  "prisma": {
+    "schema": "db/schema.prisma"
+  },
   "prettier": {
     "semi": false,
     "printWidth": 100

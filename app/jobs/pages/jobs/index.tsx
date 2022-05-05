@@ -19,7 +19,7 @@ import Guard from "app/guard/ability"
 import Confirm from "app/core/components/Confirm"
 import { checkPlan } from "app/users/utils/checkPlan"
 import { CardType, DragDirection, ExtendedJob, ExtendedWorkflowStage, Plan, PlanName } from "types"
-import { Candidate, Category } from ".prisma1/client"
+import { Candidate, Category } from "@prisma/client"
 import moment from "moment"
 import { Country, State } from "country-state-city"
 import { titleCase } from "app/core/utils/titleCase"
@@ -446,7 +446,9 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                       )
                       setOpenConfirm(true)
                     } else {
-                      router.push(Routes.JobSettingsPage({ slug: job.slug }))
+                      job.canUpdate
+                        ? router.push(Routes.JobSettingsPage({ slug: job.slug }))
+                        : router.push(Routes.JobSettingsSchedulingPage({ slug: job.slug }))
                     }
                   }}
                 >

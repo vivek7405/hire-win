@@ -1,7 +1,7 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
 import { Question } from "app/questions/validations"
-import { QuestionType } from ".prisma1/client"
+import { QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"

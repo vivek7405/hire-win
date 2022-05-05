@@ -4,19 +4,18 @@ import { Signup } from "app/auth/validations"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWithFactoryFormQuestions"
-import { UserRole } from ".prisma1/client"
+import { UserRole } from "@prisma/client"
 import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
 import createFactoryCategories from "app/categories/mutations/createFactoryCategories"
 import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
-import createBaikalUserWithDefaultCalendar from "app/scheduling/mutations/createBaikalUserWithDefaultCalendar"
-import { baikalUserDefaultEncryptedPassword, initialSchedule } from "app/scheduling/constants"
-import addConnectedCalendar from "app/scheduling/calendars/mutations/addConnectedCalendar"
+import { initialSchedule } from "app/scheduling/constants"
+import addCalendar from "app/scheduling/calendars/mutations/addCalendar"
 import addSchedule from "app/scheduling/schedules/mutations/addSchedule"
 import { mapValues } from "app/core/utils/map-values"
 
 export default resolver.pipe(
   resolver.zod(Signup),
-  async ({ email, companyName, password }, ctx: Ctx) => {
+  async ({ name, email, companyName, password }, ctx: Ctx) => {
     const hashedPassword = await SecurePassword.hash(password.trim())
 
     const slug = slugify(companyName, { strict: true })
@@ -27,6 +26,7 @@ export default resolver.pipe(
 
     const user = await db.user.create({
       data: {
+        name,
         email: email.toLowerCase().trim(),
         companyName,
         slug: newSlug,
@@ -52,21 +52,6 @@ export default resolver.pipe(
             ? { startTime: "00:00", endTime: "00:00" }
             : { startTime: "09:00", endTime: "17:00" }
         ),
-      },
-      ctx
-    )
-    await createBaikalUserWithDefaultCalendar(
-      newSlug,
-      baikalUserDefaultEncryptedPassword,
-      user?.email
-    )
-    await addConnectedCalendar(
-      {
-        name: "Default",
-        type: "CaldavDigest",
-        url: `http://localhost:5232/dav.php/calendars/${newSlug}/default/`,
-        username: newSlug,
-        password: "root",
       },
       ctx
     )

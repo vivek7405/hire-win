@@ -1,6 +1,6 @@
 import { Ctx } from "blitz"
 import db, { Prisma } from "db"
-import { User } from ".prisma1/client"
+import { User } from "@prisma/client"
 import stripe from "app/core/utils/stripe"
 
 type UpdateUserInput = Pick<Prisma.UserUpdateArgs, "where" | "data"> & {

@@ -122,6 +122,7 @@ const JobSettingsPage = ({
           user={user}
           category={job?.category!}
           workflow={job?.workflow!}
+          form={job?.form!}
           jobId={job?.id}
           header="Job Details"
           subHeader="Update job details"

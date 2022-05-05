@@ -16,7 +16,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
             include: {
               stage: true,
               scoreCards: { include: { scoreCard: true } },
-              interviewers: true,
+              interviewDetails: true,
             },
           },
         },
@@ -49,7 +49,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
         },
       },
       scoreCards: { include: { scoreCard: true } },
-      interviewers: true,
+      interviewDetails: true,
     },
   })
 

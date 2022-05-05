@@ -1,4 +1,4 @@
-import { QuestionType } from ".prisma1/client"
+import { QuestionType } from "@prisma/client"
 import { z } from "zod"
 
 export const QuestionOption = z.object({

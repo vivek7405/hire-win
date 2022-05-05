@@ -16,21 +16,47 @@ const Navbar = ({ user }: NavbarProps) => {
   const router = useRouter()
   const [logoutMutation] = useMutation(logout)
   const nav = [
-    { name: "Jobs", href: "/jobs", current: router.route === "/jobs" },
-    { name: "Categories", href: "/categories", current: router.route === "/categories" },
-    // { name: "Stages", href: "/stages", current: router.route === "/stages" },
-    { name: "Workflows", href: "/workflows", current: router.route === "/workflows" },
-    // { name: "Questions", href: "/questions", current: router.route === "/questions" },
-    { name: "Forms", href: "/forms", current: router.route === "/forms" },
-    { name: "Score Cards", href: "/score-cards", current: router.route === "/score-cards" },
-    { name: "Schedules", href: "/schedules", current: router.route === "/schedules" },
-    { name: "Calendars", href: "/calendars", current: router.route === "/calendars" },
+    {
+      name: "Jobs",
+      href: Routes.JobsHome().pathname,
+      current: router.route === Routes.JobsHome().pathname,
+    },
+    {
+      name: "Categories",
+      href: Routes.CategoriesHome().pathname,
+      current: router.route === Routes.CategoriesHome().pathname,
+    },
+    {
+      name: "Workflows",
+      href: Routes.WorkflowsHome().pathname,
+      current: router.route === Routes.WorkflowsHome().pathname,
+    },
+    {
+      name: "Forms",
+      href: Routes.FormsHome().pathname,
+      current: router.route === Routes.FormsHome().pathname,
+    },
+    {
+      name: "Score Cards",
+      href: Routes.ScoreCardsHome().pathname,
+      current: router.route === Routes.ScoreCardsHome().pathname,
+    },
   ]
   let dropDownNav = [
     {
       name: "Settings",
       href: Routes.UserSettingsPage().pathname,
       current: router.route === "/settings",
+    },
+    {
+      name: "Schedules",
+      href: Routes.UserSettingsSchedulesPage().pathname,
+      current: router.route === "/settings/schedules",
+    },
+    {
+      name: "Calendars",
+      href: Routes.UserSettingsCalendarsPage().pathname,
+      current: router.route === Routes.UserSettingsCalendarsPage().pathname,
     },
     {
       name: "Sign Out",
@@ -47,7 +73,7 @@ const Navbar = ({ user }: NavbarProps) => {
     dropDownNav.push({
       name: "Admin",
       href: Routes.Admin().pathname,
-      current: router.route === "/admin",
+      current: router.route === Routes.Admin().pathname,
     })
 
   useEffect(() => {

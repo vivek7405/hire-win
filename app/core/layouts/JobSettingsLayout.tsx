@@ -1,6 +1,12 @@
 import React, { ReactNode } from "react"
 import { useRouter, Link } from "blitz"
-import { CreditCardIcon, CogIcon, UserGroupIcon, KeyIcon } from "@heroicons/react/outline"
+import {
+  CreditCardIcon,
+  CogIcon,
+  UserGroupIcon,
+  KeyIcon,
+  ClockIcon,
+} from "@heroicons/react/outline"
 import { ExtendedJob } from "types"
 
 type LayoutProps = {
@@ -25,6 +31,13 @@ const JobSettingsLayout = ({ job, children, isOwner }: LayoutProps) => {
       href: `/jobs/${job?.slug}/settings/members`,
       current: router.route === `/jobs/[slug]/settings/members`,
       icon: UserGroupIcon,
+      canView: true,
+    },
+    {
+      name: "Scheduling",
+      href: `/jobs/${job?.slug}/settings/scheduling`,
+      current: router.route === `/jobs/[slug]/settings/scheduling`,
+      icon: ClockIcon,
       canView: true,
     },
     // {

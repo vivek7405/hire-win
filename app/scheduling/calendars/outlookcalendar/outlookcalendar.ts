@@ -4,22 +4,22 @@ import {
   getAuthorizationHeader,
 } from "app/scheduling/calendars/outlookcalendar/helper/getAuthorizationHeader"
 import { addMinutes } from "date-fns"
-import { ConnectedCalendar } from "db"
+import { Calendar } from "db"
 import { boilDownTimeIntervals } from "app/scheduling/calendars/utils/boildown-intervals"
 import makeRequestTo from "app/scheduling/calendars/outlookcalendar/helper/callMicrosoftAPI"
 import { zonedTimeToUtc } from "date-fns-tz"
 
 export class OutlookCalendarService implements CalendarService {
   private authorizationHeader: AuthorizationHeader
-  private calendar: ConnectedCalendar
+  private calendar: Calendar
 
-  public static async getOutlookCalendarService(calendar: ConnectedCalendar) {
+  public static async getOutlookCalendarService(calendar: Calendar) {
     const outlookCalendarService = new OutlookCalendarService(calendar)
     await outlookCalendarService.initialize()
     return outlookCalendarService
   }
 
-  private constructor(calendar: ConnectedCalendar) {
+  private constructor(calendar: Calendar) {
     if (!calendar.refreshToken) {
       throw new Error("refreshToken missing!")
     }
@@ -33,10 +33,10 @@ export class OutlookCalendarService implements CalendarService {
   public async createEvent(booking: CreateEventBooking) {
     const url = "https://graph.microsoft.com/v1.0/me/calendar/events"
     const startDate = booking.startDateUTC
-    const endDate = addMinutes(booking.startDateUTC, booking.meeting.duration)
+    const endDate = addMinutes(booking.startDateUTC, booking.interviewDetail.duration)
 
     const body = {
-      Subject: booking.meeting.name + " with " + booking.inviteeEmail,
+      Subject: `Interview with ${booking.inviteeEmail}`,
       Body: {
         ContentType: "HTML",
         Content: "This meeting was booked via hire.win",

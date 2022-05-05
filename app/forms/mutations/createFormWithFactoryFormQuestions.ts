@@ -2,7 +2,7 @@ import db from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryFormQuestions from "../../questions/utils/factoryFormQuestions"
-import { QuestionType } from ".prisma1/client"
+import { QuestionType } from "@prisma/client"
 
 async function createFormWithFactoryFormQuestions(formName: string, userId: number) {
   const slugForm = slugify(formName, { strict: true })

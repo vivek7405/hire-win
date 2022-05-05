@@ -38,6 +38,10 @@ import Form from "app/core/components/Form"
 import assignInterviewerToJobStage from "app/jobs/mutations/assignInterviewerToJobStage"
 import LabeledInputSelectField from "app/core/components/LabeledInputSelectField"
 import getSchedulesWOPagination from "app/scheduling/schedules/queries/getSchedulesWOPagination"
+import getCalendars from "app/scheduling/calendars/queries/getCalendars"
+import getDefaultCalendarByUser from "app/scheduling/calendars/queries/getDefaultCalendarByUser"
+import assignScheduleToJobStage from "app/jobs/mutations/assignScheduleToJobStage"
+import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -136,7 +140,11 @@ const JobSettingsMembersPage = ({
   const [changePermissionMutation] = useMutation(updateMemberRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
   const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
+  const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
+  const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
   const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
+  const [calendars] = useQuery(getCalendars, { where: { ownerId: user?.id } })
+  const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
 
   const [jobData, setJobData] = useState(job)
 
@@ -332,13 +340,12 @@ const JobSettingsMembersPage = ({
                       return a.order - b.order
                     })
                     .map((ws, index) => {
-                      const existingInterviewerJobWorkflowStage = ws.interviewers?.find(
+                      const existingInterviewDetail = ws.interviewDetails?.find(
                         (int) => int.workflowStageId === ws.id && int.jobId === jobData.id
                       )
                       const existingInterviewer: User | null | undefined =
                         jobData?.memberships?.find(
-                          (member) =>
-                            member?.userId === existingInterviewerJobWorkflowStage?.interviewerId
+                          (member) => member?.userId === existingInterviewDetail?.interviewerId
                         )?.user
 
                       return (
@@ -358,7 +365,7 @@ const JobSettingsMembersPage = ({
                               className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
                               name={`timeIntervals.${index}.intervalId`}
                               placeholder={`Time interval for ${ws.stage?.name}`}
-                              // disabled={existingInterviewerJobWorkflowStage && !existingInterviewer}
+                              // disabled={existingInterviewDetail && !existingInterviewer}
                               defaultValue="30"
                             >
                               <option value="15">15 minutes</option>
@@ -377,9 +384,9 @@ const JobSettingsMembersPage = ({
                               className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
                               name={`interviewers.${index}.interviewerId`}
                               placeholder={`Interviewer for ${ws.stage?.name}`}
-                              disabled={existingInterviewerJobWorkflowStage && !existingInterviewer}
+                              disabled={existingInterviewDetail && !existingInterviewer}
                               defaultValue={
-                                existingInterviewerJobWorkflowStage?.interviewerId?.toString() ||
+                                existingInterviewDetail?.interviewerId?.toString() ||
                                 jobData?.memberships
                                   ?.find((member) => member?.role === "OWNER")
                                   ?.userId?.toString()
@@ -396,8 +403,8 @@ const JobSettingsMembersPage = ({
                                       workflowStageId: ws.id,
                                       interviewerId: parseInt(selectedInterviewerId || "0"),
                                     })
-                                  if (existingInterviewerJobWorkflowStage && assignedInterviewer) {
-                                    existingInterviewerJobWorkflowStage.interviewerId =
+                                  if (existingInterviewDetail && assignedInterviewer) {
+                                    existingInterviewDetail.interviewerId =
                                       assignedInterviewer.interviewerId
                                     setJobData(jobData)
                                   }
@@ -413,7 +420,7 @@ const JobSettingsMembersPage = ({
                                 }
                               }}
                             >
-                              {!existingInterviewerJobWorkflowStage || existingInterviewer ? (
+                              {!existingInterviewDetail || existingInterviewer ? (
                                 jobData?.memberships?.map((member) => {
                                   return (
                                     <option
@@ -442,112 +449,6 @@ const JobSettingsMembersPage = ({
                               )}
                             </select>
                           </div>
-                        </div>
-                      )
-                    })}
-                </div>
-              </div>
-
-              <div className="mt-10 mb-6 flex flex-col justify-center items-center">
-                <h3 className="font-semibold text-lg">
-                  Stages assigned to you and their schedules & calendars
-                </h3>
-                <div className="mt-5 w-full flex flex-col items-center justify-center space-y-2">
-                  {jobData?.workflow?.stages
-                    ?.sort((a, b) => {
-                      return a.order - b.order
-                    })
-                    .map((ws, index) => {
-                      const existingInterviewerJobWorkflowStage = ws.interviewers?.find(
-                        (int) => int.workflowStageId === ws.id && int.jobId === jobData.id
-                      )
-                      const existingInterviewer: User | null | undefined =
-                        jobData?.memberships?.find(
-                          (member) =>
-                            member?.userId === existingInterviewerJobWorkflowStage?.interviewerId
-                        )?.user
-
-                      const defaultInterviewerId =
-                        existingInterviewer?.id?.toString() ||
-                        jobData?.memberships
-                          ?.find((member) => member?.role === "OWNER")
-                          ?.userId?.toString()
-
-                      return defaultInterviewerId !== user?.id?.toString() ? (
-                        <></>
-                      ) : (
-                        <div key={ws.id} className="flex">
-                          <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
-                            <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                              {ws.stage?.name}
-                            </div>
-                          </div>
-
-                          <div className="w-32 my-2 flex flex-col items-center justify-center">
-                            <ArrowSmRightIcon className="h-6 w-auto text-neutral-500" />
-                          </div>
-
-                          <div className="w-32 flex flex-col items-center justify-center">
-                            <select
-                              className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
-                              name={`schedules.${index}.scheduleId`}
-                              placeholder={`Select Schedule`}
-                              // disabled={existingInterviewerJobWorkflowStage && !existingInterviewer}
-                              defaultValue={
-                                schedules?.find((schedule) => schedule.name === "Default")?.id
-                              }
-                            >
-                              {schedules?.map((schedule) => {
-                                return (
-                                  <option key={schedule.id} value={schedule.id}>
-                                    {schedule.name}
-                                  </option>
-                                )
-                              })}
-                            </select>
-                          </div>
-
-                          {/* <div className="w-32 my-2 flex flex-col items-center justify-center">
-                            <ArrowSmRightIcon className="h-6 w-auto text-neutral-500" />
-                          </div>
-
-                          <div className="w-32 flex flex-col items-center justify-center">
-                            <select
-                              className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
-                              name={`interviewers.${index}.interviewerId`}
-                              placeholder={`Interviewer for ${ws.stage?.name}`}
-                              disabled={existingInterviewerJobWorkflowStage && !existingInterviewer}
-                              defaultValue={defaultInterviewerId}
-                            >
-                              {!existingInterviewerJobWorkflowStage || existingInterviewer ? (
-                                jobData?.memberships?.map((member) => {
-                                  return (
-                                    <option
-                                      key={member?.userId?.toString()!}
-                                      value={member?.userId?.toString()!}
-                                    >
-                                      {member?.user?.email!}
-                                    </option>
-                                  )
-                                })
-                              ) : (
-                                <option
-                                  key={
-                                    (
-                                      existingInterviewer as User | null | undefined
-                                    )?.id?.toString()!
-                                  }
-                                  value={
-                                    (
-                                      existingInterviewer as User | null | undefined
-                                    )?.id?.toString()!
-                                  }
-                                >
-                                  {(existingInterviewer as User | null | undefined)?.email!}
-                                </option>
-                              )}
-                            </select>
-                          </div> */}
                         </div>
                       )
                     })}

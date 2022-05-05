@@ -8,7 +8,6 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma1/client"
 }
 
 // --------------------------------------
@@ -18,6 +17,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  name           String
   email          String    @unique
   companyName    String
   companyInfo    Json?
@@ -47,10 +47,9 @@ model User {
   scoreCards    ScoreCard[]
   cardQuestions CardQuestion[]
 
-  assignedStagesForInterviews InterviewerJobWorkflowStage[]
-
-  calendars        ConnectedCalendar[]
-  meetings         Meeting[]
+  calendars        Calendar[]
+  // meetings         Meeting[]
+  interviewDetails InterviewDetail[]
   schedules        Schedule[]
   defaultCalendars DefaultCalendar[]
 }
@@ -158,17 +157,27 @@ model Job {
 
   scoreCards ScoreCardJobWorkflowStage[]
 
-  interviewers InterviewerJobWorkflowStage[]
-  candidates   Candidate[]
+  interviewDetails InterviewDetail[]
+  candidates       Candidate[]
 }
 
-model InterviewerJobWorkflowStage {
+model InterviewDetail {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   interviewer   User @relation(fields: [interviewerId], references: [id])
   interviewerId Int
+
+  duration Int
+
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+
+  calendar   Calendar? @relation(fields: [calendarId], references: [id])
+  calendarId Int?
+
+  bookings Booking[]
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
@@ -265,8 +274,8 @@ model WorkflowStage {
   scoreCards ScoreCardJobWorkflowStage[]
   scores     Score[]
 
-  interviewers InterviewerJobWorkflowStage[]
-  candidates   Candidate[]
+  interviewDetails InterviewDetail[]
+  candidates       Candidate[]
 
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
@@ -513,56 +522,52 @@ enum CandidateSource {
 }
 
 model DefaultCalendar {
-  id         Int               @id @default(autoincrement())
-  userId     Int               @unique
-  user       User              @relation(fields: [userId], references: [id])
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  user       User     @relation(fields: [userId], references: [id])
   calendarId Int
-  calendar   ConnectedCalendar @relation(fields: [calendarId], references: [id])
+  calendar   Calendar @relation(fields: [calendarId], references: [id])
 }
 
-enum ConnectedCalendarStatus {
-  active
-}
-
-enum ConnectedCalendarType {
+enum CalendarType {
   CaldavDigest
   CaldavBasic
   GoogleCalendar
   OutlookCalendar
 }
 
-model ConnectedCalendar {
-  id                Int                     @id @default(autoincrement())
+model Calendar {
+  id                Int               @id @default(autoincrement())
   name              String
   caldavAddress     String?
   username          String?
   encryptedPassword String?
   refreshToken      String?
-  owner             User                    @relation(fields: [ownerId], references: [id])
+  owner             User              @relation(fields: [ownerId], references: [id])
   ownerId           Int
-  status            ConnectedCalendarStatus
-  type              ConnectedCalendarType
+  type              CalendarType
   defaultCalendars  DefaultCalendar[]
-  meetings          Meeting[]
+  // meetings          Meeting[]
+  interviewDetails  InterviewDetail[]
 }
 
-model Meeting {
-  id                         Int               @id @default(autoincrement())
-  name                       String
-  link                       String
-  owner                      User              @relation(fields: [ownerName], references: [slug])
-  ownerName                  String
-  description                String
-  duration                   Int
-  startDateUTC               DateTime
-  endDateUTC                 DateTime
-  schedule                   Schedule          @relation(fields: [scheduleId], references: [id])
-  scheduleId                 Int
-  location                   String
-  bookings                   Booking[]
-  defaultConnectedCalendar   ConnectedCalendar @relation(fields: [defaultConnectedCalendarId], references: [id])
-  defaultConnectedCalendarId Int
-}
+// model Meeting {
+//   id                         Int               @id @default(autoincrement())
+//   name                       String
+//   link                       String
+//   owner                      User              @relation(fields: [ownerName], references: [slug])
+//   ownerName                  String
+//   description                String
+//   duration                   Int
+//   startDateUTC               DateTime
+//   endDateUTC                 DateTime
+//   schedule                   Schedule          @relation(fields: [scheduleId], references: [id])
+//   scheduleId                 Int
+//   location                   String
+//   bookings                   Booking[]
+//   defaultCalendar   Calendar @relation(fields: [defaultCalendarId], references: [id])
+//   defaultCalendarId Int
+// }
 
 model DailySchedule {
   id         Int      @id @default(autoincrement())
@@ -574,20 +579,23 @@ model DailySchedule {
 }
 
 model Schedule {
-  id             Int             @id @default(autoincrement())
-  name           String
-  timezone       String
-  dailySchedules DailySchedule[]
-  owner          User            @relation(fields: [ownerId], references: [id])
-  ownerId        Int
-  meetings       Meeting[]
+  id               Int               @id @default(autoincrement())
+  name             String
+  timezone         String
+  dailySchedules   DailySchedule[]
+  owner            User              @relation(fields: [ownerId], references: [id])
+  ownerId          Int
+  // meetings       Meeting[]
+  interviewDetails InterviewDetail[]
 }
 
 model Booking {
-  id           Int      @id @default(autoincrement())
-  meeting      Meeting  @relation(fields: [meetingId], references: [id])
-  meetingId    Int
-  inviteeEmail String
-  startDateUTC DateTime
-  cancelCode   String
+  id                Int             @id @default(autoincrement())
+  // meeting      Meeting  @relation(fields: [meetingId], references: [id])
+  // meetingId    Int
+  interviewDetail   InterviewDetail @relation(fields: [interviewDetailId], references: [id])
+  interviewDetailId String
+  inviteeEmail      String
+  startDateUTC      DateTime
+  cancelCode        String
 }

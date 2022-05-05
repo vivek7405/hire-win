@@ -15,13 +15,12 @@ export default resolver.pipe(
     const oauth2Client = createGoogleOauth()
     const { tokens } = await oauth2Client.getToken(oauthCode)
 
-    const calendar = await db.connectedCalendar.create({
+    const calendar = await db.calendar.create({
       data: {
         name: name,
         owner: {
           connect: { id: ctx.session.userId },
         },
-        status: "active",
         type: "GoogleCalendar",
         refreshToken: tokens.refresh_token,
       },

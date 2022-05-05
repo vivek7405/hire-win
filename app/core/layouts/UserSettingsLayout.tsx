@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react"
 import { useRouter, Link } from "blitz"
-import { CreditCardIcon, CogIcon, KeyIcon } from "@heroicons/react/outline"
+import { CreditCardIcon, CogIcon, KeyIcon, CalendarIcon } from "@heroicons/react/outline"
 import { ExtendedUser } from "types"
+import { ClockIcon } from "@heroicons/react/solid"
 
 type LayoutProps = {
   children: ReactNode
@@ -16,6 +17,18 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
       href: `/settings`,
       current: router.route === `/settings`,
       icon: CogIcon,
+    },
+    {
+      name: "Schedules",
+      href: `/settings/schedules`,
+      current: router.route === `/settings/schedules`,
+      icon: ClockIcon,
+    },
+    {
+      name: "Calendars",
+      href: `/settings/calendars`,
+      current: router.route === `/settings/calendars`,
+      icon: CalendarIcon,
     },
     {
       name: "Billing",

@@ -28,7 +28,7 @@ import {
   ExtendedWorkflowStage,
 } from "types"
 import Skeleton from "react-loading-skeleton"
-import { QuestionType, WorkflowStage } from ".prisma1/client"
+import { QuestionType, WorkflowStage } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

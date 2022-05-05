@@ -1,41 +1,49 @@
 {
   "users": [
     {
+      "name": "test",
       "email": "test@test.com",
       "companyName": "Company 1",
       "password": "test"
     },
     {
+      "name": "test2",
       "email": "test2@test.com",
       "companyName": "Company 2",
       "password": "test"
     },
     {
+      "name": "test3",
       "email": "test3@test.com",
       "companyName": "Company 3",
       "password": "test"
     },
     {
+      "name": "test4",
       "email": "test4@test.com",
       "companyName": "Company 4",
       "password": "test"
     },
     {
+      "name": "test5",
       "email": "test5@test.com",
       "companyName": "Company 5",
       "password": "test"
     },
     {
+      "name": "test6",
       "email": "test6@test.com",
       "companyName": "Company 6",
       "password": "test"
     },
     {
+      "name": "test7",
       "email": "test7@test.com",
       "companyName": "Company 7",
       "password": "test"
     },
     {
+      "name": "invitedUser",
       "email": "invitedUser@test.com",
       "companyName": "Company 8",
       "password": "test"
