@@ -468,13 +468,13 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                               ?.filter((score) => score.rating > 0) || ([] as any),
                         },
                       })
-                      // Stop resume by reloading by assigning previous value since resume won't be changed by this mutation
+                      // Stop resume from reloading by assigning previous value since resume won't be changed by this mutation
                       setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
                       toast.success(
                         () => (
                           <span>
                             Candidate Score Card Updated for stage{" "}
-                            {candidate?.workflowStage?.stage?.name}
+                            {selectedWorkflowStage?.stage?.name}
                           </span>
                         ),
                         { id: toastId }
