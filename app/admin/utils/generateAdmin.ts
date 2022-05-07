@@ -13,7 +13,6 @@ const DO_NOT_INCLUDE = [
   "job",
   "membership",
   "test",
-  "interviewdetail",
   "category",
   "workflow",
   "stage",
@@ -33,7 +32,8 @@ const DO_NOT_INCLUDE = [
   "calendar",
   "dailyschedule",
   "schedule",
-  "booking",
+  "interviewdetail",
+  "interview",
 ]
 
 const entities = database._dmmf.datamodel.models.reduce((arr, m) => {

@@ -12,7 +12,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
-import getInterviewdetails from "app/admin/queries/admin/getInterviewdetails"
+import getInterviewdetails from "app/admin/queries/admin/getInterviewDetails"
 import AdminLayout from "app/core/layouts/AdminLayout"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -68,7 +68,7 @@ const Interviewdetails = () => {
     setQuery(search)
   }, [router.query])
 
-  const [{ interviewdetails, hasMore, count }] = usePaginatedQuery(getInterviewdetails, {
+  const [{ interviewDetails, hasMore, count }] = usePaginatedQuery(getInterviewdetails, {
     where: {
       ...query,
     },
@@ -88,17 +88,17 @@ const Interviewdetails = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await interviewdetails.forEach((interviewdetail) => {
+    await interviewDetails.forEach((interviewDetail) => {
       data = [
         ...data,
         {
-          ...interviewdetail,
+          ...interviewDetail,
         },
       ]
 
       setData(data)
     })
-  }, [interviewdetails])
+  }, [interviewDetails])
 
   const columns = [
     {
@@ -191,8 +191,8 @@ const Interviewdetails = () => {
       },
     },
     {
-      Header: "Bookings",
-      accessor: "bookings",
+      Header: "Interviews",
+      accessor: "interviews",
 
       Cell: (props) => {
         return props.value && props.value.toString()

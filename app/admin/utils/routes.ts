@@ -31,11 +31,6 @@ const routes = (router) => {
       current: router.route === `/admin/memberships`,
     },
     {
-      name: "Interviewdetails",
-      href: "/admin/interviewdetails",
-      current: router.route === "/admin/interviewdetails",
-    },
-    {
       name: "Categorys",
       href: "/admin/categorys",
       current: router.route === "/admin/categorys",
@@ -131,9 +126,14 @@ const routes = (router) => {
       current: router.route === "/admin/schedules",
     },
     {
-      name: "Bookings",
-      href: "/admin/bookings",
-      current: router.route === "/admin/bookings",
+      name: "Interviewdetails",
+      href: "/admin/interviewdetails",
+      current: router.route === "/admin/interviewdetails",
+    },
+    {
+      name: "Interviews",
+      href: "/admin/interviews",
+      current: router.route === "/admin/interviews",
     },
   ]
 }

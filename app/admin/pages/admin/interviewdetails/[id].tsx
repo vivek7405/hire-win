@@ -12,7 +12,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import AdminLayout from "app/core/layouts/AdminLayout"
 
-import getInterviewdetails from "app/admin/queries/admin/getInterviewdetails"
+import getInterviewdetails from "app/admin/queries/admin/getInterviewDetails"
 import updateInterviewdetail from "app/admin/mutations/admin/updateInterviewDetail"
 
 import { Form } from "app/core/components/Form"
@@ -40,7 +40,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     return {
       props: {
         user: user,
-        foundInterviewdetail: foundInterviewdetail.interviewdetails[0],
+        foundInterviewdetail: foundInterviewdetail.interviewDetails[0],
       },
     }
   } else {
@@ -95,7 +95,7 @@ const SingleInterviewdetailAdminPage = ({
           <LabeledTextField name="scheduleId" label="scheduleId" disabled />
           <LabeledTextField name="calendar" label="calendar" disabled />
           <LabeledTextField name="calendarId" label="calendarId" disabled />
-          <LabeledTextField name="bookings" label="bookings" disabled />
+          <LabeledTextField name="interviews" label="interviews" disabled />
           <LabeledTextField name="job" label="job" disabled />
           <LabeledTextField name="jobId" label="jobId" disabled />
           <LabeledTextField name="workflowStage" label="workflowStage" disabled />

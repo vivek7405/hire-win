@@ -3,15 +3,15 @@ import db, { Prisma } from "db"
 
 type UpdateInterviewdetailInput = Pick<Prisma.InterviewDetailUpdateArgs, "where" | "data">
 
-async function updateInterviewdetail({ where, data }: UpdateInterviewdetailInput, ctx: Ctx) {
+async function updateInterviewDetail({ where, data }: UpdateInterviewdetailInput, ctx: Ctx) {
   ctx.session.$authorize("ADMIN")
 
-  const interviewdetail = await db.interviewDetail.update({
+  const interviewDetail = await db.interviewDetail.update({
     where,
     data,
   })
 
-  return interviewdetail
+  return interviewDetail
 }
 
-export default updateInterviewdetail
+export default updateInterviewDetail

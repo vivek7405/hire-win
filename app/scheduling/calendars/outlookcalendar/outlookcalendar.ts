@@ -1,4 +1,4 @@
-import { CalendarService, CreateEventBooking } from "app/scheduling/calendars/calendar-service"
+import { CalendarService, CreateEventInterview } from "app/scheduling/calendars/calendar-service"
 import {
   AuthorizationHeader,
   getAuthorizationHeader,
@@ -30,13 +30,13 @@ export class OutlookCalendarService implements CalendarService {
     this.authorizationHeader = await getAuthorizationHeader(this.calendar.refreshToken!)
   }
 
-  public async createEvent(booking: CreateEventBooking) {
+  public async createEvent(interview: CreateEventInterview) {
     const url = "https://graph.microsoft.com/v1.0/me/calendar/events"
-    const startDate = booking.startDateUTC
-    const endDate = addMinutes(booking.startDateUTC, booking.interviewDetail.duration)
+    const startDate = interview.startDateUTC
+    const endDate = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
 
     const body = {
-      Subject: `Interview with ${booking.inviteeEmail}`,
+      Subject: `Interview with ${interview.candidate.email}`,
       Body: {
         ContentType: "HTML",
         Content: "This meeting was booked via hire.win",
@@ -52,8 +52,8 @@ export class OutlookCalendarService implements CalendarService {
       Attendees: [
         {
           EmailAddress: {
-            Address: booking.inviteeEmail,
-            Name: booking.inviteeEmail.split("@")[0],
+            Address: interview.candidate.email,
+            Name: interview.candidate.email.split("@")[0],
           },
           Type: "Required",
         },

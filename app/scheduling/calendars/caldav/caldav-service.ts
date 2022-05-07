@@ -4,7 +4,7 @@ import _ from "lodash"
 import { v4 as uuidv4 } from "uuid"
 import type {
   CalendarService,
-  CreateEventBooking,
+  CreateEventInterview,
   ExternalEvent,
 } from "app/scheduling/calendars/calendar-service"
 import { Calendar } from "db"
@@ -304,9 +304,9 @@ export class CaldavService implements CalendarService {
     return await icsFreeBusyToInternalFreeBusy(response.data.toString())
   }
 
-  public async createEvent(booking: CreateEventBooking) {
-    const start = booking.startDateUTC
-    const end = addMinutes(booking.startDateUTC, booking.interviewDetail.duration)
+  public async createEvent(interview: CreateEventInterview) {
+    const start = interview.startDateUTC
+    const end = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
 
     const dateNow = new Date()
     const uid = uuidv4()
@@ -324,7 +324,7 @@ LAST-MODIFIED:${formatDateAsICS(dateNow)}
 DTSTAMP:${formatDateAsICS(dateNow)}
 CREATED:${formatDateAsICS(dateNow)}
 LOCATION:${``}
-SUMMARY:${`Interview with ${booking.inviteeEmail}`}
+SUMMARY:${`Interview with ${interview.candidate.email}`}
 CLASS:PUBLIC
 END:VEVENT
 END:VCALENDAR\r\n`.trimLeft()

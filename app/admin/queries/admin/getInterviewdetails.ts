@@ -1,17 +1,17 @@
 import { paginate, Ctx } from "blitz"
 import db, { Prisma } from "db"
 
-interface GetInterviewdetailsInput
+interface GetInterviewDetailsInput
   extends Pick<Prisma.InterviewDetailFindManyArgs, "where" | "orderBy" | "skip" | "take"> {}
 
-async function getInterviewdetails(
-  { where, orderBy, skip = 0, take = 100 }: GetInterviewdetailsInput,
+async function getInterviewDetails(
+  { where, orderBy, skip = 0, take = 100 }: GetInterviewDetailsInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize("ADMIN")
 
   const {
-    items: interviewdetails,
+    items: interviewDetails,
     hasMore,
     count,
   } = await paginate({
@@ -27,10 +27,10 @@ async function getInterviewdetails(
   })
 
   return {
-    interviewdetails,
+    interviewDetails,
     hasMore,
     count,
   }
 }
 
-export default getInterviewdetails
+export default getInterviewDetails

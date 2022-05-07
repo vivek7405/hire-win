@@ -1,10 +1,12 @@
-import { Booking, Calendar, InterviewDetail, Prisma, User } from "db"
+import { Interview, Calendar, InterviewDetail, Prisma, User, Candidate } from "db"
 import { CaldavService } from "./caldav"
 import { GoogleCalendarService } from "./googlecalendar/googlecalendar"
 import { OutlookCalendarService } from "./outlookcalendar/outlookcalendar"
 
-export type CreateEventBooking = Pick<Booking, "startDateUTC" | "inviteeEmail"> & {
+export type CreateEventInterview = Pick<Interview, "startDateUTC"> & {
   interviewDetail: Pick<InterviewDetail, "duration" | "jobId" | "workflowStageId" | "interviewerId">
+} & {
+  candidate: Pick<Candidate, "email">
 }
 
 export interface ExternalEvent {
@@ -14,7 +16,7 @@ export interface ExternalEvent {
 }
 
 export interface CalendarService {
-  createEvent(booking: CreateEventBooking): Promise<void>
+  createEvent(interview: CreateEventInterview): Promise<void>
   getTakenTimeSlots(start: Date, end: Date): Promise<ExternalEvent[]>
 }
 

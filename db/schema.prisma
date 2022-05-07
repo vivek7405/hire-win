@@ -177,7 +177,7 @@ model InterviewDetail {
   calendar   Calendar? @relation(fields: [calendarId], references: [id])
   calendarId Int?
 
-  bookings Booking[]
+  interviews Interview[]
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
@@ -512,6 +512,8 @@ model Candidate {
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
+  interviews Interview[]
+
   @@unique([jobId, email])
 }
 
@@ -589,13 +591,15 @@ model Schedule {
   interviewDetails InterviewDetail[]
 }
 
-model Booking {
+model Interview {
   id                Int             @id @default(autoincrement())
   // meeting      Meeting  @relation(fields: [meetingId], references: [id])
   // meetingId    Int
   interviewDetail   InterviewDetail @relation(fields: [interviewDetailId], references: [id])
   interviewDetailId String
-  inviteeEmail      String
+  candidate         Candidate       @relation(fields: [candidateId], references: [id])
+  candidateId       String
+  // inviteeEmail      String
   startDateUTC      DateTime
   cancelCode        String
 }

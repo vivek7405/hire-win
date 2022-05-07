@@ -1,7 +1,7 @@
 import { google, calendar_v3 } from "googleapis"
 import { createAuthenticatedGoogleOauth } from "./helpers/GoogleClient"
 import db, { Calendar } from "db"
-import { CalendarService, CreateEventBooking } from "app/scheduling/calendars/calendar-service"
+import { CalendarService, CreateEventInterview } from "app/scheduling/calendars/calendar-service"
 import { addMinutes } from "date-fns"
 import { boilDownTimeIntervals } from "../utils/boildown-intervals"
 
@@ -19,20 +19,20 @@ export class GoogleCalendarService implements CalendarService {
     })
   }
 
-  public async createEvent(booking: CreateEventBooking) {
-    const startDate = booking.startDateUTC
-    const endDate = addMinutes(booking.startDateUTC, booking.interviewDetail.duration)
+  public async createEvent(interview: CreateEventInterview) {
+    const startDate = interview.startDateUTC
+    const endDate = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
 
     const interviewer = await db.user.findFirst({
-      where: { id: booking?.interviewDetail.interviewerId },
+      where: { id: interview?.interviewDetail.interviewerId },
     })
 
     await this.calendar.events.insert({
       calendarId: "primary",
       requestBody: {
-        summary: `Interview with ${booking.inviteeEmail}`,
+        summary: `Interview with ${interview.candidate.email}`,
         location: "",
-        description: `Interview with ${booking.inviteeEmail}`,
+        description: `Interview with ${interview.candidate.email}`,
         start: {
           dateTime: startDate.toISOString(),
           timeZone: "Etc/UTC",
@@ -40,7 +40,7 @@ export class GoogleCalendarService implements CalendarService {
         end: {
           dateTime: endDate.toISOString(),
         },
-        attendees: [{ email: interviewer?.email }, { email: booking.inviteeEmail }],
+        attendees: [{ email: interviewer?.email }, { email: interview.candidate.email }],
         reminders: {
           useDefault: true,
         },

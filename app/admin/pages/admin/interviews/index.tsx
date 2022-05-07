@@ -12,7 +12,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
-import getBookings from "app/admin/queries/admin/getBookings"
+import getInterviews from "app/admin/queries/admin/getInterviews"
 import AdminLayout from "app/core/layouts/AdminLayout"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -38,7 +38,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Bookings = () => {
+const Interviews = () => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -68,7 +68,7 @@ const Bookings = () => {
     setQuery(search)
   }, [router.query])
 
-  const [{ bookings, hasMore, count }] = usePaginatedQuery(getBookings, {
+  const [{ interviews, hasMore, count }] = usePaginatedQuery(getInterviews, {
     where: {
       ...query,
     },
@@ -88,17 +88,17 @@ const Bookings = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await bookings.forEach((booking) => {
+    await interviews.forEach((interview) => {
       data = [
         ...data,
         {
-          ...booking,
+          ...interview,
         },
       ]
 
       setData(data)
     })
-  }, [bookings])
+  }, [interviews])
 
   const columns = [
     {
@@ -108,7 +108,7 @@ const Bookings = () => {
       Cell: (props) => {
         return (
           <Link
-            href={Routes.SingleBookingAdminPage({
+            href={Routes.SingleInterviewAdminPage({
               id: props.cell.row.original.id,
             })}
             passHref
@@ -135,8 +135,16 @@ const Bookings = () => {
       },
     },
     {
-      Header: "InviteeEmail",
-      accessor: "inviteeEmail",
+      Header: "Candidate",
+      accessor: "candidate",
+
+      Cell: (props) => {
+        return props.value && props.value.toString()
+      },
+    },
+    {
+      Header: "CandidateId",
+      accessor: "candidateId",
 
       Cell: (props) => {
         return props.value && props.value.toString()
@@ -176,24 +184,24 @@ const Bookings = () => {
   )
 }
 
-const AdminBooking = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const AdminInterview = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title={`Admin | hire-win`} user={user}>
       <AdminLayout>
         <div className="bg-gray-200 w-full p-2 rounded text-gray-500">
-          <p>Bookings</p>
+          <p>Interviews</p>
         </div>
 
         <Suspense
           fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
         >
-          <Bookings />
+          <Interviews />
         </Suspense>
       </AdminLayout>
     </AuthLayout>
   )
 }
 
-AdminBooking.authenticate = true
+AdminInterview.authenticate = true
 
-export default AdminBooking
+export default AdminInterview

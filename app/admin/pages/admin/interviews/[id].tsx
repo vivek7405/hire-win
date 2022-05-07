@@ -12,8 +12,8 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import AdminLayout from "app/core/layouts/AdminLayout"
 
-import getBookings from "app/admin/queries/admin/getBookings"
-import updateBooking from "app/admin/mutations/admin/updateBooking"
+import getInterviews from "app/admin/queries/admin/getInterviews"
+import updateInterview from "app/admin/mutations/admin/updateInterview"
 
 import { Form } from "app/core/components/Form"
 import { LabeledTextField } from "app/core/components/LabeledTextField"
@@ -29,8 +29,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const user = await getCurrentUserServer({ ...context })
 
   if (user && user.role === "ADMIN") {
-    const foundBooking = await invokeWithMiddleware(
-      getBookings,
+    const foundInterview = await invokeWithMiddleware(
+      getInterviews,
       {
         where: { id: `${context?.params?.id}` },
       },
@@ -40,7 +40,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     return {
       props: {
         user: user,
-        foundBooking: foundBooking.bookings[0],
+        foundInterview: foundInterview.interviews[0],
       },
     }
   } else {
@@ -54,41 +54,42 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const SingleBookingAdminPage = ({
+const SingleInterviewAdminPage = ({
   user,
-  foundBooking,
+  foundInterview,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [updateBookingMutation] = useMutation(updateBooking)
+  const [updateInterviewMutation] = useMutation(updateInterview)
 
   return (
     <AuthLayout user={user}>
       <AdminLayout>
         <Form
           submitText="Update"
-          initialValues={foundBooking}
+          initialValues={foundInterview}
           onSubmit={async (values) => {
-            const toastId = toast.loading(() => <span>Updating Booking</span>)
+            const toastId = toast.loading(() => <span>Updating Interview</span>)
             try {
-              await updateBookingMutation({
-                where: { id: foundBooking?.id },
+              await updateInterviewMutation({
+                where: { id: foundInterview?.id },
                 data: { ...values },
               })
-              toast.success(() => <span>Booking Updated</span>, { id: toastId })
-              router.push(Routes.AdminBooking())
+              toast.success(() => <span>Interview Updated</span>, { id: toastId })
+              router.push(Routes.AdminInterview())
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()
               )
             }
           }}
-          header={foundBooking?.id?.toString()}
+          header={foundInterview?.id?.toString()}
           subHeader={``}
         >
           <LabeledTextField name="id" label="id" disabled />
           <LabeledTextField name="interviewDetail" label="interviewDetail" disabled />
           <LabeledTextField name="interviewDetailId" label="interviewDetailId" disabled />
-          <LabeledTextField name="inviteeEmail" label="inviteeEmail" disabled />
+          <LabeledTextField name="candidate" label="candidate" disabled />
+          <LabeledTextField name="candidateId" label="candidateId" disabled />
           <LabeledTextField name="startDateUTC" label="startDateUTC" disabled />
           <LabeledTextField name="cancelCode" label="cancelCode" disabled />
         </Form>
@@ -97,4 +98,4 @@ const SingleBookingAdminPage = ({
   )
 }
 
-export default SingleBookingAdminPage
+export default SingleInterviewAdminPage

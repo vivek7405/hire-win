@@ -42,6 +42,8 @@ import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import updateCandidateScores from "app/jobs/mutations/updateCandidateScores"
 import linkScoreCardWithJobWorkflowStage from "app/jobs/mutations/linkScoreCardWithJobWorkflowStage"
+import Modal from "app/core/components/Modal"
+import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInterview"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -292,6 +294,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     })
   })
 
+  const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -314,11 +318,28 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         </a>
       </Link>
 
-      <Link href={Routes.JobsHome()} passHref>
-        <a className="float-right text-white bg-theme-600 mx-6 px-4 py-2 rounded-sm hover:bg-theme-700">
-          Schedule Meeting
-        </a>
-      </Link>
+      <Modal
+        header="Schedule Interview"
+        open={openScheduleInterviewModal}
+        setOpen={setOpenScheduleInterviewModal}
+      >
+        <ScheduleInterview
+          interviewDetailId={
+            selectedWorkflowStage?.interviewDetails?.find((int) => int.jobId === candidate?.jobId)
+              ?.id || "0"
+          }
+          candidateId={candidate?.id || "0"}
+        />
+      </Modal>
+
+      <button
+        className="float-right text-white bg-theme-600 mx-6 px-4 py-2 rounded-sm hover:bg-theme-700"
+        onClick={() => {
+          setOpenScheduleInterviewModal(true)
+        }}
+      >
+        Schedule Interview
+      </button>
 
       {canUpdate && (
         <Link
