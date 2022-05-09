@@ -1,3 +1,4 @@
+import { Ctx } from "blitz"
 import db, { Interview, User } from "db"
 import { sendInterviewCancellation } from "mailers/sendInterviewCancellation"
 import verifyCancelCode from "../queries/verifyCancelCode"
@@ -31,7 +32,7 @@ import verifyCancelCode from "../queries/verifyCancelCode"
 //   })
 // }
 
-export default async function deleteAppointmentMutation({ interviewId, cancelCode }) {
+export default async function deleteAppointmentMutation({ interviewId, cancelCode }, ctx: Ctx) {
   const cancelCodeValid = await verifyCancelCode({ interviewId, cancelCode })
   if (!cancelCodeValid) {
     throw Error("Invalid Cancellationcode given")
@@ -40,6 +41,11 @@ export default async function deleteAppointmentMutation({ interviewId, cancelCod
   const interview = await db.interview.delete({
     where: { id: interviewId },
     include: { interviewDetail: { include: { interviewer: true } }, candidate: true },
+  })
+
+  const organizer = await db.user.findUnique({
+    where: { id: ctx.session.userId! },
+    select: { name: true, email: true },
   })
 
   // const interviewDetail = await db.interviewDetail.findFirst({

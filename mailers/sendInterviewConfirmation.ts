@@ -13,11 +13,15 @@ type SendInterviewConfirmationInput = {
   interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } } & {
     candidate: Candidate
   }
+  organizer: Pick<User, "email" | "name">
+  moreAttendees: string[]
   cancelLink: string
 }
 
 export async function sendInterviewConfirmation({
   interview,
+  organizer,
+  moreAttendees,
   cancelLink,
 }: SendInterviewConfirmationInput) {
   // const job = await db.job.findUnique({
@@ -61,7 +65,7 @@ export async function sendInterviewConfirmation({
             Attachments: [
               {
                 Name: "appointment.ics",
-                Content: createICalendarEvent(interview),
+                Content: createICalendarEvent(interview, organizer, moreAttendees),
                 ContentType: "text/calendar",
               },
             ],

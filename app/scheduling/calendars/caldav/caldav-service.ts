@@ -324,7 +324,7 @@ LAST-MODIFIED:${formatDateAsICS(dateNow)}
 DTSTAMP:${formatDateAsICS(dateNow)}
 CREATED:${formatDateAsICS(dateNow)}
 LOCATION:${``}
-SUMMARY:${`Interview with ${interview.candidate.email}`}
+SUMMARY:${`Interview with ${interview.candidate.name}`}
 CLASS:PUBLIC
 END:VEVENT
 END:VCALENDAR\r\n`.trimLeft()

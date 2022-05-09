@@ -276,14 +276,14 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
 
   const resume = candidate?.resume as AttachmentObject
-  useMemo(() => {
-    // if (resume?.Key && !file) {
-    getResume(resume).then((response) => {
-      const file = response?.data?.Body
-      setFile(file)
-    })
-    // }
-  }, [resume])
+  // useMemo(() => {
+  //   // if (resume?.Key && !file) {
+  //   getResume(resume).then((response) => {
+  //     const file = response?.data?.Body
+  //     setFile(file)
+  //   })
+  //   // }
+  // }, [resume])
 
   let ratingsArray = [] as number[]
   candidate?.job?.scoreCards?.forEach((scoreCardJobWorkflowStage) => {
@@ -329,6 +329,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
               ?.id || "0"
           }
           candidateId={candidate?.id || "0"}
+          setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
         />
       </Modal>
 

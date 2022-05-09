@@ -5,9 +5,9 @@ import { OutlookCalendarService } from "./outlookcalendar/outlookcalendar"
 
 export type CreateEventInterview = Pick<Interview, "startDateUTC"> & {
   interviewDetail: Pick<InterviewDetail, "duration" | "jobId" | "workflowStageId" | "interviewerId">
-} & {
-  candidate: Pick<Candidate, "email">
-}
+} & { candidate: Pick<Candidate, "email" | "name"> } & {
+  organizer: Pick<User, "email" | "name">
+} & { moreAttendees: string[] } // userIds of attendees
 
 export interface ExternalEvent {
   title?: string

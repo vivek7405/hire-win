@@ -1,17 +1,23 @@
 import { TrashIcon } from "@heroicons/react/outline"
 import Card from "app/core/components/Card"
 import Form from "app/core/components/Form"
+import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
+import LabeledSelectField from "app/core/components/LabeledSelectField"
 import LabeledTextField from "app/core/components/LabeledTextField"
 import Modal from "app/core/components/Modal"
 import Debouncer from "app/core/utils/debouncer"
 import { getAppOriginURL } from "app/core/utils/getAppOriginURL"
-import { invalidateQuery, useMutation, useQuery, useRouter } from "blitz"
+import getCandidate from "app/jobs/queries/getCandidate"
+import getJob from "app/jobs/queries/getJob"
+import getUser from "app/users/queries/getUser"
+import { invalidateQuery, useMutation, useQuery, useRouter, useSession } from "blitz"
 import { enUS } from "date-fns/locale"
 import moment from "moment"
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 import Skeleton from "react-loading-skeleton"
 import { DatePickerCalendar } from "react-nice-dates"
-import bookAppointment from "../mutations/bookAppointment"
+import scheduleInterview from "../mutations/scheduleInterview"
 import getInterviewDetail from "../queries/getInterviewDetail"
 import getTimeSlots from "../queries/getTimeSlots"
 import { TimeSlot } from "../types"
@@ -22,13 +28,18 @@ import AvailableTimeSlotsSelection from "./AvailableTimeSlotsSelection"
 type ScheduleMeetingProps = {
   interviewDetailId: string
   candidateId: string
+  setOpenScheduleInterviewModal: any
 }
-export default function ScheduleMeeting({ interviewDetailId, candidateId }: ScheduleMeetingProps) {
+export default function ScheduleMeeting({
+  interviewDetailId,
+  candidateId,
+  setOpenScheduleInterviewModal,
+}: ScheduleMeetingProps) {
   //   const [meeting] = useQuery(getMeeting, { username: username, slug: meetingSlug })
   const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
   const [selectedDay, setSelectedDay] = useState<Date>(new Date())
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot>()
-  const [bookAppointmentMutation] = useMutation(bookAppointment)
+  const [scheduleInterviewMutation] = useMutation(scheduleInterview)
   // const [email, setEmail] = useState("")
   const [notificationTime, setNotificationTime] = useState(30)
   const [modalVisible, setModalVisible] = useState(false)
@@ -37,10 +48,15 @@ export default function ScheduleMeeting({ interviewDetailId, candidateId }: Sche
   const [error, setError] = useState({ error: false, message: "" })
   const [success, setSuccess] = useState(false)
   const [message, setMessage] = useState("")
+  const session = useSession()
+  const [organizer] = useQuery(getUser, { where: { id: session?.userId! } })
+  const [candidate] = useQuery(getCandidate, { where: { id: candidateId } })
+  const [job] = useQuery(getJob, { where: { id: interviewDetail?.jobId } })
+  const [moreAttendees, setMoreAttendees] = useState([] as string[])
 
   const [slots] = useQuery(getTimeSlots, {
     interviewDetailId: interviewDetailId,
-    hideInviteeSlots: false,
+    moreAttendees,
     startDateUTC: new Date(moment()?.startOf("month")?.format("YYYY-MM-DD")),
     endDateUTC: new Date(moment()?.endOf("month")?.format("YYYY-MM-DD")),
   })
@@ -62,9 +78,14 @@ export default function ScheduleMeeting({ interviewDetailId, candidateId }: Sche
     setSelectedDay(firstSlot.start)
   }, [slots, selectedDay])
 
-  //   useEffect(() => {
-  //     invalidateQuery(getTimeSlots)
-  //   }, [hideOccupied])
+  // useEffect(() => {
+  //   invalidateQuery(getTimeSlots)
+  // }, [hideOccupied])
+
+  useEffect(() => {
+    invalidateQuery(getTimeSlots)
+    setSelectedTimeSlot(undefined)
+  }, [moreAttendees])
 
   if (!interviewDetail) {
     return (
@@ -120,14 +141,18 @@ export default function ScheduleMeeting({ interviewDetailId, candidateId }: Sche
     // }
 
     try {
-      await bookAppointmentMutation({
+      await scheduleInterviewMutation({
         interviewDetailId,
         candidateId,
         startDate: selectedTimeSlot.start,
+        moreAttendees,
       })
       setSuccess(true)
+      setOpenScheduleInterviewModal(false)
+      toast.success("Interview scheduled successfully")
     } catch (e) {
       setError({ error: true, message: e.message })
+      toast.error("Something went wrong while scheduling interview")
     }
   }
 
@@ -135,6 +160,43 @@ export default function ScheduleMeeting({ interviewDetailId, candidateId }: Sche
     <>
       <div className="bg-white text-center p-10 w-full md:w-96 lg:w-96 space-y-5">
         <h3 className="font-semibold text-xl">Schedule Interview</h3>
+        <h5>Organizer: You ({organizer?.email})</h5>
+        <h5>
+          Interviewer: {interviewDetail?.interviewer?.name} ({interviewDetail?.interviewer?.email})
+        </h5>
+        <h5>
+          Candidate: {candidate?.name} ({candidate?.email})
+        </h5>
+        <Form
+          noFormatting={true}
+          onSubmit={async () => {
+            return
+          }}
+        >
+          <label>Add more attendees:</label>
+          {/* <LabeledTextField
+            placeholder="Enter comma seperated email addresses"
+            name="email"
+            onChange={(e) => {
+              // setEmail(e.target.value)
+            }}
+          /> */}
+          <LabeledReactSelectField
+            name="attendees"
+            placeholder="Select members to invite"
+            isMulti={true}
+            options={job?.memberships
+              ?.filter(
+                (m) => m.userId !== organizer?.id && m.userId !== interviewDetail?.interviewer?.id
+              )
+              ?.map((m) => {
+                return { label: m.user.name, value: m.userId.toString() }
+              })}
+            onChange={(val) => {
+              setMoreAttendees(val as any as string[])
+            }}
+          />
+        </Form>
         <DatePickerCalendar
           date={selectedDay}
           onDateChange={onDateChange}

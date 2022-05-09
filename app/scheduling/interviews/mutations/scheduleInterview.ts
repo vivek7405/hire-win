@@ -1,4 +1,4 @@
-import { NotFoundError, resolver, invoke } from "blitz"
+import { NotFoundError, resolver, invoke, Ctx, invalidateQuery } from "blitz"
 import db from "db"
 import { addMinutes, subMinutes } from "date-fns"
 import reminderQueue from "../api/queues/reminders"
@@ -67,18 +67,28 @@ export default resolver.pipe(
       interviewDetailId: z.string(),
       candidateId: z.string(),
       startDate: z.date(),
+      moreAttendees: z.array(z.string()),
     })
   ),
-  async (interviewInfo) => {
+  async (interviewInfo, ctx: Ctx) => {
     const interviewDetail = await db.interviewDetail.findUnique({
       where: { id: interviewInfo.interviewDetailId },
       include: { interviewer: { include: { calendars: true, defaultCalendars: true } } },
     })
     const candidate = await db.candidate.findUnique({
       where: { id: interviewInfo.candidateId },
-      select: { id: true, email: true },
+      select: { id: true, email: true, name: true },
     })
-    if (!interviewDetail || !candidate) {
+    const organizer = await db.user.findUnique({
+      where: { id: ctx.session.userId || 0 },
+      select: { email: true, name: true },
+    })
+    const moreAttendees = await db.user.findMany({
+      where: { id: { in: interviewInfo.moreAttendees?.map((userId) => parseInt(userId)) } },
+      select: { email: true },
+    })
+
+    if (!interviewDetail || !candidate || !organizer) {
       throw new NotFoundError()
     }
 
@@ -102,13 +112,21 @@ export default resolver.pipe(
           connect: { id: interviewDetail.id },
         },
         candidate: { connect: { id: candidate.id } },
+        moreAttendees: moreAttendees?.map((attendee) => attendee.email)?.toString(),
         startDateUTC: interviewInfo.startDate,
         cancelCode: hashedCode,
       },
       include: { interviewDetail: { include: { interviewer: true } }, candidate: true },
     })
+
     const calendarService = await getCalendarService(interviewerCalendar)
-    await calendarService.createEvent({ ...interview, interviewDetail, candidate })
+    await calendarService.createEvent({
+      ...interview,
+      interviewDetail,
+      candidate,
+      organizer,
+      moreAttendees: interviewInfo.moreAttendees,
+    })
 
     const interviewDetailFromDb = await db.interviewDetail.findUnique({
       where: { id: interviewInfo.interviewDetailId },
@@ -120,7 +138,12 @@ export default resolver.pipe(
 
     const cancelLink =
       process.env.NEXT_PUBLIC_APP_URL + "/cancelInterview/" + interview.id + "/" + cancelCode
-    await sendInterviewConfirmation({ interview, cancelLink })
+    await sendInterviewConfirmation({
+      interview,
+      organizer,
+      moreAttendees: interviewInfo.moreAttendees,
+      cancelLink,
+    })
     const startTime = subMinutes(interviewInfo.startDate, 30)
     if (startTime > addMinutes(new Date(), 30)) {
       await reminderQueue.enqueue(interview.id, { runAt: startTime })

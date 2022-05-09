@@ -4,7 +4,7 @@ import {
   getAuthorizationHeader,
 } from "app/scheduling/calendars/outlookcalendar/helper/getAuthorizationHeader"
 import { addMinutes } from "date-fns"
-import { Calendar } from "db"
+import db, { Calendar } from "db"
 import { boilDownTimeIntervals } from "app/scheduling/calendars/utils/boildown-intervals"
 import makeRequestTo from "app/scheduling/calendars/outlookcalendar/helper/callMicrosoftAPI"
 import { zonedTimeToUtc } from "date-fns-tz"
@@ -35,8 +35,22 @@ export class OutlookCalendarService implements CalendarService {
     const startDate = interview.startDateUTC
     const endDate = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
 
+    const interviewer = await db.user.findFirst({
+      where: { id: interview?.interviewDetail.interviewerId },
+    })
+
+    const moreAttendees = await db.user.findMany({
+      where: {
+        id: {
+          in: interview?.moreAttendees?.map((userId) => {
+            return parseInt(userId)
+          }),
+        },
+      },
+    })
+
     const body = {
-      Subject: `Interview with ${interview.candidate.email}`,
+      Subject: `Interview with ${interview.candidate.name}`,
       Body: {
         ContentType: "HTML",
         Content: "This meeting was booked via hire.win",
@@ -49,15 +63,40 @@ export class OutlookCalendarService implements CalendarService {
         DateTime: endDate,
         timeZone: "UTC",
       },
+      Organizer: {
+        emailAddress: {
+          name: interview.organizer.name,
+          address: interview.organizer.email,
+        },
+      },
       Attendees: [
         {
           EmailAddress: {
-            Address: interview.candidate.email,
-            Name: interview.candidate.email.split("@")[0],
+            Address: interviewer?.email,
+            Name: interviewer?.name,
           },
           Type: "Required",
         },
+        {
+          EmailAddress: {
+            Address: interview.candidate.email,
+            Name: interview.candidate.name,
+          },
+          Type: "Required",
+        },
+        ...moreAttendees?.map((attendee) => {
+          return {
+            EmailAddress: {
+              Address: attendee.email,
+              Name: attendee.name,
+            },
+            Type: "Required",
+          }
+        }),
       ],
+      isOnlineMeeting: true,
+      // onlineMeetingProvider: "teamsForBusiness",
+      onlineMeetingProvider: "skypeForConsumer",
     }
 
     const options = {

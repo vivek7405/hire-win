@@ -11,10 +11,22 @@ function durationToIcsDurationObject(durationInMinutes: number): ics.DurationObj
 export async function createICalendarEvent(
   interview: Interview & {
     interviewDetail: Pick<InterviewDetail, "interviewerId" | "duration">
-  } & { candidate: Pick<Candidate, "email"> }
+  } & { candidate: Pick<Candidate, "email" | "name"> },
+  organizer: Pick<User, "email" | "name">,
+  moreAttendees: string[]
 ) {
   const interviewer = await db.user.findFirst({
     where: { id: interview?.interviewDetail?.interviewerId },
+  })
+  const moreAttendeeUsers = await db.user.findMany({
+    where: {
+      id: {
+        in: moreAttendees?.map((userId) => {
+          return parseInt(userId)
+        }),
+      },
+    },
+    select: { name: true, email: true },
   })
 
   const { error, value } = ics.createEvent({
@@ -26,10 +38,10 @@ export async function createICalendarEvent(
       interview.startDateUTC.getMinutes(),
     ],
     duration: durationToIcsDurationObject(interview?.interviewDetail.duration),
-    title: `Interview with ${interview?.candidate?.email}`,
-    description: `Interview with ${interview?.candidate?.email}`,
+    title: `Interview with ${interview?.candidate?.name}`,
+    description: `Interview with ${interview?.candidate?.name}`,
     location: "",
-    organizer: { name: interviewer?.name, email: interviewer?.email },
+    organizer: { name: organizer?.name, email: organizer?.email },
     attendees: [
       {
         name: interviewer?.name,
@@ -38,6 +50,22 @@ export async function createICalendarEvent(
         partstat: "ACCEPTED",
         role: "REQ-PARTICIPANT",
       },
+      {
+        name: interview?.candidate?.name,
+        email: interview?.candidate?.email,
+        rsvp: true,
+        partstat: "ACCEPTED",
+        role: "REQ-PARTICIPANT",
+      },
+      ...moreAttendeeUsers.map((attendee) => {
+        return {
+          name: attendee.name,
+          email: attendee.email,
+          rsvp: true,
+          partstat: "ACCEPTED" as ics.ParticipationStatus,
+          role: "REQ-PARTICIPANT" as ics.ParticipationRole,
+        }
+      }),
     ],
   })
 

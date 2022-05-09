@@ -7,7 +7,6 @@
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
 import db, { Candidate, Interview, InterviewDetail, User } from "db"
-import { createICalendarEvent } from "app/scheduling/interviews/utils/createCalendarEvent"
 
 type SendInterviewCancellationInput = {
   interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } } & {
@@ -52,13 +51,6 @@ export async function sendInterviewCancellation({ interview }: SendInterviewCanc
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
             MessageStream: "send-meeting-cancellation",
-            Attachments: [
-              {
-                Name: "appointment.ics",
-                Content: createICalendarEvent(interview),
-                ContentType: "text/calendar",
-              },
-            ],
           })
         } catch (e) {
           throw new Error(

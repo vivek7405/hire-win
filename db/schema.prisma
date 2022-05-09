@@ -600,6 +600,7 @@ model Interview {
   candidate         Candidate       @relation(fields: [candidateId], references: [id])
   candidateId       String
   // inviteeEmail      String
+  moreAttendees     String          @default("")
   startDateUTC      DateTime
   cancelCode        String
 }
