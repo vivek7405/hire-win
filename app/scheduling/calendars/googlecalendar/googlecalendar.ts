@@ -34,16 +34,6 @@ export class GoogleCalendarService implements CalendarService {
       where: { id: interview?.interviewDetail.interviewerId },
     })
 
-    const moreAttendees = await db.user.findMany({
-      where: {
-        id: {
-          in: interview?.moreAttendees?.map((userId) => {
-            return parseInt(userId)
-          }),
-        },
-      },
-    })
-
     await this.calendar.events.insert({
       calendarId: "primary",
       sendNotifications: true,
@@ -63,7 +53,7 @@ export class GoogleCalendarService implements CalendarService {
         attendees: [
           { email: interviewer?.email, displayName: interviewer?.name },
           { email: interview.candidate.email, displayName: interview.candidate.name },
-          ...moreAttendees?.map((attendee) => {
+          ...interview.otherAttendees?.map((attendee) => {
             return { email: attendee?.email, displayName: attendee?.name }
           }),
         ],

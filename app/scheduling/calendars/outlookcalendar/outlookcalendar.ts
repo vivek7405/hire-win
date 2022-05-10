@@ -39,16 +39,6 @@ export class OutlookCalendarService implements CalendarService {
       where: { id: interview?.interviewDetail.interviewerId },
     })
 
-    const moreAttendees = await db.user.findMany({
-      where: {
-        id: {
-          in: interview?.moreAttendees?.map((userId) => {
-            return parseInt(userId)
-          }),
-        },
-      },
-    })
-
     const body = {
       Subject: `Interview with ${interview.candidate.name}`,
       Body: {
@@ -84,7 +74,7 @@ export class OutlookCalendarService implements CalendarService {
           },
           Type: "Required",
         },
-        ...moreAttendees?.map((attendee) => {
+        ...interview.otherAttendees?.map((attendee) => {
           return {
             EmailAddress: {
               Address: attendee.email,

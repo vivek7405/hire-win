@@ -18,6 +18,7 @@ import toast from "react-hot-toast"
 import Skeleton from "react-loading-skeleton"
 import { DatePickerCalendar } from "react-nice-dates"
 import scheduleInterview from "../mutations/scheduleInterview"
+import getCandidateInterviewsByStage from "../queries/getCandidateInterviewsByStage"
 import getInterviewDetail from "../queries/getInterviewDetail"
 import getTimeSlots from "../queries/getTimeSlots"
 import { TimeSlot } from "../types"
@@ -52,11 +53,11 @@ export default function ScheduleMeeting({
   const [organizer] = useQuery(getUser, { where: { id: session?.userId! } })
   const [candidate] = useQuery(getCandidate, { where: { id: candidateId } })
   const [job] = useQuery(getJob, { where: { id: interviewDetail?.jobId } })
-  const [moreAttendees, setMoreAttendees] = useState([] as string[])
+  const [otherAttendees, setOtherAttendees] = useState([] as string[])
 
   const [slots] = useQuery(getTimeSlots, {
     interviewDetailId: interviewDetailId,
-    moreAttendees,
+    otherAttendees,
     startDateUTC: new Date(moment()?.startOf("month")?.format("YYYY-MM-DD")),
     endDateUTC: new Date(moment()?.endOf("month")?.format("YYYY-MM-DD")),
   })
@@ -85,7 +86,7 @@ export default function ScheduleMeeting({
   useEffect(() => {
     invalidateQuery(getTimeSlots)
     setSelectedTimeSlot(undefined)
-  }, [moreAttendees])
+  }, [otherAttendees])
 
   if (!interviewDetail) {
     return (
@@ -145,11 +146,12 @@ export default function ScheduleMeeting({
         interviewDetailId,
         candidateId,
         startDate: selectedTimeSlot.start,
-        moreAttendees,
+        otherAttendees,
       })
       setSuccess(true)
       setOpenScheduleInterviewModal(false)
       toast.success("Interview scheduled successfully")
+      invalidateQuery(getCandidateInterviewsByStage)
     } catch (e) {
       setError({ error: true, message: e.message })
       toast.error("Something went wrong while scheduling interview")
@@ -193,7 +195,7 @@ export default function ScheduleMeeting({
                 return { label: m.user.name, value: m.userId.toString() }
               })}
             onChange={(val) => {
-              setMoreAttendees(val as any as string[])
+              setOtherAttendees(val as any as string[])
             }}
           />
         </Form>

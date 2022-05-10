@@ -58,12 +58,12 @@ export default resolver.pipe(
   resolver.zod(
     z.object({
       interviewDetailId: z.string(),
-      moreAttendees: z.array(z.string()), // user ids - numbers as strings
+      otherAttendees: z.array(z.string()), // user ids - numbers as strings
       startDateUTC: z.date(),
       endDateUTC: z.date(),
     })
   ),
-  async ({ interviewDetailId, moreAttendees, startDateUTC, endDateUTC }, ctx: Ctx) => {
+  async ({ interviewDetailId, otherAttendees, startDateUTC, endDateUTC }, ctx: Ctx) => {
     // const meeting = await db.meeting.findFirst({
     //   where: { link: meetingSlug, ownerName: ownerName },
     //   include: { schedule: { include: { dailySchedules: true } } },
@@ -100,7 +100,7 @@ export default resolver.pipe(
 
     let takenTimeSlots = await getTakenSlots(calendars, startDateUTC, endDateUTC)
 
-    if (moreAttendees) {
+    if (otherAttendees) {
       // ctx.session.$authorize()
       // const invitee = await db.user.findFirst({
       //   where: { id: ctx.session.userId },
@@ -110,7 +110,7 @@ export default resolver.pipe(
       //   throw new Error("Current user invalid. Try logging in again")
       // }
       await Promise.all(
-        moreAttendees?.map(async (userId) => {
+        otherAttendees?.map(async (userId) => {
           const attendee = await db.user.findFirst({
             where: { id: parseInt(userId) },
             include: { calendars: true },

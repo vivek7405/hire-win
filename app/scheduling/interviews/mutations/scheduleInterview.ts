@@ -9,6 +9,7 @@ import { createICalendarEvent } from "../utils/createCalendarEvent"
 import * as uuid from "uuid"
 import getCalendar from "../queries/getCalendar"
 import { sendInterviewConfirmation } from "mailers/sendInterviewConfirmation"
+import moment from "moment"
 const bcrypt = require("bcrypt")
 
 // async function sendConfirmationMail(
@@ -67,7 +68,7 @@ export default resolver.pipe(
       interviewDetailId: z.string(),
       candidateId: z.string(),
       startDate: z.date(),
-      moreAttendees: z.array(z.string()),
+      otherAttendees: z.array(z.string()),
     })
   ),
   async (interviewInfo, ctx: Ctx) => {
@@ -81,11 +82,11 @@ export default resolver.pipe(
     })
     const organizer = await db.user.findUnique({
       where: { id: ctx.session.userId || 0 },
-      select: { email: true, name: true },
+      select: { id: true, email: true, name: true },
     })
-    const moreAttendees = await db.user.findMany({
-      where: { id: { in: interviewInfo.moreAttendees?.map((userId) => parseInt(userId)) } },
-      select: { email: true },
+    const otherAttendees = await db.user.findMany({
+      where: { id: { in: interviewInfo.otherAttendees?.map((userId) => parseInt(userId)) } },
+      select: { id: true, email: true, name: true },
     })
 
     if (!interviewDetail || !candidate || !organizer) {
@@ -105,6 +106,8 @@ export default resolver.pipe(
 
     const cancelCode = uuid.v4()
 
+    const startDateUTC = moment(interviewInfo.startDate).utc().toDate()
+
     const hashedCode = await bcrypt.hash(cancelCode, 10)
     const interview = await db.interview.create({
       data: {
@@ -112,8 +115,15 @@ export default resolver.pipe(
           connect: { id: interviewDetail.id },
         },
         candidate: { connect: { id: candidate.id } },
-        moreAttendees: moreAttendees?.map((attendee) => attendee.email)?.toString(),
-        startDateUTC: interviewInfo.startDate,
+        organizer: { connect: { id: organizer.id } },
+        interviewer: { connect: { id: interviewDetail.interviewerId } },
+        otherAttendees: {
+          connect: otherAttendees?.map((attendee) => {
+            return { id: attendee.id }
+          }),
+        },
+        startDateUTC,
+        duration: interviewDetail.duration,
         cancelCode: hashedCode,
       },
       include: { interviewDetail: { include: { interviewer: true } }, candidate: true },
@@ -125,7 +135,7 @@ export default resolver.pipe(
       interviewDetail,
       candidate,
       organizer,
-      moreAttendees: interviewInfo.moreAttendees,
+      otherAttendees: otherAttendees,
     })
 
     const interviewDetailFromDb = await db.interviewDetail.findUnique({
@@ -141,10 +151,10 @@ export default resolver.pipe(
     await sendInterviewConfirmation({
       interview,
       organizer,
-      moreAttendees: interviewInfo.moreAttendees,
+      otherAttendees,
       cancelLink,
     })
-    const startTime = subMinutes(interviewInfo.startDate, 30)
+    const startTime = subMinutes(startDateUTC, 30)
     if (startTime > addMinutes(new Date(), 30)) {
       await reminderQueue.enqueue(interview.id, { runAt: startTime })
     }

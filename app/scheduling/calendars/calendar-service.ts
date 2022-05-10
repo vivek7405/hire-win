@@ -7,7 +7,7 @@ export type CreateEventInterview = Pick<Interview, "startDateUTC"> & {
   interviewDetail: Pick<InterviewDetail, "duration" | "jobId" | "workflowStageId" | "interviewerId">
 } & { candidate: Pick<Candidate, "email" | "name"> } & {
   organizer: Pick<User, "email" | "name">
-} & { moreAttendees: string[] } // userIds of attendees
+} & { otherAttendees: Pick<User, "email" | "name">[] } // userIds of attendees
 
 export interface ExternalEvent {
   title?: string

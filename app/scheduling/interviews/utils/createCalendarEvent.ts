@@ -13,20 +13,10 @@ export async function createICalendarEvent(
     interviewDetail: Pick<InterviewDetail, "interviewerId" | "duration">
   } & { candidate: Pick<Candidate, "email" | "name"> },
   organizer: Pick<User, "email" | "name">,
-  moreAttendees: string[]
+  otherAttendees: Pick<User, "email" | "name">[]
 ) {
   const interviewer = await db.user.findFirst({
     where: { id: interview?.interviewDetail?.interviewerId },
-  })
-  const moreAttendeeUsers = await db.user.findMany({
-    where: {
-      id: {
-        in: moreAttendees?.map((userId) => {
-          return parseInt(userId)
-        }),
-      },
-    },
-    select: { name: true, email: true },
   })
 
   const { error, value } = ics.createEvent({
@@ -57,7 +47,7 @@ export async function createICalendarEvent(
         partstat: "ACCEPTED",
         role: "REQ-PARTICIPANT",
       },
-      ...moreAttendeeUsers.map((attendee) => {
+      ...otherAttendees.map((attendee) => {
         return {
           name: attendee.name,
           email: attendee.email,

@@ -29,7 +29,7 @@ type ScoreCardProps = {
   onSubmit: any
   submitDisabled?: boolean
   header: string
-  subHeader: string
+  subHeader?: string
   scoreCardId: string
   preview: boolean
   scoreCardQuestions?: ExtendedScoreCardQuestion[]

@@ -62,9 +62,11 @@ export const LabeledToggleGroupField = forwardRef<HTMLInputElement, LabeledToggl
             render={({ field: { onChange, value } }) => {
               return (
                 <ToggleGroupPrimitive.Root
-                  onValueChange={(e) => {
-                    onChange(e)
-                    props.onChange && props.onChange(e)
+                  onValueChange={(value) => {
+                    // onChange(e)
+                    if (value) {
+                      props.onChange && props.onChange(value)
+                    }
                   }}
                   type="single"
                   defaultValue={defaultValue || ""}
