@@ -10,7 +10,7 @@ import * as uuid from "uuid"
 import getCalendar from "../queries/getCalendar"
 import { sendInterviewConfirmation } from "mailers/sendInterviewConfirmation"
 import moment from "moment"
-const bcrypt = require("bcrypt")
+import bcrypt from "bcrypt"
 
 // async function sendConfirmationMail(
 //   interview: Interview,
@@ -148,6 +148,8 @@ export default resolver.pipe(
 
     const cancelLink =
       process.env.NEXT_PUBLIC_APP_URL + "/cancelInterview/" + interview.id + "/" + cancelCode
+    console.log("CANCEL LINK CANCEL LINK")
+    console.log(cancelLink)
     await sendInterviewConfirmation({
       interview,
       organizer,

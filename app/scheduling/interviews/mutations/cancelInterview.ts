@@ -32,9 +32,17 @@ import verifyCancelCode from "../queries/verifyCancelCode"
 //   })
 // }
 
-export default async function deleteAppointmentMutation({ interviewId, cancelCode }, ctx: Ctx) {
+type CancelInterviewInput = {
+  interviewId: number
+  cancelCode: string
+  skipCancelCodeVerification?: boolean
+}
+export default async function cancelInterview(
+  { interviewId, cancelCode, skipCancelCodeVerification }: CancelInterviewInput,
+  ctx: Ctx
+) {
   const cancelCodeValid = await verifyCancelCode({ interviewId, cancelCode })
-  if (!cancelCodeValid) {
+  if (!skipCancelCodeVerification && !cancelCodeValid) {
     throw Error("Invalid Cancellation code")
   }
 

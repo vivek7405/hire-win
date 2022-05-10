@@ -49,6 +49,9 @@ import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInte
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
 import moment from "moment"
+import { TrashIcon } from "@heroicons/react/outline"
+import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview"
+import Confirm from "app/core/components/Confirm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -547,7 +550,19 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                       <div className="flex items-center">
                         <div className="font-bold text-lg w-full">Interviews</div>
                         <button
-                          className="flex-end text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+                          className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+                          disabled={
+                            selectedWorkflowStage?.interviewDetails?.find(
+                              (int) =>
+                                int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                            )?.interviewerId !== user?.id &&
+                            user?.memberships?.find(
+                              (membership) => membership.jobId === candidate?.jobId
+                            )?.role !== "OWNER" &&
+                            user?.memberships?.find(
+                              (membership) => membership.jobId === candidate?.jobId
+                            )?.role !== "ADMIN"
+                          }
                           onClick={() => {
                             setOpenScheduleInterviewModal(true)
                           }}
@@ -564,7 +579,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                             return (
                               <>
                                 {index === 0 && <span className="font-semibold">Upcoming</span>}
-                                <CandidateInterview key={interview.id} interview={interview} />
+                                <CandidateInterview
+                                  key={interview.id}
+                                  interview={interview}
+                                  user={user as any}
+                                />
                               </>
                             )
                           })}
@@ -574,7 +593,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                             return (
                               <>
                                 {index === 0 && <span className="font-semibold">Past</span>}
-                                <CandidateInterview key={interview.id} interview={interview} />
+                                <CandidateInterview
+                                  key={interview.id}
+                                  interview={interview}
+                                  user={user as any}
+                                />
                               </>
                             )
                           })}
@@ -593,23 +616,60 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
 type CandidateInterviewProps = {
   interview: Interview & { organizer: User } & { interviewer: User } & { otherAttendees: User[] }
+  user: User
 }
-const CandidateInterview = ({ interview }: CandidateInterviewProps) => {
+const CandidateInterview = ({ interview, user }: CandidateInterviewProps) => {
+  const [cancelInterviewMutation] = useMutation(cancelInterview)
+  const [openConfirm, setOpenConfirm] = useState(false)
+
   return (
     <div key={interview.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
-      <b className="capitalize">
-        {moment(interview.startDateUTC).local().fromNow()} • {interview.duration} mins
-      </b>
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header="Cancel Interview"
+        onSuccess={async () => {
+          const toastId = toast.loading("Cancelling interview")
+          try {
+            await cancelInterviewMutation({
+              interviewId: interview?.id || 0,
+              cancelCode: interview?.cancelCode,
+              skipCancelCodeVerification: true,
+            })
+            toast.success("Interview cancelled", { id: toastId })
+            await invalidateQuery(getCandidateInterviewsByStage)
+          } catch (error) {
+            toast.error(`Interview cancellation failed - ${error.toString()}`, { id: toastId })
+          }
+        }}
+      >
+        Are you sure you want to cancel the interview?
+      </Confirm>
+      <button
+        className="float-right"
+        onClick={() => {
+          setOpenConfirm(true)
+        }}
+      >
+        <TrashIcon className="w-5 h-5 text-red-500 hover:text-red-600" />
+      </button>
+      <b className="capitalize">{moment(interview.startDateUTC).local().fromNow()}</b>
       <br />
       {moment(interview.startDateUTC).toLocaleString()}
       <br />
+      Duration: <span className="whitespace-nowrap">{interview.duration} mins</span>
+      <br />
       {interview.organizerId === interview.interviewerId ? (
-        <>Organizer & Interviewer: {interview.organizer?.name}</>
+        <>
+          Organizer & Interviewer:{" "}
+          {interview?.organizer?.id === user?.id ? "You" : interview?.organizer?.name}
+        </>
       ) : (
         <>
-          Organizer: {interview.organizer?.name}
+          Organizer: {interview?.organizer?.id === user?.id ? "You" : interview?.organizer?.name}
           <br />
-          Interviewer: {interview.interviewer?.name}
+          Interviewer:{" "}
+          {interview?.interviewer?.id === user?.id ? "You" : interview?.interviewer?.name}
         </>
       )}
       <br />

@@ -1,7 +1,11 @@
 import db from "db"
-const bcrypt = require("bcrypt")
+import bcrypt from "bcrypt"
 
-export default async function verifyCancelCode({ interviewId, cancelCode }) {
+type VerifyCancelCodeInput = {
+  interviewId: number
+  cancelCode: string
+}
+export default async function verifyCancelCode({ interviewId, cancelCode }: VerifyCancelCodeInput) {
   const interview = await db.interview.findFirst({
     where: { id: interviewId },
   })

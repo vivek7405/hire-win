@@ -162,13 +162,27 @@ export default function ScheduleMeeting({
     <>
       <div className="bg-white text-center p-10 w-full md:w-96 lg:w-96 space-y-5">
         <h3 className="font-semibold text-xl">Schedule Interview</h3>
-        <h5>Organizer: You ({organizer?.email})</h5>
-        <h5>
-          Interviewer: {interviewDetail?.interviewer?.name} ({interviewDetail?.interviewer?.email})
-        </h5>
-        <h5>
-          Candidate: {candidate?.name} ({candidate?.email})
-        </h5>
+        <div>
+          {organizer?.id === interviewDetail?.interviewer?.id ? (
+            <>
+              <h5>
+                Organizer & Interviewer:{" "}
+                {organizer?.id === session?.userId ? "You" : organizer?.name}
+              </h5>
+            </>
+          ) : (
+            <>
+              <h5>Organizer: {organizer?.id === session?.userId ? "You" : organizer?.name}</h5>
+              <h5>
+                Interviewer:{" "}
+                {interviewDetail?.interviewer?.id === session?.userId
+                  ? "You"
+                  : interviewDetail?.interviewer?.name}
+              </h5>
+            </>
+          )}
+          <h5>Candidate: {candidate?.name}</h5>
+        </div>
         <Form
           noFormatting={true}
           onSubmit={async () => {
