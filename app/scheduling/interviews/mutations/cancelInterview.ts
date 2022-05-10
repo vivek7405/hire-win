@@ -1,3 +1,4 @@
+import Guard from "app/guard/ability"
 import { Ctx } from "blitz"
 import db, { Interview, User } from "db"
 import { sendInterviewCancellation } from "mailers/sendInterviewCancellation"
@@ -37,10 +38,10 @@ type CancelInterviewInput = {
   cancelCode: string
   skipCancelCodeVerification?: boolean
 }
-export default async function cancelInterview(
+const cancelInterview = async (
   { interviewId, cancelCode, skipCancelCodeVerification }: CancelInterviewInput,
   ctx: Ctx
-) {
+) => {
   const cancelCodeValid = await verifyCancelCode({ interviewId, cancelCode })
   if (!skipCancelCodeVerification && !cancelCodeValid) {
     throw Error("Invalid Cancellation code")
@@ -57,3 +58,5 @@ export default async function cancelInterview(
 
   await sendInterviewCancellation({ interview })
 }
+
+export default Guard.authorize("cancelInterview", "interview", cancelInterview)

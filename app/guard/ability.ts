@@ -20,8 +20,9 @@ type ExtendedResourceTypes =
   | "scoreCard"
   | "schedule"
   | "calendar"
+  | "interview"
 
-type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
+type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser" | "cancelInterview"
 
 const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
   async (ctx, { can, cannot }) => {
@@ -508,6 +509,21 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           candidates.every(
             (c) => c.job.memberships.some((m) => m.userId === ctx.session.userId) === true
           ) === true
+        )
+      })
+
+      can("cancelInterview", "interview", async (args) => {
+        const interview = await db.interview.findUnique({
+          where: { id: args.interviewId },
+          include: { interviewDetail: { include: { job: { include: { memberships: true } } } } },
+        })
+
+        return (
+          ctx.session.userId === interview?.interviewerId ||
+          ctx.session.userId === interview?.organizerId ||
+          interview?.interviewDetail?.job?.memberships?.find(
+            (membership) => membership.userId === ctx.session.userId
+          )?.role === "OWNER"
         )
       })
     }

@@ -1,12 +1,15 @@
+import { TrashIcon } from "@heroicons/react/outline"
 import Card from "app/core/components/Card"
+import Confirm from "app/core/components/Confirm"
 import Form from "app/core/components/Form"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import Modal from "app/core/components/Modal"
 import Debouncer from "app/core/utils/debouncer"
 import { invalidateQuery, useMutation, useQuery, useRouter } from "blitz"
-import { User } from "db"
+import { Calendar, User } from "db"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import deleteCalendar from "../mutations/deleteCalendar"
 import updateDefaultCalendar from "../mutations/updateDefaultCalendar"
 import getCalendars from "../queries/getCalendars"
 import getDefaultCalendarByUser from "../queries/getDefaultCalendarByUser"
@@ -71,6 +74,9 @@ const Calendars = ({ user }: CalendarProps) => {
   })
 
   const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
+  const [deleteCalendarMutation] = useMutation(deleteCalendar)
+  const [calendarToDelete, setCalendarToDelete] = useState(null as any as Calendar)
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   // if (error) {
   //   return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -128,6 +134,24 @@ const Calendars = ({ user }: CalendarProps) => {
             New Calendar
           </button>
 
+          <Confirm
+            open={openConfirm}
+            setOpen={setOpenConfirm}
+            header={`Delte Calendar - ${calendarToDelete?.name}`}
+            onSuccess={async () => {
+              const toastId = toast.loading(`Deleting Calendar - ${calendarToDelete?.name}`)
+              try {
+                await deleteCalendarMutation(calendarToDelete?.id)
+                toast.success("Calendar Deleted", { id: toastId })
+                setOpenConfirm(false)
+                await invalidateQuery(getCalendars)
+              } catch (error) {
+                toast.error(`Deleting calendar failed - ${error.toString()}`, { id: toastId })
+              }
+            }}
+          >
+            Are you sure you want to delete the calendar?
+          </Confirm>
           {filteredCalendarEntries?.length > 0 && (
             <div className="float-right flex items-center">
               <span>Default Calendar</span>
@@ -213,20 +237,21 @@ const Calendars = ({ user }: CalendarProps) => {
                         {cal.name}
                       </a>
                     </div>
-                    {/* <div className="absolute top-0.5 right-0">
+                    <div className="absolute top-0.5 right-0">
                       <button
                         id={"delete-" + cal.id}
                         className="float-right text-red-600 hover:text-red-800"
-                        title="Remove Calendar"
+                        title="Delete Calendar"
                         type="button"
                         onClick={(e) => {
                           e.preventDefault()
-                          // submitDeletion(s.id)
+                          setCalendarToDelete(cal as any)
+                          setOpenConfirm(true)
                         }}
                       >
                         <TrashIcon className="w-5 h-5" />
                       </button>
-                    </div> */}
+                    </div>
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
                   <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">

@@ -34,7 +34,15 @@ import {
 } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { Interview, QuestionType, ScoreCardJobWorkflowStage, User } from "@prisma/client"
+import {
+  Candidate,
+  Interview,
+  InterviewDetail,
+  Membership,
+  QuestionType,
+  ScoreCardJobWorkflowStage,
+  User,
+} from "@prisma/client"
 import Cards from "app/core/components/Cards"
 import Skeleton from "react-loading-skeleton"
 import ScoreCard from "app/score-cards/components/ScoreCard"
@@ -314,6 +322,9 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   })
 
   const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
+  const [cancelInterviewMutation] = useMutation(cancelInterview)
+  const [interviewToDelete, setInterviewToDelete] = useState(null as any as Interview)
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -392,6 +403,30 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
+        <Confirm
+          open={openConfirm}
+          setOpen={setOpenConfirm}
+          header="Cancel Interview"
+          onSuccess={async () => {
+            const toastId = toast.loading("Cancelling interview")
+            try {
+              await cancelInterviewMutation({
+                interviewId: interviewToDelete?.id || 0,
+                cancelCode: interviewToDelete?.cancelCode,
+                skipCancelCodeVerification: true,
+              })
+              toast.success("Interview cancelled", { id: toastId })
+              setOpenConfirm(false)
+              await invalidateQuery(getCandidateInterviewsByStage)
+            } catch (error) {
+              toast.error(`Interview cancellation failed - ${error.toString()}`, {
+                id: toastId,
+              })
+            }
+          }}
+        >
+          Are you sure you want to cancel the interview?
+        </Confirm>
         <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
           <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-400 rounded-lg">
             {file && <PDFViewer file={file} scale={1.29} />}
@@ -583,6 +618,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                                   key={interview.id}
                                   interview={interview}
                                   user={user as any}
+                                  setOpenConfirm={setOpenConfirm}
+                                  setInterviewToDelete={setInterviewToDelete}
                                 />
                               </>
                             )
@@ -597,6 +634,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                                   key={interview.id}
                                   interview={interview}
                                   user={user as any}
+                                  setOpenConfirm={setOpenConfirm}
+                                  setInterviewToDelete={setInterviewToDelete}
                                 />
                               </>
                             )
@@ -615,40 +654,33 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 }
 
 type CandidateInterviewProps = {
-  interview: Interview & { organizer: User } & { interviewer: User } & { otherAttendees: User[] }
-  user: User
+  interview: Interview & { organizer: User } & { interviewer: User } & {
+    otherAttendees: User[]
+  } & { interviewDetail: InterviewDetail }
+  user: User & { memberships: Membership[] }
+  setOpenConfirm: any
+  setInterviewToDelete: any
 }
-const CandidateInterview = ({ interview, user }: CandidateInterviewProps) => {
-  const [cancelInterviewMutation] = useMutation(cancelInterview)
-  const [openConfirm, setOpenConfirm] = useState(false)
-
+const CandidateInterview = ({
+  interview,
+  user,
+  setOpenConfirm,
+  setInterviewToDelete,
+}: CandidateInterviewProps) => {
   return (
     <div key={interview.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
-      <Confirm
-        open={openConfirm}
-        setOpen={setOpenConfirm}
-        header="Cancel Interview"
-        onSuccess={async () => {
-          const toastId = toast.loading("Cancelling interview")
-          try {
-            await cancelInterviewMutation({
-              interviewId: interview?.id || 0,
-              cancelCode: interview?.cancelCode,
-              skipCancelCodeVerification: true,
-            })
-            toast.success("Interview cancelled", { id: toastId })
-            await invalidateQuery(getCandidateInterviewsByStage)
-          } catch (error) {
-            toast.error(`Interview cancellation failed - ${error.toString()}`, { id: toastId })
-          }
-        }}
-      >
-        Are you sure you want to cancel the interview?
-      </Confirm>
       <button
-        className="float-right"
+        className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={
+          user?.id !== interview?.interviewerId &&
+          user?.id !== interview?.organizerId &&
+          user?.memberships?.find(
+            (membership) => membership.jobId === interview?.interviewDetail?.jobId
+          )?.role !== "OWNER"
+        }
         onClick={() => {
           setOpenConfirm(true)
+          setInterviewToDelete(interview)
         }}
       >
         <TrashIcon className="w-5 h-5 text-red-500 hover:text-red-600" />

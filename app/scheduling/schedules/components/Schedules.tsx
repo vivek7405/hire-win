@@ -1,9 +1,12 @@
 import { TrashIcon } from "@heroicons/react/outline"
+import { Schedule } from "@prisma/client"
 import Card from "app/core/components/Card"
+import Confirm from "app/core/components/Confirm"
 import Modal from "app/core/components/Modal"
 import Debouncer from "app/core/utils/debouncer"
 import { invalidateQuery, useMutation, useQuery, useRouter } from "blitz"
 import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
 import deleteSchedule from "../mutations/deleteSchedule"
 import getSchedulesWOPagination from "../queries/getSchedulesWOPagination"
 import AddScheduleModal from "./AddScheduleModal"
@@ -15,6 +18,8 @@ const Schedules = ({ user }) => {
   const [message, setMessage] = useState("")
   const [detailsModalVisible, setDetailsModalVisible] = useState(false)
   const [selectedScheduleForDetails, setSelectedScheduleForDetails] = useState({} as any)
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const [scheduleToDelete, setScheduleToDelete] = useState(null as any as Schedule)
   const router = useRouter()
   const [query, setQuery] = useState({})
 
@@ -93,6 +98,25 @@ const Schedules = ({ user }) => {
         </div>
       </Modal>
 
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={`Delte Schedule - ${scheduleToDelete?.name}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Deleting Schedule - ${scheduleToDelete?.name}`)
+          try {
+            await submitDeletion(scheduleToDelete?.id)
+            toast.success("Schedule Deleted", { id: toastId })
+            setOpenConfirm(false)
+            await invalidateQuery(getSchedulesWOPagination)
+          } catch (error) {
+            toast.error(`Deleting schedule failed - ${error.toString()}`, { id: toastId })
+          }
+        }}
+      >
+        Are you sure you want to delete the schedule?
+      </Confirm>
+
       <div className="flex w-full justify-between">
         <input
           placeholder="Search"
@@ -137,11 +161,12 @@ const Schedules = ({ user }) => {
                     <button
                       id={"delete-" + s.name}
                       className="float-right text-red-600 hover:text-red-800"
-                      title="Remove Schedule"
+                      title="Delete Schedule"
                       type="button"
                       onClick={(e) => {
                         e.preventDefault()
-                        submitDeletion(s.id)
+                        setScheduleToDelete(s)
+                        setOpenConfirm(true)
                       }}
                     >
                       <TrashIcon className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
