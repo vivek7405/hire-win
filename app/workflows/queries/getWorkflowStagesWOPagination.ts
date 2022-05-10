@@ -14,6 +14,7 @@ async function getWorkflowStagesWOPagination({ where, orderBy }: GetWorkflowStag
     include: {
       stage: true,
       scoreCards: { include: { scoreCard: true } },
+      interviewDetails: true,
     },
   })
 

@@ -43,10 +43,16 @@ export const SignupForm = (props: SignupFormProps) => {
         }}
       >
         <LabeledTextField
+          name="name"
+          label="Name"
+          placeholder="Enter your name"
+          testid="signupName"
+        />
+        <LabeledTextField
           type="email"
           name="email"
           label="Email"
-          placeholder="Email"
+          placeholder="Enter your email"
           testid="signupEmail"
         />
         <LabeledTextField
@@ -58,7 +64,7 @@ export const SignupForm = (props: SignupFormProps) => {
         <LabeledTextField
           name="password"
           label="Password"
-          placeholder="Password"
+          placeholder="Enter a password for your account"
           type="password"
           testid="signupPassword"
         />

@@ -8,6 +8,7 @@ export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElem
   type?: "text" | "password" | "email" | "number" | "date" | "url" | "hidden"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
+  onChange?: any
 }
 
 export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldProps>(
@@ -45,6 +46,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             {...props}
             data-testid={`${props.testid && `${props.testid}-`}input`}
             className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
+            onChange={props.onChange}
           />
         </div>
       </div>

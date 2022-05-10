@@ -14,6 +14,9 @@ const getScoreCardsWOPagination = resolver.pipe(
         cardQuestions: { include: { cardQuestion: true } },
         jobWorkflowStages: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     })
     return scoreCards
   }

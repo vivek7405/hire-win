@@ -1,0 +1,19 @@
+/* styles to override */
+
+:root {
+  --PhoneInput-color--focus: var(--theme-500);
+}
+
+.PhoneInputInput {
+  @apply !border !border-gray-300 !px-2 !py-2 !block !w-full sm:!text-sm !rounded;
+}
+
+.nice-dates-day.-selected:before {
+  background-color: var(--theme-600);
+}
+.nice-dates-day.-selected:hover:after {
+  border: 2px solid var(--theme-600);
+}
+.nice-dates-day:hover:after {
+  border: 2px solid var(--theme-600);
+}

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react"
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -169,120 +169,123 @@ export const CardQuestions = ({ user, scoreCard }) => {
     })
   }, [scoreCardQuestions])
 
-  const getCards = (scoreCardQuestions) => {
-    return scoreCardQuestions.map((sq: ExtendedScoreCardQuestion) => {
-      return {
-        id: sq?.id,
-        title: sq.cardQuestion?.name,
-        description: "",
-        renderContent: (
-          <>
-            <div className="flex flex-col space-y-2">
-              <div className="w-full relative">
-                <div className="font-bold flex justify-between">
-                  {!sq.cardQuestion.factory ? (
-                    <Link
-                      href={Routes.SingleCardQuestionPage({ slug: sq.cardQuestion.slug })}
-                      passHref
-                    >
-                      <a
-                        data-testid={`cardQuestionlink`}
-                        className="text-theme-600 hover:text-theme-900"
+  const getCards = useCallback(
+    (scoreCardQuestions) => {
+      return scoreCardQuestions.map((sq: ExtendedScoreCardQuestion) => {
+        return {
+          id: sq?.id,
+          title: sq.cardQuestion?.name,
+          description: "",
+          renderContent: (
+            <>
+              <div className="flex flex-col space-y-2">
+                <div className="w-full relative">
+                  <div className="font-bold flex justify-between">
+                    {!sq.cardQuestion.factory ? (
+                      <Link
+                        href={Routes.SingleCardQuestionPage({ slug: sq.cardQuestion.slug })}
+                        passHref
                       >
-                        {sq.cardQuestion.name}
-                      </a>
-                    </Link>
-                  ) : (
-                    sq.cardQuestion.name
+                        <a
+                          data-testid={`cardQuestionlink`}
+                          className="text-theme-600 hover:text-theme-900"
+                        >
+                          {sq.cardQuestion.name}
+                        </a>
+                      </Link>
+                    ) : (
+                      sq.cardQuestion.name
+                    )}
+                  </div>
+                  {!sq.cardQuestion.factory && (
+                    <div className="absolute top-0.5 right-0">
+                      <button
+                        className="float-right text-red-600 hover:text-red-800"
+                        title="Remove CardQuestion"
+                        onClick={async (e) => {
+                          e.preventDefault()
+
+                          setScoreCardQuestionToRemove(sq)
+                          setOpenConfirm(true)
+                        }}
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   )}
                 </div>
-                {!sq.cardQuestion.factory && (
-                  <div className="absolute top-0.5 right-0">
-                    <button
-                      className="float-right text-red-600 hover:text-red-800"
-                      title="Remove CardQuestion"
-                      onClick={async (e) => {
-                        e.preventDefault()
 
-                        setScoreCardQuestionToRemove(sq)
-                        setOpenConfirm(true)
-                      }}
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
+                {sq.allowBehaviourEdit && <div className="border-b-2 border-neutral-50" />}
+                {sq.allowBehaviourEdit && (
+                  <div>
+                    <Form noFormatting={true} onSubmit={async (values) => {}}>
+                      <LabeledToggleGroupField
+                        name={`scoreCardQuestion-${sq.id}-behaviour`}
+                        paddingX={3}
+                        paddingY={1}
+                        defaultValue={sq?.behaviour || ScoreCardQuestionBehaviour.OPTIONAL}
+                        value={sq?.behaviour}
+                        options={Object.keys(ScoreCardQuestionBehaviour).map(
+                          (scoreCardQuestionBehaviour) => {
+                            return {
+                              label: scoreCardQuestionBehaviour,
+                              value: scoreCardQuestionBehaviour,
+                            }
+                          }
+                        )}
+                        onChange={async (value) => {
+                          const toastId = toast.loading(() => (
+                            <span>
+                              <b>Setting behaviour as {value}</b>
+                              <br />
+                              for question - {sq.cardQuestion.name}
+                            </span>
+                          ))
+                          try {
+                            await updateScoreCardQuestionMutation({
+                              where: { id: sq?.id },
+                              data: {
+                                order: sq.order,
+                                behaviour: value,
+                              },
+                            })
+                            toast.success(
+                              () => (
+                                <span>
+                                  <b>Behaviour changed successfully</b>
+                                  <br />
+                                  for question - {sq?.cardQuestion?.name}
+                                </span>
+                              ),
+                              { id: toastId }
+                            )
+                            sq.behaviour = value
+                            setData([...scoreCardQuestions])
+                          } catch (error) {
+                            toast.error(
+                              "Sorry, we had an unexpected error. Please try again. - " +
+                                error.toString(),
+                              { id: toastId }
+                            )
+                          }
+                        }}
+                      />
+                    </Form>
                   </div>
                 )}
               </div>
-
-              {sq.allowBehaviourEdit && <div className="border-b-2 border-neutral-50" />}
-              {sq.allowBehaviourEdit && (
-                <div>
-                  <Form noFormatting={true} onSubmit={async (values) => {}}>
-                    <LabeledToggleGroupField
-                      name={`scoreCardQuestion-${sq.id}-behaviour`}
-                      paddingX={3}
-                      paddingY={1}
-                      defaultValue={sq?.behaviour || ScoreCardQuestionBehaviour.OPTIONAL}
-                      value={sq?.behaviour}
-                      options={Object.keys(ScoreCardQuestionBehaviour).map(
-                        (scoreCardQuestionBehaviour) => {
-                          return {
-                            label: scoreCardQuestionBehaviour,
-                            value: scoreCardQuestionBehaviour,
-                          }
-                        }
-                      )}
-                      onChange={async (value) => {
-                        const toastId = toast.loading(() => (
-                          <span>
-                            <b>Setting behaviour as {value}</b>
-                            <br />
-                            for question - {sq.cardQuestion.name}
-                          </span>
-                        ))
-                        try {
-                          await updateScoreCardQuestionMutation({
-                            where: { id: sq?.id },
-                            data: {
-                              order: sq.order,
-                              behaviour: value,
-                            },
-                          })
-                          toast.success(
-                            () => (
-                              <span>
-                                <b>Behaviour changed successfully</b>
-                                <br />
-                                for question - {sq?.cardQuestion?.name}
-                              </span>
-                            ),
-                            { id: toastId }
-                          )
-                          sq.behaviour = value
-                          setData([...scoreCardQuestions])
-                        } catch (error) {
-                          toast.error(
-                            "Sorry, we had an unexpected error. Please try again. - " +
-                              error.toString(),
-                            { id: toastId }
-                          )
-                        }
-                      }}
-                    />
-                  </Form>
-                </div>
-              )}
-            </div>
-          </>
-        ),
-      }
-    }) as CardType[]
-  }
+            </>
+          ),
+        }
+      }) as CardType[]
+    },
+    [updateScoreCardQuestionMutation]
+  )
 
   const [cards, setCards] = useState(getCards(data))
   useEffect(() => {
     setCards(getCards(data))
-  }, [data])
+  }, [data, getCards])
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }

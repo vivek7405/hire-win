@@ -3,6 +3,7 @@ import { z } from "zod"
 const password = z.string().min(8).max(100)
 
 export const Signup = z.object({
+  name: z.string().nonempty({ message: "Required" }),
   email: z.string().email(),
   companyName: z.string().nonempty({ message: "Required" }),
   slug: z.string().optional(),

@@ -27,6 +27,7 @@ async function createUsers() {
 
       const createdUser = await db.user.create({
         data: {
+          name: user.name,
           email: user.email,
           companyName: user.companyName,
           slug: newSlug,

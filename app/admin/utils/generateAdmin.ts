@@ -6,7 +6,35 @@ import j from "jscodeshift"
 const database: { [k: string]: any } = db
 
 // Do not overwrite premade admin pages,mutations & queries
-const DO_NOT_INCLUDE = ["user", "session", "token", "job", "membership", "test"]
+const DO_NOT_INCLUDE = [
+  "user",
+  "session",
+  "token",
+  "job",
+  "membership",
+  "test",
+  "category",
+  "workflow",
+  "stage",
+  "workflowstage",
+  "form",
+  "question",
+  "scorecard",
+  "cardquestion",
+  "scorecardquestion",
+  "scorecardjobworkflowstage",
+  "score",
+  "questionoption",
+  "formquestion",
+  "answer",
+  "candidate",
+  "defaultcalendar",
+  "calendar",
+  "dailyschedule",
+  "schedule",
+  "interviewdetail",
+  "interview",
+]
 
 const entities = database._dmmf.datamodel.models.reduce((arr, m) => {
   if (!DO_NOT_INCLUDE.includes(m.name.toLowerCase())) {

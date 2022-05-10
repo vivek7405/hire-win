@@ -90,7 +90,7 @@ async function updateCandidateScores(
           form: {
             include: { questions: { include: { question: { include: { options: true } } } } },
           },
-          workflow: { include: { stages: { include: { stage: true } } } },
+          workflow: { include: { stages: { include: { stage: true, interviewDetails: true } } } },
           scoreCards: {
             include: {
               scoreCard: {
@@ -109,7 +109,7 @@ async function updateCandidateScores(
           },
         },
       },
-      workflowStage: { include: { stage: true } },
+      workflowStage: { include: { stage: true, interviewDetails: true } },
       answers: { include: { question: { include: { options: true } } } },
     },
   })

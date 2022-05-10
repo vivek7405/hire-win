@@ -28,7 +28,10 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     scoreCards,
   } = Job.parse(data)
 
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  const user = await db.user.findFirst({
+    where: { id: ctx.session.userId! },
+    include: { defaultCalendars: true, schedules: true },
+  })
   if (!user) throw new AuthenticationError()
 
   const slug = slugify(title, { strict: true })
@@ -82,6 +85,21 @@ async function createJob(data: JobInputType, ctx: Ctx) {
               workflowStageId: scoreCardJobWorkflowStage?.workflowStageId!,
             }
           })!,
+        },
+      },
+      interviewDetails: {
+        createMany: {
+          data:
+            workflow?.stages?.map((ws) => {
+              return {
+                workflowStageId: ws.id || "",
+                interviewerId: user.id || 0,
+                calendarId:
+                  user.defaultCalendars?.find((cal) => cal.userId === user.id)?.calendarId || null,
+                scheduleId: user.schedules?.find((sch) => sch.name === "Default")?.id || 0,
+                duration: 30,
+              }
+            }) || [],
         },
       },
     },

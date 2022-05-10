@@ -7,6 +7,7 @@ export const UserObj = z.object({
       Key: z.string().optional(),
     })
     .nullable(),
+  name: z.string().nonempty({ message: "Required" }),
   companyName: z.string().nonempty({ message: "Required" }),
   companyInfo: z.any().optional(),
   website: z.string().url().optional(),

@@ -18,8 +18,11 @@ type ExtendedResourceTypes =
   | "cardQuestion"
   | "scoreCardQuestion"
   | "scoreCard"
+  | "schedule"
+  | "calendar"
+  | "interview"
 
-type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser"
+type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser" | "cancelInterview"
 
 const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
   async (ctx, { can, cannot }) => {
@@ -368,6 +371,40 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return scoreCards.every((p) => p.userId === ctx.session.userId) === true
       })
 
+      can("create", "schedule")
+      can("update", "schedule")
+      can("read", "schedule", async (args) => {
+        const schedule = await db.schedule.findFirst({
+          where: args.where,
+        })
+
+        return schedule?.ownerId === ctx.session.userId
+      })
+      can("readAll", "schedule", async (args) => {
+        const schedules = await db.schedule.findMany({
+          where: args.where,
+        })
+
+        return schedules.every((p) => p.ownerId === ctx.session.userId) === true
+      })
+
+      can("create", "calendar")
+      can("update", "calendar")
+      can("read", "calendar", async (args) => {
+        const calendar = await db.calendar.findFirst({
+          where: args.where,
+        })
+
+        return calendar?.ownerId === ctx.session.userId
+      })
+      can("readAll", "calendar", async (args) => {
+        const calendars = await db.calendar.findMany({
+          where: args.where,
+        })
+
+        return calendars.every((p) => p.ownerId === ctx.session.userId) === true
+      })
+
       can("create", "question")
       can("read", "question", async (args) => {
         const question = await db.question.findFirst({
@@ -472,6 +509,21 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           candidates.every(
             (c) => c.job.memberships.some((m) => m.userId === ctx.session.userId) === true
           ) === true
+        )
+      })
+
+      can("cancelInterview", "interview", async (args) => {
+        const interview = await db.interview.findUnique({
+          where: { id: args.interviewId },
+          include: { interviewDetail: { include: { job: { include: { memberships: true } } } } },
+        })
+
+        return (
+          ctx.session.userId === interview?.interviewerId ||
+          ctx.session.userId === interview?.organizerId ||
+          interview?.interviewDetail?.job?.memberships?.find(
+            (membership) => membership.userId === ctx.session.userId
+          )?.role === "OWNER"
         )
       })
     }

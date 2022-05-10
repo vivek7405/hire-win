@@ -12,6 +12,8 @@ import {
   usePaginatedQuery,
   dynamic,
   useMutation,
+  useQuery,
+  invalidateQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -32,7 +34,15 @@ import {
 } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { QuestionType, ScoreCardJobWorkflowStage } from "@prisma/client"
+import {
+  Candidate,
+  Interview,
+  InterviewDetail,
+  Membership,
+  QuestionType,
+  ScoreCardJobWorkflowStage,
+  User,
+} from "@prisma/client"
 import Cards from "app/core/components/Cards"
 import Skeleton from "react-loading-skeleton"
 import ScoreCard from "app/score-cards/components/ScoreCard"
@@ -42,6 +52,14 @@ import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import updateCandidateScores from "app/jobs/mutations/updateCandidateScores"
 import linkScoreCardWithJobWorkflowStage from "app/jobs/mutations/linkScoreCardWithJobWorkflowStage"
+import Modal from "app/core/components/Modal"
+import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInterview"
+import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
+import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
+import moment from "moment"
+import { TrashIcon } from "@heroicons/react/outline"
+import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview"
+import Confirm from "app/core/components/Confirm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -238,35 +256,42 @@ const getCards = (candidate: ExtendedCandidate) => {
   )
 }
 
-const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageIdForScoreCard) => {
-  return candidate?.job?.scoreCards?.find(
-    (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard || candidate?.workflowStageId
-  )
-}
+// const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageId) => {
+//   return candidate?.job?.scoreCards?.find(
+//     (sc) => sc.workflowStageId === selectedWorkflowStageId || candidate?.workflowStageId
+//   )
+// }
 
 const getScoreAverage = (ratingsArray: number[]) => {
   return ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length
 }
 
 const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  enum CandidateToggleView {
+    ScoreCard = "Score Card",
+    Interviews = "Interviews",
+    Comments = "Comments",
+  }
+
   const { user, error, canUpdate } = props
   const [candidate, setCandidate] = useState(props.candidate)
-  const [selectedWorkflowStageIdForScoreCard, setSelectedWorkflowStageIdForScoreCard] = useState(
-    candidate?.workflowStageId || ""
-  )
-  // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStageIdForScoreCard)?.scoreCardId || ""
+  const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.ScoreCard)
+  const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
+  // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
   const [scoreCardId, setScoreCardId] = useState(
-    candidate?.job?.scoreCards?.find(
-      (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
-    )?.scoreCardId || ""
+    candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
+      ?.scoreCardId || ""
   )
+  const [candidateStageInterviews] = useQuery(getCandidateInterviewsByStage, {
+    candidateId: candidate?.id || "0",
+    workflowStageId: selectedWorkflowStage?.id || "0",
+  })
   useEffect(() => {
     setScoreCardId(
-      candidate?.job?.scoreCards?.find(
-        (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
-      )?.scoreCardId || ""
+      candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
+        ?.scoreCardId || ""
     )
-  }, [candidate, selectedWorkflowStageIdForScoreCard])
+  }, [candidate, selectedWorkflowStage?.id])
 
   const [file, setFile] = useState(null as any)
   const [cards, setCards] = useState(getCards(candidate!))
@@ -278,14 +303,14 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
 
   const resume = candidate?.resume as AttachmentObject
-  useMemo(() => {
-    // if (resume?.Key && !file) {
-    getResume(resume).then((response) => {
-      const file = response?.data?.Body
-      setFile(file)
-    })
-    // }
-  }, [resume])
+  // useMemo(() => {
+  //   // if (resume?.Key && !file) {
+  //   getResume(resume).then((response) => {
+  //     const file = response?.data?.Body
+  //     setFile(file)
+  //   })
+  //   // }
+  // }, [resume])
 
   let ratingsArray = [] as number[]
   candidate?.job?.scoreCards?.forEach((scoreCardJobWorkflowStage) => {
@@ -295,6 +320,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       })
     })
   })
+
+  const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
+  const [cancelInterviewMutation] = useMutation(cancelInterview)
+  const [interviewToDelete, setInterviewToDelete] = useState(null as any as Interview)
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -312,15 +342,24 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
       <br />
 
-      <Link href={Routes.JobsHome()} passHref>
-        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
-          Send Email
-        </a>
-      </Link>
+      <Modal
+        header="Schedule Interview"
+        open={openScheduleInterviewModal}
+        setOpen={setOpenScheduleInterviewModal}
+      >
+        <ScheduleInterview
+          interviewDetailId={
+            selectedWorkflowStage?.interviewDetails?.find((int) => int.jobId === candidate?.jobId)
+              ?.id || "0"
+          }
+          candidateId={candidate?.id || "0"}
+          setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
+        />
+      </Modal>
 
       <Link href={Routes.JobsHome()} passHref>
-        <a className="float-right text-white bg-theme-600 mx-6 px-4 py-2 rounded-sm hover:bg-theme-700">
-          Schedule Meeting
+        <a className="float-right text-white bg-theme-600 px-4 py-2 ml-6 rounded-sm hover:bg-theme-700">
+          Send Email
         </a>
       </Link>
 
@@ -364,6 +403,30 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
+        <Confirm
+          open={openConfirm}
+          setOpen={setOpenConfirm}
+          header="Cancel Interview"
+          onSuccess={async () => {
+            const toastId = toast.loading("Cancelling interview")
+            try {
+              await cancelInterviewMutation({
+                interviewId: interviewToDelete?.id || 0,
+                cancelCode: interviewToDelete?.cancelCode,
+                skipCancelCodeVerification: true,
+              })
+              toast.success("Interview cancelled", { id: toastId })
+              setOpenConfirm(false)
+              await invalidateQuery(getCandidateInterviewsByStage)
+            } catch (error) {
+              toast.error(`Interview cancellation failed - ${error.toString()}`, {
+                id: toastId,
+              })
+            }
+          }}
+        >
+          Are you sure you want to cancel the interview?
+        </Confirm>
         <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
           <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-400 rounded-lg">
             {file && <PDFViewer file={file} scale={1.29} />}
@@ -392,17 +455,16 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                       return (
                         <div
                           key={`${ws.stage?.name}${index}`}
-                          className={`${index > 0 ? "border-l-2" : ""} ${
+                          className={`${index > 0 ? "border-l-2 rounded-bl-md" : ""} ${
                             index < (candidate?.job?.workflow?.stages?.length || 0) - 1
-                              ? "border-r-2"
+                              ? "border-r-2 rounded-br-md"
                               : ""
                           } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
-                            selectedWorkflowStageIdForScoreCard === ws.id
-                              ? "!bg-theme-500 !text-white"
-                              : ""
+                            selectedWorkflowStage?.id === ws.id ? "!bg-theme-500 !text-white" : ""
                           }`}
                           onClick={() => {
-                            setSelectedWorkflowStageIdForScoreCard(ws.id)
+                            setSelectedWorkflowStage(ws)
+                            invalidateQuery(getCandidateInterviewsByStage)
                             // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
                           }}
                         >
@@ -411,98 +473,245 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                       )
                     })}
                 </div>
-                <ScoreCard
-                  submitDisabled={
-                    selectedWorkflowStageIdForScoreCard !== candidate?.workflowStageId
-                  }
-                  key={selectedWorkflowStageIdForScoreCard}
-                  candidate={candidate}
-                  header={`${titleCase(candidate?.name)}'s Score`}
-                  subHeader={`${
-                    candidate?.job?.workflow?.stages?.find(
-                      (ws) => ws.id === selectedWorkflowStageIdForScoreCard
-                    )?.stage?.name
-                  } Stage`}
-                  scoreCardId={scoreCardId}
-                  preview={false}
-                  userId={user?.id || 0}
-                  workflowStageId={selectedWorkflowStageIdForScoreCard}
-                  onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Updating Candidate</span>)
-                    try {
-                      let linkedScoreCard: ExtendedScoreCard | null = null
-                      if (candidate && !scoreCardId) {
-                        linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
-                          jobId: candidate?.jobId || "0",
-                          workflowStageId:
-                            selectedWorkflowStageIdForScoreCard ||
-                            candidate?.workflowStageId ||
-                            "0",
-                        })
-                      }
-                      const updatedCandidate = await updateCandidateScoresMutation({
-                        where: { id: candidate?.id },
-                        initial: candidate as any,
-                        data: {
-                          id: candidate?.id,
-                          jobId: candidate?.job?.id,
-                          name: candidate?.name,
-                          email: candidate?.email,
-                          source: candidate?.source,
-                          resume: candidate?.resume || undefined,
-                          answers: candidate?.answers || ([] as any),
-                          scores:
-                            (
-                              candidate?.job?.scoreCards?.find(
-                                (sc) => sc.workflowStageId === selectedWorkflowStageIdForScoreCard
-                              )?.scoreCard || linkedScoreCard
-                            )?.cardQuestions
-                              ?.map((sq) => {
-                                const rating = values[sq.cardQuestion?.name] || 0
-                                const note = values[`${sq.cardQuestion?.name} Note`]
-                                const scoreId = values[`${sq.cardQuestion?.name} ScoreId`]
-
-                                return {
-                                  scoreCardQuestionId: sq.id,
-                                  rating: rating ? parseInt(rating) : 0,
-                                  note: note,
-                                  id: scoreId || null,
-                                  workflowStageId:
-                                    selectedWorkflowStageIdForScoreCard ||
-                                    candidate?.workflowStageId ||
-                                    "0",
-                                }
-                              })
-                              ?.filter((score) => score.rating > 0) || ([] as any),
-                        },
-                      })
-                      // Stop resume by reloading by assigning previous value since resume won't be changed by this mutation
-                      setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
-                      toast.success(
-                        () => (
-                          <span>
-                            Candidate Score Card Updated for stage{" "}
-                            {candidate?.workflowStage?.stage?.name}
-                          </span>
-                        ),
-                        { id: toastId }
-                      )
-                    } catch (error) {
-                      toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                      )
+                <div className="w-full flex items-center justify-center mt-5">
+                  <Form noFormatting={true} onSubmit={async (values) => {}}>
+                    <LabeledToggleGroupField
+                      name={`candidateToggleView`}
+                      paddingX={3}
+                      paddingY={1}
+                      defaultValue={CandidateToggleView.ScoreCard}
+                      value={candidateToggleView}
+                      options={Object.values(CandidateToggleView)?.map((toggleView) => {
+                        return { label: toggleView, value: toggleView }
+                      })}
+                      onChange={(value) => {
+                        setCandidateToggleView(value)
+                      }}
+                    />
+                  </Form>
+                </div>
+                {candidateToggleView === CandidateToggleView.ScoreCard && (
+                  <ScoreCard
+                    submitDisabled={
+                      selectedWorkflowStage?.interviewDetails?.find(
+                        (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                      )?.interviewerId !== user?.id
                     }
-                  }}
-                  // scoreCardQuestions={
-                  //   scoreCardJobWorkflowStage.scoreCard.cardQuestions as any as ExtendedScoreCardQuestion[]
-                  // }
-                />
+                    key={selectedWorkflowStage?.id}
+                    candidate={candidate}
+                    header="Score Card"
+                    // subHeader={`${
+                    //   candidate?.job?.workflow?.stages?.find(
+                    //     (ws) => ws.id === selectedWorkflowStage?.id
+                    //   )?.stage?.name
+                    // } Stage`}
+                    scoreCardId={scoreCardId}
+                    preview={false}
+                    userId={user?.id || 0}
+                    workflowStage={selectedWorkflowStage as any}
+                    onSubmit={async (values) => {
+                      const toastId = toast.loading(() => <span>Updating Candidate</span>)
+                      try {
+                        let linkedScoreCard: ExtendedScoreCard | null = null
+                        if (candidate && !scoreCardId) {
+                          linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
+                            jobId: candidate?.jobId || "0",
+                            workflowStageId:
+                              selectedWorkflowStage?.id || candidate?.workflowStageId || "0",
+                          })
+                        }
+                        const updatedCandidate = await updateCandidateScoresMutation({
+                          where: { id: candidate?.id },
+                          initial: candidate as any,
+                          data: {
+                            id: candidate?.id,
+                            jobId: candidate?.job?.id,
+                            name: candidate?.name,
+                            email: candidate?.email,
+                            source: candidate?.source,
+                            resume: candidate?.resume || undefined,
+                            answers: candidate?.answers || ([] as any),
+                            scores:
+                              (
+                                candidate?.job?.scoreCards?.find(
+                                  (sc) => sc.workflowStageId === selectedWorkflowStage?.id
+                                )?.scoreCard || linkedScoreCard
+                              )?.cardQuestions
+                                ?.map((sq) => {
+                                  const rating = values[sq.cardQuestion?.name] || 0
+                                  const note = values[`${sq.cardQuestion?.name} Note`]
+                                  const scoreId = values[`${sq.cardQuestion?.name} ScoreId`]
+
+                                  return {
+                                    scoreCardQuestionId: sq.id,
+                                    rating: rating ? parseInt(rating) : 0,
+                                    note: note,
+                                    id: scoreId || null,
+                                    workflowStageId:
+                                      selectedWorkflowStage?.id ||
+                                      candidate?.workflowStageId ||
+                                      "0",
+                                  }
+                                })
+                                ?.filter((score) => score.rating > 0) || ([] as any),
+                          },
+                        })
+                        // Stop resume from reloading by assigning previous value since resume won't be changed by this mutation
+                        setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
+                        toast.success(
+                          () => (
+                            <span>
+                              Candidate Score Card Updated for stage{" "}
+                              {selectedWorkflowStage?.stage?.name}
+                            </span>
+                          ),
+                          { id: toastId }
+                        )
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString()
+                        )
+                      }
+                    }}
+                    // scoreCardQuestions={
+                    //   scoreCardJobWorkflowStage.scoreCard.cardQuestions as any as ExtendedScoreCardQuestion[]
+                    // }
+                  />
+                )}
+                {candidateToggleView === CandidateToggleView.Interviews && (
+                  <>
+                    <div className="m-6">
+                      <div className="flex items-center">
+                        <div className="font-bold text-lg w-full">Interviews</div>
+                        <button
+                          className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+                          disabled={
+                            selectedWorkflowStage?.interviewDetails?.find(
+                              (int) =>
+                                int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                            )?.interviewerId !== user?.id &&
+                            user?.memberships?.find(
+                              (membership) => membership.jobId === candidate?.jobId
+                            )?.role !== "OWNER" &&
+                            user?.memberships?.find(
+                              (membership) => membership.jobId === candidate?.jobId
+                            )?.role !== "ADMIN"
+                          }
+                          onClick={() => {
+                            setOpenScheduleInterviewModal(true)
+                          }}
+                        >
+                          Schedule
+                        </button>
+                      </div>
+                      <div className="w-full mt-3 flex flex-col space-y-3">
+                        {/* List scheduled interviews here */}
+                        {candidateStageInterviews?.length === 0 && <p>No interviews scheduled</p>}
+                        {candidateStageInterviews
+                          ?.filter((interview) => interview.startDateUTC >= new Date())
+                          .map((interview, index) => {
+                            return (
+                              <>
+                                {index === 0 && <span className="font-semibold">Upcoming</span>}
+                                <CandidateInterview
+                                  key={interview.id}
+                                  interview={interview}
+                                  user={user as any}
+                                  setOpenConfirm={setOpenConfirm}
+                                  setInterviewToDelete={setInterviewToDelete}
+                                />
+                              </>
+                            )
+                          })}
+                        {candidateStageInterviews
+                          ?.filter((interview) => interview.startDateUTC < new Date())
+                          .map((interview, index) => {
+                            return (
+                              <>
+                                {index === 0 && <span className="font-semibold">Past</span>}
+                                <CandidateInterview
+                                  key={interview.id}
+                                  interview={interview}
+                                  user={user as any}
+                                  setOpenConfirm={setOpenConfirm}
+                                  setInterviewToDelete={setInterviewToDelete}
+                                />
+                              </>
+                            )
+                          })}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
       </Suspense>
     </AuthLayout>
+  )
+}
+
+type CandidateInterviewProps = {
+  interview: Interview & { organizer: User } & { interviewer: User } & {
+    otherAttendees: User[]
+  } & { interviewDetail: InterviewDetail }
+  user: User & { memberships: Membership[] }
+  setOpenConfirm: any
+  setInterviewToDelete: any
+}
+const CandidateInterview = ({
+  interview,
+  user,
+  setOpenConfirm,
+  setInterviewToDelete,
+}: CandidateInterviewProps) => {
+  return (
+    <div key={interview.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
+      <button
+        className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={
+          user?.id !== interview?.interviewerId &&
+          user?.id !== interview?.organizerId &&
+          user?.memberships?.find(
+            (membership) => membership.jobId === interview?.interviewDetail?.jobId
+          )?.role !== "OWNER"
+        }
+        onClick={() => {
+          setOpenConfirm(true)
+          setInterviewToDelete(interview)
+        }}
+      >
+        <TrashIcon className="w-5 h-5 text-red-500 hover:text-red-600" />
+      </button>
+      <b className="capitalize">{moment(interview.startDateUTC).local().fromNow()}</b>
+      <br />
+      {moment(interview.startDateUTC).toLocaleString()}
+      <br />
+      Duration: <span className="whitespace-nowrap">{interview.duration} mins</span>
+      <br />
+      {interview.organizerId === interview.interviewerId ? (
+        <>
+          Organizer & Interviewer:{" "}
+          {interview?.organizer?.id === user?.id ? "You" : interview?.organizer?.name}
+        </>
+      ) : (
+        <>
+          Organizer: {interview?.organizer?.id === user?.id ? "You" : interview?.organizer?.name}
+          <br />
+          Interviewer:{" "}
+          {interview?.interviewer?.id === user?.id ? "You" : interview?.interviewer?.name}
+        </>
+      )}
+      <br />
+      Other Attendees:{" "}
+      {interview.otherAttendees
+        ?.map((attendee) => {
+          return attendee.name
+        })
+        ?.toString() || "NA"}
+    </div>
   )
 }
 

@@ -12,7 +12,13 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
       candidates: true,
       workflow: {
         include: {
-          stages: { include: { stage: true, scoreCards: { include: { scoreCard: true } } } },
+          stages: {
+            include: {
+              stage: true,
+              scoreCards: { include: { scoreCard: true } },
+              interviewDetails: true,
+            },
+          },
         },
       },
       form: {
@@ -30,11 +36,11 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
       memberships: {
         include: {
           user: {
-            select: {
-              id: true,
-              email: true,
-              role: true,
-              logo: true,
+            include: {
+              // id: true,
+              // email: true,
+              // role: true,
+              // logo: true,
               memberships: true,
               sessions: true,
               tokens: true,
@@ -43,6 +49,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
         },
       },
       scoreCards: { include: { scoreCard: true } },
+      interviewDetails: true,
     },
   })
 

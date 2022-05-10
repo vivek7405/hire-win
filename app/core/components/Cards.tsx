@@ -184,7 +184,7 @@ const Cards = ({
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         className={`my-2 md:mx-2 lg:mx-2 w-full ${
-                          isFull ? "md:w-full lg:w-full" : "md:w-60 lg:w-60"
+                          isFull ? "!mx-0 md:w-full lg:w-full" : "md:w-60 lg:w-60"
                         }`}
                       >
                         <div className="inline-block whitespace-normal w-full">

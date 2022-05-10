@@ -56,6 +56,7 @@ const NewUserAdminPage = ({ user }: InferGetServerSidePropsType<typeof getServer
         <Form
           submitText="Submit"
           initialValues={{
+            name: "",
             email: "",
             companyName: "",
             companyInfo: EditorState.createEmpty(),
@@ -79,6 +80,7 @@ const NewUserAdminPage = ({ user }: InferGetServerSidePropsType<typeof getServer
           header={"Create A New User"}
           subHeader={``}
         >
+          <LabeledTextField name="name" label="Name" />
           <LabeledTextField name="email" label="Email" type="email" />
           <LabeledTextField name="companyName" label="Company Name" />
           <LabeledRichTextField

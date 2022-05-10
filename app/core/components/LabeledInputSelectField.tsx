@@ -33,19 +33,21 @@ export const LabeledInputSelectField = forwardRef<HTMLInputElement, LabeledInput
 
     return (
       <div {...outerProps}>
-        <label
-          data-testid={`${props.testid && `${props.testid}-`}label`}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {label}
-        </label>
-        <div className="mt-1">
+        {label && (
+          <label
+            data-testid={`${props.testid && `${props.testid}-`}label`}
+            className="block text-sm font-medium text-gray-700"
+          >
+            {label}
+          </label>
+        )}
+        <div className={label ? "mt-1" : ""}>
           <input
             disabled={isSubmitting}
             {...register(`${name}` as const)}
             {...props}
             list={`data-list-${name}`}
-            className="border border-gray-300 mt-2 px-2 py-2 block w-full sm:text-sm rounded"
+            className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
             data-testid={`${props.testid && `${props.testid}-`}input`}
           />
           <datalist id={`data-list-${name}`}>

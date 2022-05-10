@@ -22,7 +22,7 @@ async function addNewStageToWorkflow(data: StageInputType, ctx: Ctx) {
     async (e) => await db.stage.findFirst({ where: { slug: e } })
   )
 
-  const existingStage = await db.stage.findFirst({ where: { name } })
+  const existingStage = await db.stage.findFirst({ where: { name, userId: user?.id } })
   const order = (await db.workflowStage.count({ where: { workflowId: workflowId } })) + 1
 
   // Add New or connect existing stage and put it to the last position

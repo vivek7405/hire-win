@@ -426,7 +426,9 @@ type Step6FormProps = {
 }
 const Step6Form = (props: Step6FormProps) => {
   const [forms] = useQuery(getFormsWOPagination, { where: { userId: props.user?.id } })
-  const [selectedFormId, setSelectedFormId] = useState(forms.find((f) => f.name === "Default")?.id)
+  const [selectedFormId, setSelectedFormId] = useState(
+    props.form?.id || forms.find((f) => f.name === "Default")?.id
+  )
   const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
     where: { formId: selectedFormId! },
     orderBy: { order: "asc" },

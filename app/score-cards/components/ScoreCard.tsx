@@ -13,7 +13,12 @@ import LabeledPhoneNumberField from "app/core/components/LabeledPhoneNumberField
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
 import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreCardQuestionsWOPagination"
-import { ExtendedScoreCardQuestion, ExtendedCardQuestion } from "types"
+import {
+  ExtendedScoreCardQuestion,
+  ExtendedCardQuestion,
+  ExtendedCandidate,
+  ExtendedWorkflowStage,
+} from "types"
 import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline"
 import getScoreCard from "../queries/getScoreCard"
 import { Candidate } from "@prisma/client"
@@ -24,14 +29,14 @@ type ScoreCardProps = {
   onSubmit: any
   submitDisabled?: boolean
   header: string
-  subHeader: string
+  subHeader?: string
   scoreCardId: string
   preview: boolean
   scoreCardQuestions?: ExtendedScoreCardQuestion[]
   onChange?: any
   userId: number
-  candidate?: Candidate
-  workflowStageId?: string
+  candidate?: ExtendedCandidate
+  workflowStage?: ExtendedWorkflowStage
 }
 
 export const ScoreCard = (props: ScoreCardProps) => {
@@ -106,16 +111,21 @@ export const ScoreCard = (props: ScoreCardProps) => {
             (score) =>
               score.candidateId === props.candidate?.id &&
               score.workflowStageId ===
-                (props.workflowStageId || props.candidate?.workflowStageId || "0") &&
+                (props.workflowStage?.id || props.candidate?.workflowStageId || "0") &&
               sq.scoreCard.jobWorkflowStages.findIndex(
                 (jws) =>
                   jws.workflowStageId ===
-                    (props.workflowStageId || props.candidate?.workflowStageId || "0") &&
+                    (props.workflowStage?.id || props.candidate?.workflowStageId || "0") &&
                   jws.jobId === (props.candidate?.jobId || "0")
               ) >= 0
           )
 
-          const disabled = props.workflowStageId !== props.candidate?.workflowStageId
+          // const disabled = props.workflowStageId !== props.candidate?.workflowStageId
+          const disabled =
+            !props.preview &&
+            props.workflowStage?.interviewDetails?.find(
+              (int) => int.jobId === props.candidate?.jobId && int.interviewerId === props.userId
+            )?.interviewerId !== props.userId
 
           return (
             <div key={q.id}>

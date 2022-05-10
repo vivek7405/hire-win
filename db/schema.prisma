@@ -17,6 +17,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  name           String
   email          String    @unique
   companyName    String
   companyInfo    Json?
@@ -45,6 +46,17 @@ model User {
 
   scoreCards    ScoreCard[]
   cardQuestions CardQuestion[]
+
+  calendars        Calendar[]
+  // meetings         Meeting[]
+  interviewDetails InterviewDetail[]
+  schedules        Schedule[]
+  defaultCalendars DefaultCalendar[]
+
+  organizerInterviews      Interview[] @relation(name: "organizerInterviews")
+  interviewerInterviews    Interview[] @relation(name: "interviewerInterviews")
+  otherAttendeeInterview   Interview?  @relation(fields: [otherAttendeeInterviewId], references: [id])
+  otherAttendeeInterviewId Int?
 }
 
 enum UserRole {
@@ -149,7 +161,36 @@ model Job {
   formId String?
 
   scoreCards ScoreCardJobWorkflowStage[]
-  candidates Candidate[]
+
+  interviewDetails InterviewDetail[]
+  candidates       Candidate[]
+}
+
+model InterviewDetail {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  interviewer   User @relation(fields: [interviewerId], references: [id])
+  interviewerId Int
+
+  duration Int
+
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+
+  calendar   Calendar? @relation(fields: [calendarId], references: [id])
+  calendarId Int?
+
+  interviews Interview[]
+
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  @@unique([interviewerId, jobId, workflowStageId])
 }
 
 enum MembershipRole {
@@ -238,7 +279,8 @@ model WorkflowStage {
   scoreCards ScoreCardJobWorkflowStage[]
   scores     Score[]
 
-  candidates Candidate[]
+  interviewDetails InterviewDetail[]
+  candidates       Candidate[]
 
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
@@ -475,6 +517,8 @@ model Candidate {
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
+  interviews Interview[]
+
   @@unique([jobId, email])
 }
 
@@ -482,4 +526,91 @@ enum CandidateSource {
   Manual
   Job_Board
   LinkedIn
+}
+
+model DefaultCalendar {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  user       User     @relation(fields: [userId], references: [id])
+  calendarId Int
+  calendar   Calendar @relation(fields: [calendarId], references: [id])
+}
+
+enum CalendarType {
+  CaldavDigest
+  CaldavBasic
+  GoogleCalendar
+  OutlookCalendar
+}
+
+model Calendar {
+  id                Int               @id @default(autoincrement())
+  name              String
+  caldavAddress     String?
+  username          String?
+  encryptedPassword String?
+  refreshToken      String?
+  owner             User              @relation(fields: [ownerId], references: [id])
+  ownerId           Int
+  type              CalendarType
+  defaultCalendars  DefaultCalendar[]
+  // meetings          Meeting[]
+  interviewDetails  InterviewDetail[]
+}
+
+// model Meeting {
+//   id                         Int               @id @default(autoincrement())
+//   name                       String
+//   link                       String
+//   owner                      User              @relation(fields: [ownerName], references: [slug])
+//   ownerName                  String
+//   description                String
+//   duration                   Int
+//   startDateUTC               DateTime
+//   endDateUTC                 DateTime
+//   schedule                   Schedule          @relation(fields: [scheduleId], references: [id])
+//   scheduleId                 Int
+//   location                   String
+//   bookings                   Booking[]
+//   defaultCalendar   Calendar @relation(fields: [defaultCalendarId], references: [id])
+//   defaultCalendarId Int
+// }
+
+model DailySchedule {
+  id         Int      @id @default(autoincrement())
+  day        String
+  startTime  String
+  endTime    String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+}
+
+model Schedule {
+  id               Int               @id @default(autoincrement())
+  name             String
+  timezone         String
+  dailySchedules   DailySchedule[]
+  owner            User              @relation(fields: [ownerId], references: [id])
+  ownerId          Int
+  // meetings       Meeting[]
+  interviewDetails InterviewDetail[]
+}
+
+model Interview {
+  id                Int             @id @default(autoincrement())
+  // meeting      Meeting  @relation(fields: [meetingId], references: [id])
+  // meetingId    Int
+  interviewDetail   InterviewDetail @relation(fields: [interviewDetailId], references: [id])
+  interviewDetailId String
+  candidate         Candidate       @relation(fields: [candidateId], references: [id])
+  candidateId       String
+  // inviteeEmail      String
+  organizer         User            @relation(fields: [organizerId], references: [id], name: "organizerInterviews")
+  organizerId       Int
+  interviewer       User            @relation(fields: [interviewerId], references: [id], name: "interviewerInterviews")
+  interviewerId     Int
+  otherAttendees    User[]
+  startDateUTC      DateTime
+  duration          Int
+  cancelCode        String
 }
