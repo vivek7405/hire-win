@@ -21,6 +21,7 @@ type ExtendedResourceTypes =
   | "schedule"
   | "calendar"
   | "interview"
+  | "comment"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser" | "cancelInterview"
 
@@ -525,6 +526,21 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             (membership) => membership.userId === ctx.session.userId
           )?.role === "OWNER"
         )
+      })
+
+      can("update", "comment", async (args) => {
+        const comment = await db.comment.findFirst({
+          where: { id: args.commentId, creatorId: ctx.session.userId || 0 },
+        })
+
+        return comment ? true : false
+      })
+      can("delete", "comment", async (args) => {
+        const comment = await db.comment.findFirst({
+          where: { id: args.commentId, creatorId: ctx.session.userId || 0 },
+        })
+
+        return comment ? true : false
       })
     }
   }

@@ -15,7 +15,7 @@ export const Confirm = ({ open, setOpen, children, header, onSuccess }: ModalPro
     <>
       <AlertDialog.Root open={open} onOpenChange={setOpen}>
         {open && (
-          <div className="fixed inset-0 z-50 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div className="h-screen fixed inset-0 z-50 !m-0 bg-gray-500 bg-opacity-75 transition-opacity" />
         )}
         <AlertDialog.Content className="fixed p-4 md:p-6 bg-white top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 md:w-auto">
           <div className="flex items-center justify-center h-10 w-10 rounded-full bg-red-100 mb-4">

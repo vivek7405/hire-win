@@ -60,6 +60,8 @@ import moment from "moment"
 import { TrashIcon } from "@heroicons/react/outline"
 import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview"
 import Confirm from "app/core/components/Confirm"
+import Interviews from "app/scheduling/interviews/components/Interviews"
+import Comments from "app/comments/components/Comments"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -282,10 +284,6 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
       ?.scoreCardId || ""
   )
-  const [candidateStageInterviews] = useQuery(getCandidateInterviewsByStage, {
-    candidateId: candidate?.id || "0",
-    workflowStageId: selectedWorkflowStage?.id || "0",
-  })
   useEffect(() => {
     setScoreCardId(
       candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
@@ -321,10 +319,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     })
   })
 
-  const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
-  const [cancelInterviewMutation] = useMutation(cancelInterview)
-  const [interviewToDelete, setInterviewToDelete] = useState(null as any as Interview)
-  const [openConfirm, setOpenConfirm] = useState(false)
+  // const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
+  // const [cancelInterviewMutation] = useMutation(cancelInterview)
+  // const [interviewToDelete, setInterviewToDelete] = useState(null as any as Interview)
+  // const [openConfirm, setOpenConfirm] = useState(false)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -341,21 +339,6 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
 
       <br />
-
-      <Modal
-        header="Schedule Interview"
-        open={openScheduleInterviewModal}
-        setOpen={setOpenScheduleInterviewModal}
-      >
-        <ScheduleInterview
-          interviewDetailId={
-            selectedWorkflowStage?.interviewDetails?.find((int) => int.jobId === candidate?.jobId)
-              ?.id || "0"
-          }
-          candidateId={candidate?.id || "0"}
-          setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
-        />
-      </Modal>
 
       <Link href={Routes.JobsHome()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 ml-6 rounded-sm hover:bg-theme-700">
@@ -403,30 +386,6 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Confirm
-          open={openConfirm}
-          setOpen={setOpenConfirm}
-          header="Cancel Interview"
-          onSuccess={async () => {
-            const toastId = toast.loading("Cancelling interview")
-            try {
-              await cancelInterviewMutation({
-                interviewId: interviewToDelete?.id || 0,
-                cancelCode: interviewToDelete?.cancelCode,
-                skipCancelCodeVerification: true,
-              })
-              toast.success("Interview cancelled", { id: toastId })
-              setOpenConfirm(false)
-              await invalidateQuery(getCandidateInterviewsByStage)
-            } catch (error) {
-              toast.error(`Interview cancellation failed - ${error.toString()}`, {
-                id: toastId,
-              })
-            }
-          }}
-        >
-          Are you sure you want to cancel the interview?
-        </Confirm>
         <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
           <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-400 rounded-lg">
             {file && <PDFViewer file={file} scale={1.29} />}
@@ -443,7 +402,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
           </div>
           <div className="w-full md:w-1/2 lg:w-1/3">
             <div
-              className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
+              className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
             >
               <div className="w-full h-full rounded-2xl">
                 <div className="z-10 flex w-full max-w-full overflow-auto bg-theme-50 justify-between sticky top-0">
@@ -580,69 +539,18 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                   />
                 )}
                 {candidateToggleView === CandidateToggleView.Interviews && (
-                  <>
-                    <div className="m-6">
-                      <div className="flex items-center">
-                        <div className="font-bold text-lg w-full">Interviews</div>
-                        <button
-                          className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-                          disabled={
-                            selectedWorkflowStage?.interviewDetails?.find(
-                              (int) =>
-                                int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                            )?.interviewerId !== user?.id &&
-                            user?.memberships?.find(
-                              (membership) => membership.jobId === candidate?.jobId
-                            )?.role !== "OWNER" &&
-                            user?.memberships?.find(
-                              (membership) => membership.jobId === candidate?.jobId
-                            )?.role !== "ADMIN"
-                          }
-                          onClick={() => {
-                            setOpenScheduleInterviewModal(true)
-                          }}
-                        >
-                          Schedule
-                        </button>
-                      </div>
-                      <div className="w-full mt-3 flex flex-col space-y-3">
-                        {/* List scheduled interviews here */}
-                        {candidateStageInterviews?.length === 0 && <p>No interviews scheduled</p>}
-                        {candidateStageInterviews
-                          ?.filter((interview) => interview.startDateUTC >= new Date())
-                          .map((interview, index) => {
-                            return (
-                              <>
-                                {index === 0 && <span className="font-semibold">Upcoming</span>}
-                                <CandidateInterview
-                                  key={interview.id}
-                                  interview={interview}
-                                  user={user as any}
-                                  setOpenConfirm={setOpenConfirm}
-                                  setInterviewToDelete={setInterviewToDelete}
-                                />
-                              </>
-                            )
-                          })}
-                        {candidateStageInterviews
-                          ?.filter((interview) => interview.startDateUTC < new Date())
-                          .map((interview, index) => {
-                            return (
-                              <>
-                                {index === 0 && <span className="font-semibold">Past</span>}
-                                <CandidateInterview
-                                  key={interview.id}
-                                  interview={interview}
-                                  user={user as any}
-                                  setOpenConfirm={setOpenConfirm}
-                                  setInterviewToDelete={setInterviewToDelete}
-                                />
-                              </>
-                            )
-                          })}
-                      </div>
-                    </div>
-                  </>
+                  <Interviews
+                    user={user}
+                    selectedWorkflowStage={selectedWorkflowStage}
+                    candidate={candidate}
+                  />
+                )}
+                {candidateToggleView === CandidateToggleView.Comments && (
+                  <Comments
+                    user={user}
+                    selectedWorkflowStage={selectedWorkflowStage}
+                    candidate={candidate}
+                  />
                 )}
               </div>
             </div>
@@ -650,68 +558,6 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         </div>
       </Suspense>
     </AuthLayout>
-  )
-}
-
-type CandidateInterviewProps = {
-  interview: Interview & { organizer: User } & { interviewer: User } & {
-    otherAttendees: User[]
-  } & { interviewDetail: InterviewDetail }
-  user: User & { memberships: Membership[] }
-  setOpenConfirm: any
-  setInterviewToDelete: any
-}
-const CandidateInterview = ({
-  interview,
-  user,
-  setOpenConfirm,
-  setInterviewToDelete,
-}: CandidateInterviewProps) => {
-  return (
-    <div key={interview.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
-      <button
-        className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={
-          user?.id !== interview?.interviewerId &&
-          user?.id !== interview?.organizerId &&
-          user?.memberships?.find(
-            (membership) => membership.jobId === interview?.interviewDetail?.jobId
-          )?.role !== "OWNER"
-        }
-        onClick={() => {
-          setOpenConfirm(true)
-          setInterviewToDelete(interview)
-        }}
-      >
-        <TrashIcon className="w-5 h-5 text-red-500 hover:text-red-600" />
-      </button>
-      <b className="capitalize">{moment(interview.startDateUTC).local().fromNow()}</b>
-      <br />
-      {moment(interview.startDateUTC).toLocaleString()}
-      <br />
-      Duration: <span className="whitespace-nowrap">{interview.duration} mins</span>
-      <br />
-      {interview.organizerId === interview.interviewerId ? (
-        <>
-          Organizer & Interviewer:{" "}
-          {interview?.organizer?.id === user?.id ? "You" : interview?.organizer?.name}
-        </>
-      ) : (
-        <>
-          Organizer: {interview?.organizer?.id === user?.id ? "You" : interview?.organizer?.name}
-          <br />
-          Interviewer:{" "}
-          {interview?.interviewer?.id === user?.id ? "You" : interview?.interviewer?.name}
-        </>
-      )}
-      <br />
-      Other Attendees:{" "}
-      {interview.otherAttendees
-        ?.map((attendee) => {
-          return attendee.name
-        })
-        ?.toString() || "NA"}
-    </div>
   )
 }
 

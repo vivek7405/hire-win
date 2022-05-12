@@ -57,6 +57,8 @@ model User {
   interviewerInterviews    Interview[] @relation(name: "interviewerInterviews")
   otherAttendeeInterview   Interview?  @relation(fields: [otherAttendeeInterviewId], references: [id])
   otherAttendeeInterviewId Int?
+
+  comments Comment[]
 }
 
 enum UserRole {
@@ -281,6 +283,7 @@ model WorkflowStage {
 
   interviewDetails InterviewDetail[]
   candidates       Candidate[]
+  comments         Comment[]
 
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
@@ -518,6 +521,7 @@ model Candidate {
   jobId String
 
   interviews Interview[]
+  comments   Comment[]
 
   @@unique([jobId, email])
 }
@@ -613,4 +617,25 @@ model Interview {
   startDateUTC      DateTime
   duration          Int
   cancelCode        String
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  text String
+
+  creator   User @relation(fields: [creatorId], references: [id])
+  creatorId Int
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  parentComment   Comment?  @relation(fields: [parentCommentId], references: [id], name: "childComments", onDelete: Cascade)
+  parentCommentId String?
+  childComments   Comment[] @relation(name: "childComments")
 }
