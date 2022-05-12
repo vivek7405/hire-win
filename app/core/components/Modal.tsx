@@ -14,7 +14,7 @@ export const Modal = ({ open, setOpen, children, header }: ModalProps) => {
     <>
       <Dialog.Root open={open} onOpenChange={setOpen}>
         {open && (
-          <div className="h-screen fixed inset-0 z-50 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <div className="h-screen fixed inset-0 z-50 !m-0 bg-gray-500 bg-opacity-75 transition-opacity" />
         )}
         <Dialog.Content className="border-2 border-theme-300 rounded-md h-11/12 fixed top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-11/12 max-h-screen md:w-auto overflow-auto">
           {children}

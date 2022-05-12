@@ -201,7 +201,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
                     <div className="absolute top-0.5 right-0">
                       <button
                         className="float-right text-red-600 hover:text-red-800"
-                        title="Remove CardQuestion"
+                        title="Remove Card Question"
                         onClick={async (e) => {
                           e.preventDefault()
 
@@ -322,12 +322,12 @@ export const CardQuestions = ({ user, scoreCard }) => {
         setOpen={setOpenConfirm}
         header={
           Object.entries(scoreCardQuestionToRemove).length
-            ? `Remove CardQuestion - ${scoreCardQuestionToRemove.cardQuestion.name}?`
-            : "Remove CardQuestion?"
+            ? `Remove Card Question - ${scoreCardQuestionToRemove.cardQuestion.name}?`
+            : "Remove Card Question?"
         }
         onSuccess={async () => {
           const toastId = toast.loading(() => (
-            <span>Removing CardQuestion {scoreCardQuestionToRemove.cardQuestion.name}</span>
+            <span>Removing Card Question {scoreCardQuestionToRemove.cardQuestion.name}</span>
           ))
           try {
             await removeCardQuestionFromScoreCardMutation({
@@ -336,7 +336,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
             })
             toast.success(
               () => (
-                <span>CardQuestion removed - {scoreCardQuestionToRemove.cardQuestion.name}</span>
+                <span>Card Question removed - {scoreCardQuestionToRemove.cardQuestion.name}</span>
               ),
               {
                 id: toastId,
@@ -351,7 +351,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
           router.reload()
         }}
       >
-        Are you sure you want to remove this Question from the scoreCard?
+        Are you sure you want to remove this Question from the Score Card?
       </Confirm>
       <div className="w-full flex flex-wrap md:flex-nowrap lg:flex-nowrap space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
         <div className="w-full md:w-1/2 lg:w-2/3 p-3 border-2 border-theme-400 rounded">
@@ -431,7 +431,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
         </div>
         <div className="w-full md:w-1/2 lg:w-1/3 flex justify-end">
           <div
-            className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
+            className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
           >
             <div className="w-full h-full rounded-2xl">
               <ScoreCard

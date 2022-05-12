@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react"
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -167,118 +167,121 @@ export const Questions = ({ user, form }) => {
     })
   }, [formQuestions])
 
-  const getCards = (formQuestions) => {
-    return formQuestions.map((fq) => {
-      return {
-        id: fq?.id,
-        title: fq.question?.name,
-        description: "",
-        renderContent: (
-          <>
-            <div className="flex flex-col space-y-2">
-              <div className="w-full relative">
-                <div className="font-bold flex justify-between">
-                  {!fq.question.factory ? (
-                    <Link href={Routes.SingleQuestionPage({ slug: fq.question.slug })} passHref>
-                      <a
-                        data-testid={`questionlink`}
-                        className="text-theme-600 hover:text-theme-900"
+  const getCards = useCallback(
+    (formQuestions) => {
+      return formQuestions.map((fq) => {
+        return {
+          id: fq?.id,
+          title: fq.question?.name,
+          description: "",
+          renderContent: (
+            <>
+              <div className="flex flex-col space-y-2">
+                <div className="w-full relative">
+                  <div className="font-bold flex justify-between">
+                    {!fq.question.factory ? (
+                      <Link href={Routes.SingleQuestionPage({ slug: fq.question.slug })} passHref>
+                        <a
+                          data-testid={`questionlink`}
+                          className="text-theme-600 hover:text-theme-900"
+                        >
+                          {fq.question.name}
+                        </a>
+                      </Link>
+                    ) : (
+                      fq.question.name
+                    )}
+                  </div>
+                  {!fq.question.factory && (
+                    <div className="absolute top-0.5 right-0">
+                      <button
+                        className="float-right text-red-600 hover:text-red-800"
+                        title="Remove Question"
+                        onClick={async (e) => {
+                          e.preventDefault()
+
+                          setFormQuestionToRemove(fq)
+                          setOpenConfirm(true)
+                        }}
                       >
-                        {fq.question.name}
-                      </a>
-                    </Link>
-                  ) : (
-                    fq.question.name
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                   )}
                 </div>
-                {!fq.question.factory && (
-                  <div className="absolute top-0.5 right-0">
-                    <button
-                      className="float-right text-red-600 hover:text-red-800"
-                      title="Remove Question"
-                      onClick={async (e) => {
-                        e.preventDefault()
 
-                        setFormQuestionToRemove(fq)
-                        setOpenConfirm(true)
-                      }}
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
+                <div className="border-b-2 border-neutral-50" />
+
+                <div className="text-sm text-neutral-500 font-semibold">
+                  {fq.question?.type?.toString().replaceAll("_", " ")}
+                </div>
+
+                {fq.allowBehaviourEdit && <div className="border-b-2 border-neutral-50" />}
+                {fq.allowBehaviourEdit && (
+                  <div>
+                    <Form noFormatting={true} onSubmit={async (values) => {}}>
+                      <LabeledToggleGroupField
+                        name={`formQuestion-${fq.id}-behaviour`}
+                        paddingX={3}
+                        paddingY={1}
+                        defaultValue={fq?.behaviour || FormQuestionBehaviour.OPTIONAL}
+                        value={fq?.behaviour}
+                        options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
+                          return { label: formQuestionBehaviour, value: formQuestionBehaviour }
+                        })}
+                        onChange={async (value) => {
+                          const toastId = toast.loading(() => (
+                            <span>
+                              <b>Setting behaviour as {value}</b>
+                              <br />
+                              for question - {fq.question.name}
+                            </span>
+                          ))
+                          try {
+                            await updateFormQuestionMutation({
+                              where: { id: fq?.id },
+                              data: {
+                                order: fq.order,
+                                behaviour: value,
+                              },
+                            })
+                            toast.success(
+                              () => (
+                                <span>
+                                  <b>Behaviour changed successfully</b>
+                                  <br />
+                                  for question - {fq?.question?.name}
+                                </span>
+                              ),
+                              { id: toastId }
+                            )
+                            fq.behaviour = value
+                            setData([...formQuestions])
+                          } catch (error) {
+                            toast.error(
+                              "Sorry, we had an unexpected error. Please try again. - " +
+                                error.toString(),
+                              { id: toastId }
+                            )
+                          }
+                        }}
+                      />
+                    </Form>
                   </div>
                 )}
               </div>
-
-              <div className="border-b-2 border-neutral-50" />
-
-              <div className="text-sm text-neutral-500 font-semibold">
-                {fq.question?.type?.toString().replaceAll("_", " ")}
-              </div>
-
-              {fq.allowBehaviourEdit && <div className="border-b-2 border-neutral-50" />}
-              {fq.allowBehaviourEdit && (
-                <div>
-                  <Form noFormatting={true} onSubmit={async (values) => {}}>
-                    <LabeledToggleGroupField
-                      name={`formQuestion-${fq.id}-behaviour`}
-                      paddingX={3}
-                      paddingY={1}
-                      defaultValue={fq?.behaviour || FormQuestionBehaviour.OPTIONAL}
-                      value={fq?.behaviour}
-                      options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
-                        return { label: formQuestionBehaviour, value: formQuestionBehaviour }
-                      })}
-                      onChange={async (value) => {
-                        const toastId = toast.loading(() => (
-                          <span>
-                            <b>Setting behaviour as {value}</b>
-                            <br />
-                            for question - {fq.question.name}
-                          </span>
-                        ))
-                        try {
-                          await updateFormQuestionMutation({
-                            where: { id: fq?.id },
-                            data: {
-                              order: fq.order,
-                              behaviour: value,
-                            },
-                          })
-                          toast.success(
-                            () => (
-                              <span>
-                                <b>Behaviour changed successfully</b>
-                                <br />
-                                for question - {fq?.question?.name}
-                              </span>
-                            ),
-                            { id: toastId }
-                          )
-                          fq.behaviour = value
-                          setData([...formQuestions])
-                        } catch (error) {
-                          toast.error(
-                            "Sorry, we had an unexpected error. Please try again. - " +
-                              error.toString(),
-                            { id: toastId }
-                          )
-                        }
-                      }}
-                    />
-                  </Form>
-                </div>
-              )}
-            </div>
-          </>
-        ),
-      }
-    }) as CardType[]
-  }
+            </>
+          ),
+        }
+      }) as CardType[]
+    },
+    [updateFormQuestionMutation]
+  )
 
   const [cards, setCards] = useState(getCards(data))
   useEffect(() => {
     setCards(getCards(data))
-  }, [data])
+  }, [data, getCards])
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -422,7 +425,7 @@ export const Questions = ({ user, form }) => {
         </div>
         <div className="w-full md:w-1/2 lg:w-1/3 flex justify-end">
           <div
-            className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md drop-shadow-2xl shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
+            className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
           >
             {/* <div className="bg-neutral-400 rounded-b-2xl h-8 w-1/2 absolute left-1/4 top-0" /> */}
             {/* <div className="border-2 border-neutral-400 rounded-2xl h-2 w-1/3 absolute left-1/3 top-2" /> */}
