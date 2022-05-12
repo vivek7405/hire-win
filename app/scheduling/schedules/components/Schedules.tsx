@@ -90,7 +90,7 @@ const Schedules = ({ user }) => {
                 <b>{dailySchedule.day.charAt(0).toUpperCase() + dailySchedule.day.slice(1)}</b>
                 <br />
                 {dailySchedule.startTime === dailySchedule.endTime
-                  ? "blocked"
+                  ? "Not available"
                   : dailySchedule.startTime + " - " + dailySchedule.endTime}
               </div>
             )
@@ -194,7 +194,7 @@ const Schedules = ({ user }) => {
                         {ds.day.charAt(0).toUpperCase() + ds.day.slice(1)}
                         <br />
                         {ds.startTime === ds.endTime
-                          ? "blocked"
+                          ? "Not available"
                           : ds.startTime + " - " + ds.endTime}
                       </div>
                       {/* <div className="text-neutral-600">
@@ -225,7 +225,7 @@ const Schedules = ({ user }) => {
                     <b>{dailySchedule.day.charAt(0).toUpperCase() + dailySchedule.day.slice(1)}: </b>
                     <br />
                     {dailySchedule.startTime === dailySchedule.endTime
-                      ? "blocked"
+                      ? "Not available"
                       : dailySchedule.startTime + " - " + dailySchedule.endTime}
                   </div>
                 )
@@ -265,7 +265,7 @@ const Schedules = ({ user }) => {
                             </Col>
                             <Col sm={6}>
                               {dailySchedule.startTime === dailySchedule.endTime
-                                ? "blocked"
+                                ? "Not available"
                                 : dailySchedule.startTime + " - " + dailySchedule.endTime}
                             </Col>
                           </Row>

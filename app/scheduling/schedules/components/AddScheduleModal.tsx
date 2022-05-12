@@ -173,7 +173,7 @@ const AddSchedule = () => {
                   name="blockAllDay"
                   checked={schedule[day].blocked}
                   type="checkbox"
-                  label="Block all day"
+                  label="Not available"
                   onChange={(e: any): void => {
                     scheduleChanged(!schedule[day].blocked, day, "blocked")
                   }}
@@ -249,7 +249,7 @@ const AddSchedule = () => {
     //                 <Form.Check
     //                   checked={schedule[day].blocked}
     //                   type="checkbox"
-    //                   label="Block all day"
+    //                   label="Not available"
     //                   onChange={(e: any): void => {
     //                     scheduleChanged(!schedule[day].blocked, day, "blocked")
     //                   }}

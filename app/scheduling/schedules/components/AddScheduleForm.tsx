@@ -79,7 +79,7 @@ export const AddScheduleForm = (props: AddScheduleFormProps) => {
                 name="blockAllDay"
                 checked={schedule[day].blocked}
                 type="checkbox"
-                label="Block all day"
+                label="Not available"
                 onChange={(e: any): void => {
                   scheduleChanged(!schedule[day].blocked, day, "blocked")
                 }}
