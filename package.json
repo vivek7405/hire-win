@@ -2,7 +2,7 @@
   "name": "hire-win",
   "version": "1.0.0",
   "scripts": {
-    "dev": "concurrently -r \"blitz dev\" \"docker-compose up\" quirrel",
+    "dev": "concurrently -r 'blitz dev' 'quirrel'",
     "build-old": "blitz build",
     "build": "NODE_ENV=production blitz build && blitz prisma migrate deploy",
     "build:prod": "NODE_ENV=production blitz build && blitz prisma migrate deploy",
@@ -74,7 +74,7 @@
     "node-ical": "0.15.1",
     "postcss": "8.4.6",
     "postmark": "2.7.8",
-    "quirrel": "1.8.1",
+    "quirrel": "1.9.0",
     "react": "18.0.0-alpha-fd5e01c2e-20210913",
     "react-beautiful-dnd": "13.1.0",
     "react-dom": "18.0.0-alpha-fd5e01c2e-20210913",
