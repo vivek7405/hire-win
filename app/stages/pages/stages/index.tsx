@@ -32,7 +32,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: "/login",
+        destination: "/login?next=/stages",
         permanent: false,
       },
       props: {},

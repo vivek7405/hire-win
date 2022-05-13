@@ -36,7 +36,7 @@ import bcrypt from "bcrypt"
 //         description: meeting.description ?? "Description",
 //         location: meeting.location,
 //         url: "www.kalle.app",
-//         organiser: {
+//         organizer: {
 //           name: meeting.ownerName,
 //           email: meeting.owner.email,
 //         },

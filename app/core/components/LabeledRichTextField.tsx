@@ -1,8 +1,9 @@
-import { forwardRef, PropsWithoutRef, useMemo } from "react"
+import { forwardRef, PropsWithoutRef, useMemo, useState } from "react"
 import { useFormContext, Controller } from "react-hook-form"
 import toast from "react-hot-toast"
 import { dynamic } from "blitz"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
+import TemplatePlaceholders from "app/email-templates/components/TemplatePlaceholders"
 
 export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["div"]> {
   /** Field name. */
@@ -13,10 +14,14 @@ export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.Intrinsic
   testid?: string
   toolbarHidden?: boolean
   readOnly?: boolean
+  showTemplatePlaceholders?: boolean
 }
 
 export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFieldProps>(
-  ({ label, outerProps, name, toolbarHidden, readOnly, ...props }, ref) => {
+  (
+    { label, outerProps, name, toolbarHidden, readOnly, showTemplatePlaceholders, ...props },
+    ref
+  ) => {
     const {
       control,
       formState: { isSubmitting, errors },
@@ -62,6 +67,13 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
                   readOnly={readOnly}
                   editorState={value}
                   onEditorStateChange={onChange}
+                  toolbarCustomButtons={[
+                    showTemplatePlaceholders ? (
+                      <TemplatePlaceholders key={0} editorState={value} onChange={onChange} />
+                    ) : (
+                      <></>
+                    ),
+                  ]}
                 />
               )
             }}

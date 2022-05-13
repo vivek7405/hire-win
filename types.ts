@@ -11,6 +11,15 @@ export enum DragDirection {
   VERTICAL = "vertical",
 }
 
+export enum EmailTemplatePlaceholders {
+  Candidate_Name = "Candidate_Name",
+  Job_Title = "Job_Title",
+  Company_Name = "Company_Name",
+  Sender_Name = "Sender_Name",
+  Interviewer_Name = "Interviewer_Name",
+  Organizer_Name = "Organizer_Name",
+}
+
 export type Plan = {
   name: PlanName
   priceId: string
