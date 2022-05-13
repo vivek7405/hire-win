@@ -41,6 +41,11 @@ const Navbar = ({ user }: NavbarProps) => {
       href: Routes.ScoreCardsHome().pathname,
       current: router.route === Routes.ScoreCardsHome().pathname,
     },
+    {
+      name: "Email Templates",
+      href: Routes.EmailTemplatesHome().pathname,
+      current: router.route === Routes.EmailTemplatesHome().pathname,
+    },
   ]
   let dropDownNav = [
     {

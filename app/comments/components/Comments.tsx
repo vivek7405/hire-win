@@ -203,7 +203,7 @@ const CommentWithChildren = ({
               •{" "}
               <button
                 type="button"
-                className="text-sm text-theme-500 underline"
+                className="text-sm text-theme-500 underline hover:text-theme-700"
                 onClick={() => {
                   setShowEditCommentId(comment.id)
                   setEditCommentText("")
@@ -214,7 +214,7 @@ const CommentWithChildren = ({
               •{" "}
               <button
                 type="button"
-                className="text-sm text-theme-500 underline"
+                className="text-sm text-theme-500 underline hover:text-theme-700"
                 onClick={() => {
                   setDeleteCommentId(comment.id)
                   setOpenDeleteConfirm(true)
@@ -284,7 +284,7 @@ const CommentWithChildren = ({
         {showReplyCommentId !== comment.id && (
           <button
             type="button"
-            className="text-sm text-theme-500 underline mt-1 mr-3"
+            className="text-sm text-theme-500 underline hover:text-theme-700 mt-1 mr-3"
             onClick={() => {
               setShowReplyCommentId(comment.id)
               setReplyCommentText("")

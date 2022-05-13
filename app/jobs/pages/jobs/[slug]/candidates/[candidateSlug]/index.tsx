@@ -57,7 +57,7 @@ import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInte
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
 import moment from "moment"
-import { TrashIcon } from "@heroicons/react/outline"
+import { ChevronDownIcon } from "@heroicons/react/outline"
 import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview"
 import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
@@ -270,14 +270,15 @@ const getScoreAverage = (ratingsArray: number[]) => {
 
 const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   enum CandidateToggleView {
-    ScoreCard = "Score Card",
+    Scores = "Scores",
     Interviews = "Interviews",
     Comments = "Comments",
+    Emails = "Emails",
   }
 
   const { user, error, canUpdate } = props
   const [candidate, setCandidate] = useState(props.candidate)
-  const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.ScoreCard)
+  const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
   // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
   const [scoreCardId, setScoreCardId] = useState(
@@ -340,11 +341,14 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
       <br />
 
-      <Link href={Routes.JobsHome()} passHref>
-        <a className="float-right text-white bg-theme-600 px-4 py-2 ml-6 rounded-sm hover:bg-theme-700">
+      <div className="float-right cursor-pointer flex justify-center">
+        <a className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm">
           Send Email
         </a>
-      </Link>
+        <a className="text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center">
+          <ChevronDownIcon className="w-5 h-5" />
+        </a>
+      </div>
 
       {canUpdate && (
         <Link
@@ -438,7 +442,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                       name={`candidateToggleView`}
                       paddingX={3}
                       paddingY={1}
-                      defaultValue={CandidateToggleView.ScoreCard}
+                      defaultValue={CandidateToggleView.Scores}
                       value={candidateToggleView}
                       options={Object.values(CandidateToggleView)?.map((toggleView) => {
                         return { label: toggleView, value: toggleView }
@@ -449,7 +453,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                     />
                   </Form>
                 </div>
-                {candidateToggleView === CandidateToggleView.ScoreCard && (
+                {candidateToggleView === CandidateToggleView.Scores && (
                   <ScoreCard
                     submitDisabled={
                       selectedWorkflowStage?.interviewDetails?.find(
