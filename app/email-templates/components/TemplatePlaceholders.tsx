@@ -41,7 +41,7 @@ const TemplatePlaceholders = ({ editorState, onChange }) => {
     <>
       <div
         onClick={() => {
-          setOpen(true)
+          setOpen(!open)
         }}
         className="rdw-block-wrapper"
         aria-label="rdw-block-control"
@@ -51,7 +51,11 @@ const TemplatePlaceholders = ({ editorState, onChange }) => {
             <span>Placeholder</span>
             <div className={`rdw-dropdown-caretto${open ? "close" : "open"}`}></div>
           </div>
-          <ul className={`rdw-dropdown-optionwrapper ${open ? "" : "placeholder-ul"}`}>
+          <ul
+            className={`rdw-dropdown-optionwrapper whitespace-nowrap ${
+              open ? "" : "placeholder-ul"
+            }`}
+          >
             {listItem}
           </ul>
         </div>
@@ -63,6 +67,9 @@ const TemplatePlaceholders = ({ editorState, onChange }) => {
         }
         .placeholder-li:hover {
           background: #f1f1f1;
+        }
+        .rdw-dropdown-optionwrapper {
+          width: fit-content;
         }
       `}</style>
     </>

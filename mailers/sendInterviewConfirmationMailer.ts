@@ -9,7 +9,7 @@ import { convert } from "html-to-text"
 import db, { Candidate, Interview, InterviewDetail, User } from "db"
 import { createICalendarEvent } from "app/scheduling/interviews/utils/createCalendarEvent"
 
-type SendInterviewConfirmationInput = {
+type SendInterviewConfirmationMailerInput = {
   interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } } & {
     candidate: Candidate
   }
@@ -18,12 +18,12 @@ type SendInterviewConfirmationInput = {
   cancelLink: string
 }
 
-export async function sendInterviewConfirmation({
+export async function sendInterviewConfirmationMailer({
   interview,
   organizer,
   otherAttendees,
   cancelLink,
-}: SendInterviewConfirmationInput) {
+}: SendInterviewConfirmationMailerInput) {
   // const job = await db.job.findUnique({
   //     where: {
   //         id: jobId,
@@ -72,7 +72,7 @@ export async function sendInterviewConfirmation({
           })
         } catch (e) {
           throw new Error(
-            "Something went wrong with email implementation in mailers/sendInterviewConfirmation"
+            "Something went wrong with email implementation in mailers/sendInterviewConfirmationMailer"
           )
         }
       } else {

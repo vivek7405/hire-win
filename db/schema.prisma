@@ -60,6 +60,7 @@ model User {
 
   comments       Comment[]
   emailTemplates EmailTemplate[]
+  emails         Email[]
 }
 
 enum UserRole {
@@ -285,6 +286,7 @@ model WorkflowStage {
   interviewDetails InterviewDetail[]
   candidates       Candidate[]
   comments         Comment[]
+  emails           Email[]
 
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
@@ -523,6 +525,7 @@ model Candidate {
 
   interviews Interview[]
   comments   Comment[]
+  emails     Email[]
 
   @@unique([jobId, email])
 }
@@ -561,6 +564,8 @@ model Calendar {
   defaultCalendars  DefaultCalendar[]
   // meetings          Meeting[]
   interviewDetails  InterviewDetail[]
+
+  @@unique([ownerId, name])
 }
 
 // model Meeting {
@@ -599,6 +604,8 @@ model Schedule {
   ownerId          Int
   // meetings       Meeting[]
   interviewDetails InterviewDetail[]
+
+  @@unique([ownerId, name])
 }
 
 model Interview {
@@ -652,4 +659,31 @@ model EmailTemplate {
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
+
+  emails Email[]
+
+  @@unique([userId, subject])
+}
+
+model Email {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subject String
+  cc      String?
+  slug    String  @unique
+  body    Json
+
+  templateUsed EmailTemplate? @relation(fields: [templateId], references: [id])
+  templateId   String?
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  sender   User @relation(fields: [senderId], references: [id])
+  senderId Int
 }

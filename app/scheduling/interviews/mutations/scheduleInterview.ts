@@ -8,7 +8,7 @@ import { getCalendarService } from "app/scheduling/calendars/calendar-service"
 import { createICalendarEvent } from "../utils/createCalendarEvent"
 import * as uuid from "uuid"
 import getCalendar from "../queries/getCalendar"
-import { sendInterviewConfirmation } from "mailers/sendInterviewConfirmation"
+import { sendInterviewConfirmationMailer } from "mailers/sendInterviewConfirmationMailer"
 import moment from "moment"
 import bcrypt from "bcrypt"
 
@@ -150,12 +150,15 @@ export default resolver.pipe(
       process.env.NEXT_PUBLIC_APP_URL + "/cancelInterview/" + interview.id + "/" + cancelCode
     console.log("CANCEL LINK CANCEL LINK")
     console.log(cancelLink)
-    await sendInterviewConfirmation({
+
+    const buildEmail = await sendInterviewConfirmationMailer({
       interview,
       organizer,
       otherAttendees,
       cancelLink,
     })
+    await buildEmail.send()
+
     const startTime = subMinutes(startDateUTC, 30)
     if (startTime > addMinutes(new Date(), 30)) {
       await reminderQueue.enqueue(interview.id, { runAt: startTime })

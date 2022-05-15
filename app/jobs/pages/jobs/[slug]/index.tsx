@@ -478,7 +478,7 @@ const SingleJobPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [isKanban, setKanban] = useState(false)
+  const [isKanban, setKanban] = useState(true)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />

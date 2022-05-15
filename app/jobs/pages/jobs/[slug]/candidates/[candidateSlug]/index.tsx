@@ -62,6 +62,7 @@ import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview
 import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
 import Comments from "app/comments/components/Comments"
+import Emails from "app/emails/components/Emails"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -343,7 +344,16 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
       <div className="float-right cursor-pointer flex justify-center">
         <a className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm">
-          Send Email
+          Add to Pool
+        </a>
+        <a className="text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center">
+          <ChevronDownIcon className="w-5 h-5" />
+        </a>
+      </div>
+
+      <div className="float-right cursor-pointer flex justify-center">
+        <a className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm">
+          Move to Stage
         </a>
         <a className="text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center">
           <ChevronDownIcon className="w-5 h-5" />
@@ -551,6 +561,13 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                 )}
                 {candidateToggleView === CandidateToggleView.Comments && (
                   <Comments
+                    user={user}
+                    selectedWorkflowStage={selectedWorkflowStage}
+                    candidate={candidate}
+                  />
+                )}
+                {candidateToggleView === CandidateToggleView.Emails && (
+                  <Emails
                     user={user}
                     selectedWorkflowStage={selectedWorkflowStage}
                     candidate={candidate}
