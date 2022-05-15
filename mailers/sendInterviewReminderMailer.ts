@@ -6,15 +6,17 @@
  */
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
-import db, { Candidate, Interview, InterviewDetail, User } from "db"
+import db, { Interview, InterviewDetail, User } from "db"
 
-type SendInterviewCancellationInput = {
-  interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } } & {
-    candidate: Candidate
-  }
+type SendInterviewReminderMailerInput = {
+  to: string
+  interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } }
 }
 
-export async function sendInterviewCancellation({ interview }: SendInterviewCancellationInput) {
+export async function sendInterviewReminderMailer({
+  to,
+  interview,
+}: SendInterviewReminderMailerInput) {
   // const job = await db.job.findUnique({
   //     where: {
   //         id: jobId,
@@ -27,12 +29,12 @@ export async function sendInterviewCancellation({ interview }: SendInterviewCanc
 
   const msg = {
     from: "noreply@hire.win",
-    to: interview?.candidate?.email,
-    subject: "Interview cancelled",
+    to,
+    subject: "Interview reminder",
     html: `
-      <h1>Your interview with ${interview?.interviewDetail?.interviewer?.name} has been cancelled.</h1>
+      <h1>You have an interview with ${interview?.interviewDetail?.interviewer?.name} in 1 hour</h1>
       <br />
-      <p>For any queries, please contact the interviewer on the following email: ${interview?.interviewDetail?.interviewer?.email}</p>      
+      <p>You must have got a meeting invite. If not, contact the interviewer on the following email: ${interview?.interviewDetail?.interviewer?.email}</p>
     `,
   }
 
@@ -50,11 +52,11 @@ export async function sendInterviewCancellation({ interview }: SendInterviewCanc
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "send-meeting-cancellation",
+            MessageStream: "send-meeting-reminder",
           })
         } catch (e) {
           throw new Error(
-            "Something went wrong with email implementation in mailers/sendInterviewCancellation"
+            "Something went wrong with email implementation in mailers/sendInterviewReminderMailer"
           )
         }
       } else {

@@ -1,7 +1,7 @@
 import Guard from "app/guard/ability"
 import { Ctx } from "blitz"
 import db, { Interview, User } from "db"
-import { sendInterviewCancellation } from "mailers/sendInterviewCancellation"
+import { sendInterviewCancellationMailer } from "mailers/sendInterviewCancellationMailer"
 import verifyCancelCode from "../queries/verifyCancelCode"
 
 // async function sendCancellationMail(interview: Interview, meeting: Interview & { owner: User }) {
@@ -56,7 +56,8 @@ const cancelInterview = async (
     throw new Error("Interview details doesn't exist for this interview")
   }
 
-  await sendInterviewCancellation({ interview })
+  const buildEmail = await sendInterviewCancellationMailer({ interview })
+  await buildEmail.send()
 }
 
 export default Guard.authorize("cancelInterview", "interview", cancelInterview)

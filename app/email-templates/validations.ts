@@ -5,6 +5,7 @@ export const EmailTemplateObj = z.object({
   subject: z.string().nonempty({ message: "Can't be empty" }),
   slug: z.string().optional(),
   body: z.any(),
+  userId: z.number().optional(),
 })
 
 export type EmailTemplateInputType = z.infer<typeof EmailTemplateObj>

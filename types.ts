@@ -17,7 +17,6 @@ export enum EmailTemplatePlaceholders {
   Company_Name = "Company_Name",
   Sender_Name = "Sender_Name",
   Interviewer_Name = "Interviewer_Name",
-  Organizer_Name = "Organizer_Name",
 }
 
 export type Plan = {

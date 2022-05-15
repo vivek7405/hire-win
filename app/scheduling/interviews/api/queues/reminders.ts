@@ -1,7 +1,7 @@
 // import { getEmailService } from "app/email"
 import { Queue } from "quirrel/blitz"
 import db, { Interview } from "db"
-import { sendInterviewReminder } from "mailers/sendInterviewReminder"
+import { sendInterviewReminderMailer } from "mailers/sendInterviewReminderMailer"
 
 function asTwoDigit(n: number): string {
   const s = n.toString()
@@ -23,5 +23,10 @@ export default Queue("api/queues/reminders", async (interviewId: Interview["id"]
   if (!interview) {
     return
   }
-  await sendInterviewReminder({ to: interview?.candidate?.email, interview })
+
+  const buildEmail = await sendInterviewReminderMailer({
+    to: interview?.candidate?.email,
+    interview,
+  })
+  await buildEmail.send()
 })
