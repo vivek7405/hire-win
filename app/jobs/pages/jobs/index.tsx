@@ -8,6 +8,8 @@ import {
   usePaginatedQuery,
   getSession,
   useMutation,
+  useQuery,
+  invalidateQuery,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -19,7 +21,7 @@ import Guard from "app/guard/ability"
 import Confirm from "app/core/components/Confirm"
 import { checkPlan } from "app/users/utils/checkPlan"
 import { CardType, DragDirection, ExtendedJob, ExtendedWorkflowStage, Plan, PlanName } from "types"
-import { Candidate, Category } from "@prisma/client"
+import { Candidate, Category, Stage, WorkflowStage } from "@prisma/client"
 import moment from "moment"
 import { Country, State } from "country-state-city"
 import { titleCase } from "app/core/utils/titleCase"
@@ -29,6 +31,11 @@ import setJobHidden from "app/jobs/mutations/setJobHidden"
 import toast from "react-hot-toast"
 import Cards from "app/core/components/Cards"
 import { ExternalLinkIcon } from "@heroicons/react/outline"
+import getCategories from "app/categories/queries/getCategories"
+import Card from "app/core/components/Card"
+import Pagination from "app/core/components/Pagination"
+import Debouncer from "app/core/utils/debouncer"
+import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -64,6 +71,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
+  const [categories] = useQuery(getCategoriesWOPagination, { where: { userId: user?.id } })
 
   useEffect(() => {
     const search = router.query.search
@@ -82,16 +90,23 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
     setQuery(search)
   }, [router.query])
 
+  const [selectedCategoryId, setSelectedCategoryId] = useState("0")
+
   const [{ memberships, hasMore, count }] = usePaginatedQuery(getJobs, {
-    where: {
-      userId: user?.id,
-      ...query,
-    },
+    where:
+      selectedCategoryId !== "0"
+        ? {
+            userId: user?.id,
+            job: { categoryId: selectedCategoryId },
+            ...query,
+          }
+        : {
+            userId: user?.id,
+            ...query,
+          },
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
   })
-
-  // Use blitz guard to check if user can update t
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
   let endPage = startPage - 1 + ITEMS_PER_PAGE
@@ -100,426 +115,226 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
     endPage = count
   }
 
-  useMemo(async () => {
-    let data: {}[] = []
-
-    await memberships.forEach((membership) => {
-      data = [
-        ...data,
-        {
-          ...membership.job,
-          hasByPassedPlanLimit: !currentPlan && memberships?.length > 1,
-          canUpdate: membership.role === "OWNER" || membership.role === "ADMIN",
-        },
-      ]
-
-      setData(data)
-    })
-  }, [memberships, currentPlan])
-
-  // let columns = [
-  //   {
-  //     Header: "Title",
-  //     accessor: "title",
-  //     Cell: (props) => {
-  //       return (
-  //         // <Link href={Routes.SingleJobPage({ slug: props.cell.row.original.slug })} passHref>
-  //         <a
-  //           data-testid={`joblink`}
-  //           className="cursor-pointer text-theme-600 hover:text-theme-900"
-  //           onClick={(e) => {
-  //             e.preventDefault()
-  //             if (props.cell.row.original.hasByPassedPlanLimit) {
-  //               setConfirmMessage(
-  //                 "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
-  //               )
-  //               setOpenConfirm(true)
-  //             } else {
-  //               router.push(Routes.SingleJobPage({ slug: props.cell.row.original.slug }))
-  //             }
-  //           }}
-  //         >
-  //           {props.value}
-  //         </a>
-  //         // </Link>
-  //       )
-  //     },
-  //   },
-  //   {
-  //     Header: "Category",
-  //     accessor: "category",
-  //     Cell: (props) => {
-  //       const category = props.value as Category
-  //       return category?.name
-  //     },
-  //   },
-  //   {
-  //     Header: "Candidates",
-  //     accessor: "candidates",
-  //     Cell: (props) => {
-  //       const candidates = props.value as Candidate[]
-  //       return candidates?.length
-  //     },
-  //   },
-  //   {
-  //     Header: "",
-  //     accessor: "action",
-  //     Cell: (props) => {
-  //       return (
-  //         <>
-  //           {props.cell.row.original.canUpdate && (
-  //             // <Link href={Routes.JobSettingsPage({ slug: props.cell.row.original.slug })} passHref>
-  //             <a
-  //               className="cursor-pointer text-theme-600 hover:text-theme-900"
-  //               onClick={(e) => {
-  //                 e.preventDefault()
-  //                 if (props.cell.row.original.hasByPassedPlanLimit) {
-  //                   setConfirmMessage(
-  //                     "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
-  //                   )
-  //                   setOpenConfirm(true)
-  //                 } else {
-  //                   router.push(Routes.JobSettingsPage({ slug: props.cell.row.original.slug }))
-  //                 }
-  //               }}
-  //             >
-  //               Settings
-  //             </a>
-  //             // </Link>
-  //           )}
-  //         </>
-  //       )
-  //     },
-  //   },
-  // ]
-
   const [setJobHiddenMutation] = useMutation(setJobHidden)
 
-  // let columns = [
-  //   {
-  //     Header: "All Jobs",
-  //     Cell: (props) => {
-  //       const job: ExtendedJob = props.cell.row.original
-  //       const stages: ExtendedWorkflowStage[] =
-  //         job?.workflow?.stages?.sort((a, b) => {
-  //           return a?.order - b?.order
-  //         }) || []
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.push({
+      query: {
+        ...router.query,
+        ...searchQuery,
+      },
+    })
+  }
 
-  //       return (
-  //         <div className="bg-gray-50 w-full rounded">
-  //           <div className="flex items-center justify-between flex-wrap px-6 py-4">
-  //             <div className="w-full md:w-2/3 lg:w-4/5">
-  //               <div className="font-bold text-xl text-theme-900 whitespace-normal">
-  //                 <a
-  //                   data-testid={`joblink`}
-  //                   className="cursor-pointer text-theme-600 hover:text-theme-800"
-  //                   onClick={(e) => {
-  //                     e.preventDefault()
-  //                     if (props.cell.row.original.hasByPassedPlanLimit) {
-  //                       setConfirmMessage(
-  //                         "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
-  //                       )
-  //                       setOpenConfirm(true)
-  //                     } else {
-  //                       router.push(Routes.SingleJobPage({ slug: props.cell.row.original.slug }))
-  //                     }
-  //                   }}
-  //                 >
-  //                   {job?.title}
-  //                 </a>
-  //               </div>
-  //               <p className="text-gray-500 text-sm">
-  //                 Created{" "}
-  //                 {moment(job.createdAt || undefined)
-  //                   .local()
-  //                   .fromNow()}
-  //                 ,{" "}
-  //                 {moment(job.validThrough || undefined)
-  //                   .local()
-  //                   .fromNow()
-  //                   .includes("ago")
-  //                   ? "expired"
-  //                   : "expires"}{" "}
-  //                 {moment(job.validThrough || undefined)
-  //                   .local()
-  //                   .fromNow()}
-  //               </p>
-  //             </div>
-  //             <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-6 mt-6 md:mt-0 lg:mt-0">
-  //               <a
-  //                 className="cursor-pointer text-theme-600 hover:text-theme-800"
-  //                 onClick={(e) => {
-  //                   e.preventDefault()
-  //                   if (props.cell.row.original.hasByPassedPlanLimit) {
-  //                     setConfirmMessage(
-  //                       "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
-  //                     )
-  //                     setOpenConfirm(true)
-  //                   } else {
-  //                     router.push(Routes.JobSettingsPage({ slug: props.cell.row.original.slug }))
-  //                   }
-  //                 }}
-  //               >
-  //                 Job Settings
-  //               </a>
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
 
-  //               <Form
-  //                 noFormatting={true}
-  //                 onSubmit={(value) => {
-  //                   return value
-  //                 }}
-  //               >
-  //                 <LabeledToggleSwitch
-  //                   name="toggleJobHidden"
-  //                   label="Hidden"
-  //                   flex={true}
-  //                   height={4}
-  //                   width={3}
-  //                   value={job?.hidden}
-  //                   defaultChecked={job?.hidden}
-  //                   onChange={async (switchState: boolean) => {
-  //                     const toastId = toast.loading(() => (
-  //                       <span>
-  //                         <b>Hiding job - {job?.title} from Job Board</b>
-  //                       </span>
-  //                     ))
+  return (
+    <>
+      <input
+        placeholder="Search"
+        type="text"
+        defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+        className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+        onChange={(e) => {
+          execDebouncer(e)
+        }}
+      />
 
-  //                     try {
-  //                       await setJobHiddenMutation({
-  //                         where: { slug: job?.slug! },
-  //                         hidden: switchState,
-  //                       })
-  //                       job.hidden = switchState
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="job"
+      />
 
-  //                       toast.success(
-  //                         () => (
-  //                           <span>
-  //                             <b>
-  //                               {job?.title} job {switchState ? "hidden" : "unhidden"} successfully
-  //                             </b>
-  //                           </span>
-  //                         ),
-  //                         { id: toastId }
-  //                       )
-  //                     } catch (error) {
-  //                       toast.error(
-  //                         "Sorry, we had an unexpected error. Please try again. - " +
-  //                           error.toString(),
-  //                         {
-  //                           id: toastId,
-  //                         }
-  //                       )
-  //                     }
-  //                   }}
-  //                 />
-  //               </Form>
-  //             </div>
-  //           </div>
-
-  //           <div className="px-6 py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
-  //             <div className="text-xl text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-  //               {job?.candidates?.length} candidates
-  //             </div>
-  //             {/* <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
-  //               {stages?.map((ws) => {
-  //                 return (
-  //                   <div
-  //                     key={ws.id}
-  //                     className="p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
-  //                   >
-  //                     <div className="overflow-hidden text-neutral-600">{ws.stage?.name}</div>
-  //                     <div className="text-neutral-600">
-  //                       {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
-  //                     </div>
-  //                   </div>
-  //                 )
-  //               })}
-  //             </div> */}
-  //             <div className="hidden md:flex lg:flex flex-wrap mt-2 items-center md:justify-center lg:justify-center">
-  //               {stages?.map((ws) => {
-  //                 return (
-  //                   <div
-  //                     key={ws.id}
-  //                     className="p-1 m-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
-  //                   >
-  //                     <div className="overflow-hidden text-sm text-neutral-600 whitespace-nowrap w-full text-center">
-  //                       {ws.stage?.name}
-  //                     </div>
-  //                     <div className="text-neutral-600">
-  //                       {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
-  //                     </div>
-  //                   </div>
-  //                 )
-  //               })}
-  //             </div>
-  //           </div>
-
-  //           <div className="px-6 pt-4 pb-2 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
-  //             <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-  //               <span>{job?.city},&nbsp;</span>
-  //               <span>
-  //                 {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name},&nbsp;
-  //               </span>
-  //               <span>{Country.getCountryByCode(job?.country!)?.name}</span>
-  //             </span>
-  //             {job?.category && (
-  //               <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-  //                 {job.category?.name}
-  //               </span>
-  //             )}
-  //             {job?.employmentType && (
-  //               <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-  //                 {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
-  //               </span>
-  //             )}
-  //             {job?.remote && (
-  //               <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-  //                 {job?.remote && "Remote"}
-  //               </span>
-  //             )}
-  //           </div>
-  //         </div>
-  //       )
-  //     },
-  //   },
-  // ]
-
-  const getCards = (jobs) => {
-    return jobs.map((job) => {
-      const stages: ExtendedWorkflowStage[] =
-        job?.workflow?.stages?.sort((a, b) => {
-          return a?.order - b?.order
-        }) || []
-
-      return {
-        id: job.id,
-        title: job.title,
-        description: "",
-        renderContent: (
-          <div className="bg-gray-50 w-full rounded">
-            <div className="flex items-center justify-between flex-wrap px-6 py-4">
-              <div className="w-full md:w-2/3 lg:w-4/5">
-                <div className="font-bold text-xl text-theme-900 whitespace-normal">
-                  <a
-                    data-testid={`joblink`}
-                    className="cursor-pointer text-theme-600 hover:text-theme-800"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      if (job.hasByPassedPlanLimit) {
-                        setConfirmMessage(
-                          "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
-                        )
-                        setOpenConfirm(true)
-                      } else {
-                        router.push(Routes.SingleJobPage({ slug: job.slug }))
-                      }
-                    }}
-                  >
-                    {job?.title}
-                  </a>
-                </div>
-                <p className="text-gray-500 text-sm">
-                  Created{" "}
-                  {moment(job.createdAt || undefined)
-                    .local()
-                    .fromNow()}
-                  ,{" "}
-                  {moment(job.validThrough || undefined)
-                    .local()
-                    .fromNow()
-                    .includes("ago")
-                    ? "expired"
-                    : "expires"}{" "}
-                  {moment(job.validThrough || undefined)
-                    .local()
-                    .fromNow()}
-                </p>
+      <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
+        {categories?.length > 0 && (
+          <div
+            className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+              selectedCategoryId === "0"
+                ? "bg-theme-700 cursor-default"
+                : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+            }`}
+            onClick={() => {
+              setSelectedCategoryId("0")
+            }}
+          >
+            All
+          </div>
+        )}
+        {categories
+          ?.filter((c) => c.jobs.length > 0)
+          ?.map((category) => {
+            return (
+              <div
+                key={category.id}
+                className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+                  selectedCategoryId === category.id
+                    ? "bg-theme-700 cursor-default"
+                    : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+                }`}
+                onClick={async () => {
+                  setSelectedCategoryId(category.id)
+                  await invalidateQuery(getJobs)
+                }}
+              >
+                {category.name}
               </div>
-              <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-6 mt-6 md:mt-0 lg:mt-0">
-                <a
-                  className="cursor-pointer text-theme-600 hover:text-theme-800"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    if (job.hasByPassedPlanLimit) {
-                      setConfirmMessage(
-                        "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
-                      )
-                      setOpenConfirm(true)
-                    } else {
-                      job.canUpdate
-                        ? router.push(Routes.JobSettingsPage({ slug: job.slug }))
-                        : router.push(Routes.JobSettingsSchedulingPage({ slug: job.slug }))
-                    }
-                  }}
-                >
-                  Job Settings
-                </a>
+            )
+          })}
+      </div>
 
-                <Form
-                  noFormatting={true}
-                  onSubmit={(value) => {
-                    return value
-                  }}
-                >
-                  <LabeledToggleSwitch
-                    name="toggleJobHidden"
-                    label="Hidden"
-                    flex={true}
-                    height={4}
-                    width={3}
-                    value={job?.hidden}
-                    defaultChecked={job?.hidden}
-                    onChange={async (switchState: boolean) => {
-                      const toastId = toast.loading(() => (
-                        <span>
-                          <b>Hiding job - {job?.title} from Job Board</b>
-                        </span>
-                      ))
+      <div>
+        {memberships
+          .map((membership) => {
+            return {
+              ...membership.job,
+              hasByPassedPlanLimit: !currentPlan && memberships?.length > 1,
+              canUpdate: membership.role === "OWNER" || membership.role === "ADMIN",
+            }
+          })
+          ?.map((job) => {
+            const stages: (WorkflowStage & { stage: Stage })[] =
+              job?.workflow?.stages?.sort((a, b) => {
+                return a?.order - b?.order
+              }) || []
 
-                      try {
-                        await setJobHiddenMutation({
-                          where: { slug: job?.slug! },
-                          hidden: switchState,
-                        })
+            return (
+              <>
+                <Card isFull={true}>
+                  <div className="bg-gray-50 w-full rounded">
+                    <div className="flex items-center justify-between flex-wrap px-6 py-4">
+                      <div className="w-full md:w-2/3 lg:w-4/5">
+                        <div className="font-bold text-xl text-theme-900 whitespace-normal">
+                          <a
+                            data-testid={`joblink`}
+                            className="cursor-pointer text-theme-600 hover:text-theme-800"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              if (job.hasByPassedPlanLimit) {
+                                setConfirmMessage(
+                                  "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
+                                )
+                                setOpenConfirm(true)
+                              } else {
+                                router.push(Routes.SingleJobPage({ slug: job.slug }))
+                              }
+                            }}
+                          >
+                            {job?.title}
+                          </a>
+                        </div>
+                        <p className="text-gray-500 text-sm">
+                          Created{" "}
+                          {moment(job.createdAt || undefined)
+                            .local()
+                            .fromNow()}
+                          ,{" "}
+                          {moment(job.validThrough || undefined)
+                            .local()
+                            .fromNow()
+                            .includes("ago")
+                            ? "expired"
+                            : "expires"}{" "}
+                          {moment(job.validThrough || undefined)
+                            .local()
+                            .fromNow()}
+                        </p>
+                      </div>
+                      <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-6 mt-6 md:mt-0 lg:mt-0">
+                        <a
+                          className="cursor-pointer text-theme-600 hover:text-theme-800"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            if (job.hasByPassedPlanLimit) {
+                              setConfirmMessage(
+                                "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
+                              )
+                              setOpenConfirm(true)
+                            } else {
+                              job.canUpdate
+                                ? router.push(Routes.JobSettingsPage({ slug: job.slug }))
+                                : router.push(Routes.JobSettingsSchedulingPage({ slug: job.slug }))
+                            }
+                          }}
+                        >
+                          Job Settings
+                        </a>
 
-                        let newArr = [...data] as any
-                        const updateIndex = newArr.findIndex((j) => j.id === job?.id)
-                        if (updateIndex >= 0 && newArr[updateIndex]) {
-                          newArr[updateIndex].hidden = switchState
-                          setData(newArr)
-                        }
+                        <Form
+                          noFormatting={true}
+                          onSubmit={(value) => {
+                            return value
+                          }}
+                        >
+                          <LabeledToggleSwitch
+                            name="toggleJobHidden"
+                            label="Hidden"
+                            flex={true}
+                            height={4}
+                            width={3}
+                            value={job?.hidden}
+                            defaultChecked={job?.hidden}
+                            onChange={async (switchState: boolean) => {
+                              const toastId = toast.loading(() => (
+                                <span>
+                                  <b>Hiding job - {job?.title} from Job Board</b>
+                                </span>
+                              ))
 
-                        toast.success(
-                          () => (
-                            <span>
-                              <b>
-                                {job?.title} job {switchState ? "hidden" : "unhidden"} successfully
-                              </b>
-                            </span>
-                          ),
-                          { id: toastId }
-                        )
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          {
-                            id: toastId,
-                          }
-                        )
-                      }
-                    }}
-                  />
-                </Form>
-              </div>
-            </div>
+                              try {
+                                await setJobHiddenMutation({
+                                  where: { slug: job?.slug! },
+                                  hidden: switchState,
+                                })
 
-            <div className="px-6 py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
-              <div className="text-lg text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                {job?.candidates?.length}{" "}
-                {job?.candidates?.length === 1 ? "candidate" : "candidates"}
-              </div>
-              {/* <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                                let newArr = [...data] as any
+                                const updateIndex = newArr.findIndex((j) => j.id === job?.id)
+                                if (updateIndex >= 0 && newArr[updateIndex]) {
+                                  newArr[updateIndex].hidden = switchState
+                                  setData(newArr)
+                                }
+
+                                toast.success(
+                                  () => (
+                                    <span>
+                                      <b>
+                                        {job?.title} job {switchState ? "hidden" : "unhidden"}{" "}
+                                        successfully
+                                      </b>
+                                    </span>
+                                  ),
+                                  { id: toastId }
+                                )
+                              } catch (error) {
+                                toast.error(
+                                  "Sorry, we had an unexpected error. Please try again. - " +
+                                    error.toString(),
+                                  {
+                                    id: toastId,
+                                  }
+                                )
+                              }
+                            }}
+                          />
+                        </Form>
+                      </div>
+                    </div>
+
+                    <div className="px-6 py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
+                      <div className="text-lg text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                        {job?.candidates?.length}{" "}
+                        {job?.candidates?.length === 1 ? "candidate" : "candidates"}
+                      </div>
+                      {/* <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {stages?.map((ws) => {
                   return (
                     <div
@@ -534,94 +349,61 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                   )
                 })}
               </div> */}
-              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center">
-                {stages?.map((ws) => {
-                  return (
-                    <div
-                      key={ws.id}
-                      className="overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
-                    >
-                      <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                        {ws.stage?.name}
-                      </div>
-                      <div className="text-neutral-500">
-                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
+                      <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center">
+                        {stages?.map((ws) => {
+                          return (
+                            <div
+                              key={ws.id}
+                              className="overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
+                            >
+                              <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                                {ws.stage?.name}
+                              </div>
+                              <div className="text-neutral-500">
+                                {
+                                  job?.candidates?.filter((c) => c.workflowStageId === ws.id)
+                                    ?.length
+                                }
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
-                  )
-                })}
-              </div>
-            </div>
 
-            <div className="px-6 pt-4 pb-2 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
-              <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                <span>{job?.city},&nbsp;</span>
-                <span>
-                  {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name},&nbsp;
-                </span>
-                <span>{Country.getCountryByCode(job?.country!)?.name}</span>
-              </span>
-              {job?.category && (
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                  {job.category?.name}
-                </span>
-              )}
-              {job?.employmentType && (
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                  {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
-                </span>
-              )}
-              {job?.remote && (
-                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                  {job?.remote && "Remote"}
-                </span>
-              )}
-            </div>
-          </div>
-        ),
-      }
-    }) as CardType[]
-  }
-
-  const [cards, setCards] = useState(getCards(data))
-  useEffect(() => {
-    setCards(getCards(data))
-  }, [data])
-
-  return (
-    <Cards
-      cards={cards}
-      setCards={setCards}
-      mutateCardDropDB={(source, destination, draggableId) => {}}
-      droppableName="categories"
-      isDragDisabled={true}
-      direction={DragDirection.VERTICAL}
-      isFull={true}
-      pageIndex={tablePage}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
-      resultName="job"
-    />
+                    <div className="px-6 pt-4 pb-2 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
+                      <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        <span>{job?.city},&nbsp;</span>
+                        <span>
+                          {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
+                          ,&nbsp;
+                        </span>
+                        <span>{Country.getCountryByCode(job?.country!)?.name}</span>
+                      </span>
+                      {job?.category && (
+                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                          {job.category?.name}
+                        </span>
+                      )}
+                      {job?.employmentType && (
+                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                          {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
+                        </span>
+                      )}
+                      {job?.remote && (
+                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                          {job?.remote && "Remote"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              </>
+            )
+          })}
+      </div>
+    </>
   )
-
-  // return (
-  //   <Table
-  //     columns={columns}
-  //     data={data}
-  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-  //     pageIndex={tablePage}
-  //     pageSize={ITEMS_PER_PAGE}
-  //     hasNext={hasMore}
-  //     hasPrevious={tablePage !== 0}
-  //     totalCount={count}
-  //     startPage={startPage}
-  //     endPage={endPage}
-  //     resultName="job"
-  //   />
-  // )
 }
 
 const JobsHome = ({
