@@ -99,7 +99,7 @@ const EmailTemplates = ({ user }) => {
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
-        header={`Delte Email Template - ${emailTemplateToDelete?.subject}`}
+        header={`Delete Email Template - ${emailTemplateToDelete?.subject}`}
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Email Template`)
           try {
@@ -206,7 +206,7 @@ const EmailTemplates = ({ user }) => {
                       <button
                         id={"delete-" + et.id}
                         className="float-right text-red-600 hover:text-red-800"
-                        title="Delete Calendar"
+                        title="Delete Email Template"
                         type="button"
                         onClick={(e) => {
                           e.preventDefault()

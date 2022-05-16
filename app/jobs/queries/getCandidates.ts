@@ -32,6 +32,7 @@ const getCandidates = resolver.pipe(
                 workflow: { include: { stages: { include: { stage: true } } } },
               },
             },
+            scores: true,
             workflowStage: { include: { stage: true } },
             answers: { include: { question: { include: { options: true } } } },
           },

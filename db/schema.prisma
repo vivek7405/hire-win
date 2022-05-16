@@ -61,6 +61,7 @@ model User {
   comments       Comment[]
   emailTemplates EmailTemplate[]
   emails         Email[]
+  candidatePools CandidatePool[]
 }
 
 enum UserRole {
@@ -523,9 +524,10 @@ model Candidate {
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
-  interviews Interview[]
-  comments   Comment[]
-  emails     Email[]
+  interviews     Interview[]
+  comments       Comment[]
+  emails         Email[]
+  candidatePools CandidatePool[]
 
   @@unique([jobId, email])
 }
@@ -686,4 +688,20 @@ model Email {
 
   sender   User @relation(fields: [senderId], references: [id])
   senderId Int
+}
+
+model CandidatePool {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  slug String @unique
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  candidates Candidate[]
+
+  @@unique([userId, name])
 }

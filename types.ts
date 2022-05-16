@@ -108,6 +108,9 @@ export type ExtendedCandidate = Prisma.CandidateGetPayload<{
   }
 }>
 export type ExtendedCategory = Prisma.CategoryGetPayload<{ include: { jobs: true } }>
+export type ExtendedCandidatePool = Prisma.CandidatePoolGetPayload<{
+  include: { candidates: true }
+}>
 export type ExtendedUser = Prisma.UserGetPayload<{
   include: {
     memberships: {

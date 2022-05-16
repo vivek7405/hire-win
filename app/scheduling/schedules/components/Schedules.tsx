@@ -101,7 +101,7 @@ const Schedules = ({ user }) => {
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
-        header={`Delte Schedule - ${scheduleToDelete?.name}`}
+        header={`Delete Schedule - ${scheduleToDelete?.name}`}
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Schedule - ${scheduleToDelete?.name}`)
           try {

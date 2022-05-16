@@ -46,6 +46,11 @@ const Navbar = ({ user }: NavbarProps) => {
       href: Routes.EmailTemplatesHome().pathname,
       current: router.route === Routes.EmailTemplatesHome().pathname,
     },
+    {
+      name: "Candidate Pools",
+      href: Routes.CandidatePoolsHome().pathname,
+      current: router.route === Routes.CandidatePoolsHome().pathname,
+    },
   ]
   let dropDownNav = [
     {
