@@ -109,6 +109,7 @@ async function updateCandidateScores(
           },
         },
       },
+      scores: true,
       workflowStage: { include: { stage: true, interviewDetails: true } },
       answers: { include: { question: { include: { options: true } } } },
     },

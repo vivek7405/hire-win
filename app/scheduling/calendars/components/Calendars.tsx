@@ -137,7 +137,7 @@ const Calendars = ({ user }: CalendarProps) => {
           <Confirm
             open={openConfirm}
             setOpen={setOpenConfirm}
-            header={`Delte Calendar - ${calendarToDelete?.name}`}
+            header={`Delete Calendar - ${calendarToDelete?.name}`}
             onSuccess={async () => {
               const toastId = toast.loading(`Deleting Calendar - ${calendarToDelete?.name}`)
               try {

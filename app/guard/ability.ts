@@ -22,6 +22,7 @@ type ExtendedResourceTypes =
   | "calendar"
   | "interview"
   | "comment"
+  | "candidatePool"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser" | "cancelInterview"
 
@@ -232,6 +233,21 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         return category.every((c) => c.userId === ctx.session.userId) === true
+      })
+
+      can("read", "candidatePool", async (args) => {
+        const candidatePool = await db.candidatePool.findFirst({
+          where: args.where,
+        })
+
+        return candidatePool?.userId === ctx.session.userId
+      })
+      can("readAll", "candidatePool", async (args) => {
+        const candidatePool = await db.candidatePool.findMany({
+          where: args.where,
+        })
+
+        return candidatePool.every((c) => c.userId === ctx.session.userId) === true
       })
 
       can("create", "stage")

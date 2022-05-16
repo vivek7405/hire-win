@@ -20,6 +20,7 @@ import Guard from "app/guard/ability"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 import getCandidate from "app/jobs/queries/getCandidate"
 import {
@@ -36,6 +37,7 @@ import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
 import {
   Candidate,
+  CandidatePool,
   Interview,
   InterviewDetail,
   Membership,
@@ -63,6 +65,9 @@ import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
 import Comments from "app/comments/components/Comments"
 import Emails from "app/emails/components/Emails"
+import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
+import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool"
+import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -265,10 +270,6 @@ const getCards = (candidate: ExtendedCandidate) => {
 //   )
 // }
 
-const getScoreAverage = (ratingsArray: number[]) => {
-  return ratingsArray.reduce((a, b) => a + b, 0) / ratingsArray.length
-}
-
 const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   enum CandidateToggleView {
     Scores = "Scores",
@@ -301,6 +302,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
+  const [candidatePools] = useQuery(getCandidatePools, {
+    where: { userId: user?.id, candidates: { none: { id: candidate?.id } } },
+  })
+  const [candidatePoolsOpen, setCandidatePoolsOpen] = useState(false)
+  const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
 
   const resume = candidate?.resume as AttachmentObject
   // useMemo(() => {
@@ -312,14 +318,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   //   // }
   // }, [resume])
 
-  let ratingsArray = [] as number[]
-  candidate?.job?.scoreCards?.forEach((scoreCardJobWorkflowStage) => {
-    scoreCardJobWorkflowStage.scoreCard?.cardQuestions?.forEach((cq) => {
-      cq.scores?.forEach((score) => {
-        ratingsArray.push(score.rating)
-      })
-    })
-  })
+  // let ratingsArray = [] as number[]
+  // candidate?.scores?.forEach((score) => {
+  //   ratingsArray.push(score.rating)
+  // })
 
   // const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
   // const [cancelInterviewMutation] = useMutation(cancelInterview)
@@ -342,14 +344,74 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
       <br />
 
-      <div className="float-right cursor-pointer flex justify-center">
-        <a className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm">
-          Add to Pool
-        </a>
-        <a className="text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center">
-          <ChevronDownIcon className="w-5 h-5" />
-        </a>
-      </div>
+      <DropdownMenu.Root
+        modal={false}
+        open={candidatePoolsOpen}
+        onOpenChange={setCandidatePoolsOpen}
+      >
+        <DropdownMenu.Trigger
+          className="float-right ml-6 disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
+          disabled={
+            user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+              "OWNER" &&
+            user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+              "ADMIN"
+          }
+        >
+          <button
+            className="flex px-2 py-1 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={
+              selectedWorkflowStage?.interviewDetails?.find(
+                (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+              )?.interviewerId !== user?.id &&
+              user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
+                ?.role !== "OWNER" &&
+              user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
+                ?.role !== "ADMIN"
+            }
+          >
+            Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
+          <DropdownMenu.Arrow className="fill-current" offset={10} />
+          {candidatePools?.length === 0 && (
+            <DropdownMenu.Item
+              disabled={true}
+              onSelect={(e) => {
+                e.preventDefault()
+              }}
+              className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
+            >
+              No more pools to add
+            </DropdownMenu.Item>
+          )}
+          {candidatePools.map((cp) => {
+            return (
+              <DropdownMenu.Item
+                key={cp.id}
+                onSelect={async (e) => {
+                  e.preventDefault()
+                  const toastId = toast.loading(`Adding candidate to pool - ${cp.name}`)
+                  try {
+                    await addCandidateToPoolMutation({ candidateId: candidate?.id, poolId: cp.id })
+                    await invalidateQuery(getCandidatePools)
+                    toast.success(`Candidate added to pool - ${cp.name}`, { id: toastId })
+                  } catch (error) {
+                    toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
+                      id: toastId,
+                    })
+                  }
+                  setCandidatePoolsOpen(false)
+                }}
+                className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+              >
+                {cp.name}
+              </DropdownMenu.Item>
+            )
+          })}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
 
       <div className="float-right cursor-pointer flex justify-center">
         <a className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm">
@@ -389,7 +451,9 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             name="candidateAverageRating"
             ratingClass="!flex items-center"
             height={8}
-            value={Math.round(getScoreAverage(ratingsArray))}
+            value={Math.round(
+              getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])
+            )}
             disabled={true}
           />
         </Form>
