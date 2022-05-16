@@ -12,6 +12,7 @@ import { initialSchedule } from "app/scheduling/constants"
 import addCalendar from "app/scheduling/calendars/mutations/addCalendar"
 import addSchedule from "app/scheduling/schedules/mutations/addSchedule"
 import { mapValues } from "app/core/utils/map-values"
+import createFactoryCandidatePools from "app/candidate-pools/mutations/createFactoryCandidatePools"
 
 export default resolver.pipe(
   resolver.zod(Signup),
@@ -40,6 +41,7 @@ export default resolver.pipe(
     await createScoreCardWithFactoryScoreCardQuestions("Default", user?.id)
     await createWorkflowWithFactoryWorkflowStages("Default", user?.id)
     await createFactoryCategories(user?.id)
+    await createFactoryCandidatePools(user?.id)
 
     await ctx.session.$create({ userId: user.id, role: user.role as UserRole })
 
