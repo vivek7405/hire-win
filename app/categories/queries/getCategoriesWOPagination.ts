@@ -7,7 +7,10 @@ interface GetCategoriesInput extends Pick<Prisma.CategoryFindManyArgs, "where"> 
 const getCategoriesWOPagination = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetCategoriesInput) => {
-    const categories = await db.category.findMany({ where, include: { jobs: true } })
+    const categories = await db.category.findMany({
+      where,
+      include: { jobs: true },
+    })
     return categories
   }
 )
