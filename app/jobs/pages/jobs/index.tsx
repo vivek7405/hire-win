@@ -156,7 +156,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
       />
 
       <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-        {categories?.length > 0 && (
+        {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
           <div
             className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
               selectedCategoryId === "0"
@@ -335,20 +335,20 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                         {job?.candidates?.length === 1 ? "candidate" : "candidates"}
                       </div>
                       {/* <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
-                {stages?.map((ws) => {
-                  return (
-                    <div
-                      key={ws.id}
-                      className="p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
-                    >
-                      <div className="overflow-hidden text-neutral-600">{ws.stage?.name}</div>
-                      <div className="text-neutral-600">
-                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div> */}
+                            {stages?.map((ws) => {
+                              return (
+                                <div
+                                  key={ws.id}
+                                  className="p-1 rounded-lg border-2 border-neutral-400 bg-neutral-100 w-32 flex flex-col items-center justify-center"
+                                >
+                                  <div className="overflow-hidden text-neutral-600">{ws.stage?.name}</div>
+                                  <div className="text-neutral-600">
+                                    {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div> */}
                       <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center">
                         {stages?.map((ws) => {
                           return (

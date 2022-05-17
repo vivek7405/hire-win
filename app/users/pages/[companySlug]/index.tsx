@@ -127,7 +127,7 @@ const Jobs = ({ user }) => {
 
   return (
     <>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center mb-4">
         <input
           placeholder="Search"
           type="text"
@@ -139,7 +139,7 @@ const Jobs = ({ user }) => {
         />
 
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {categories?.length > 0 && (
+          {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
             <div
               className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
                 selectedCategoryId === "0"
@@ -186,7 +186,7 @@ const Jobs = ({ user }) => {
           })
           ?.map((job) => {
             return (
-              <>
+              <div key={job.id}>
                 <Card key={job.id} isFull={true}>
                   <Link
                     href={Routes.JobDescriptionPage({
@@ -245,7 +245,7 @@ const Jobs = ({ user }) => {
                     </div>
                   </Link>
                 </Card>
-              </>
+              </div>
             )
           })}
       </div>
