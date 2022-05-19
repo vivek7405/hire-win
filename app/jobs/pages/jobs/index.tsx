@@ -36,6 +36,7 @@ import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
+import setJobSalaryVisibility from "app/jobs/mutations/setJobSalaryVisibility"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -116,6 +117,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
   }
 
   const [setJobHiddenMutation] = useMutation(setJobHidden)
+  const [setJobSalaryVisibilityMutation] = useMutation(setJobSalaryVisibility)
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -286,7 +288,10 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                             onChange={async (switchState: boolean) => {
                               const toastId = toast.loading(() => (
                                 <span>
-                                  <b>Hiding job - {job?.title} from Job Board</b>
+                                  <b>
+                                    {switchState ? "Hiding" : "Unhiding"} job - {job?.title} from
+                                    Job Board
+                                  </b>
                                 </span>
                               ))
 
@@ -309,6 +314,68 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
                                       <b>
                                         {job?.title} job {switchState ? "hidden" : "unhidden"}{" "}
                                         successfully
+                                      </b>
+                                    </span>
+                                  ),
+                                  { id: toastId }
+                                )
+                              } catch (error) {
+                                toast.error(
+                                  "Sorry, we had an unexpected error. Please try again. - " +
+                                    error.toString(),
+                                  {
+                                    id: toastId,
+                                  }
+                                )
+                              }
+                            }}
+                          />
+                        </Form>
+
+                        <Form
+                          noFormatting={true}
+                          onSubmit={(value) => {
+                            return value
+                          }}
+                        >
+                          <LabeledToggleSwitch
+                            name="toggleJobSalaryVisibility"
+                            label="Salary"
+                            flex={true}
+                            height={4}
+                            width={3}
+                            value={job?.showSalary}
+                            defaultChecked={job?.showSalary}
+                            onChange={async (switchState: boolean) => {
+                              const toastId = toast.loading(() => (
+                                <span>
+                                  <b>
+                                    {switchState ? "Showing" : "Hiding"} salary - {job?.showSalary}{" "}
+                                    {switchState ? "on" : "from"}
+                                    Job Board
+                                  </b>
+                                </span>
+                              ))
+
+                              try {
+                                await setJobSalaryVisibilityMutation({
+                                  where: { slug: job?.slug! },
+                                  showSalary: switchState,
+                                })
+
+                                let newArr = [...data] as any
+                                const updateIndex = newArr.findIndex((j) => j.id === job?.id)
+                                if (updateIndex >= 0 && newArr[updateIndex]) {
+                                  newArr[updateIndex].showSalary = switchState
+                                  setData(newArr)
+                                }
+
+                                toast.success(
+                                  () => (
+                                    <span>
+                                      <b>
+                                        Salary for {job?.title} job{" "}
+                                        {switchState ? "shown" : "hidden"} successfully
                                       </b>
                                     </span>
                                   ),
