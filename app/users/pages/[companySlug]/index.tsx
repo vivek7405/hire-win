@@ -30,6 +30,7 @@ import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
+import getSymbolFromCurrency from "currency-symbol-map"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -196,26 +197,37 @@ const Jobs = ({ user }) => {
                     passHref
                   >
                     <div className="bg-gray-50 cursor-pointer w-full rounded overflow-hidden hover:shadow hover:drop-shadow">
-                      <div className="px-6 py-4">
-                        <div className="font-bold text-xl text-theme-700 whitespace-normal">
-                          {job?.title}
+                      <div className="flex flex-wrap items-center justify-between">
+                        <div className="px-6 py-4">
+                          <div className="font-bold text-xl text-theme-700 whitespace-normal">
+                            {job?.title}
+                          </div>
+                          <p className="text-gray-500 text-sm">
+                            Posted{" "}
+                            {moment(job.createdAt || undefined)
+                              .local()
+                              .fromNow()}
+                            ,{" "}
+                            {moment(job.validThrough || undefined)
+                              .local()
+                              .fromNow()
+                              .includes("ago")
+                              ? "expired"
+                              : "expires"}{" "}
+                            {moment(job.validThrough || undefined)
+                              .local()
+                              .fromNow()}
+                          </p>
                         </div>
-                        <p className="text-gray-500 text-sm">
-                          Posted{" "}
-                          {moment(job.createdAt || undefined)
-                            .local()
-                            .fromNow()}
-                          ,{" "}
-                          {moment(job.validThrough || undefined)
-                            .local()
-                            .fromNow()
-                            .includes("ago")
-                            ? "expired"
-                            : "expires"}{" "}
-                          {moment(job.validThrough || undefined)
-                            .local()
-                            .fromNow()}
-                        </p>
+                        <div className="px-6 py-4">
+                          {job.showSalary && (
+                            <p className="text-gray-500 text-sm">
+                              {getSymbolFromCurrency(job.currency)}
+                              {job.minSalary} - {getSymbolFromCurrency(job.currency)}
+                              {job.maxSalary}
+                            </p>
+                          )}
+                        </div>
                       </div>
                       <div className="px-6 pt-4 pb-2 flex flex-wrap">
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">

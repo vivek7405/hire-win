@@ -143,6 +143,7 @@ model Job {
 
   remote Boolean
   hidden Boolean @default(false)
+  showSalary Boolean @default(false)
 
   currency   String
   minSalary  Int
