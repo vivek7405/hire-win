@@ -61,4 +61,4 @@ async function assignCalendarToJobStage(
   return null
 }
 
-export default Guard.authorize("update", "job", assignCalendarToJobStage)
+export default assignCalendarToJobStage
