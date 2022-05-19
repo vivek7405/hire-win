@@ -309,14 +309,14 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
 
   const resume = candidate?.resume as AttachmentObject
-  // useMemo(() => {
-  //   // if (resume?.Key && !file) {
-  //   getResume(resume).then((response) => {
-  //     const file = response?.data?.Body
-  //     setFile(file)
-  //   })
-  //   // }
-  // }, [resume])
+  useMemo(() => {
+    // if (resume?.Key && !file) {
+    getResume(resume).then((response) => {
+      const file = response?.data?.Body
+      setFile(file)
+    })
+    // }
+  }, [resume])
 
   // let ratingsArray = [] as number[]
   // candidate?.scores?.forEach((score) => {
@@ -527,116 +527,122 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                     />
                   </Form>
                 </div>
-                {candidateToggleView === CandidateToggleView.Scores && (
-                  <ScoreCard
-                    submitDisabled={
-                      selectedWorkflowStage?.interviewDetails?.find(
-                        (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                      )?.interviewerId !== user?.id
-                    }
-                    key={selectedWorkflowStage?.id}
-                    candidate={candidate}
-                    header="Score Card"
-                    // subHeader={`${
-                    //   candidate?.job?.workflow?.stages?.find(
-                    //     (ws) => ws.id === selectedWorkflowStage?.id
-                    //   )?.stage?.name
-                    // } Stage`}
-                    scoreCardId={scoreCardId}
-                    preview={false}
-                    userId={user?.id || 0}
-                    workflowStage={selectedWorkflowStage as any}
-                    onSubmit={async (values) => {
-                      const toastId = toast.loading(() => <span>Updating Candidate</span>)
-                      try {
-                        let linkedScoreCard: ExtendedScoreCard | null = null
-                        if (candidate && !scoreCardId) {
-                          linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
-                            jobId: candidate?.jobId || "0",
-                            workflowStageId:
-                              selectedWorkflowStage?.id || candidate?.workflowStageId || "0",
-                          })
-                        }
-                        const updatedCandidate = await updateCandidateScoresMutation({
-                          where: { id: candidate?.id },
-                          initial: candidate as any,
-                          data: {
-                            id: candidate?.id,
-                            jobId: candidate?.job?.id,
-                            name: candidate?.name,
-                            email: candidate?.email,
-                            source: candidate?.source,
-                            resume: candidate?.resume || undefined,
-                            answers: candidate?.answers || ([] as any),
-                            scores:
-                              (
-                                candidate?.job?.scoreCards?.find(
-                                  (sc) => sc.workflowStageId === selectedWorkflowStage?.id
-                                )?.scoreCard || linkedScoreCard
-                              )?.cardQuestions
-                                ?.map((sq) => {
-                                  const rating = values[sq.cardQuestion?.name] || 0
-                                  const note = values[`${sq.cardQuestion?.name} Note`]
-                                  const scoreId = values[`${sq.cardQuestion?.name} ScoreId`]
-
-                                  return {
-                                    scoreCardQuestionId: sq.id,
-                                    rating: rating ? parseInt(rating) : 0,
-                                    note: note,
-                                    id: scoreId || null,
-                                    workflowStageId:
-                                      selectedWorkflowStage?.id ||
-                                      candidate?.workflowStageId ||
-                                      "0",
-                                  }
-                                })
-                                ?.filter((score) => score.rating > 0) || ([] as any),
-                          },
-                        })
-                        // Stop resume from reloading by assigning previous value since resume won't be changed by this mutation
-                        setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
-                        toast.success(
-                          () => (
-                            <span>
-                              Candidate Score Card Updated for stage{" "}
-                              {selectedWorkflowStage?.stage?.name}
-                            </span>
-                          ),
-                          { id: toastId }
-                        )
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString()
-                        )
+                <Suspense
+                  fallback={
+                    <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
+                  }
+                >
+                  {candidateToggleView === CandidateToggleView.Scores && (
+                    <ScoreCard
+                      submitDisabled={
+                        selectedWorkflowStage?.interviewDetails?.find(
+                          (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                        )?.interviewerId !== user?.id
                       }
-                    }}
-                    // scoreCardQuestions={
-                    //   scoreCardJobWorkflowStage.scoreCard.cardQuestions as any as ExtendedScoreCardQuestion[]
-                    // }
-                  />
-                )}
-                {candidateToggleView === CandidateToggleView.Interviews && (
-                  <Interviews
-                    user={user}
-                    selectedWorkflowStage={selectedWorkflowStage}
-                    candidate={candidate}
-                  />
-                )}
-                {candidateToggleView === CandidateToggleView.Comments && (
-                  <Comments
-                    user={user}
-                    selectedWorkflowStage={selectedWorkflowStage}
-                    candidate={candidate}
-                  />
-                )}
-                {candidateToggleView === CandidateToggleView.Emails && (
-                  <Emails
-                    user={user}
-                    selectedWorkflowStage={selectedWorkflowStage}
-                    candidate={candidate}
-                  />
-                )}
+                      key={selectedWorkflowStage?.id}
+                      candidate={candidate}
+                      header="Score Card"
+                      // subHeader={`${
+                      //   candidate?.job?.workflow?.stages?.find(
+                      //     (ws) => ws.id === selectedWorkflowStage?.id
+                      //   )?.stage?.name
+                      // } Stage`}
+                      scoreCardId={scoreCardId}
+                      preview={false}
+                      userId={user?.id || 0}
+                      workflowStage={selectedWorkflowStage as any}
+                      onSubmit={async (values) => {
+                        const toastId = toast.loading(() => <span>Updating Candidate</span>)
+                        try {
+                          let linkedScoreCard: ExtendedScoreCard | null = null
+                          if (candidate && !scoreCardId) {
+                            linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
+                              jobId: candidate?.jobId || "0",
+                              workflowStageId:
+                                selectedWorkflowStage?.id || candidate?.workflowStageId || "0",
+                            })
+                          }
+                          const updatedCandidate = await updateCandidateScoresMutation({
+                            where: { id: candidate?.id },
+                            initial: candidate as any,
+                            data: {
+                              id: candidate?.id,
+                              jobId: candidate?.job?.id,
+                              name: candidate?.name,
+                              email: candidate?.email,
+                              source: candidate?.source,
+                              resume: candidate?.resume || undefined,
+                              answers: candidate?.answers || ([] as any),
+                              scores:
+                                (
+                                  candidate?.job?.scoreCards?.find(
+                                    (sc) => sc.workflowStageId === selectedWorkflowStage?.id
+                                  )?.scoreCard || linkedScoreCard
+                                )?.cardQuestions
+                                  ?.map((sq) => {
+                                    const rating = values[sq.cardQuestion?.name] || 0
+                                    const note = values[`${sq.cardQuestion?.name} Note`]
+                                    const scoreId = values[`${sq.cardQuestion?.name} ScoreId`]
+
+                                    return {
+                                      scoreCardQuestionId: sq.id,
+                                      rating: rating ? parseInt(rating) : 0,
+                                      note: note,
+                                      id: scoreId || null,
+                                      workflowStageId:
+                                        selectedWorkflowStage?.id ||
+                                        candidate?.workflowStageId ||
+                                        "0",
+                                    }
+                                  })
+                                  ?.filter((score) => score.rating > 0) || ([] as any),
+                            },
+                          })
+                          // Stop resume from reloading by assigning previous value since resume won't be changed by this mutation
+                          setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
+                          toast.success(
+                            () => (
+                              <span>
+                                Candidate Score Card Updated for stage{" "}
+                                {selectedWorkflowStage?.stage?.name}
+                              </span>
+                            ),
+                            { id: toastId }
+                          )
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString()
+                          )
+                        }
+                      }}
+                      // scoreCardQuestions={
+                      //   scoreCardJobWorkflowStage.scoreCard.cardQuestions as any as ExtendedScoreCardQuestion[]
+                      // }
+                    />
+                  )}
+                  {candidateToggleView === CandidateToggleView.Interviews && (
+                    <Interviews
+                      user={user}
+                      selectedWorkflowStage={selectedWorkflowStage}
+                      candidate={candidate}
+                    />
+                  )}
+                  {candidateToggleView === CandidateToggleView.Comments && (
+                    <Comments
+                      user={user}
+                      selectedWorkflowStage={selectedWorkflowStage}
+                      candidate={candidate}
+                    />
+                  )}
+                  {candidateToggleView === CandidateToggleView.Emails && (
+                    <Emails
+                      user={user}
+                      selectedWorkflowStage={selectedWorkflowStage}
+                      candidate={candidate}
+                    />
+                  )}
+                </Suspense>
               </div>
             </div>
           </div>
