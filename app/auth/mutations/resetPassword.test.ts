@@ -28,8 +28,8 @@ describe("resetPassword mutation", () => {
       data: {
         name: "user",
         email: "user@example.com",
-        companyName: "user company",
-        slug: "user-company",
+        // companyName: "user company",
+        // slug: "user-company",
         tokens: {
           // Create old token to ensure it's deleted
           create: [
