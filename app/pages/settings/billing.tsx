@@ -4,6 +4,9 @@ import {
   useRouter,
   Routes,
   useMutation,
+  useSession,
+  getSession,
+  invokeWithMiddleware,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -22,6 +25,7 @@ import { CheckIcon } from "@heroicons/react/outline"
 import createStripeBillingPortal from "app/users/mutations/createStripeBillingPortal"
 import { checkPlan } from "app/users/utils/checkPlan"
 import { plans } from "app/core/utils/plans"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -31,12 +35,20 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/__db.js")
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
-  if (user) {
+  const session = await getSession(context.req, context.res)
+  const company = await invokeWithMiddleware(
+    getCompany,
+    { where: { id: session.companyId || 0 } },
+    { ...context }
+  )
+
+  if (user && company) {
     return {
       props: {
         plans,
-        user: user,
-        currentPlan: checkPlan(user) as Plan | null,
+        user,
+        company,
+        currentPlan: checkPlan(company) as Plan | null,
       },
     }
   } else {
@@ -56,6 +68,7 @@ const UserSettingsBillingPage = ({
   currentPlan,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
+  const session = useSession()
 
   return (
     <AuthLayout title="Settings" user={user}>
@@ -94,7 +107,7 @@ const UserSettingsBillingPage = ({
                           e.preventDefault()
                           try {
                             const url = await createStripeBillingPortalMutation({
-                              userId: user?.id as number,
+                              companyId: session.companyId || 0,
                             })
 
                             if (url) window.location.href = url

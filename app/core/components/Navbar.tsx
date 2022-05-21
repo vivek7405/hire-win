@@ -78,13 +78,13 @@ const Navbar = ({ user }: NavbarProps) => {
     },
   ]
 
-  user &&
-    user.role === "ADMIN" &&
-    dropDownNav.push({
-      name: "Admin",
-      href: Routes.Admin().pathname,
-      current: router.route === Routes.Admin().pathname,
-    })
+  // user &&
+  //   user.role === "ADMIN" &&
+  //   dropDownNav.push({
+  //     name: "Admin",
+  //     href: Routes.Admin().pathname,
+  //     current: router.route === Routes.Admin().pathname,
+  //   })
 
   useEffect(() => {
     const closeDropdownsOnResize = () => {

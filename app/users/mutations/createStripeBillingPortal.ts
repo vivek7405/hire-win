@@ -3,22 +3,22 @@ import db from "db"
 import stripe from "app/core/utils/stripe"
 
 interface CreateStripeBillingPortalInput {
-  userId: number
+  companyId: number
 }
 
-async function createStripeBillingPortal({ userId }: CreateStripeBillingPortalInput, ctx: Ctx) {
+async function createStripeBillingPortal({ companyId }: CreateStripeBillingPortalInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const user = await db.user.findFirst({
+  const company = await db.company.findFirst({
     where: {
-      id: userId,
+      id: companyId,
     },
   })
 
-  if (!user || !user.stripeCustomerId) return null
+  if (!company || !company.stripeCustomerId) return null
 
   const { url } = await stripe.billingPortal.sessions.create({
-    customer: user.stripeCustomerId,
+    customer: company.stripeCustomerId,
     return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
   })
 

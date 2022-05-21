@@ -4,6 +4,8 @@ import {
   useRouter,
   Routes,
   useMutation,
+  getSession,
+  invokeWithMiddleware,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -16,6 +18,7 @@ import changePassword from "app/auth/mutations/changePassword"
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/themeHelpers"
 import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -25,8 +28,19 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/__db.js")
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
-  if (user) {
-    return { props: { user: user } }
+  const session = await getSession(context.req, context.res)
+  const company = await invokeWithMiddleware(
+    getCompany,
+    {
+      where: {
+        id: session.companyId || 0,
+      },
+    },
+    { ...context }
+  )
+
+  if (user && company) {
+    return { props: { user, company } }
   } else {
     return {
       redirect: {
@@ -38,7 +52,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const UserSettingsPage = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const UserSettingsPage = ({
+  user,
+  company,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [updateUserMutation] = useMutation(updateUser)
   const [changePasswordMutation] = useMutation(changePassword)
@@ -51,13 +68,13 @@ const UserSettingsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
           subHeader="Update your profile details"
           initialValues={{
             name: user?.name || "",
-            logo: user?.logo,
-            companyName: user?.companyName || "",
-            companyInfo: user?.companyInfo
-              ? EditorState.createWithContent(convertFromRaw(user?.companyInfo || {}))
-              : EditorState.createEmpty(),
-            website: user?.website || "",
-            theme: user?.theme || "indigo",
+            // logo: user?.logo,
+            // companyName: user?.companyName || "",
+            // companyInfo: user?.companyInfo
+            //   ? EditorState.createWithContent(convertFromRaw(user?.companyInfo || {}))
+            //   : EditorState.createEmpty(),
+            // website: user?.website || "",
+            // theme: user?.theme || "indigo",
           }}
           onSubmit={async (values) => {
             values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())

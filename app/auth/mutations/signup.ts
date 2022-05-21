@@ -4,7 +4,7 @@ import { Signup } from "app/auth/validations"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWithFactoryFormQuestions"
-import { UserRole } from "@prisma/client"
+import { CompanyUserRole, UserRole } from "@prisma/client"
 import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
 import createFactoryCategories from "app/categories/mutations/createFactoryCategories"
 import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
@@ -22,28 +22,39 @@ export default resolver.pipe(
     const slug = slugify(companyName, { strict: true })
     const newSlug = await findFreeSlug(
       slug,
-      async (e) => await db.user.findFirst({ where: { slug: e } })
+      async (e) => await db.company.findFirst({ where: { slug: e } })
     )
 
     const user = await db.user.create({
       data: {
         name,
         email: email.toLowerCase().trim(),
-        companyName,
-        slug: newSlug,
         hashedPassword,
         role: UserRole.USER,
+        companyUsers: {
+          create: {
+            role: CompanyUserRole.OWNER,
+            company: {
+              create: {
+                name: companyName,
+                slug: newSlug,
+              },
+            },
+          },
+        },
       },
-      select: { id: true, email: true, role: true },
+      select: { id: true, email: true, role: true, companyUsers: true },
     })
 
-    await createFormWithFactoryFormQuestions("Default", user?.id)
-    await createScoreCardWithFactoryScoreCardQuestions("Default", user?.id)
-    await createWorkflowWithFactoryWorkflowStages("Default", user?.id)
-    await createFactoryCategories(user?.id)
-    await createFactoryCandidatePools(user?.id)
+    const companyId = (user.companyUsers && (user.companyUsers[0]?.companyId || 0)) || 0
 
-    await ctx.session.$create({ userId: user.id, role: user.role as UserRole })
+    await createFormWithFactoryFormQuestions("Default", companyId)
+    await createScoreCardWithFactoryScoreCardQuestions("Default", companyId)
+    await createWorkflowWithFactoryWorkflowStages("Default", companyId)
+    await createFactoryCategories(companyId)
+    await createFactoryCandidatePools(companyId)
+
+    await ctx.session.$create({ userId: user.id, role: user.role as UserRole, companyId })
 
     await addSchedule(
       {

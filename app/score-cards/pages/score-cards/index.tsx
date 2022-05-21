@@ -7,6 +7,7 @@ import {
   useRouter,
   usePaginatedQuery,
   useQuery,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -48,6 +49,7 @@ const ScoreCards = ({ user }) => {
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
+  const session = useSession()
 
   useEffect(() => {
     const search = router.query.search
@@ -82,7 +84,7 @@ const ScoreCards = ({ user }) => {
 
   const [scoreCards] = useQuery(getScoreCardsWOPagination, {
     where: {
-      userId: user?.id,
+      companyId: session.companyId || 0,
       ...query,
     },
   })
@@ -95,13 +97,13 @@ const ScoreCards = ({ user }) => {
         ...data,
         {
           ...scoreCard,
-          canUpdate: scoreCard.userId === user.id,
+          canUpdate: scoreCard.companyId === session.companyId,
         },
       ]
 
       setData(data)
     })
-  }, [scoreCards, user.id])
+  }, [scoreCards, session.companyId])
 
   // let columns = [
   //   {

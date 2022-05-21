@@ -1,8 +1,8 @@
 import { ChevronDownIcon, TrashIcon } from "@heroicons/react/outline"
-import { Candidate, Email, EmailTemplate, Membership, User } from "@prisma/client"
+import { Candidate, Email, EmailTemplate, JobUser, User } from "@prisma/client"
 import Confirm from "app/core/components/Confirm"
 import Modal from "app/core/components/Modal"
-import { invalidateQuery, useMutation, useQuery } from "blitz"
+import { invalidateQuery, useMutation, useQuery, useSession } from "blitz"
 import moment from "moment"
 import { useState } from "react"
 import toast from "react-hot-toast"
@@ -23,6 +23,7 @@ interface ETValues {
 }
 
 const Emails = ({ user, selectedWorkflowStage, candidate }) => {
+  const session = useSession()
   const [openModal, setOpenModal] = useState(false)
   const [deleteEmailMutation] = useMutation(deleteEmail)
   const [emailToDelete, setEmailToDelete] = useState(null as any as Email)
@@ -34,7 +35,9 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
   })
   const [sendEmailMutation] = useMutation(sendEmail)
   const [emailTemplatesOpen, setEmailTemplatesOpen] = useState(false)
-  const [emailTemplates] = useQuery(getEmailTemplates, { where: { userId: user?.id } })
+  const [emailTemplates] = useQuery(getEmailTemplates, {
+    where: { companyId: session.companyId || 0 },
+  })
   const [selectedEmailTemplate, setSelectedEmailTemplate] = useState(null as any as EmailTemplate)
   const interviewDetailId =
     selectedWorkflowStage?.interviewDetails?.find((int) => int.jobId === candidate?.jobId)?.id ||
@@ -275,7 +278,7 @@ type CandidateEmailProps = {
   email: Email & { candidate: Candidate } & { sender: User } & {
     templateUsed: EmailTemplate | null
   }
-  user: User & { memberships: Membership[] }
+  user: User & { jobUsers: JobUser[] }
   setOpenConfirm: any
   setEmailToDelete: any
   setEmailToView: any
@@ -295,8 +298,8 @@ const CandidateEmail = ({
         className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={
           user?.id !== email?.senderId &&
-          user?.memberships?.find((membership) => membership.jobId === email?.candidate?.jobId)
-            ?.role !== "OWNER"
+          user?.jobUsers?.find((jobUser) => jobUser.jobId === email?.candidate?.jobId)?.role !==
+            "OWNER"
         }
         onClick={() => {
           setOpenConfirm(true)

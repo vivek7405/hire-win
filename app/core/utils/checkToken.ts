@@ -15,7 +15,7 @@ export const checkToken = async (req, res, { PUBLIC }) => {
     include: {
       job: {
         include: {
-          memberships: true,
+          users: true,
         },
       },
     },
@@ -31,7 +31,7 @@ export const checkToken = async (req, res, { PUBLIC }) => {
     include: {
       job: {
         include: {
-          memberships: true,
+          users: true,
         },
       },
     },

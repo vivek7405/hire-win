@@ -45,7 +45,7 @@ export default async (req, res) => {
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(session.subscription)
 
-    await db.user.update({
+    await db.company.update({
       where: {
         id: parseInt(session.metadata.userId || "0"),
       },
@@ -61,7 +61,7 @@ export default async (req, res) => {
   if (event.type === "invoice.payment_succeeded") {
     const subscription = await stripe.subscriptions.retrieve(session.subscription)
 
-    await db.user.update({
+    await db.company.update({
       where: {
         stripeSubscriptionId: subscription.id,
       },

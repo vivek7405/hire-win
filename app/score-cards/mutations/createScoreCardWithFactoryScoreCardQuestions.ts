@@ -3,7 +3,10 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryScoreCardQuestions from "../../card-questions/utils/factoryScoreCardQuestions"
 
-async function createScoreCardWithFactoryScoreCardQuestions(scoreCardName: string, userId: number) {
+async function createScoreCardWithFactoryScoreCardQuestions(
+  scoreCardName: string,
+  companyId: number
+) {
   const slugScoreCard = slugify(scoreCardName, { strict: true })
   const newSlugScoreCard = await findFreeSlug(
     slugScoreCard,
@@ -26,7 +29,7 @@ async function createScoreCardWithFactoryScoreCardQuestions(scoreCardName: strin
 
   const existingCardQuestions = await db.cardQuestion.findMany({
     where: {
-      userId,
+      companyId,
       name: {
         in: factoryScoreCardQuestions.map((fq) => {
           return fq.cardQuestion.name
@@ -41,9 +44,9 @@ async function createScoreCardWithFactoryScoreCardQuestions(scoreCardName: strin
       updatedAt: new Date(),
       name: scoreCardName,
       slug: newSlugScoreCard,
-      user: {
+      company: {
         connect: {
-          id: userId,
+          id: companyId,
         },
       },
       cardQuestions: {
@@ -61,9 +64,9 @@ async function createScoreCardWithFactoryScoreCardQuestions(scoreCardName: strin
                   name: fq.cardQuestion.name || "",
                   slug: fq.cardQuestion.slug || "",
                   factory: fq.cardQuestion.factory || false,
-                  user: {
+                  company: {
                     connect: {
-                      id: userId,
+                      id: companyId,
                     },
                   },
                 },

@@ -29,7 +29,7 @@ import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
 import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon } from "@heroicons/react/outline"
 
-import { MembershipRole, User } from "db"
+import { JobUserRole, User } from "db"
 import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
@@ -42,6 +42,7 @@ import getCalendars from "app/scheduling/calendars/queries/getCalendars"
 import getDefaultCalendarByUser from "app/scheduling/calendars/queries/getDefaultCalendarByUser"
 import assignScheduleToJobStage from "app/jobs/mutations/assignScheduleToJobStage"
 import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStage"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -52,8 +53,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
+  const company = await invokeWithMiddleware(
+    getCompany,
+    {
+      where: { id: session.companyId || 0 },
+    },
+    { ...context }
+  )
 
-  const currentPlan = checkPlan(user)
+  const currentPlan = checkPlan(company)
 
   const { can: canUpdate } = await Guard.can(
     "update",
@@ -215,14 +223,13 @@ const JobSettingsSchedulingPage = ({
                         const existingInterviewDetail = ws.interviewDetails?.find(
                           (int) => int.workflowStageId === ws.id && int.jobId === jobData.id
                         )
-                        const existingInterviewer: User | null | undefined =
-                          jobData?.memberships?.find(
-                            (member) => member?.userId === existingInterviewDetail?.interviewerId
-                          )?.user
+                        const existingInterviewer: User | null | undefined = jobData?.users?.find(
+                          (member) => member?.userId === existingInterviewDetail?.interviewerId
+                        )?.user
 
                         const defaultInterviewerId =
                           existingInterviewer?.id?.toString() ||
-                          jobData?.memberships
+                          jobData?.users
                             ?.find((member) => member?.role === "OWNER")
                             ?.userId?.toString()
 

@@ -2,7 +2,7 @@ import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
 import LabeledSelectField from "app/core/components/LabeledSelectField"
 import getQuestionsWOPagination from "app/questions/queries/getQuestionsWOPagination"
-import { useQuery } from "blitz"
+import { useQuery, useSession } from "blitz"
 import getFormQuestionsWOPagination from "../queries/getFormQuestionsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 
@@ -16,12 +16,13 @@ type AddQuestionFormProps = {
 }
 
 export const AddExistingQuestionsForm = (props: AddQuestionFormProps) => {
+  const session = useSession()
   const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
     where: { formId: props.formId },
   })
   const [questions] = useQuery(getQuestionsWOPagination, {
     where: {
-      userId: props.user?.id,
+      companyId: session.companyId || 0,
       slug: {
         notIn: formQuestions.map((ws) => {
           return ws.question.slug

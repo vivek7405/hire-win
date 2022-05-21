@@ -1,4 +1,4 @@
-import { useMutation, useRouter } from "blitz"
+import { useMutation, useRouter, useSession } from "blitz"
 import { loadStripe } from "@stripe/stripe-js"
 import createStripeCheckoutSession from "app/users/mutations/createStripeCheckoutSession"
 import updateStripeSubscription from "app/users/mutations/updateStripeSubscription"
@@ -21,6 +21,7 @@ export default function SubscribeButton({
   const [createStripeSessionMutation] = useMutation(createStripeCheckoutSession)
   const [updateStripeSubscriptionMutation] = useMutation(updateStripeSubscription)
   const router = useRouter()
+  const session = useSession()
 
   const createSubscription = async () => {
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
@@ -35,7 +36,7 @@ export default function SubscribeButton({
   const updateSubscription = async () => {
     const toastId = toast.loading(() => <span>Upgrading Subscription</span>)
     try {
-      await updateStripeSubscriptionMutation({ priceId, userId })
+      await updateStripeSubscriptionMutation({ priceId, companyId: session.companyId || 0 })
       toast.success(() => <span>Subscription Updated</span>, { id: toastId })
       router.reload()
     } catch (error) {

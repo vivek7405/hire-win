@@ -3,25 +3,25 @@ import db from "db"
 import stripe from "app/core/utils/stripe"
 
 interface CreateStripeCheckoutSessionInput {
-  userId: number
+  companyId: number
   priceId: string
 }
 
 async function updateStripeSubscription(
-  { userId, priceId }: CreateStripeCheckoutSessionInput,
+  { companyId, priceId }: CreateStripeCheckoutSessionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const user = await db.user.findFirst({
+  const company = await db.company.findFirst({
     where: {
-      id: userId,
+      id: companyId || 0,
     },
   })
 
-  const subscription = await stripe.subscriptions.retrieve(user?.stripeSubscriptionId as string)
+  const subscription = await stripe.subscriptions.retrieve(company?.stripeSubscriptionId as string)
 
-  await stripe.subscriptions.update(user?.stripeSubscriptionId as string, {
+  await stripe.subscriptions.update(company?.stripeSubscriptionId as string, {
     proration_behavior: "none",
     items: [
       {
@@ -32,7 +32,7 @@ async function updateStripeSubscription(
     ],
   })
 
-  await db.user.update({
+  await db.company.update({
     where: {
       stripeSubscriptionId: subscription.id,
     },

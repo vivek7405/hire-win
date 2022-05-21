@@ -31,6 +31,8 @@ import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
 import getSymbolFromCurrency from "currency-symbol-map"
+import getCompany from "app/companies/queries/getCompany"
+import { Company, CompanyUser, Job, JobUser, User } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -40,16 +42,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/blitz/db.js")
   // End anti-tree-shaking
 
-  const user = await invokeWithMiddleware(
-    getUser,
+  const company = await invokeWithMiddleware(
+    getCompany,
     {
       where: { slug: context?.params?.companySlug as string },
     },
     { ...context }
   )
 
-  if (user) {
-    return { props: { user: user } }
+  const user = await getCurrentUserServer({ ...context })
+
+  if (company && user) {
+    return { props: { company, user } }
   } else {
     return {
       redirect: {
@@ -61,25 +65,37 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Jobs = ({ user }) => {
+type JobsProps = {
+  company: Company
+  user: User & {
+    companyUsers: (CompanyUser & {
+      company: Company
+    })[]
+  } & {
+    jobUsers: (JobUser & {
+      job: Job
+    })[]
+  }
+}
+const Jobs = ({ company, user }: JobsProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [query, setQuery] = useState({})
-  const [categories] = useQuery(getCategoriesWOPagination, { where: { userId: user?.id } })
+  const [categories] = useQuery(getCategoriesWOPagination, { where: { companyId: company?.id } })
   const [selectedCategoryId, setSelectedCategoryId] = useState("0")
 
-  const [{ memberships, hasMore, count }] = usePaginatedQuery(getJobs, {
+  const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getJobs, {
     where:
       selectedCategoryId !== "0"
         ? {
             userId: user?.id,
-            job: { categoryId: selectedCategoryId, hidden: false },
+            job: { companyId: company?.id, categoryId: selectedCategoryId, hidden: false },
             ...query,
           }
         : {
             userId: user?.id,
-            job: { hidden: false },
+            job: { companyId: company?.id, hidden: false },
             ...query,
           },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -178,11 +194,11 @@ const Jobs = ({ user }) => {
       </div>
 
       <div>
-        {memberships
-          .map((membership) => {
+        {jobUsers
+          .map((jobUser) => {
             return {
-              ...membership.job,
-              canUpdate: membership.role === "OWNER" || membership.role === "ADMIN",
+              ...jobUser.job,
+              canUpdate: jobUser.role === "OWNER" || jobUser.role === "ADMIN",
             }
           })
           ?.map((job) => {
@@ -191,7 +207,7 @@ const Jobs = ({ user }) => {
                 <Card key={job.id} isFull={true}>
                   <Link
                     href={Routes.JobDescriptionPage({
-                      companySlug: user?.slug,
+                      companySlug: company?.slug,
                       jobSlug: job.slug,
                     })}
                     passHref
@@ -275,18 +291,18 @@ const Jobs = ({ user }) => {
   )
 }
 
-const JobBoard = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const JobBoard = ({ user, company }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <JobApplicationLayout user={user!} isJobBoard={true}>
+    <JobApplicationLayout company={company} isJobBoard={true}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <h3 className="text-2xl font-bold">Careers at {titleCase(user?.companyName)}</h3>
+        <h3 className="text-2xl font-bold">Careers at {titleCase(company?.name)}</h3>
         <div
           className="mt-1 mb-8"
-          dangerouslySetInnerHTML={{ __html: draftToHtml(user?.companyInfo || {}) }}
+          dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
         />
-        <Jobs user={user} />
+        <Jobs user={user!} company={company!} />
       </Suspense>
     </JobApplicationLayout>
   )

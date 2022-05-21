@@ -11,8 +11,8 @@ async function createForm(data: FormInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { name } = FormObj.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
   // const slug = slugify(name, { strict: true })
   // const newSlug = await findFreeSlug(
@@ -28,7 +28,7 @@ async function createForm(data: FormInputType, ctx: Ctx) {
   //   },
   // })
 
-  const form = await createFormWithFactoryFormQuestions(name, user.id)
+  const form = await createFormWithFactoryFormQuestions(name, ctx.session.companyId || 0)
 
   return form
 }

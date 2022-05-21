@@ -61,10 +61,13 @@ const Step1Basic = () => {
 
 type Step2ExtraProps = {
   category?: Category // Need to be provided while editing the form
-  user: any
+  companyId: number
+  // user: any
 }
 const Step2Extra = (props: Step2ExtraProps) => {
-  const [categories] = useQuery(getCategoriesWOPagination, { where: { userId: props.user?.id } })
+  const [categories] = useQuery(getCategoriesWOPagination, {
+    where: { companyId: props.companyId },
+  })
 
   return (
     <>
@@ -275,18 +278,21 @@ const Step4Salary = () => {
 type Step5WorkflowProps = {
   workflow?: ExtendedWorkflow // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
-  user: any
+  companyId: number
+  // user: any
 }
 const Step5Workflow = (props: Step5WorkflowProps) => {
   const { getValues, setValue, register } = useFormContext()
 
-  const [workflows] = useQuery(getWorkflowsWOPagination, { where: { userId: props.user.id } })
+  const [workflows] = useQuery(getWorkflowsWOPagination, { where: { companyId: props.companyId } })
   const defaultWorkflow = workflows.find((w) => w.name === "Default")
   const [selectedWorkflowId, setSelectedWorkflowId] = useState(
     getValues("workflowId") || props.workflow?.id || defaultWorkflow?.id
   )
 
-  const [scoreCards] = useQuery(getScoreCardsWOPagination, { where: { userId: props.user.id } })
+  const [scoreCards] = useQuery(getScoreCardsWOPagination, {
+    where: { companyId: props.companyId },
+  })
   const defaultScoreCard = scoreCards.find((w) => w.name === "Default")
 
   useEffect(() => {
@@ -418,14 +424,15 @@ const Step5Workflow = (props: Step5WorkflowProps) => {
 
 type Step6FormProps = {
   initialValues?: any
-  user: any
+  // user: any
   category?: Category // Need to be provided while editing the form
   workflow?: ExtendedWorkflow // Need to be provided while editing the form
   form?: Form // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
+  companyId: number
 }
 const Step6Form = (props: Step6FormProps) => {
-  const [forms] = useQuery(getFormsWOPagination, { where: { userId: props.user?.id } })
+  const [forms] = useQuery(getFormsWOPagination, { where: { companyId: props.companyId } })
   const [selectedFormId, setSelectedFormId] = useState(
     props.form?.id || forms.find((f) => f.name === "Default")?.id
   )
@@ -440,10 +447,14 @@ const Step6Form = (props: Step6FormProps) => {
         <div className="w-full md:w-1/3 lg:w-1/3">
           <div className="invisible w-0 h-0 overflow-hidden">
             <Step1Basic />
-            <Step2Extra user={props.user} category={props.category} />
+            <Step2Extra companyId={props.companyId} category={props.category} />
             <Step3Location initialValues={props.initialValues} />
             <Step4Salary />
-            <Step5Workflow user={props.user} workflow={props.workflow} jobId={props.jobId} />
+            <Step5Workflow
+              companyId={props.companyId}
+              workflow={props.workflow}
+              jobId={props.jobId}
+            />
           </div>
           <LabeledReactSelectField
             name="formId"
@@ -498,6 +509,7 @@ type JobFormProps = {
   workflow?: ExtendedWorkflow // Need to be provided while editing the form
   form?: Form // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
+  companyId: number
 }
 export const JobForm = (props: JobFormProps) => {
   const stp1: FormStep = {
@@ -513,7 +525,7 @@ export const JobForm = (props: JobFormProps) => {
   }
   const stp2: FormStep = {
     name: "Extra",
-    renderComponent: <Step2Extra user={props.user} category={props.category} />,
+    renderComponent: <Step2Extra companyId={props.companyId} category={props.category} />,
     validationSchema: z.object({
       id: z.string().optional(),
       slug: z.string().optional(),
@@ -548,7 +560,7 @@ export const JobForm = (props: JobFormProps) => {
   const stp5: FormStep = {
     name: "Workflow",
     renderComponent: (
-      <Step5Workflow user={props.user} workflow={props.workflow} jobId={props.jobId} />
+      <Step5Workflow companyId={props.companyId} workflow={props.workflow} jobId={props.jobId} />
     ),
     validationSchema: z.object({
       id: z.string().optional(),
@@ -562,7 +574,7 @@ export const JobForm = (props: JobFormProps) => {
     renderComponent: (
       <Step6Form
         initialValues={props.initialValues}
-        user={props.user}
+        companyId={props.companyId}
         category={props.category}
         workflow={props.workflow}
         form={props.form}

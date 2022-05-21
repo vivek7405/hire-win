@@ -60,6 +60,7 @@ declare module "blitz" {
     PublicData: {
       userId: User["id"]
       role: UserRole
+      companyId: number
     }
   }
 }
@@ -71,7 +72,7 @@ export enum ShiftDirection {
 
 export type ExtendedJob = Prisma.JobGetPayload<{
   include: {
-    memberships: true
+    users: true
     category: true
     workflow: { include: { stages: { include: { stage: true; interviewDetails: true } } } }
     form: { include: { questions: { include: { question: true } } } }
@@ -113,7 +114,7 @@ export type ExtendedCandidatePool = Prisma.CandidatePoolGetPayload<{
 }>
 export type ExtendedUser = Prisma.UserGetPayload<{
   include: {
-    memberships: {
+    jobUsers: {
       include: {
         job: true
       }

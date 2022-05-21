@@ -201,7 +201,7 @@ export default function ScheduleMeeting({
             name="attendees"
             placeholder="Select members to invite"
             isMulti={true}
-            options={job?.memberships
+            options={job?.users
               ?.filter(
                 (m) => m.userId !== organizer?.id && m.userId !== interviewDetail?.interviewer?.id
               )

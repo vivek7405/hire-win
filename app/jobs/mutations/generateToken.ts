@@ -16,7 +16,7 @@ async function generateToken({ jobId }: GenerateTokenInput, ctx: Ctx) {
       id: jobId,
     },
     include: {
-      memberships: true,
+      users: true,
     },
   })
 

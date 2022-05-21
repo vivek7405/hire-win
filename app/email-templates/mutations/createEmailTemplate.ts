@@ -19,7 +19,7 @@ export default resolver.pipe(
         subject,
         slug: newSlug,
         body,
-        userId: ctx.session.userId || 0,
+        companyId: ctx.session.companyId || 0,
       },
     })
 

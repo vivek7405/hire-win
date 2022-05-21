@@ -12,6 +12,7 @@ import {
   useRouter,
   useMutation,
   useQuery,
+  useSession,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -104,7 +105,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const CardQuestions = ({ user, scoreCard }) => {
+export const CardQuestions = ({ user, scoreCard, companyId }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -444,6 +445,7 @@ export const CardQuestions = ({ user, scoreCard }) => {
                 }}
                 scoreCardQuestions={data}
                 userId={user?.id || 0}
+                companyId={companyId || 0}
               />
             </div>
           </div>
@@ -467,6 +469,7 @@ const SingleScoreCardPage = ({
   const [createCardQuestionMutation] = useMutation(createCardQuestion)
   const [addNewCardQuestionToScoreCardMutation] = useMutation(addNewCardQuestionToScoreCard)
   const router = useRouter()
+  const session = useSession()
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -527,6 +530,7 @@ const SingleScoreCardPage = ({
                 <AddExistingCardQuestionsForm
                   schema={ScoreCardQuestions}
                   user={user}
+                  companyId={session.companyId || 0}
                   scoreCardId={scoreCard?.id!}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Adding CardQuestion(s)</span>)
@@ -609,7 +613,7 @@ const SingleScoreCardPage = ({
               <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
             }
           >
-            <CardQuestions scoreCard={scoreCard} user={user} />
+            <CardQuestions companyId={session.companyId || 0} scoreCard={scoreCard} user={user} />
           </Suspense>
         </div>
       )}

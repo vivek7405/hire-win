@@ -10,6 +10,8 @@ import {
   Image,
   useMutation,
   Head,
+  useSession,
+  getSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -30,6 +32,7 @@ import { CandidateSource } from "@prisma/client"
 import toast from "react-hot-toast"
 import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
 import { checkPlan } from "app/users/utils/checkPlan"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -39,16 +42,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/blitz/db.js")
   // End anti-tree-shaking
 
-  const user = await invokeWithMiddleware(
-    getUser,
+  const company = await invokeWithMiddleware(
+    getCompany,
     {
       where: { slug: context?.params?.companySlug as string },
     },
     { ...context }
   )
 
-  if (user) {
-    const currentPlan = checkPlan(user)
+  if (company) {
+    const currentPlan = checkPlan(company)
 
     const job = await invokeWithMiddleware(
       getJob,
@@ -61,7 +64,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     if (job) {
       return {
         props: {
-          user,
+          company,
           job,
           currentPlan,
         },
@@ -87,7 +90,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const ApplyToJob = ({
-  user,
+  company,
   job,
   currentPlan,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -96,7 +99,7 @@ const ApplyToJob = ({
 
   // Post job to Google if on paid plan
   return (
-    <JobApplicationLayout user={user} job={job} addGoogleJobPostingScript={!!currentPlan}>
+    <JobApplicationLayout job={job} company={company} addGoogleJobPostingScript={!!currentPlan}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
@@ -105,7 +108,7 @@ const ApplyToJob = ({
           className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
           onClick={() => {
             router.push(
-              Routes.JobDescriptionPage({ companySlug: user?.slug!, jobSlug: job?.slug! })
+              Routes.JobDescriptionPage({ companySlug: company?.slug || "", jobSlug: job?.slug! })
             )
           }}
         >
@@ -139,7 +142,7 @@ const ApplyToJob = ({
                   }) || [],
               })
               toast.success(() => <span>Applied successfully</span>, { id: toastId })
-              router.push(Routes.JobBoard({ companySlug: user?.slug! }))
+              router.push(Routes.JobBoard({ companySlug: company?.slug || "" }))
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString(),

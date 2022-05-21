@@ -25,6 +25,7 @@ import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { Country, State } from "country-state-city"
 import { titleCase } from "app/core/utils/titleCase"
 import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -34,15 +35,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/blitz/db.js")
   // End anti-tree-shaking
 
-  const user = await invokeWithMiddleware(
-    getUser,
+  const company = await invokeWithMiddleware(
+    getCompany,
     {
       where: { slug: context?.params?.companySlug as string },
     },
     { ...context }
   )
 
-  if (user) {
+  if (company) {
     const job = await invokeWithMiddleware(
       getJob,
       {
@@ -54,8 +55,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     if (job) {
       return {
         props: {
-          user: user,
-          job: job,
+          company,
+          job,
         },
       }
     } else {
@@ -79,13 +80,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const JobDescriptionPage = ({
-  user,
+  company,
   job,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
 
   return (
-    <JobApplicationLayout user={user!} job={job!}>
+    <JobApplicationLayout company={company!} job={job!}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
@@ -93,7 +94,7 @@ const JobDescriptionPage = ({
           type="button"
           className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
           onClick={() => {
-            router.push(Routes.ApplyToJob({ companySlug: user?.slug!, jobSlug: job?.slug! }))
+            router.push(Routes.ApplyToJob({ companySlug: company?.slug!, jobSlug: job?.slug! }))
           }}
         >
           Apply to Job

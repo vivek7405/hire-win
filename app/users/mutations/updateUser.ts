@@ -12,31 +12,31 @@ type UpdateUserInput = Pick<Prisma.UserUpdateArgs, "where" | "data"> & {
 async function updateUser({ where, data, initial }: UpdateUserInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { logo, companyName, companyInfo, website, theme } = UserObj.parse(data) as any
+  const { name, logo, companyName, companyInfo, website, theme } = UserObj.parse(data) as any
 
   // if (!logo) return null
 
-  const slug = slugify(`${data.companyName}`, { strict: true })
-  const newSlug: string = await findFreeSlug(
-    slug,
-    async (e) => await db.user.findFirst({ where: { slug: e } })
-  )
+  // const slug = slugify(`${data.companyName}`, { strict: true })
+  // const newSlug: string = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.user.findFirst({ where: { slug: e } })
+  // )
 
-  let updateData = {
-    companyName,
-    companyInfo,
-    website,
-    theme,
-    slug: initial.companyName !== data.companyName ? newSlug : initial.slug,
-  }
+  // let updateData = {
+  //   companyName,
+  //   companyInfo,
+  //   website,
+  //   theme,
+  //   slug: initial.companyName !== data.companyName ? newSlug : initial.slug,
+  // }
 
-  if (logo) {
-    updateData["logo"] = logo
-  }
+  // if (logo) {
+  //   updateData["logo"] = logo
+  // }
 
   const user = await db.user.update({
     where,
-    data: updateData,
+    data: { name }, // updateData,
   })
 
   return user

@@ -9,7 +9,8 @@ type AddStageFormProps = {
   onSuccess?: () => void
   initialValues?: {}
   onSubmit: any
-  user: any
+  // user: any
+  companyId: number
   schema: any
   workflowId: string
 }
@@ -20,7 +21,7 @@ export const AddStageForm = (props: AddStageFormProps) => {
   })
   const [stages] = useQuery(getStagesWOPagination, {
     where: {
-      userId: props.user?.id,
+      companyId: props.companyId || 0,
       slug: {
         notIn: workflowStages.map((ws) => {
           return ws.stage.slug

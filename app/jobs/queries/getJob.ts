@@ -33,15 +33,11 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
           },
         },
       },
-      memberships: {
+      users: {
         include: {
           user: {
             include: {
-              // id: true,
-              // email: true,
-              // role: true,
-              // logo: true,
-              memberships: true,
+              jobUsers: true,
               sessions: true,
               tokens: true,
             },

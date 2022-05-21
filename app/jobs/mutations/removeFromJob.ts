@@ -11,7 +11,7 @@ interface InviteToJobInput {
 async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const membership = await db.membership.findFirst({
+  const membership = await db.jobUser.findFirst({
     where: {
       job: {
         id: jobId,
@@ -22,7 +22,7 @@ async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
     },
   })
 
-  await db.membership.delete({
+  await db.jobUser.delete({
     where: {
       id: membership?.id,
     },
@@ -33,7 +33,7 @@ async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
       id: jobId,
     },
     include: {
-      memberships: true,
+      users: true,
     },
   })
 

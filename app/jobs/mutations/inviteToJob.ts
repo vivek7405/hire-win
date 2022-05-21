@@ -11,7 +11,7 @@ interface InviteToJobInput {
 async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const inviter = await db.membership.findFirst({
+  const inviter = await db.jobUser.findFirst({
     where: {
       userId: ctx.session.userId,
       jobId: jobId,
@@ -23,7 +23,7 @@ async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
       id: jobId,
     },
     include: {
-      memberships: true,
+      users: true,
     },
   })
 

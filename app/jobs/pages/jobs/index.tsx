@@ -10,6 +10,7 @@ import {
   useMutation,
   useQuery,
   invalidateQuery,
+  invokeWithMiddleware,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -37,6 +38,7 @@ import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
 import setJobSalaryVisibility from "app/jobs/mutations/setJobSalaryVisibility"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -48,13 +50,20 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
+  const company = await invokeWithMiddleware(
+    getCompany,
+    {
+      where: { id: session.companyId || 0 },
+    },
+    { ...context }
+  )
 
-  if (user) {
+  if (user && company) {
     const { can: canCreate } = await Guard.can("create", "job", { session }, {})
 
-    const currentPlan = checkPlan(user)
+    const currentPlan = checkPlan(company)
 
-    return { props: { user, canCreate, currentPlan } }
+    return { props: { user, company, canCreate, currentPlan } }
   } else {
     return {
       redirect: {
@@ -66,13 +75,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
+const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
-  const [categories] = useQuery(getCategoriesWOPagination, { where: { userId: user?.id } })
+  const [categories] = useQuery(getCategoriesWOPagination, { where: { companyId: company?.id } })
 
   useEffect(() => {
     const search = router.query.search
@@ -93,7 +102,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
 
   const [selectedCategoryId, setSelectedCategoryId] = useState("0")
 
-  const [{ memberships, hasMore, count }] = usePaginatedQuery(getJobs, {
+  const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getJobs, {
     where:
       selectedCategoryId !== "0"
         ? {
@@ -195,12 +204,12 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
       </div>
 
       <div>
-        {memberships
-          .map((membership) => {
+        {jobUsers
+          .map((jobUser) => {
             return {
-              ...membership.job,
-              hasByPassedPlanLimit: !currentPlan && memberships?.length > 1,
-              canUpdate: membership.role === "OWNER" || membership.role === "ADMIN",
+              ...jobUser.job,
+              hasByPassedPlanLimit: !currentPlan && jobUsers?.length > 1,
+              canUpdate: jobUser.role === "OWNER" || jobUser.role === "ADMIN",
             }
           })
           ?.map((job) => {
@@ -475,6 +484,7 @@ const Jobs = ({ user, currentPlan, setOpenConfirm, setConfirmMessage }) => {
 
 const JobsHome = ({
   user,
+  company,
   canCreate,
   currentPlan,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -515,7 +525,7 @@ const JobsHome = ({
       </a>
       {/* </Link> */}
 
-      <Link href={Routes.JobBoard({ companySlug: user?.slug! })} passHref>
+      <Link href={Routes.JobBoard({ companySlug: company?.slug! })} passHref>
         <a
           target="_blank"
           rel="noopener noreferrer"
@@ -531,6 +541,7 @@ const JobsHome = ({
       >
         <Jobs
           user={user}
+          company={company}
           currentPlan={currentPlan}
           setOpenConfirm={setOpenConfirm}
           setConfirmMessage={setConfirmMessage}

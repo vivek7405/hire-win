@@ -14,6 +14,7 @@ import {
   useMutation,
   useQuery,
   invalidateQuery,
+  useSession,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -40,7 +41,7 @@ import {
   CandidatePool,
   Interview,
   InterviewDetail,
-  Membership,
+  JobUser,
   QuestionType,
   ScoreCardJobWorkflowStage,
   User,
@@ -300,10 +301,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     setCards(getCards(candidate!))
   }, [candidate])
 
+  const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
   const [candidatePools] = useQuery(getCandidatePools, {
-    where: { userId: user?.id, candidates: { none: { id: candidate?.id } } },
+    where: { companyId: session.companyId || 0, candidates: { none: { id: candidate?.id } } },
   })
   const [candidatePoolsOpen, setCandidatePoolsOpen] = useState(false)
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
@@ -352,9 +354,9 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         <DropdownMenu.Trigger
           className="float-right ml-6 disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
           disabled={
-            user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+            user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
               "OWNER" &&
-            user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+            user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
               "ADMIN"
           }
         >
@@ -364,10 +366,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
               selectedWorkflowStage?.interviewDetails?.find(
                 (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
               )?.interviewerId !== user?.id &&
-              user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                ?.role !== "OWNER" &&
-              user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                ?.role !== "ADMIN"
+              user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+                "OWNER" &&
+              user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+                "ADMIN"
             }
           >
             Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
@@ -548,6 +550,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                       //   )?.stage?.name
                       // } Stage`}
                       scoreCardId={scoreCardId}
+                      companyId={session.companyId || 0}
                       preview={false}
                       userId={user?.id || 0}
                       workflowStage={selectedWorkflowStage as any}

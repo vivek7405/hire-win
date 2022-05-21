@@ -30,7 +30,7 @@ export const UserForm = (props: UserFormProps) => {
           placeholder="Enter your name"
           testid="userUpdateName"
         />
-        <LabeledTextField
+        {/* <LabeledTextField
           type="text"
           name="companyName"
           label="Company Name"
@@ -53,7 +53,7 @@ export const UserForm = (props: UserFormProps) => {
           label="Company Info"
           placeholder="This shall appear on Job Boards"
           testid="userUpdateCompanyInfo"
-        />
+        /> */}
       </Form>
     </>
   )

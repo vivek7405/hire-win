@@ -47,6 +47,7 @@ import getCandidatesWOPagination from "app/jobs/queries/getCandidatesWOPaginatio
 import Debouncer from "app/core/utils/debouncer"
 import Pagination from "app/core/components/Pagination"
 import KanbanBoard from "app/core/components/KanbanBoard"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -63,8 +64,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { session },
     { where: { slug: context?.params?.slug as string } }
   )
+  const company = await invokeWithMiddleware(
+    getCompany,
+    {
+      where: { id: session.companyId || 0 },
+    },
+    { ...context }
+  )
 
-  if (user) {
+  if (user && company) {
     try {
       const job = await invokeWithMiddleware(
         getJobWithGuard,
@@ -76,9 +84,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
       return {
         props: {
-          user: user,
+          user,
+          company,
           canUpdate: canUpdate,
-          job: job,
+          job,
         },
       }
     } catch (error) {
@@ -474,6 +483,7 @@ const CandidateCard = ({ candidate, dragging }: CandidateCardProps) => {
 
 const SingleJobPage = ({
   user,
+  company,
   job,
   error,
   canUpdate,
@@ -522,7 +532,7 @@ const SingleJobPage = ({
         </Form>
       </div>
       <Link
-        href={Routes.JobDescriptionPage({ companySlug: user?.slug!, jobSlug: job?.slug! })}
+        href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
         passHref
       >
         <a
