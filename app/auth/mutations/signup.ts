@@ -31,7 +31,7 @@ export default resolver.pipe(
         email: email.toLowerCase().trim(),
         hashedPassword,
         role: UserRole.USER,
-        companyUsers: {
+        companies: {
           create: {
             role: CompanyUserRole.OWNER,
             company: {
@@ -43,10 +43,10 @@ export default resolver.pipe(
           },
         },
       },
-      select: { id: true, email: true, role: true, companyUsers: true },
+      select: { id: true, email: true, role: true, companies: true },
     })
 
-    const companyId = (user.companyUsers && (user.companyUsers[0]?.companyId || 0)) || 0
+    const companyId = (user.companies && (user.companies[0]?.companyId || 0)) || 0
 
     await createFormWithFactoryFormQuestions("Default", companyId)
     await createScoreCardWithFactoryScoreCardQuestions("Default", companyId)

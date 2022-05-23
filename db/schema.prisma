@@ -29,8 +29,8 @@ model User {
   // stripePriceId          String?
   // stripeCurrentPeriodEnd DateTime?
 
-  companyUsers CompanyUser[]
-  jobUsers     JobUser[]
+  companies CompanyUser[]
+  jobs      JobUser[]
 
   // categories     Category[]
 
@@ -160,8 +160,7 @@ model Company {
   theme   String? @default("indigo")
 
   users CompanyUser[]
-
-  jobs Job[]
+  jobs  Job[]
 
   categories Category[]
 

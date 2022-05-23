@@ -68,11 +68,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 type JobsProps = {
   company: Company
   user: User & {
-    companyUsers: (CompanyUser & {
+    companies: (CompanyUser & {
       company: Company
     })[]
   } & {
-    jobUsers: (JobUser & {
+    jobs: (JobUser & {
       job: Job
     })[]
   }

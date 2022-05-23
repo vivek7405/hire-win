@@ -114,7 +114,7 @@ export type ExtendedCandidatePool = Prisma.CandidatePoolGetPayload<{
 }>
 export type ExtendedUser = Prisma.UserGetPayload<{
   include: {
-    jobUsers: {
+    jobs: {
       include: {
         job: true
       }

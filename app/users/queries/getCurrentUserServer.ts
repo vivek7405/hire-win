@@ -8,12 +8,12 @@ const getCurrentUserServer = async ({ req, res }: Parameters<GetServerSideProps>
     const user = await db.user.findFirst({
       where: { id: session.userId },
       include: {
-        companyUsers: {
+        companies: {
           include: {
             company: true,
           },
         },
-        jobUsers: {
+        jobs: {
           include: {
             job: true,
           },

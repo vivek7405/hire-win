@@ -37,7 +37,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
         include: {
           user: {
             include: {
-              jobUsers: true,
+              jobs: true,
               sessions: true,
               tokens: true,
             },

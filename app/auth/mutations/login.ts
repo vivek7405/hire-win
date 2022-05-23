@@ -8,7 +8,7 @@ export const authenticateUser = async (rawEmail: string, rawPassword: string) =>
   const password = rawPassword.trim()
   const user = await db.user.findFirst({
     where: { email },
-    include: { companyUsers: { orderBy: { createdAt: "asc" } } },
+    include: { companies: { orderBy: { createdAt: "asc" } } },
   })
   if (!user) throw new AuthenticationError()
 
@@ -27,7 +27,7 @@ export const authenticateUser = async (rawEmail: string, rawPassword: string) =>
 export default resolver.pipe(resolver.zod(Login), async ({ email, password }, ctx) => {
   // This throws an error if credentials are invalid
   const user = await authenticateUser(email, password)
-  const companyUsers = user.companyUsers
+  const companyUsers = user.companies
   const companyId = (companyUsers && (companyUsers[0]?.companyId || 0)) || 0
   await ctx.session.$create({
     userId: user.id,

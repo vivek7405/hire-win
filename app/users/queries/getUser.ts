@@ -8,11 +8,11 @@ async function getUser({ where }: GetUserInput, ctx: Ctx) {
   const user = await db.user.findFirst({
     where,
     include: {
-      jobUsers: {
+      jobs: {
         include: {
           user: {
             include: {
-              companyUsers: {
+              companies: {
                 include: {
                   company: true,
                 },

@@ -354,9 +354,9 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         <DropdownMenu.Trigger
           className="float-right ml-6 disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
           disabled={
-            user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+            user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
               "OWNER" &&
-            user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+            user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
               "ADMIN"
           }
         >
@@ -366,9 +366,9 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
               selectedWorkflowStage?.interviewDetails?.find(
                 (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
               )?.interviewerId !== user?.id &&
-              user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
                 "OWNER" &&
-              user?.jobUsers?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
                 "ADMIN"
             }
           >
