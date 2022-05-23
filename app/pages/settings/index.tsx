@@ -60,7 +60,6 @@ const UserSettingsPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [updateUserMutation] = useMutation(updateUser)
-  const [updateCompanyMutation] = useMutation(updateCompany)
 
   return (
     <AuthLayout title="Settings" user={user}>
@@ -92,37 +91,6 @@ const UserSettingsPage = ({
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-              )
-            }
-          }}
-        />
-        <CompanyForm
-          header="Company"
-          subHeader="Update your company details"
-          initialValues={{
-            name: company?.name || "",
-            logo: company?.logo,
-            info: company?.info
-              ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
-              : EditorState.createEmpty(),
-            website: company?.website || "",
-            theme: company?.theme || "indigo",
-          }}
-          onSubmit={async (values) => {
-            values.info = convertToRaw(values?.info?.getCurrentContent())
-            const toastId = toast.loading(() => <span>Updating Company details</span>)
-            try {
-              await updateCompanyMutation({
-                where: { id: company?.id },
-                data: { ...values },
-                initial: company!,
-              })
-              toast.success(() => <span>Company details Updated</span>, { id: toastId })
-              // router.push(Routes.JobsHome())
-            } catch (error) {
-              toast.error(
-                "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                { id: toastId }
               )
             }
           }}
