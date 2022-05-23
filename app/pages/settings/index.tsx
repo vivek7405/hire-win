@@ -19,6 +19,8 @@ import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/themeHelpers"
 import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
 import getCompany from "app/companies/queries/getCompany"
+import CompanyForm from "app/companies/components/CompanyForm"
+import updateCompany from "app/companies/mutations/updateCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -58,7 +60,7 @@ const UserSettingsPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [updateUserMutation] = useMutation(updateUser)
-  const [changePasswordMutation] = useMutation(changePassword)
+  const [updateCompanyMutation] = useMutation(updateCompany)
 
   return (
     <AuthLayout title="Settings" user={user}>
@@ -68,28 +70,59 @@ const UserSettingsPage = ({
           subHeader="Update your profile details"
           initialValues={{
             name: user?.name || "",
-            // logo: user?.logo,
-            // companyName: user?.companyName || "",
-            // companyInfo: user?.companyInfo
-            //   ? EditorState.createWithContent(convertFromRaw(user?.companyInfo || {}))
+            email: user?.email || "",
+            // logo: company?.logo,
+            // info: company?.info
+            //   ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
             //   : EditorState.createEmpty(),
-            // website: user?.website || "",
-            // theme: user?.theme || "indigo",
+            // website: company?.website || "",
+            // theme: company?.theme || "indigo",
           }}
           onSubmit={async (values) => {
-            values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())
+            // values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())
             const toastId = toast.loading(() => <span>Updating User</span>)
             try {
-              const updatedUser = await updateUserMutation({
+              await updateUserMutation({
                 where: { id: user?.id },
                 data: { ...values },
                 initial: user!,
               })
               toast.success(() => <span>User Updated</span>, { id: toastId })
-              router.push(Routes.JobsHome())
+              // router.push(Routes.JobsHome())
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+              )
+            }
+          }}
+        />
+        <CompanyForm
+          header="Company"
+          subHeader="Update your company details"
+          initialValues={{
+            name: company?.name || "",
+            logo: company?.logo,
+            info: company?.info
+              ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
+              : EditorState.createEmpty(),
+            website: company?.website || "",
+            theme: company?.theme || "indigo",
+          }}
+          onSubmit={async (values) => {
+            values.info = convertToRaw(values?.info?.getCurrentContent())
+            const toastId = toast.loading(() => <span>Updating Company details</span>)
+            try {
+              await updateCompanyMutation({
+                where: { id: company?.id },
+                data: { ...values },
+                initial: company!,
+              })
+              toast.success(() => <span>Company details Updated</span>, { id: toastId })
+              // router.push(Routes.JobsHome())
+            } catch (error) {
+              toast.error(
+                "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+                { id: toastId }
               )
             }
           }}

@@ -1,4 +1,4 @@
-import db from "db"
+import db, { CompanyUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "app/users/utils/checkPlan"
 
@@ -23,6 +23,7 @@ type ExtendedResourceTypes =
   | "interview"
   | "comment"
   | "candidatePool"
+  | "company"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser" | "cancelInterview"
 
@@ -187,6 +188,20 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("update", "user", async (args) => {
         return args.where.id === ctx.session.userId
+      })
+
+      can("update", "company", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        return (
+          args.where.id === companyUser?.companyId && companyUser?.role === CompanyUserRole.OWNER
+        )
       })
 
       can("read", "tokens", async (args) => {
