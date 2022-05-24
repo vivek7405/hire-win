@@ -106,12 +106,13 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
     where:
       selectedCategoryId !== "0"
         ? {
-            userId: user?.id,
-            job: { categoryId: selectedCategoryId },
+            userId: user?.id || 0,
+            job: { companyId: company?.id || 0, categoryId: selectedCategoryId },
             ...query,
           }
         : {
             userId: user?.id,
+            job: { companyId: company?.id || 0 },
             ...query,
           },
     skip: ITEMS_PER_PAGE * Number(tablePage),

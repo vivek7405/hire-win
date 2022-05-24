@@ -108,7 +108,6 @@ const UserSettingsCompanyPage = ({
                     initial: company!,
                   })
                   toast.success(() => <span>Company details Updated</span>, { id: toastId })
-                  // router.push(Routes.JobsHome())
                 } catch (error) {
                   toast.error(
                     "Sorry, we had an unexpected error. Please try again. - " + error.toString(),

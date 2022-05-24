@@ -7,6 +7,7 @@ interface GetCompanyUserInput extends Pick<Prisma.CompanyUserFindFirstArgs, "whe
 async function getCompanyUser({ where }: GetCompanyUserInput, ctx: Ctx) {
   const companyUser = await db.companyUser.findFirst({
     where,
+    include: { company: true },
   })
 
   if (!companyUser) throw new NotFoundError()
