@@ -4,9 +4,11 @@ import { AuthForm } from "app/auth/components/AuthForm"
 import signup from "app/auth/mutations/signup"
 import { Signup } from "app/auth/validations"
 import toast from "react-hot-toast"
+import { z } from "zod"
 
 type SignupFormProps = {
   onSuccess?: () => void
+  companyId?: number
 }
 
 export const SignupForm = (props: SignupFormProps) => {
@@ -26,10 +28,20 @@ export const SignupForm = (props: SignupFormProps) => {
       <AuthForm
         testid="signupForm"
         submitText="Create Account"
-        schema={Signup}
+        schema={z.object({
+          name: z.string().nonempty({ message: "Required" }),
+          email: z.string().email(),
+          companyName:
+            !props.companyId || props.companyId === 0
+              ? z.string().nonempty({ message: "Required" })
+              : z.string().optional(),
+          companyId: z.number().optional(),
+          password: z.string().nonempty({ message: "Required" }),
+        })}
         initialValues={{ email: "", password: "" }}
         onSubmit={async (values) => {
           try {
+            values["companyId"] = props.companyId || 0
             await signupMutation(values)
             props.onSuccess?.()
           } catch (error) {
@@ -55,12 +67,14 @@ export const SignupForm = (props: SignupFormProps) => {
           placeholder="Enter your email"
           testid="signupEmail"
         />
-        <LabeledTextField
-          name="companyName"
-          label="Company Name"
-          placeholder="This shall appear on job board"
-          testid="signupCompanyName"
-        />
+        {(!props.companyId || props.companyId === 0) && (
+          <LabeledTextField
+            name="companyName"
+            label="Company Name"
+            placeholder="This shall appear on job board"
+            testid="signupCompanyName"
+          />
+        )}
         <LabeledTextField
           name="password"
           label="Password"

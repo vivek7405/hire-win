@@ -5,14 +5,16 @@ type InvitationFormProps = {
   onSuccess?: () => void
   initialValues?: {}
   onSubmit: any
+  header: string
+  subheader: string
 }
 
 export const InvitationForm = (props: InvitationFormProps) => {
   return (
     <>
       <Form
-        header="Invite A User"
-        subHeader="Invite a new member to the job. An email will be sent to the user."
+        header={props.header}
+        subHeader={props.subheader}
         submitText="Invite"
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}

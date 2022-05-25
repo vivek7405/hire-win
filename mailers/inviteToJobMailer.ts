@@ -22,7 +22,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
   })
 
   const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
-  const webhookUrl = `${origin}/api/invitations/accept?token=${token}&jobId=${job?.id}`
+  const webhookUrl = `${origin}/api/invitations/job/accept?token=${token}&jobId=${job?.id}`
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
@@ -30,7 +30,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
     to,
     subject: "You have been invited to a job",
     html: `
-      <h1>You've been invited to ${job?.title}</h1>
+      <h1>You've been invited to the job - ${job?.title}</h1>
 
       <a href="${webhookUrl}">
         Click here to accept your invite

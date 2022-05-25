@@ -24,6 +24,7 @@ type ExtendedResourceTypes =
   | "comment"
   | "candidatePool"
   | "company"
+  | "companyUser"
 
 type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser" | "cancelInterview"
 
@@ -192,8 +193,56 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return owner?.userId === ctx.session.userId
       })
 
+      can("update", "companyUser", async (args) => {
+        const companyUser = await db.companyUser.findFirst({
+          where: args.where,
+        })
+
+        const company = await db.company.findFirst({
+          where: {
+            id: companyUser?.companyId,
+          },
+          include: {
+            users: true,
+          },
+        })
+
+        const owner = company?.users.find((p) => p.role === "OWNER")
+
+        return owner?.userId === ctx.session.userId
+      })
+
       can("update", "user", async (args) => {
         return args.where.id === ctx.session.userId
+      })
+
+      can("inviteUser", "company", async (args) => {
+        // const company = await db.company.findFirst({
+        //   where: { id: args.companyId },
+        //   include: {
+        //     users: true,
+        //   },
+        // })
+
+        // Check user plan and don't allow to invite to job
+        // if the user is running on the Free Plan
+        const company = await db.company.findFirst({
+          where: { id: ctx.session.companyId || 0 },
+          include: {
+            // jobs: true,
+            users: true,
+          },
+        })
+        const currentPlan = checkPlan(company)
+        if (!currentPlan) return false
+
+        const owner = company?.users.find((u) => u.role === "OWNER")
+        const admins = company?.users.filter((u) => u.role === "ADMIN")
+
+        return (
+          admins?.some((a) => a.userId === ctx.session.userId) ||
+          owner?.userId === ctx.session.userId
+        )
       })
 
       can("update", "company", async (args) => {
@@ -208,6 +257,32 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return (
           args.where.id === companyUser?.companyId && companyUser?.role === CompanyUserRole.OWNER
         )
+      })
+
+      can("isOwner", "company", async (args) => {
+        const company = await db.company.findFirst({
+          where: args.where,
+          include: {
+            users: true,
+          },
+        })
+
+        const owner = company?.users.find((p) => p.role === "OWNER")
+
+        return owner?.userId === ctx.session.userId
+      })
+
+      can("isAdmin", "company", async (args) => {
+        const company = await db.company.findFirst({
+          where: args.where,
+          include: {
+            users: true,
+          },
+        })
+
+        const admins = company?.users.filter((m) => m.role === "ADMIN")
+
+        return admins?.some((a) => a.userId === ctx.session.userId) === true
       })
 
       can("read", "tokens", async (args) => {

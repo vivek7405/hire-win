@@ -1,6 +1,14 @@
 import React, { ReactNode } from "react"
 import { useRouter, Link, useSession, useQuery } from "blitz"
-import { CreditCardIcon, CogIcon, KeyIcon, CalendarIcon } from "@heroicons/react/outline"
+import {
+  CreditCardIcon,
+  CogIcon,
+  KeyIcon,
+  CalendarIcon,
+  UserGroupIcon,
+  OfficeBuildingIcon,
+  UserCircleIcon,
+} from "@heroicons/react/outline"
 import { ExtendedUser } from "types"
 import { ClockIcon } from "@heroicons/react/solid"
 import getUser from "app/users/queries/getUser"
@@ -23,7 +31,7 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
       name: "Profile",
       href: `/settings`,
       current: router.route === `/settings`,
-      icon: CogIcon,
+      icon: UserCircleIcon,
     },
     {
       name: "Schedules",
@@ -48,7 +56,15 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
           name: "Company",
           href: `/settings/company`,
           current: router.route === `/settings/company`,
-          icon: CreditCardIcon,
+          icon: OfficeBuildingIcon,
+        }
+      : null,
+    companyUser?.role === CompanyUserRole.OWNER
+      ? {
+          name: "Members",
+          href: `/settings/members`,
+          current: router.route === `/settings/members`,
+          icon: UserGroupIcon,
         }
       : null,
     companyUser?.role === CompanyUserRole.OWNER

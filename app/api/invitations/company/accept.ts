@@ -1,14 +1,14 @@
 import db from "db"
 import { hash256, BlitzApiRequest, BlitzApiResponse } from "blitz"
 import stripe from "app/core/utils/stripe"
-import { JobUserRole, UserRole } from "@prisma/client"
+import { CompanyUserRole, UserRole } from "@prisma/client"
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
   // 1. Try to find this token in the database
   const hashedToken = hash256(req.query.token as string)
   const possibleToken = await db.token.findFirst({
-    where: { hashedToken, type: "INVITE_TOKEN" },
+    where: { hashedToken, type: "INVITE_TO_COMPANY_TOKEN" },
     include: {
       user: {
         select: {
@@ -44,53 +44,57 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
       Usually the "token" parameter would come first, but here we need to use "&"
     */
     res.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/signup?next=/api/invitations/accept/&token=${req.query.token}&jobId=${req.query.jobId}`
+      `${process.env.NEXT_PUBLIC_APP_URL}/signup/${
+        (req.query.companyId as string) || "0"
+      }?next=/api/invitations/company/accept/&token=${req.query.token}&companyId=${
+        req.query.companyId
+      }`
     )
   } else {
     // 6. If there is a user, create a new membership associated with the project and user
-    await db.jobUser.create({
-      data: {
-        role: JobUserRole.USER,
-        job: {
-          connect: {
-            id: req.query.jobId as string,
-          },
-        },
-        user: {
-          connect: {
-            id: existingUser?.id,
-          },
-        },
-      },
-    })
+    // await db.companyUser.create({
+    //   data: {
+    //     role: CompanyUserRole.USER,
+    //     company: {
+    //       connect: {
+    //         id: parseInt((req.query.companyId as string) || "0"),
+    //       },
+    //     },
+    //     user: {
+    //       connect: {
+    //         id: existingUser?.id,
+    //       },
+    //     },
+    //   },
+    // })
 
     // 7. Delete token from database when done
     await db.token.delete({ where: { id: savedToken.id } })
 
-    // 8. Fetch job and it's memberships to count it's length to update stripe subscription quantity (NOTE: this is optional, remove if your business model isn't effected by amount of users per project)
-    const job = await db.job.findFirst({
-      where: {
-        id: req.query.jobId as string,
-      },
-      include: {
-        users: true,
-      },
-    })
+    // 8. Fetch company and it's memberships to count it's length to update stripe subscription quantity (NOTE: this is optional, remove if your business model isn't effected by amount of users per project)
+    // const company = await db.company.findFirst({
+    //   where: {
+    //     id: parseInt((req.query.companyId as string) || "0"),
+    //   },
+    //   include: {
+    //     users: true,
+    //   },
+    // })
 
-    // 9. Fetch the job subscription and update based on the job membership length
-    // if (job?.stripeSubscriptionId) {
-    //   const subscription = await stripe.subscriptions.retrieve(job?.stripeSubscriptionId as string)
-    //   await stripe.subscriptions.update(job?.stripeSubscriptionId as string, {
+    // 9. Fetch the company subscription and update based on the company membership length
+    // if (company?.stripeSubscriptionId) {
+    //   const subscription = await stripe.subscriptions.retrieve(company?.stripeSubscriptionId as string)
+    //   await stripe.subscriptions.update(company?.stripeSubscriptionId as string, {
     //     proration_behavior: "none",
     //     items: [
     //       {
     //         id: subscription.items.data[0]?.id,
-    //         quantity: job?.memberships.length,
+    //         quantity: company?.memberships.length,
     //       },
     //     ],
     //   })
     // }
 
-    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job?.slug}`)
+    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/jobs`)
   }
 }

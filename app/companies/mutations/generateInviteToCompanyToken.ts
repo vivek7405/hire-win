@@ -3,28 +3,28 @@ import Guard from "app/guard/ability"
 import db from "db"
 
 interface GenerateTokenInput {
-  jobId: string
+  companyId: number
 }
 
 const INVITE_TOKEN_EXPIRE_IN_HOURS = 9999
 
-async function generateToken({ jobId }: GenerateTokenInput, ctx: Ctx) {
+async function generateInviteToCompanyToken({ companyId }: GenerateTokenInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const job = await db.job.findFirst({
+  const company = await db.company.findFirst({
     where: {
-      id: jobId,
+      id: companyId,
     },
     include: {
       users: true,
     },
   })
 
-  if (!job) return new Error("No job selected")
+  if (!company) return new Error("No company selected")
 
   const findPastPublicKey = await db.token.findFirst({
     where: {
-      jobId: jobId,
+      companyId: companyId,
       type: "PUBLIC_KEY",
     },
   })
@@ -46,9 +46,9 @@ async function generateToken({ jobId }: GenerateTokenInput, ctx: Ctx) {
             id: ctx.session.userId,
           },
         },
-        job: {
+        company: {
           connect: {
-            id: job.id,
+            id: company.id,
           },
         },
       },
@@ -69,9 +69,9 @@ async function generateToken({ jobId }: GenerateTokenInput, ctx: Ctx) {
           id: ctx.session.userId,
         },
       },
-      job: {
+      company: {
         connect: {
-          id: job.id,
+          id: company.id,
         },
       },
     },
@@ -80,4 +80,4 @@ async function generateToken({ jobId }: GenerateTokenInput, ctx: Ctx) {
   return generatePrivateToken
 }
 
-export default Guard.authorize("update", "job", generateToken)
+export default Guard.authorize("update", "company", generateInviteToCompanyToken)

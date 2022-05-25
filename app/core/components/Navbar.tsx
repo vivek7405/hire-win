@@ -11,6 +11,7 @@ import Modal from "./Modal"
 import CompanyForm from "app/companies/components/CompanyForm"
 import { EditorState } from "draft-js"
 import updateCompanySession from "app/companies/mutations/updateCompanySession"
+import { CompanyUserRole } from "@prisma/client"
 
 type NavbarProps = {
   user?: ExtendedUser | null
@@ -78,6 +79,14 @@ const Navbar = ({ user }: NavbarProps) => {
       href: Routes.UserSettingsPage().pathname,
       current: router.route === "/settings",
     },
+    selectedCompanyUser?.role === CompanyUserRole.OWNER ||
+    selectedCompanyUser?.role === CompanyUserRole.ADMIN
+      ? {
+          name: "Members",
+          href: Routes.UserSettingsMembersPage().pathname,
+          current: router.route === Routes.UserSettingsMembersPage().pathname,
+        }
+      : null,
     {
       name: "Schedules",
       href: Routes.UserSettingsSchedulesPage().pathname,
@@ -148,8 +157,11 @@ const Navbar = ({ user }: NavbarProps) => {
 
             <div className="flex">
               <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
-                <DropdownMenu.Trigger className="mr-6 bg-theme-700 flex items-center text-sm rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
-                  <div className="w-24 p-1 text-white truncate">
+                <DropdownMenu.Trigger className="mr-6 bg-theme-700 flex items-center text-sm text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
+                  <div
+                    title={selectedCompanyUser?.company?.name}
+                    className="w-24 p-1 text-white font-semibold truncate"
+                  >
                     {selectedCompanyUser?.company?.name}
                   </div>
                 </DropdownMenu.Trigger>
@@ -165,7 +177,6 @@ const Navbar = ({ user }: NavbarProps) => {
                       setSelectedCompanyUser(cu!)
                       await updateCompanySessionMutation(parseInt(companyId || "0"))
                       router.push(Routes.JobsHome())
-                      // router.reload()
                     }}
                   >
                     {companyUsers?.map((cu) => {
@@ -227,6 +238,8 @@ const Navbar = ({ user }: NavbarProps) => {
                     Add Company
                   </DropdownMenu.Item>
                   {dropDownNav.map((item, i) => {
+                    if (!item) return <></>
+
                     return (
                       <DropdownMenu.Item
                         key={i}
@@ -291,6 +304,8 @@ const Navbar = ({ user }: NavbarProps) => {
             <div className="w-full h1 border border-theme-700 rounded-full mt-4 mb-2" />
 
             {dropDownNav.map((item, i) => {
+              if (!item) return <></>
+
               return item.href.length ? (
                 <Link href={item.href} passHref key={i}>
                   <a
