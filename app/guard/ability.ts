@@ -51,13 +51,13 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       can("read", "job", async (args) => {
         const job = await db.job.findFirst({
           where: args.where,
-          include: {
-            users: {
-              include: {
-                user: true,
-              },
-            },
-          },
+          // include: {
+          //   users: {
+          //     include: {
+          //       user: true,
+          //     },
+          //   },
+          // },
         })
 
         // Check user plan and don't allow to read the job
@@ -68,13 +68,13 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             jobs: true,
           },
         })
-        const allUserJobsLength = company?.jobs?.length || 0
-        if (allUserJobsLength > 1) {
+        const allCompanyJobsLength = company?.jobs?.length || 0
+        if (allCompanyJobsLength > 1) {
           const currentPlan = checkPlan(company)
           if (!currentPlan) return false
         }
 
-        return job?.users.some((p) => p.userId === ctx.session.userId) === true
+        return job?.companyId === ctx.session.companyId
       })
       can("readAll", "job", async (args) => {
         const memberships = await db.jobUser.findMany({
@@ -87,7 +87,12 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const job = await db.job.findFirst({
           where: args.where,
           include: {
-            users: true,
+            company: {
+              include: {
+                users: true,
+              },
+            },
+            // users: true,
           },
         })
 
@@ -99,18 +104,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             jobs: true,
           },
         })
-        const allUserJobsLength = company?.jobs?.length || 0
-        if (allUserJobsLength > 1) {
+        const allCompanyJobsLength = company?.jobs?.length || 0
+        if (allCompanyJobsLength > 1) {
           const currentPlan = checkPlan(company)
           if (!currentPlan) return false
         }
 
-        const owner = job?.users.find((p) => p.role === "OWNER")
-        const admins = job?.users.filter((m) => m.role === "ADMIN")
+        const owner = job?.company?.users.find((u) => u.role === "OWNER")
+        const admins = job?.company?.users.filter((u) => u.role === "ADMIN")
 
         return (
-          admins?.some((a) => a.userId === ctx.session.userId) ||
-          owner?.userId === ctx.session.userId
+          ctx.session.companyId === job?.companyId &&
+          (admins?.some((a) => a.userId === ctx.session.userId) ||
+            owner?.userId === ctx.session.userId)
         )
       })
       can("inviteUser", "job", async (args) => {
@@ -239,14 +245,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           where: args.where,
         })
 
-        return candidatePool?.companyId === ctx.session.companyId
+        return candidatePool?.companyId === ctx.session.companyId ? true : false
       })
       can("readAll", "candidatePool", async (args) => {
-        const candidatePool = await db.candidatePool.findMany({
+        const candidatePools = await db.candidatePool.findMany({
           where: args.where,
         })
 
-        return candidatePool.every((c) => c.companyId === ctx.session.companyId) === true
+        return candidatePools.every((c) => c.companyId === ctx.session.companyId) === true
       })
 
       can("create", "stage")
@@ -503,13 +509,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           include: {
             job: {
               include: {
-                users: true,
+                // users: true,
+                company: {
+                  include: { users: true },
+                },
               },
             },
           },
         })
 
-        return candidate?.job.users.some((m) => m.userId === ctx.session.userId) === true
+        return (
+          ctx.session?.companyId === candidate?.job?.companyId &&
+          candidate?.job?.company?.users.some((m) => m.userId === ctx.session.userId) === true
+        )
       })
       can("readAll", "candidate", async (args) => {
         const candidates = await db.candidate.findMany({

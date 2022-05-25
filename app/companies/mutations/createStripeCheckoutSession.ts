@@ -4,24 +4,24 @@ import stripe from "app/core/utils/stripe"
 import { Plan } from "types"
 
 interface CreateStripeCheckoutSessionInput {
-  userId: number
+  companyId: number
   priceId: string
   quantity: number
 }
 
 async function createStripeCheckoutSession(
-  { userId, priceId, quantity }: CreateStripeCheckoutSessionInput,
+  { companyId, priceId, quantity }: CreateStripeCheckoutSessionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const user = await db.user.findFirst({
+  const company = await db.company.findFirst({
     where: {
-      id: userId,
+      id: companyId,
     },
   })
 
-  if (!user || ctx.session.userId !== user?.id || !priceId) return null
+  if (!company || ctx.session.companyId !== company?.id || !priceId) return null
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -33,7 +33,7 @@ async function createStripeCheckoutSession(
       },
     ],
     metadata: {
-      userId,
+      companyId,
     },
     allow_promotion_codes: true,
     billing_address_collection: "auto",

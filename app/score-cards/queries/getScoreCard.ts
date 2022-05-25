@@ -9,26 +9,25 @@ import db, { Prisma } from "db"
 
 interface GetScoreCardInput extends Pick<Prisma.ScoreCardFindFirstArgs, "where"> {}
 
-const getScoreCard = resolver.pipe(
-  resolver.authorize(),
-  async ({ where }: GetScoreCardInput, ctx: Ctx) => {
-    const scoreCard = await db.scoreCard.findFirst({
-      where,
-      include: {
-        cardQuestions: {
-          include: {
-            cardQuestion: true,
-            scoreCard: { include: { jobWorkflowStages: true } },
-            scores: { include: { candidate: true } },
-          },
+const getScoreCard = async ({ where }: GetScoreCardInput, ctx: Ctx) => {
+  ctx.session.$authorize()
+
+  const scoreCard = await db.scoreCard.findFirst({
+    where,
+    include: {
+      cardQuestions: {
+        include: {
+          cardQuestion: true,
+          scoreCard: { include: { jobWorkflowStages: true } },
+          scores: { include: { candidate: true } },
         },
       },
-    })
+    },
+  })
 
-    if (!scoreCard) throw new NotFoundError()
+  if (!scoreCard) throw new NotFoundError()
 
-    return scoreCard
-  }
-)
+  return scoreCard
+}
 
 export default Guard.authorize("read", "scoreCard", getScoreCard)

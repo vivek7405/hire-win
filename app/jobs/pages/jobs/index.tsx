@@ -526,7 +526,7 @@ const JobsHome = ({
       </a>
       {/* </Link> */}
 
-      <Link href={Routes.JobBoard({ companySlug: company?.slug! })} passHref>
+      <Link href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
         <a
           target="_blank"
           rel="noopener noreferrer"

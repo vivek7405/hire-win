@@ -19,6 +19,7 @@ import Cards from "app/core/components/Cards"
 import { CardType, DragDirection, ExtendedScoreCard } from "types"
 import { CogIcon } from "@heroicons/react/outline"
 import getScoreCardsWOPagination from "app/score-cards/queries/getScoreCardsWOPagination"
+import groupByKey from "app/core/utils/groupByKey"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -193,8 +194,10 @@ const ScoreCards = ({ user }) => {
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
                 {`${f.cardQuestions?.length} ${
                   f.cardQuestions?.length === 1 ? "Question" : "Questions"
-                } · ${f.jobWorkflowStages?.length} ${
-                  f.jobWorkflowStages?.length === 1 ? "Job" : "Jobs"
+                } · ${Object.keys(groupByKey(f.jobWorkflowStages, "jobId"))?.length} ${
+                  Object.keys(groupByKey(f.jobWorkflowStages, "jobId"))?.length === 1
+                    ? "Job"
+                    : "Jobs"
                 }`}
               </div>
               <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">

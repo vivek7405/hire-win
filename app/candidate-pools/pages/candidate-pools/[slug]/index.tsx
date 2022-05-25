@@ -9,6 +9,11 @@ import {
   useQuery,
   useMutation,
   invalidateQuery,
+  invokeWithMiddleware,
+  AuthorizationError,
+  getSession,
+  useSession,
+  ErrorComponent,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -46,9 +51,30 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
 
   const user = await getCurrentUserServer({ ...context })
+  // const session = await getSession(context.req, context.res)
 
   if (user) {
-    return { props: { user: user, slug: context?.params?.slug } }
+    try {
+      await invokeWithMiddleware(
+        getCandidatePool,
+        { where: { slug: context?.params?.slug } },
+        { ...context }
+      )
+      return { props: { user: user, slug: context?.params?.slug } }
+    } catch (error) {
+      if (error instanceof AuthorizationError) {
+        return {
+          props: {
+            error: {
+              statusCode: error.statusCode,
+              message: "You don't have permission",
+            },
+          },
+        }
+      } else {
+        return { props: { error: { statusCode: error.statusCode, message: error.message } } }
+      }
+    }
   } else {
     return {
       redirect: {
@@ -60,9 +86,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const Candidates = ({ user, slug }) => {
+export const Candidates = ({ slug }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const session = useSession()
   const tablePage = Number(router.query.page) || 0
   const [query, setQuery] = useState({})
   const [openConfirm, setOpenConfirm] = useState(false)
@@ -107,6 +134,7 @@ export const Candidates = ({ user, slug }) => {
       candidatePools: {
         some: {
           slug,
+          companyId: session?.companyId || 0,
         },
       },
       ...query,
@@ -240,15 +268,19 @@ export const Candidates = ({ user, slug }) => {
 }
 
 const SingleCandidatePoolPage = ({
+  error,
   user,
   slug,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
   return (
     <AuthLayout title="CandidatePoolsHome | hire-win" user={user}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Candidates user={user} slug={slug} />
+        <Candidates slug={slug} />
       </Suspense>
     </AuthLayout>
   )

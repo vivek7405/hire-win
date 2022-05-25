@@ -142,7 +142,7 @@ const ApplyToJob = ({
                   }) || [],
               })
               toast.success(() => <span>Applied successfully</span>, { id: toastId })
-              router.push(Routes.JobBoard({ companySlug: company?.slug || "" }))
+              router.push(Routes.CareersPage({ companySlug: company?.slug || "" }))
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString(),

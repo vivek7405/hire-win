@@ -29,7 +29,7 @@ import Cards from "app/core/components/Cards"
 import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
-import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
+import getCategoriesUnauthorized from "app/categories/queries/getCategoriesUnauthorized"
 import getSymbolFromCurrency from "currency-symbol-map"
 import getCompany from "app/companies/queries/getCompany"
 import { Company, CompanyUser, Job, JobUser, User } from "@prisma/client"
@@ -50,10 +50,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { ...context }
   )
 
-  const user = await getCurrentUserServer({ ...context })
+  // const user = await getCurrentUserServer({ ...context })
 
-  if (company && user) {
-    return { props: { company, user } }
+  if (company) {
+    return { props: { company } }
   } else {
     return {
       redirect: {
@@ -67,34 +67,25 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 type JobsProps = {
   company: Company
-  user: User & {
-    companies: (CompanyUser & {
-      company: Company
-    })[]
-  } & {
-    jobs: (JobUser & {
-      job: Job
-    })[]
-  }
 }
-const Jobs = ({ company, user }: JobsProps) => {
+const Jobs = ({ company }: JobsProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [query, setQuery] = useState({})
-  const [categories] = useQuery(getCategoriesWOPagination, { where: { companyId: company?.id } })
+  const [categories] = useQuery(getCategoriesUnauthorized, { where: { companyId: company?.id } })
   const [selectedCategoryId, setSelectedCategoryId] = useState("0")
 
   const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getJobs, {
     where:
       selectedCategoryId !== "0"
         ? {
-            userId: user?.id,
+            // userId: user?.id,
             job: { companyId: company?.id, categoryId: selectedCategoryId, hidden: false },
             ...query,
           }
         : {
-            userId: user?.id,
+            // userId: user?.id,
             job: { companyId: company?.id, hidden: false },
             ...query,
           },
@@ -291,9 +282,9 @@ const Jobs = ({ company, user }: JobsProps) => {
   )
 }
 
-const JobBoard = ({ user, company }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const CareersPage = ({ company }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <JobApplicationLayout company={company} isJobBoard={true}>
+    <JobApplicationLayout company={company} isCareersPage={true}>
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
@@ -302,10 +293,10 @@ const JobBoard = ({ user, company }: InferGetServerSidePropsType<typeof getServe
           className="mt-1 mb-8"
           dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
         />
-        <Jobs user={user!} company={company!} />
+        <Jobs company={company!} />
       </Suspense>
     </JobApplicationLayout>
   )
 }
 
-export default JobBoard
+export default CareersPage

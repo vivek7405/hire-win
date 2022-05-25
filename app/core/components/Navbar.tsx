@@ -164,7 +164,8 @@ const Navbar = ({ user }: NavbarProps) => {
                       )
                       setSelectedCompanyUser(cu!)
                       await updateCompanySessionMutation(parseInt(companyId || "0"))
-                      router.pathname && router.push(router.pathname)
+                      router.push(Routes.JobsHome())
+                      // router.reload()
                     }}
                   >
                     {companyUsers?.map((cu) => {

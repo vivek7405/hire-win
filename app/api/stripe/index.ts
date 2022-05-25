@@ -5,7 +5,7 @@ import db from "db"
 interface ISession {
   customer: string
   metadata: {
-    userId: string
+    companyId: string
   }
   subscription: string
 }
@@ -47,7 +47,7 @@ export default async (req, res) => {
 
     await db.company.update({
       where: {
-        id: parseInt(session.metadata.userId || "0"),
+        id: parseInt(session.metadata.companyId || "0"),
       },
       data: {
         stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),

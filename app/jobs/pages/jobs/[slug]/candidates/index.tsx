@@ -17,7 +17,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
-import getJob from "app/jobs/queries/getJob"
+import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
 import Table from "app/core/components/Table"
 import getCandidates from "app/jobs/queries/getCandidates"
 import {
@@ -49,7 +49,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user) {
     try {
       const job = await invokeWithMiddleware(
-        getJob,
+        getJobWithGuard,
         {
           where: { slug: context?.params?.slug as string },
         },

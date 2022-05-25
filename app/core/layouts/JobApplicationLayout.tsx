@@ -54,7 +54,7 @@ type JobApplicationLayoutProps = {
   children: ReactNode
   job?: ExtendedJob
   company?: Company
-  isJobBoard?: boolean
+  isCareersPage?: boolean
   addGoogleJobPostingScript?: boolean
 }
 
@@ -62,7 +62,7 @@ const JobApplicationLayout = ({
   children,
   company,
   job,
-  isJobBoard,
+  isCareersPage,
   addGoogleJobPostingScript,
 }: JobApplicationLayoutProps) => {
   const logo = company?.logo as AttachmentObject
@@ -83,10 +83,10 @@ const JobApplicationLayout = ({
   return (
     <>
       <Head>
-        {isJobBoard && (
+        {isCareersPage && (
           <title>{`Job Board | ${titleCase(company?.name?.toLocaleLowerCase())}`}</title>
         )}
-        {!isJobBoard && (
+        {!isCareersPage && (
           <title>{`Job Application | ${titleCase(job?.title?.toLocaleLowerCase())} | ${titleCase(
             company?.name?.toLocaleLowerCase()
           )}`}</title>
@@ -107,7 +107,7 @@ const JobApplicationLayout = ({
           <div className="flex justify-center items-center">
             <span className="self-center cursor-pointer">
               {company?.slug && (
-                <Link href={Routes.JobBoard({ companySlug: company?.slug })}>
+                <Link href={Routes.CareersPage({ companySlug: company?.slug })}>
                   {logo?.Location ? (
                     <img src={logo?.Location} alt={`${company?.name} logo`} width={200} />
                   ) : (
@@ -117,7 +117,7 @@ const JobApplicationLayout = ({
               )}
             </span>
           </div>
-          {!isJobBoard && (
+          {!isCareersPage && (
             <div className="mt-6 flex flex-col space-y-2 justify-center items-center">
               <h3 className="text-2xl font-bold">{job?.title}</h3>
               {job?.remote && (
@@ -152,14 +152,14 @@ const JobApplicationLayout = ({
         <footer>
           <div
             className={`text-neutral-50 flex flex-col ${
-              !(isJobBoard && !company?.website) && "space-y-3"
+              !(isCareersPage && !company?.website) && "space-y-3"
             } justify-center items-center bg-theme-600 h-32`}
           >
             <div className="flex justify-center items-center">
-              {!isJobBoard && (
+              {!isCareersPage && (
                 <span className="hover:text-neutral-200">
                   {company?.slug && (
-                    <Link href={Routes.JobBoard({ companySlug: company?.slug })}>
+                    <Link href={Routes.CareersPage({ companySlug: company?.slug })}>
                       View all jobs
                     </Link>
                   )}
@@ -168,12 +168,12 @@ const JobApplicationLayout = ({
               <span className="hover:text-neutral-200">
                 {company?.website && (
                   <a href={company?.website} target="_blank" rel="noreferrer">
-                    {!isJobBoard && <>&nbsp;&nbsp;·&nbsp;&nbsp;</>}View Website
+                    {!isCareersPage && <>&nbsp;&nbsp;·&nbsp;&nbsp;</>}View Website
                   </a>
                 )}
               </span>
             </div>
-            {!(isJobBoard && !company?.website) && <hr />}
+            {!(isCareersPage && !company?.website) && <hr />}
             <div className="flex justify-center items-center">
               <span>Powered by&nbsp;</span>
               <span className="underline hover:text-neutral-200">

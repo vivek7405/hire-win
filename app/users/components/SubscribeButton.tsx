@@ -1,7 +1,7 @@
 import { useMutation, useRouter, useSession } from "blitz"
 import { loadStripe } from "@stripe/stripe-js"
-import createStripeCheckoutSession from "app/users/mutations/createStripeCheckoutSession"
-import updateStripeSubscription from "app/users/mutations/updateStripeSubscription"
+import createStripeCheckoutSession from "app/companies/mutations/createStripeCheckoutSession"
+import updateStripeSubscription from "app/companies/mutations/updateStripeSubscription"
 import { Plan } from "types"
 import { toast } from "react-hot-toast"
 
@@ -25,7 +25,11 @@ export default function SubscribeButton({
 
   const createSubscription = async () => {
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
-    const sessionId = await createStripeSessionMutation({ priceId, userId, quantity })
+    const sessionId = await createStripeSessionMutation({
+      priceId,
+      companyId: session?.companyId || 0,
+      quantity,
+    })
 
     sessionId &&
       stripe?.redirectToCheckout({

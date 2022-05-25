@@ -10,13 +10,14 @@ import { z } from "zod"
 
 interface GetFormInput extends Pick<Prisma.FormFindFirstArgs, "where"> {}
 
-const getForm = resolver.pipe(resolver.authorize(), async ({ where }: GetFormInput, ctx: Ctx) => {
-  // TODO: in multi-tenant app, you must add validation to ensure correct tenant
+const getForm = async ({ where }: GetFormInput, ctx: Ctx) => {
+  ctx.session.$authorize()
+
   const form = await db.form.findFirst({ where, include: { questions: true } })
 
   if (!form) throw new NotFoundError()
 
   return form
-})
+}
 
 export default Guard.authorize("read", "form", getForm)
