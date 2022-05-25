@@ -103,7 +103,7 @@ const Forms = ({ user }) => {
 
       setData(data)
     })
-  }, [forms, user.id])
+  }, [forms, session.companyId])
 
   // let columns = [
   //   {

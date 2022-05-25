@@ -15,6 +15,7 @@ import {
   useMutation,
   useQuery,
   useRouter,
+  useSession,
 } from "blitz"
 import path from "path"
 import { Suspense, useEffect, useState } from "react"
@@ -52,13 +53,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 const EmailTemplates = ({ user }) => {
   const router = useRouter()
+  const session = useSession()
   const [query, setQuery] = useState({})
   const [emailTemplateToDelete, setEmailTemplateToDelete] = useState(null as any as EmailTemplate)
   const [openConfirm, setOpenConfirm] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [createEmailTemplateMutation] = useMutation(createEmailTemplate)
   const [updateEmailTemplateMutation] = useMutation(updateEmailTemplate)
-  const [emailTemplates] = useQuery(getEmailTemplates, { where: { ...query } })
+  const [emailTemplates] = useQuery(getEmailTemplates, {
+    where: { ...query, companyId: session.companyId || 0 },
+  })
   const [deleteEmailTemplateMutation] = useMutation(deleteEmailTemplate)
   const [emailTemplateToEdit, setEmailTemplateToEdit] = useState(null as any as EmailTemplate)
 
