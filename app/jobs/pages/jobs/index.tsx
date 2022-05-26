@@ -182,7 +182,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
         resultName="job"
       />
 
-      {jobUsers && jobUsers.length > 0 && (
+      {jobUsers?.length > 0 && (
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
           {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
             <div

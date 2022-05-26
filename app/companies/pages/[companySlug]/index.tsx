@@ -147,40 +147,44 @@ const Jobs = ({ company }: JobsProps) => {
         />
 
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
-            <div
-              className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-                selectedCategoryId === "0"
-                  ? "bg-theme-700 cursor-default"
-                  : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
-              }`}
-              onClick={() => {
-                setSelectedCategoryId("0")
-              }}
-            >
-              All
-            </div>
-          )}
-          {categories
-            ?.filter((c) => c.jobs.length > 0)
-            ?.map((category) => {
-              return (
+          {jobUsers?.length > 0 && (
+            <>
+              {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
                 <div
-                  key={category.id}
                   className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-                    selectedCategoryId === category.id
+                    selectedCategoryId === "0"
                       ? "bg-theme-700 cursor-default"
                       : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
                   }`}
-                  onClick={async () => {
-                    setSelectedCategoryId(category.id)
-                    await invalidateQuery(getJobs)
+                  onClick={() => {
+                    setSelectedCategoryId("0")
                   }}
                 >
-                  {category.name}
+                  All
                 </div>
-              )
-            })}
+              )}
+              {categories
+                ?.filter((c) => c.jobs.length > 0)
+                ?.map((category) => {
+                  return (
+                    <div
+                      key={category.id}
+                      className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+                        selectedCategoryId === category.id
+                          ? "bg-theme-700 cursor-default"
+                          : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+                      }`}
+                      onClick={async () => {
+                        setSelectedCategoryId(category.id)
+                        await invalidateQuery(getJobs)
+                      }}
+                    >
+                      {category.name}
+                    </div>
+                  )
+                })}
+            </>
+          )}
         </div>
       </div>
 
