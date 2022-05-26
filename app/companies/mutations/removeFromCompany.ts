@@ -10,6 +10,20 @@ interface RemoveFromCompanyInput {
 async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, ctx: Ctx) {
   ctx.session.$authorize()
 
+  const jobUsers = await db.jobUser.findMany({
+    where: {
+      user: {
+        id: userId,
+      },
+    },
+  })
+
+  await db.jobUser.deleteMany({
+    where: {
+      userId: { in: jobUsers?.map((ju) => ju.userId) },
+    },
+  })
+
   const companyUser = await db.companyUser.findFirst({
     where: {
       company: {

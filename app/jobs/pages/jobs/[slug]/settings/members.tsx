@@ -148,11 +148,6 @@ const JobSettingsMembersPage = ({
   const [changePermissionMutation] = useMutation(updateMemberRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
   const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
-  const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
-  const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
-  const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
-  const [calendars] = useQuery(getCalendars, { where: { ownerId: user?.id } })
-  const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
 
   const [jobData, setJobData] = useState(job)
 
@@ -174,8 +169,8 @@ const JobSettingsMembersPage = ({
               </h2>
               <Modal header="Invite A User" open={openInvite} setOpen={setOpenInvite}>
                 <InvitationForm
-                  header="Invite a User"
-                  subheader="Invite a new member to the job. An email will be sent to the user."
+                  jobId={job?.id || "0"}
+                  isJobInvitation={true}
                   initialValues={{ email: "" }}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Inviting {values.email}</span>)

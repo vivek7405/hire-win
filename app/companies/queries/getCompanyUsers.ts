@@ -7,7 +7,7 @@ interface GetCompanyUsersInput extends Pick<Prisma.CompanyUserFindManyArgs, "whe
 async function getCompanyUsers({ where }: GetCompanyUsersInput, ctx: Ctx) {
   const companyUsers = await db.companyUser.findMany({
     where,
-    include: { company: true },
+    include: { company: true, user: true },
   })
 
   if (!companyUsers) throw new NotFoundError()

@@ -48,6 +48,7 @@ import Debouncer from "app/core/utils/debouncer"
 import Pagination from "app/core/components/Pagination"
 import KanbanBoard from "app/core/components/KanbanBoard"
 import getCompany from "app/companies/queries/getCompany"
+import getCompanyUser from "app/companies/queries/getCompanyUser"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -58,21 +59,44 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
+
+  const companyUser = await invokeWithMiddleware(
+    getCompanyUser,
+    {
+      where: {
+        companyId: session.companyId || 0,
+        userId: session.userId || 0,
+      },
+    },
+    { ...context }
+  )
+
+  if (user && !companyUser) {
+    return {
+      redirect: {
+        destination: "/companies/new",
+        permanent: false,
+      },
+      props: {},
+    }
+  }
+
   const { can: canUpdate } = await Guard.can(
     "update",
     "job",
     { session },
     { where: { slug: context?.params?.slug as string } }
   )
-  const company = await invokeWithMiddleware(
-    getCompany,
-    {
-      where: { id: session.companyId || 0 },
-    },
-    { ...context }
-  )
 
-  if (user && company) {
+  // const company = await invokeWithMiddleware(
+  //   getCompany,
+  //   {
+  //     where: { id: session.companyId || 0 },
+  //   },
+  //   { ...context }
+  // )
+
+  if (user && companyUser) {
     try {
       const job = await invokeWithMiddleware(
         getJobWithGuard,
@@ -85,7 +109,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       return {
         props: {
           user,
-          company,
+          company: companyUser.company,
           canUpdate: canUpdate,
           job,
         },

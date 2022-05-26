@@ -52,21 +52,21 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
     )
   } else {
     // 6. If there is a user, create a new membership associated with the project and user
-    // await db.companyUser.create({
-    //   data: {
-    //     role: CompanyUserRole.USER,
-    //     company: {
-    //       connect: {
-    //         id: parseInt((req.query.companyId as string) || "0"),
-    //       },
-    //     },
-    //     user: {
-    //       connect: {
-    //         id: existingUser?.id,
-    //       },
-    //     },
-    //   },
-    // })
+    await db.companyUser.create({
+      data: {
+        role: CompanyUserRole.USER,
+        company: {
+          connect: {
+            id: parseInt((req.query.companyId as string) || "0"),
+          },
+        },
+        user: {
+          connect: {
+            id: existingUser?.id,
+          },
+        },
+      },
+    })
 
     // 7. Delete token from database when done
     await db.token.delete({ where: { id: savedToken.id } })

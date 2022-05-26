@@ -15,7 +15,7 @@ async function getCompany({ where }: GetCompanyInput, ctx: Ctx) {
     },
   })
 
-  if (!company) throw new NotFoundError()
+  // if (!company) throw new NotFoundError()
 
   return company
 }

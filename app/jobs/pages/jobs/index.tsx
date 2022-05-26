@@ -39,6 +39,7 @@ import Debouncer from "app/core/utils/debouncer"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
 import setJobSalaryVisibility from "app/jobs/mutations/setJobSalaryVisibility"
 import getCompany from "app/companies/queries/getCompany"
+import getCompanyUser from "app/companies/queries/getCompanyUser"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -51,7 +52,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
 
-  if (user && session?.companyId === 0) {
+  const companyUser = await invokeWithMiddleware(
+    getCompanyUser,
+    {
+      where: {
+        companyId: session.companyId || 0,
+        userId: session.userId || 0,
+      },
+    },
+    { ...context }
+  )
+
+  if (user && !companyUser) {
     return {
       redirect: {
         destination: "/companies/new",
@@ -61,20 +73,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     }
   }
 
-  const company = await invokeWithMiddleware(
-    getCompany,
-    {
-      where: { id: session.companyId || 0 },
-    },
-    { ...context }
-  )
-
-  if (user && company) {
+  if (user && companyUser) {
     const { can: canCreate } = await Guard.can("create", "job", { session }, {})
 
-    const currentPlan = checkPlan(company)
+    const currentPlan = checkPlan(companyUser.company)
 
-    return { props: { user, company, canCreate, currentPlan } }
+    return { props: { user, company: companyUser.company, canCreate, currentPlan } }
   } else {
     return {
       redirect: {

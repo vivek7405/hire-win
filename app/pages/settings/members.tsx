@@ -172,8 +172,7 @@ const UserSettingsMembersPage = ({
               </h2>
               <Modal header="Invite A User" open={openInvite} setOpen={setOpenInvite}>
                 <InvitationForm
-                  header="Invite a User"
-                  subheader="Invite a new member to the company. An email will be sent to the user."
+                  isJobInvitation={false}
                   initialValues={{ email: "" }}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Inviting {values.email}</span>)

@@ -5,6 +5,7 @@ import {
   GetServerSidePropsContext,
   useMutation,
   useSession,
+  useQuery,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import CompanyForm from "app/companies/components/CompanyForm"
@@ -14,6 +15,8 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import createCompany from "app/companies/mutations/createCompany"
 import path from "path"
 import { EditorState, convertToRaw } from "draft-js"
+import getCompanyUser from "app/companies/queries/getCompanyUser"
+import { Suspense } from "react"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -41,36 +44,44 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
   const router = useRouter()
   const session = useSession()
   const [createCompanyMutation] = useMutation(createCompany)
+  const [companyUser] = useQuery(getCompanyUser, {
+    where: {
+      companyId: session.companyId || 0,
+      userId: session.userId || 0,
+    },
+  })
 
   return (
     <AuthLayout title="New Company" user={user}>
-      {session.companyId !== 0 && <Breadcrumbs />}
-      <div className="mt-6">
-        <CompanyForm
-          header="Create A New Company"
-          subHeader="Enter your company details"
-          initialValues={{
-            name: "",
-            info: EditorState.createEmpty(),
-            logo: null,
-            website: "",
-            theme: "indigo",
-          }}
-          onSubmit={async (values) => {
-            values.info = convertToRaw(values?.info?.getCurrentContent())
-            const toastId = toast.loading(() => <span>Creating Company</span>)
-            try {
-              await createCompanyMutation(values)
-              toast.success(() => <span>Company Created</span>, { id: toastId })
-              router.push(Routes.JobsHome())
-            } catch (error) {
-              toast.error(
-                "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-              )
-            }
-          }}
-        />
-      </div>
+      <Suspense fallback="Loading...">
+        {companyUser && <Breadcrumbs />}
+        <div className="mt-6">
+          <CompanyForm
+            header="Create A New Company"
+            subHeader="Enter your company details"
+            initialValues={{
+              name: "",
+              info: EditorState.createEmpty(),
+              logo: null,
+              website: "",
+              theme: "indigo",
+            }}
+            onSubmit={async (values) => {
+              values.info = convertToRaw(values?.info?.getCurrentContent())
+              const toastId = toast.loading(() => <span>Creating Company</span>)
+              try {
+                await createCompanyMutation(values)
+                toast.success(() => <span>Company Created</span>, { id: toastId })
+                router.push(Routes.JobsHome())
+              } catch (error) {
+                toast.error(
+                  "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                )
+              }
+            }}
+          />
+        </div>
+      </Suspense>
     </AuthLayout>
   )
 }
