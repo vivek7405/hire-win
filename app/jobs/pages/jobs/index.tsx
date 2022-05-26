@@ -50,6 +50,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
+
+  if (user && session?.companyId === 0) {
+    return {
+      redirect: {
+        destination: "/companies/new",
+        permanent: false,
+      },
+      props: {},
+    }
+  }
+
   const company = await invokeWithMiddleware(
     getCompany,
     {

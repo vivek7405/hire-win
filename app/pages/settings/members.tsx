@@ -29,7 +29,7 @@ import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
 import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon } from "@heroicons/react/outline"
 
-import { CompanyUserRole, JobUserRole, User } from "db"
+import { CompanyUser, CompanyUserRole, JobUserRole, User } from "db"
 // import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
@@ -148,16 +148,10 @@ const UserSettingsMembersPage = ({
   const [openInvite, setOpenInvite] = useState(false)
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false)
   const [inviteToCompanyMutation] = useMutation(inviteToCompany)
-  // const [removeFromJobMutation] = useMutation(removeFromJob)
   const [removeFromCompanyMutation] = useMutation(removeFromCompany)
   const [changePermissionMutation] = useMutation(updateCompanyUserRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
-  // const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
-  // const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
-  // const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
-  // const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
-  // const [calendars] = useQuery(getCalendars, { where: { ownerId: user?.id } })
-  // const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
+  const [memberToDelete, setMemberToDelete] = useState(null as any as CompanyUser & { user: User })
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -188,6 +182,7 @@ const UserSettingsMembersPage = ({
                         companyId: company?.id as number,
                         email: values.email,
                       })
+                      setOpenInvite(false)
                       toast.success(() => <span>{values.email} invited</span>, { id: toastId })
                     } catch (error) {
                       toast.error(
@@ -219,7 +214,6 @@ const UserSettingsMembersPage = ({
                     setOpenConfirmBilling(true)
                   }
                 }}
-                data-testid={`open-inviteUser-modal`}
                 className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
               >
                 Invite User
@@ -304,19 +298,22 @@ const UserSettingsMembersPage = ({
                               <Confirm
                                 open={openConfirmDelete}
                                 setOpen={setOpenConfirmDelete}
-                                header={"Delete Member?"}
+                                header={`Delete Member - ${memberToDelete?.user?.name}?`}
                                 onSuccess={async () => {
                                   const toastId = toast.loading(() => (
-                                    <span>Removing {m.user.name}</span>
+                                    <span>Removing {memberToDelete?.user?.name}</span>
                                   ))
                                   try {
                                     await removeFromCompanyMutation({
                                       companyId: company?.id || 0,
-                                      userId: m.user.id,
+                                      userId: memberToDelete?.user?.id,
                                     })
-                                    toast.success(() => <span>{m.user.name} removed</span>, {
-                                      id: toastId,
-                                    })
+                                    toast.success(
+                                      () => <span>{memberToDelete?.user?.name} removed</span>,
+                                      {
+                                        id: toastId,
+                                      }
+                                    )
                                   } catch (error) {
                                     toast.error(
                                       "Sorry, we had an unexpected error. Please try again. - " +
@@ -324,7 +321,7 @@ const UserSettingsMembersPage = ({
                                       { id: toastId }
                                     )
                                   }
-                                  // setOpenInvite(false)
+                                  setMemberToDelete(null as any)
                                   router.reload()
                                 }}
                               >
@@ -332,10 +329,10 @@ const UserSettingsMembersPage = ({
                               </Confirm>
 
                               <button
-                                data-testid={`remove-${m.user.email}-fromJob`}
                                 className="bg-red-500 rounded-full flex flex-col justify-center items-center"
                                 onClick={async (e) => {
                                   e.preventDefault()
+                                  setMemberToDelete(m)
                                   setOpenConfirmDelete(true)
                                 }}
                               >

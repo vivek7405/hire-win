@@ -4,6 +4,7 @@ import {
   Routes,
   GetServerSidePropsContext,
   useMutation,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import CompanyForm from "app/companies/components/CompanyForm"
@@ -38,11 +39,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [createCompanyMutation] = useMutation(createCompany)
 
   return (
     <AuthLayout title="New Company" user={user}>
-      <Breadcrumbs />
+      {session.companyId !== 0 && <Breadcrumbs />}
       <div className="mt-6">
         <CompanyForm
           header="Create A New Company"

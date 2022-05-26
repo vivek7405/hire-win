@@ -34,5 +34,5 @@ export default resolver.pipe(resolver.zod(Login), async ({ email, password }, ct
     role: user.role as UserRole,
     companyId,
   })
-  return user
+  return companyId
 })

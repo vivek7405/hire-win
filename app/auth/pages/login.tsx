@@ -1,4 +1,13 @@
-import { useRouter, BlitzPage, Head, Routes, Link, Image, GetServerSidePropsContext } from "blitz"
+import {
+  useRouter,
+  BlitzPage,
+  Head,
+  Routes,
+  Link,
+  Image,
+  GetServerSidePropsContext,
+  getSession,
+} from "blitz"
 import { LoginForm } from "app/auth/components/LoginForm"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
@@ -10,6 +19,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/blitz/db.js")
 
   const user = await getCurrentUserServer({ ...context })
+  const session = await getSession(context.req, context.res)
+
+  if (user && session?.companyId === 0) {
+    return {
+      redirect: {
+        destination: "/companies/new",
+        permanent: false,
+      },
+      props: {},
+    }
+  }
 
   if (user) {
     return {

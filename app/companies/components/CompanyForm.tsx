@@ -28,7 +28,7 @@ export const CompanyForm = (props: CompanyFormProps) => {
         <LabeledTextField
           name="name"
           label="Name"
-          placeholder="Enter your name"
+          placeholder="Enter company name"
           testid="userUpdateName"
         />
 
