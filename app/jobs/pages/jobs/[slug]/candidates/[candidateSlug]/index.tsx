@@ -312,12 +312,12 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
-    // if (resume?.Key && !file) {
-    getResume(resume).then((response) => {
-      const file = response?.data?.Body
-      setFile(file)
-    })
-    // }
+    if (resume?.Key) {
+      getResume(resume).then((response) => {
+        const file = response?.data?.Body
+        setFile(file)
+      })
+    }
   }, [resume])
 
   // let ratingsArray = [] as number[]
