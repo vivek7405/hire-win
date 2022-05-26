@@ -7,6 +7,7 @@ import {
   useRouter,
   usePaginatedQuery,
   useQuery,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -18,6 +19,7 @@ import Cards from "app/core/components/Cards"
 import { CardType, DragDirection, ExtendedScoreCard } from "types"
 import { CogIcon } from "@heroicons/react/outline"
 import getScoreCardsWOPagination from "app/score-cards/queries/getScoreCardsWOPagination"
+import groupByKey from "app/core/utils/groupByKey"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -48,6 +50,7 @@ const ScoreCards = ({ user }) => {
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
+  const session = useSession()
 
   useEffect(() => {
     const search = router.query.search
@@ -82,7 +85,7 @@ const ScoreCards = ({ user }) => {
 
   const [scoreCards] = useQuery(getScoreCardsWOPagination, {
     where: {
-      userId: user?.id,
+      companyId: session.companyId || 0,
       ...query,
     },
   })
@@ -95,13 +98,13 @@ const ScoreCards = ({ user }) => {
         ...data,
         {
           ...scoreCard,
-          canUpdate: scoreCard.userId === user.id,
+          canUpdate: scoreCard.companyId === session.companyId,
         },
       ]
 
       setData(data)
     })
-  }, [scoreCards, user.id])
+  }, [scoreCards, session.companyId])
 
   // let columns = [
   //   {
@@ -191,8 +194,10 @@ const ScoreCards = ({ user }) => {
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
                 {`${f.cardQuestions?.length} ${
                   f.cardQuestions?.length === 1 ? "Question" : "Questions"
-                } · ${f.jobWorkflowStages?.length} ${
-                  f.jobWorkflowStages?.length === 1 ? "Job" : "Jobs"
+                } · ${Object.keys(groupByKey(f.jobWorkflowStages, "jobId"))?.length} ${
+                  Object.keys(groupByKey(f.jobWorkflowStages, "jobId"))?.length === 1
+                    ? "Job"
+                    : "Jobs"
                 }`}
               </div>
               <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">

@@ -29,7 +29,7 @@ import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
 import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon } from "@heroicons/react/outline"
 
-import { MembershipRole, User } from "db"
+import { JobUserRole, User } from "db"
 import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
@@ -42,6 +42,7 @@ import getCalendars from "app/scheduling/calendars/queries/getCalendars"
 import getDefaultCalendarByUser from "app/scheduling/calendars/queries/getDefaultCalendarByUser"
 import assignScheduleToJobStage from "app/jobs/mutations/assignScheduleToJobStage"
 import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStage"
+import getCompany from "app/companies/queries/getCompany"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -52,8 +53,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
+  const company = await invokeWithMiddleware(
+    getCompany,
+    {
+      where: { id: session.companyId || 0 },
+    },
+    { ...context }
+  )
 
-  const currentPlan = checkPlan(user)
+  const currentPlan = checkPlan(company)
 
   const { can: canUpdate } = await Guard.can(
     "update",
@@ -140,11 +148,6 @@ const JobSettingsMembersPage = ({
   const [changePermissionMutation] = useMutation(updateMemberRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
   const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
-  const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
-  const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
-  const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
-  const [calendars] = useQuery(getCalendars, { where: { ownerId: user?.id } })
-  const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
 
   const [jobData, setJobData] = useState(job)
 
@@ -166,6 +169,8 @@ const JobSettingsMembersPage = ({
               </h2>
               <Modal header="Invite A User" open={openInvite} setOpen={setOpenInvite}>
                 <InvitationForm
+                  jobId={job?.id || "0"}
+                  isJobInvitation={true}
                   initialValues={{ email: "" }}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Inviting {values.email}</span>)
@@ -234,7 +239,7 @@ const JobSettingsMembersPage = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {jobData?.memberships.map((m, i) => {
+                  {jobData?.users.map((m, i) => {
                     return (
                       <tr className="bg-white" key={i}>
                         <td
@@ -269,7 +274,7 @@ const JobSettingsMembersPage = ({
                                       id: m.id,
                                     },
                                     data: {
-                                      role: MembershipRole[e.target.value],
+                                      role: JobUserRole[e.target.value],
                                     },
                                   })
                                   toast.success(() => <span>Member updated</span>, { id: toastId })
@@ -282,7 +287,7 @@ const JobSettingsMembersPage = ({
                                 }
                               }}
                             >
-                              {Object.values(MembershipRole)
+                              {Object.values(JobUserRole)
                                 .filter((m) => m !== "OWNER")
                                 .map((m, i) => {
                                   return <option key={i}>{m}</option>
@@ -353,10 +358,9 @@ const JobSettingsMembersPage = ({
                       const existingInterviewDetail = ws.interviewDetails?.find(
                         (int) => int.workflowStageId === ws.id && int.jobId === jobData.id
                       )
-                      const existingInterviewer: User | null | undefined =
-                        jobData?.memberships?.find(
-                          (member) => member?.userId === existingInterviewDetail?.interviewerId
-                        )?.user
+                      const existingInterviewer: User | null | undefined = jobData?.users?.find(
+                        (member) => member?.userId === existingInterviewDetail?.interviewerId
+                      )?.user
 
                       return (
                         <div key={ws.id}>
@@ -397,7 +401,7 @@ const JobSettingsMembersPage = ({
                               disabled={existingInterviewDetail && !existingInterviewer}
                               defaultValue={
                                 existingInterviewDetail?.interviewerId?.toString() ||
-                                jobData?.memberships
+                                jobData?.users
                                   ?.find((member) => member?.role === "OWNER")
                                   ?.userId?.toString()
                               }
@@ -431,7 +435,7 @@ const JobSettingsMembersPage = ({
                               }}
                             >
                               {!existingInterviewDetail || existingInterviewer ? (
-                                jobData?.memberships?.map((member) => {
+                                jobData?.users?.map((member) => {
                                   return (
                                     <option
                                       key={member?.userId?.toString()!}

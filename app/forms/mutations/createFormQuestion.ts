@@ -7,8 +7,8 @@ async function createFormQuestion(data: FormQuestionInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { formId, questionId } = FormQuestion.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
   const order = (await db.formQuestion.count({ where: { formId: formId } })) + 1
 

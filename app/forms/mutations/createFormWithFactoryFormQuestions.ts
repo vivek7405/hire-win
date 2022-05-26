@@ -4,7 +4,7 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryFormQuestions from "../../questions/utils/factoryFormQuestions"
 import { QuestionType } from "@prisma/client"
 
-async function createFormWithFactoryFormQuestions(formName: string, userId: number) {
+async function createFormWithFactoryFormQuestions(formName: string, companyId: number) {
   const slugForm = slugify(formName, { strict: true })
   const newSlugForm = await findFreeSlug(
     slugForm,
@@ -27,7 +27,7 @@ async function createFormWithFactoryFormQuestions(formName: string, userId: numb
 
   const existingQuestions = await db.question.findMany({
     where: {
-      userId,
+      companyId,
       name: {
         in: factoryFormQuestions.map((fq) => {
           return fq.question.name
@@ -42,9 +42,9 @@ async function createFormWithFactoryFormQuestions(formName: string, userId: numb
       updatedAt: new Date(),
       name: formName,
       slug: newSlugForm,
-      user: {
+      company: {
         connect: {
-          id: userId,
+          id: companyId,
         },
       },
       questions: {
@@ -67,9 +67,9 @@ async function createFormWithFactoryFormQuestions(formName: string, userId: numb
                   acceptedFiles: fq.question.acceptedFiles || "",
                   slug: fq.question.slug || "",
                   factory: fq.question.factory || false,
-                  user: {
+                  company: {
                     connect: {
-                      id: userId,
+                      id: companyId,
                     },
                   },
                 },

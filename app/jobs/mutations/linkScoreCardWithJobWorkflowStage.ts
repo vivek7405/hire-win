@@ -4,7 +4,7 @@ import slugify from "slugify"
 import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { MembershipRole, ScoreCard } from "@prisma/client"
+import { JobUserRole, ScoreCard } from "@prisma/client"
 import { ExtendedScoreCard } from "types"
 
 type linkScoreCardWithJobWorkflowStageProps = {
@@ -20,11 +20,11 @@ async function linkScoreCardWithJobWorkflowStage(
 
   const { jobId, workflowStageId, scoreCardId } = data
 
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
   const defaultScoreCard: ExtendedScoreCard | null = await db.scoreCard.findFirst({
-    where: { userId: user.id, name: "Default" },
+    where: { companyId: ctx.session.companyId || 0, name: "Default" },
     include: {
       cardQuestions: {
         include: {
@@ -37,7 +37,7 @@ async function linkScoreCardWithJobWorkflowStage(
   })
 
   const scoreCard: ExtendedScoreCard | null = await db.scoreCard.findFirst({
-    where: { userId: user.id, id: scoreCardId || "0" },
+    where: { companyId: ctx.session.companyId || 0, id: scoreCardId || "0" },
     include: {
       cardQuestions: {
         include: {

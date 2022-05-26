@@ -6,6 +6,7 @@ import {
   Link,
   useRouter,
   usePaginatedQuery,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -42,6 +43,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 export const Questions = ({ user }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const session = useSession()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
@@ -63,7 +65,7 @@ export const Questions = ({ user }) => {
 
   const [{ questions, hasMore, count }] = usePaginatedQuery(getQuestions, {
     where: {
-      userId: user?.id,
+      companyId: session.companyId || 0,
       ...query,
     },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -85,13 +87,13 @@ export const Questions = ({ user }) => {
         ...data,
         {
           ...question,
-          canUpdate: question.userId === user.id,
+          canUpdate: question.companyId === session.companyId,
         },
       ]
 
       setData(data)
     })
-  }, [questions, user.id])
+  }, [questions, session.companyId])
 
   // let columns = [
   //   {

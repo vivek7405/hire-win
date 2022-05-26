@@ -14,7 +14,7 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
     async (e) => await db.candidate.findFirst({ where: { slug: e } })
   )
 
-  const membership = await db.membership.findFirst({
+  const membership = await db.jobUser.findFirst({
     where: { jobId },
     include: {
       job: { include: { workflow: { include: { stages: { include: { stage: true } } } } } },

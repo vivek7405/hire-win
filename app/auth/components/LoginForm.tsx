@@ -1,4 +1,4 @@
-import { AuthenticationError, Routes, useMutation, Link } from "blitz"
+import { AuthenticationError, Routes, useMutation, Link, Router, useRouter } from "blitz"
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { AuthForm } from "app/auth/components/AuthForm"
 import login from "app/auth/mutations/login"
@@ -11,6 +11,7 @@ type LoginFormProps = {
 
 export const LoginForm = (props: LoginFormProps) => {
   const [loginMutation] = useMutation(login)
+  const router = useRouter()
 
   return (
     <div className="flex flex-col space-y-6">
@@ -35,7 +36,10 @@ export const LoginForm = (props: LoginFormProps) => {
         initialValues={{ email: "", password: "" }}
         onSubmit={async (values) => {
           try {
-            await loginMutation(values)
+            const companyId = await loginMutation(values)
+            if (companyId === 0) {
+              router.push(Routes.NewCompany())
+            }
             props.onSuccess?.()
           } catch (error) {
             if (error instanceof AuthenticationError) {

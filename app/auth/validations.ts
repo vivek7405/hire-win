@@ -7,7 +7,8 @@ export const Signup = z.object({
   email: z.string().email(),
   companyName: z.string().nonempty({ message: "Required" }),
   slug: z.string().optional(),
-  password,
+  companyId: z.number().optional(),
+  password: z.string().nonempty({ message: "Required" }),
 })
 
 export const Login = z.object({

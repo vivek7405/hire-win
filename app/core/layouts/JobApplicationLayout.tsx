@@ -5,16 +5,9 @@ import { Country, State } from "country-state-city"
 import { titleCase } from "../utils/titleCase"
 import draftToHtml from "draftjs-to-html"
 import moment from "moment"
+import { Company } from "@prisma/client"
 
-type JobApplicationLayoutProps = {
-  children: ReactNode
-  user?: ExtendedUser
-  job?: ExtendedJob
-  isJobBoard?: boolean
-  addGoogleJobPostingScript?: boolean
-}
-
-function getGoogleJobPostingStructuredData(user: ExtendedUser, job: ExtendedJob) {
+function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
   return {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
@@ -22,7 +15,7 @@ function getGoogleJobPostingStructuredData(user: ExtendedUser, job: ExtendedJob)
     description: draftToHtml(job?.description),
     identifier: {
       "@type": "PropertyValue",
-      name: user?.companyName,
+      name: company?.name,
       value: job?.id,
     },
     datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
@@ -30,9 +23,9 @@ function getGoogleJobPostingStructuredData(user: ExtendedUser, job: ExtendedJob)
     employmentType: job?.employmentType,
     hiringOrganization: {
       "@type": "Organization",
-      name: user?.companyName,
-      sameAs: user?.website,
-      logo: (user?.logo as AttachmentObject)?.Location,
+      name: company?.name,
+      sameAs: company?.website,
+      logo: (company?.logo as AttachmentObject)?.Location,
     },
     jobLocation: {
       "@type": "Place",
@@ -57,46 +50,54 @@ function getGoogleJobPostingStructuredData(user: ExtendedUser, job: ExtendedJob)
   }
 }
 
+type JobApplicationLayoutProps = {
+  children: ReactNode
+  job?: ExtendedJob
+  company?: Company
+  isCareersPage?: boolean
+  addGoogleJobPostingScript?: boolean
+}
+
 const JobApplicationLayout = ({
   children,
-  user,
+  company,
   job,
-  isJobBoard,
+  isCareersPage,
   addGoogleJobPostingScript,
 }: JobApplicationLayoutProps) => {
-  const logo = user?.logo as AttachmentObject
+  const logo = company?.logo as AttachmentObject
 
-  const [theme, setTheme] = useState(user?.theme || "indigo")
+  const [theme, setTheme] = useState(company?.theme || "indigo")
   useEffect(() => {
-    const themeName = user?.theme || "indigo"
+    const themeName = company?.theme || "indigo"
     setTheme(themeName)
-  }, [setTheme, user?.theme])
+  }, [setTheme, company?.theme])
 
   // ADDED FOR TESTING
   useEffect(() => {
-    if (addGoogleJobPostingScript && user && job) {
-      console.log(getGoogleJobPostingStructuredData(user, job))
+    if (addGoogleJobPostingScript && job) {
+      console.log(getGoogleJobPostingStructuredData(job, company!))
     }
-  }, [user, job, addGoogleJobPostingScript])
+  }, [job, addGoogleJobPostingScript, company])
 
   return (
     <>
       <Head>
-        {isJobBoard && (
-          <title>{`Job Board | ${titleCase(user?.companyName?.toLocaleLowerCase())}`}</title>
+        {isCareersPage && (
+          <title>{`Job Board | ${titleCase(company?.name?.toLocaleLowerCase())}`}</title>
         )}
-        {!isJobBoard && (
+        {!isCareersPage && (
           <title>{`Job Application | ${titleCase(job?.title?.toLocaleLowerCase())} | ${titleCase(
-            user?.companyName?.toLocaleLowerCase()
+            company?.name?.toLocaleLowerCase()
           )}`}</title>
         )}
         <link rel="icon" href="/favicon.ico" />
-        {addGoogleJobPostingScript && user && job && (
+        {addGoogleJobPostingScript && job && (
           <script
             id={`jobJSON-${job?.id}`}
             type="application/ld+json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify(getGoogleJobPostingStructuredData(user, job)),
+              __html: JSON.stringify(getGoogleJobPostingStructuredData(job, company!)),
             }}
           />
         )}
@@ -105,18 +106,18 @@ const JobApplicationLayout = ({
         <header className="py-10 bg-white">
           <div className="flex justify-center items-center">
             <span className="self-center cursor-pointer">
-              {user?.slug && (
-                <Link href={Routes.JobBoard({ companySlug: user?.slug })}>
+              {company?.slug && (
+                <Link href={Routes.CareersPage({ companySlug: company?.slug })}>
                   {logo?.Location ? (
-                    <img src={logo?.Location} alt={`${user?.companyName} logo`} width={200} />
+                    <img src={logo?.Location} alt={`${company?.name} logo`} width={200} />
                   ) : (
-                    <h1 className="text-3xl font-bold">{user?.companyName}</h1>
+                    <h1 className="text-3xl font-bold">{company?.name}</h1>
                   )}
                 </Link>
               )}
             </span>
           </div>
-          {!isJobBoard && (
+          {!isCareersPage && (
             <div className="mt-6 flex flex-col space-y-2 justify-center items-center">
               <h3 className="text-2xl font-bold">{job?.title}</h3>
               {job?.remote && (
@@ -151,26 +152,28 @@ const JobApplicationLayout = ({
         <footer>
           <div
             className={`text-neutral-50 flex flex-col ${
-              !(isJobBoard && !user?.website) && "space-y-3"
+              !(isCareersPage && !company?.website) && "space-y-3"
             } justify-center items-center bg-theme-600 h-32`}
           >
             <div className="flex justify-center items-center">
-              {!isJobBoard && (
+              {!isCareersPage && (
                 <span className="hover:text-neutral-200">
-                  {user?.slug && (
-                    <Link href={Routes.JobBoard({ companySlug: user?.slug })}>View all jobs</Link>
+                  {company?.slug && (
+                    <Link href={Routes.CareersPage({ companySlug: company?.slug })}>
+                      View all jobs
+                    </Link>
                   )}
                 </span>
               )}
               <span className="hover:text-neutral-200">
-                {user?.website && (
-                  <a href={user?.website} target="_blank" rel="noreferrer">
-                    {!isJobBoard && <>&nbsp;&nbsp;·&nbsp;&nbsp;</>}View Website
+                {company?.website && (
+                  <a href={company?.website} target="_blank" rel="noreferrer">
+                    {!isCareersPage && <>&nbsp;&nbsp;·&nbsp;&nbsp;</>}View Website
                   </a>
                 )}
               </span>
             </div>
-            {!(isJobBoard && !user?.website) && <hr />}
+            {!(isCareersPage && !company?.website) && <hr />}
             <div className="flex justify-center items-center">
               <span>Powered by&nbsp;</span>
               <span className="underline hover:text-neutral-200">

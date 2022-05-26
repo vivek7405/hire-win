@@ -20,9 +20,9 @@ async function createCandidatePool(data: CandidatePoolInputType, ctx: Ctx) {
     data: {
       name: name,
       slug: newSlug,
-      user: {
+      company: {
         connect: {
-          id: ctx.session.userId || 0,
+          id: ctx.session.companyId || 0,
         },
       },
     },

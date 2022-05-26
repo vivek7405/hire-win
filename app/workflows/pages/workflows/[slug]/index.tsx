@@ -12,6 +12,7 @@ import {
   useRouter,
   useMutation,
   useQuery,
+  useSession,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -58,7 +59,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const workflow = await invokeWithMiddleware(
         getWorkflow,
-        { where: { slug: context?.params?.slug!, userId: user?.id } },
+        { where: { slug: context?.params?.slug!, companyId: session?.companyId || 0 } },
         { ...context }
       )
 
@@ -574,6 +575,7 @@ const SingleWorkflowPage = ({
   const [openAddExistingStage, setOpenAddExistingStage] = React.useState(false)
   const [openAddNewStage, setOpenAddNewStage] = React.useState(false)
   const router = useRouter()
+  const session = useSession()
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -661,7 +663,7 @@ const SingleWorkflowPage = ({
               >
                 <AddExistingStagesForm
                   schema={WorkflowStages}
-                  user={user}
+                  companyId={session.companyId || 0}
                   workflowId={workflow?.id!}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Adding Stage(s)</span>)

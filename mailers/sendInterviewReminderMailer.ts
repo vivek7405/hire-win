@@ -24,7 +24,6 @@ export async function sendInterviewReminderMailer({
   // })
 
   // const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
-  // const webhookUrl = `${origin}/api/invitations/accept?token=${token}&jobId=${job?.id}`
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {

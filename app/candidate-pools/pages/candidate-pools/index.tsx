@@ -9,6 +9,7 @@ import {
   useQuery,
   useMutation,
   invalidateQuery,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -55,12 +56,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 const CandidatePools = ({ user }) => {
   const router = useRouter()
+  const session = useSession()
   const [query, setQuery] = useState({})
   const [openConfirm, setOpenConfirm] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [createCandidatePoolMutation] = useMutation(createCandidatePool)
   const [updateCandidatePoolMutation] = useMutation(updateCandidatePool)
-  const [candidatePools] = useQuery(getCandidatePools, { where: { userId: user?.id, ...query } })
+  const [candidatePools] = useQuery(getCandidatePools, {
+    where: { companyId: session.companyId || 0, ...query },
+  })
   const [deleteCandidatePoolMutation] = useMutation(deleteCandidatePool)
   const [candidatePoolToEdit, setCandidatePoolToEdit] = useState(null as any as CandidatePool)
   const [candidatePoolToDelete, setCandidatePoolToDelete] = useState(null as any as CandidatePool)

@@ -4,6 +4,7 @@ import {
   Routes,
   GetServerSidePropsContext,
   useMutation,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import JobForm from "app/jobs/components/JobForm"
@@ -40,6 +41,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [createJobMutation] = useMutation(createJob)
 
   return (
@@ -47,6 +49,7 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <div className="mt-6">
         <JobForm
+          companyId={session.companyId || 0}
           user={user}
           header="Create A New Job"
           subHeader="Enter job details"

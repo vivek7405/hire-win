@@ -13,6 +13,7 @@ type AddExistingCardQuestionsFormProps = {
   user: any
   schema: any
   scoreCardId: string
+  companyId: number
 }
 
 export const AddExistingCardQuestionsForm = (props: AddExistingCardQuestionsFormProps) => {
@@ -21,7 +22,7 @@ export const AddExistingCardQuestionsForm = (props: AddExistingCardQuestionsForm
   })
   const [cardQuestions] = useQuery(getCardQuestionsWOPagination, {
     where: {
-      userId: props.user?.id,
+      companyId: props.companyId,
       slug: {
         notIn: scoreCardQuestions.map((ws) => {
           return ws.cardQuestion.slug

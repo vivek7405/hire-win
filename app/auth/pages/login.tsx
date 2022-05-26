@@ -1,8 +1,19 @@
-import { useRouter, BlitzPage, Head, Routes, Link, Image, GetServerSidePropsContext } from "blitz"
+import {
+  useRouter,
+  BlitzPage,
+  Head,
+  Routes,
+  Link,
+  Image,
+  GetServerSidePropsContext,
+  getSession,
+  invokeWithMiddleware,
+} from "blitz"
 import { LoginForm } from "app/auth/components/LoginForm"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import LogoBrand from "app/assets/LogoBrand"
+import getCompanyUser from "app/companies/queries/getCompanyUser"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -10,6 +21,28 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/blitz/db.js")
 
   const user = await getCurrentUserServer({ ...context })
+  const session = await getSession(context.req, context.res)
+
+  const companyUser = await invokeWithMiddleware(
+    getCompanyUser,
+    {
+      where: {
+        companyId: session.companyId || 0,
+        userId: session.userId || 0,
+      },
+    },
+    { ...context }
+  )
+
+  if (user && !companyUser) {
+    return {
+      redirect: {
+        destination: "/companies/new",
+        permanent: false,
+      },
+      props: {},
+    }
+  }
 
   if (user) {
     return {

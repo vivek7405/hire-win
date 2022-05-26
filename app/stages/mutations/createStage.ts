@@ -9,8 +9,8 @@ async function createStage(data: StageInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { name } = Stage.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true })
   const newSlug = await findFreeSlug(
@@ -22,7 +22,7 @@ async function createStage(data: StageInputType, ctx: Ctx) {
     data: {
       name: name,
       slug: newSlug,
-      userId: user.id,
+      companyId: ctx.session.companyId || 0,
     },
   })
 

@@ -7,6 +7,7 @@ import {
   useRouter,
   usePaginatedQuery,
   useQuery,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -45,6 +46,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const Forms = ({ user }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const session = useSession()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
@@ -82,7 +84,7 @@ const Forms = ({ user }) => {
 
   const [forms] = useQuery(getFormsWOPagination, {
     where: {
-      userId: user?.id,
+      companyId: session.companyId || 0,
       ...query,
     },
   })
@@ -95,13 +97,13 @@ const Forms = ({ user }) => {
         ...data,
         {
           ...form,
-          canUpdate: form.userId === user.id,
+          canUpdate: form.companyId === session.companyId,
         },
       ]
 
       setData(data)
     })
-  }, [forms, user.id])
+  }, [forms, session.companyId])
 
   // let columns = [
   //   {

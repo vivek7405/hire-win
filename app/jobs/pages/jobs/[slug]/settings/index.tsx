@@ -9,6 +9,7 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useSession,
 } from "blitz"
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import path from "path"
@@ -109,6 +110,7 @@ const JobSettingsPage = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [updateJobMutation] = useMutation(updateJob)
 
   if (error) {
@@ -119,6 +121,7 @@ const JobSettingsPage = ({
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <JobSettingsLayout job={job!} isOwner={isOwner}>
         <JobForm
+          companyId={session.companyId || 0}
           user={user}
           category={job?.category!}
           workflow={job?.workflow!}

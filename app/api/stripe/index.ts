@@ -5,7 +5,7 @@ import db from "db"
 interface ISession {
   customer: string
   metadata: {
-    userId: string
+    companyId: string
   }
   subscription: string
 }
@@ -45,9 +45,9 @@ export default async (req, res) => {
   if (event.type === "checkout.session.completed") {
     const subscription = await stripe.subscriptions.retrieve(session.subscription)
 
-    await db.user.update({
+    await db.company.update({
       where: {
-        id: parseInt(session.metadata.userId || "0"),
+        id: parseInt(session.metadata.companyId || "0"),
       },
       data: {
         stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
@@ -61,7 +61,7 @@ export default async (req, res) => {
   if (event.type === "invoice.payment_succeeded") {
     const subscription = await stripe.subscriptions.retrieve(session.subscription)
 
-    await db.user.update({
+    await db.company.update({
       where: {
         stripeSubscriptionId: subscription.id,
       },

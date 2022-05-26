@@ -11,7 +11,7 @@ const handler: BlitzApiHandler = async (req, res) => {
     res.end(JSON.stringify({ error: "Authentication Error" }))
   } else {
     if (req.method === "GET") {
-      const jobs = await db.membership.findMany({
+      const jobs = await db.jobUser.findMany({
         include: {
           job: true,
         },

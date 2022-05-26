@@ -11,7 +11,7 @@ interface InviteToJobInput {
 async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const inviter = await db.membership.findFirst({
+  const inviter = await db.jobUser.findFirst({
     where: {
       userId: ctx.session.userId,
       jobId: jobId,
@@ -23,7 +23,7 @@ async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
       id: jobId,
     },
     include: {
-      memberships: true,
+      users: true,
     },
   })
 
@@ -37,7 +37,7 @@ async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
   await db.token.create({
     data: {
       user: { connect: { id: inviter.userId } },
-      type: "INVITE_TOKEN",
+      type: "INVITE_TO_JOB_TOKEN",
       expiresAt,
       hashedToken,
       sentTo: email,
@@ -48,7 +48,7 @@ async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
 
   await buildEmail.send()
 
-  return `${process.env.NEXT_PUBLIC_APP_URL}/api/invitations/accept?token=${token}&jobId=${job?.id}`
+  return `${process.env.NEXT_PUBLIC_APP_URL}/api/invitations/job/accept?token=${token}&jobId=${job?.id}`
 }
 
 export default Guard.authorize("inviteUser", "job", inviteToJob)

@@ -35,13 +35,14 @@ type ScoreCardProps = {
   scoreCardQuestions?: ExtendedScoreCardQuestion[]
   onChange?: any
   userId: number
+  companyId: number
   candidate?: ExtendedCandidate
   workflowStage?: ExtendedWorkflowStage
 }
 
 export const ScoreCard = (props: ScoreCardProps) => {
   const [defaultScoreCard] = useQuery(getScoreCard, {
-    where: { userId: props.userId, name: "Default" },
+    where: { companyId: props.companyId, name: "Default" },
   })
 
   const [queryScoreCardQuestions] = useQuery(getScoreCardQuestionsWOPagination, {

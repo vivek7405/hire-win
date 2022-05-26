@@ -3,7 +3,7 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryCandidatePools from "../utils/factoryCandidatePools"
 
-async function createFactoryCandidatePools(userId: number) {
+async function createFactoryCandidatePools(companyId: number) {
   const getSlug = async (q) => {
     const slug = slugify(q.name, { strict: true })
     const newSlug = await findFreeSlug(
@@ -25,7 +25,7 @@ async function createFactoryCandidatePools(userId: number) {
         updatedAt: new Date(),
         name: c.name,
         slug: c.slug,
-        userId,
+        companyId,
       }
     }),
   })

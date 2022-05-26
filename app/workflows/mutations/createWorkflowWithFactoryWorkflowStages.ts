@@ -3,7 +3,7 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryWorkflowStages from "../../stages/utils/factoryWorkflowStages"
 
-async function createWorkflowWithFactoryWorkflowStages(workflowName: string, userId: number) {
+async function createWorkflowWithFactoryWorkflowStages(workflowName: string, companyId: number) {
   const slugWorkflow = slugify(workflowName, { strict: true })
   const newSlugWorkflow = await findFreeSlug(
     slugWorkflow,
@@ -26,7 +26,7 @@ async function createWorkflowWithFactoryWorkflowStages(workflowName: string, use
 
   const existingStages = await db.stage.findMany({
     where: {
-      userId,
+      companyId,
       name: {
         in: factoryWorkflowStages.map((fq) => {
           return fq.stage.name
@@ -41,9 +41,9 @@ async function createWorkflowWithFactoryWorkflowStages(workflowName: string, use
       updatedAt: new Date(),
       name: workflowName,
       slug: newSlugWorkflow,
-      user: {
+      company: {
         connect: {
-          id: userId,
+          id: companyId,
         },
       },
       stages: {
@@ -61,9 +61,9 @@ async function createWorkflowWithFactoryWorkflowStages(workflowName: string, use
                   name: fq.stage.name || "",
                   slug: fq.stage.slug || "",
                   allowEdit: fq.stage.allowEdit,
-                  user: {
+                  company: {
                     connect: {
-                      id: userId,
+                      id: companyId,
                     },
                   },
                 },

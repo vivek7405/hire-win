@@ -7,8 +7,8 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 async function createCardQuestion(data: CardQuestionInputType, ctx: Ctx) {
   const { name } = CardQuestion.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true })
   const newSlug = await findFreeSlug(
@@ -20,7 +20,7 @@ async function createCardQuestion(data: CardQuestionInputType, ctx: Ctx) {
     data: {
       name,
       slug: newSlug,
-      userId: user.id,
+      companyId: ctx.session.companyId || 0,
     },
   })
 

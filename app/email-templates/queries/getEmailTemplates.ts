@@ -7,7 +7,7 @@ const getEmailTemplates = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetEmailTemplatesInput, ctx: Ctx) => {
     const emailTemplates = await db.emailTemplate.findMany({
-      where: { ...where, userId: ctx.session.userId || 0 },
+      where,
       orderBy: { createdAt: "asc" },
     })
     return emailTemplates

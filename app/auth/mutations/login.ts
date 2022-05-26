@@ -6,7 +6,10 @@ import { UserRole } from "@prisma/client"
 export const authenticateUser = async (rawEmail: string, rawPassword: string) => {
   const email = rawEmail.toLowerCase().trim()
   const password = rawPassword.trim()
-  const user = await db.user.findFirst({ where: { email } })
+  const user = await db.user.findFirst({
+    where: { email },
+    include: { companies: { orderBy: { createdAt: "asc" } } },
+  })
   if (!user) throw new AuthenticationError()
 
   const result = await SecurePassword.verify(user.hashedPassword, password)
@@ -24,6 +27,12 @@ export const authenticateUser = async (rawEmail: string, rawPassword: string) =>
 export default resolver.pipe(resolver.zod(Login), async ({ email, password }, ctx) => {
   // This throws an error if credentials are invalid
   const user = await authenticateUser(email, password)
-  await ctx.session.$create({ userId: user.id, role: user.role as UserRole })
-  return user
+  const companyUsers = user.companies
+  const companyId = (companyUsers && (companyUsers[0]?.companyId || 0)) || 0
+  await ctx.session.$create({
+    userId: user.id,
+    role: user.role as UserRole,
+    companyId,
+  })
+  return companyId
 })

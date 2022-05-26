@@ -1,5 +1,5 @@
 import { TrashIcon } from "@heroicons/react/outline"
-import { Interview, InterviewDetail, Membership, User } from "@prisma/client"
+import { Interview, InterviewDetail, JobUser, User } from "@prisma/client"
 import Confirm from "app/core/components/Confirm"
 import Modal from "app/core/components/Modal"
 import { invalidateQuery, useMutation, useQuery } from "blitz"
@@ -127,7 +127,7 @@ type CandidateInterviewProps = {
   interview: Interview & { organizer: User } & { interviewer: User } & {
     otherAttendees: User[]
   } & { interviewDetail: InterviewDetail }
-  user: User & { memberships: Membership[] }
+  user: User & { jobUsers: JobUser[] }
   setOpenConfirm: any
   setInterviewToDelete: any
 }
@@ -144,9 +144,8 @@ const CandidateInterview = ({
         disabled={
           user?.id !== interview?.interviewerId &&
           user?.id !== interview?.organizerId &&
-          user?.memberships?.find(
-            (membership) => membership.jobId === interview?.interviewDetail?.jobId
-          )?.role !== "OWNER"
+          user?.jobUsers?.find((JobUser) => JobUser.jobId === interview?.interviewDetail?.jobId)
+            ?.role !== "OWNER"
         }
         onClick={() => {
           setOpenConfirm(true)

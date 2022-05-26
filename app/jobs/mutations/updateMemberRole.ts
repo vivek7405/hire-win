@@ -3,12 +3,12 @@ import db, { Prisma } from "db"
 
 import Guard from "app/guard/ability"
 
-type UpdateMembershipInput = Pick<Prisma.MembershipUpdateArgs, "where" | "data">
+type UpdateMembershipInput = Pick<Prisma.JobUserUpdateArgs, "where" | "data">
 
 async function updateMemberRole({ where, data }: UpdateMembershipInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const membership = await db.membership.update({
+  const membership = await db.jobUser.update({
     where,
     data,
   })

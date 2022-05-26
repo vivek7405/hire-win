@@ -9,8 +9,8 @@ async function createCategory(data: CategoryInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { name } = Category.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true })
   const newSlug = await findFreeSlug(
@@ -22,9 +22,9 @@ async function createCategory(data: CategoryInputType, ctx: Ctx) {
     data: {
       name: name,
       slug: newSlug,
-      user: {
+      company: {
         connect: {
-          id: user.id,
+          id: ctx.session.companyId || 0,
         },
       },
     },

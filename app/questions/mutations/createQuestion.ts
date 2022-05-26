@@ -7,8 +7,8 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 async function createQuestion(data: QuestionInputType, ctx: Ctx) {
   const { name, placeholder, type, options, acceptedFiles } = Question.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true })
   const newSlug = await findFreeSlug(
@@ -29,7 +29,7 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
         }),
       },
       slug: newSlug,
-      userId: user.id,
+      companyId: ctx.session.companyId || 0,
       acceptedFiles: acceptedFiles,
     },
   })

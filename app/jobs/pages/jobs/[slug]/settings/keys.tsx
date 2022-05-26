@@ -20,7 +20,7 @@ import Guard from "app/guard/ability"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import Confirm from "app/core/components/Confirm"
-import generateToken from "app/jobs/mutations/generateToken"
+import generateInviteToJobToken from "app/jobs/mutations/generateInviteToJobToken"
 import getTokens from "app/jobs/queries/getTokens"
 import deleteToken from "app/jobs/mutations/deleteToken"
 
@@ -246,7 +246,7 @@ const JobSettingsKeysPage = ({
   canUpdate,
   isOwner,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [generateTokenMutation] = useMutation(generateToken)
+  const [generateInviteToJobTokenMutation] = useMutation(generateInviteToJobToken)
   const [newSecret, setNewSecret] = React.useState("")
   const [modalOpen, setModalOpen] = React.useState(false)
 
@@ -280,7 +280,7 @@ const JobSettingsKeysPage = ({
                 <button
                   onClick={async (e) => {
                     e.preventDefault()
-                    const token = await generateTokenMutation({
+                    const token = await generateInviteToJobTokenMutation({
                       jobId: job?.id as string,
                     })
                     setNewSecret(token as string)

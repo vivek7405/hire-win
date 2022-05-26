@@ -7,6 +7,7 @@ import {
   useRouter,
   usePaginatedQuery,
   useQuery,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -48,6 +49,7 @@ const Workflows = ({ user }) => {
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
+  const session = useSession()
 
   useEffect(() => {
     const search = router.query.search
@@ -82,7 +84,7 @@ const Workflows = ({ user }) => {
 
   const [workflows] = useQuery(getWorkflowsWOPagination, {
     where: {
-      userId: user?.id,
+      companyId: session.companyId || 0,
       ...query,
     },
   })
@@ -95,13 +97,13 @@ const Workflows = ({ user }) => {
         ...data,
         {
           ...workflow,
-          canUpdate: workflow.userId === user.id,
+          canUpdate: workflow.companyId === session.companyId,
         },
       ]
 
       setData(data)
     })
-  }, [workflows, user.id])
+  }, [workflows, session.companyId])
 
   // let columns = [
   //   {

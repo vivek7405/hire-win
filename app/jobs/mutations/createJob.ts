@@ -4,7 +4,7 @@ import slugify from "slugify"
 import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { MembershipRole, ScoreCard } from "@prisma/client"
+import { JobUserRole, ScoreCard } from "@prisma/client"
 
 async function createJob(data: JobInputType, ctx: Ctx) {
   ctx.session.$authorize()
@@ -40,9 +40,9 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     async (e) => await db.job.findFirst({ where: { slug: e } })
   )
 
-  const defaultScoreCard = await db.scoreCard.findFirst({
-    where: { userId: user.id, name: "Default" },
-  })
+  // const defaultScoreCard = await db.scoreCard.findFirst({
+  //   where: { companyId: ctx.session.companyId || 0, name: "Default" },
+  // })
 
   const workflow = await db.workflow.findFirst({
     where: { id: workflowId },
@@ -67,9 +67,9 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       salaryType,
       employmentType,
       validThrough,
-      memberships: {
+      users: {
         create: {
-          role: MembershipRole.OWNER,
+          role: JobUserRole.OWNER,
           user: {
             connect: {
               id: user.id,
@@ -102,6 +102,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
             }) || [],
         },
       },
+      companyId: ctx.session.companyId || 0,
     },
   })
 

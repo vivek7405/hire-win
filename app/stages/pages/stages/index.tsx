@@ -6,6 +6,7 @@ import {
   Link,
   useRouter,
   usePaginatedQuery,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -46,6 +47,7 @@ export const Stages = ({ user }) => {
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
+  const session = useSession()
 
   useEffect(() => {
     const search = router.query.search
@@ -64,7 +66,7 @@ export const Stages = ({ user }) => {
 
   const [{ stages, hasMore, count }] = usePaginatedQuery(getStages, {
     where: {
-      userId: user?.id,
+      companyId: session.companyId || 0,
       ...query,
     },
     orderBy: { allowEdit: "asc" },
@@ -87,13 +89,13 @@ export const Stages = ({ user }) => {
         ...data,
         {
           ...stage,
-          canUpdate: stage.userId === user.id,
+          canUpdate: stage.companyId === session.companyId,
         },
       ]
 
       setData(data)
     })
-  }, [stages, user.id])
+  }, [stages, session.companyId])
 
   // let columns = [
   //   {

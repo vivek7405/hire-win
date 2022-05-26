@@ -4,7 +4,7 @@ import seedData from "./seedData.json"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { Job } from "app/jobs/validations"
-import { MembershipRole, UserRole } from "@prisma/client"
+import { JobUserRole, UserRole } from "@prisma/client"
 
 /*
  * This seed function is executed when you run `blitz db seed`.
@@ -22,15 +22,15 @@ async function createUsers() {
       const slug = slugify(`${user.companyName}`, { strict: true })
       const newSlug: string = await findFreeSlug(
         slug,
-        async (e) => await db.user.findFirst({ where: { slug: e } })
+        async (e) => await db.company.findFirst({ where: { slug: e } })
       )
 
       const createdUser = await db.user.create({
         data: {
           name: user.name,
           email: user.email,
-          companyName: user.companyName,
-          slug: newSlug,
+          // companyName: user.companyName,
+          // slug: newSlug,
           hashedPassword,
           role: UserRole.USER,
         },
@@ -82,9 +82,9 @@ async function createJobs() {
           salaryType,
           employmentType,
           validThrough,
-          memberships: {
+          users: {
             create: {
-              role: MembershipRole.USER,
+              role: JobUserRole.USER,
               user: {
                 connect: {
                   id: job.owner,
@@ -92,12 +92,13 @@ async function createJobs() {
               },
             },
           },
+          companyId: 0,
         },
       })
 
       for (let user of userArray.filter((u) => u.id !== job.owner)) {
         if (job.members.includes(user.id)) {
-          await db.membership.create({
+          await db.jobUser.create({
             data: {
               role: UserRole.USER,
               job: {

@@ -19,49 +19,45 @@ model User {
 
   name           String
   email          String    @unique
-  companyName    String
-  companyInfo    Json?
-  website        String?
-  logo           Json?
-  theme          String?   @default("indigo")
-  slug           String    @unique
   hashedPassword String?
   role           UserRole  @default(USER)
   tokens         Token[]
   sessions       Session[]
 
-  stripeCustomerId       String?   @unique
-  stripeSubscriptionId   String?   @unique
-  stripePriceId          String?
-  stripeCurrentPeriodEnd DateTime?
+  // stripeCustomerId       String?   @unique
+  // stripeSubscriptionId   String?   @unique
+  // stripePriceId          String?
+  // stripeCurrentPeriodEnd DateTime?
 
-  memberships Membership[]
-  categories  Category[]
+  companies CompanyUser[]
+  jobs      JobUser[]
 
-  workflows Workflow[]
-  stages    Stage[]
+  // categories     Category[]
 
-  forms     Form[]
-  questions Question[]
+  // workflows Workflow[]
+  // stages    Stage[]
 
-  scoreCards    ScoreCard[]
-  cardQuestions CardQuestion[]
+  // forms     Form[]
+  // questions Question[]
+
+  // scoreCards    ScoreCard[]
+  // cardQuestions CardQuestion[]
 
   calendars        Calendar[]
-  // meetings         Meeting[]
-  interviewDetails InterviewDetail[]
-  schedules        Schedule[]
   defaultCalendars DefaultCalendar[]
+  schedules        Schedule[]
 
-  organizerInterviews      Interview[] @relation(name: "organizerInterviews")
-  interviewerInterviews    Interview[] @relation(name: "interviewerInterviews")
-  otherAttendeeInterview   Interview?  @relation(fields: [otherAttendeeInterviewId], references: [id])
+  interviewDetails         InterviewDetail[]
+  organizerInterviews      Interview[]       @relation(name: "organizerInterviews")
+  interviewerInterviews    Interview[]       @relation(name: "interviewerInterviews")
+  otherAttendeeInterview   Interview?        @relation(fields: [otherAttendeeInterviewId], references: [id])
   otherAttendeeInterviewId Int?
 
-  comments       Comment[]
-  emailTemplates EmailTemplate[]
-  emails         Email[]
-  candidatePools CandidatePool[]
+  comments Comment[]
+  emails   Email[]
+
+  // emailTemplates EmailTemplate[]
+  // candidatePools CandidatePool[]
 }
 
 enum UserRole {
@@ -100,12 +96,16 @@ model Token {
   job   Job?    @relation(fields: [jobId], references: [id])
   jobId String?
 
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId Int?
+
   @@unique([hashedToken, type])
 }
 
 enum TokenType {
   RESET_PASSWORD
-  INVITE_TOKEN
+  INVITE_TO_COMPANY_TOKEN
+  INVITE_TO_JOB_TOKEN
   PUBLIC_KEY
   SECRET_KEY
 }
@@ -129,6 +129,65 @@ enum EmploymentType {
   OTHER
 }
 
+enum CompanyUserRole {
+  OWNER
+  ADMIN
+  USER
+}
+
+model CompanyUser {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role CompanyUserRole
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
+
+  @@unique([userId, companyId])
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name    String
+  slug    String  @unique
+  info    Json?
+  website String?
+  logo    Json?
+  theme   String? @default("indigo")
+
+  tokens Token[]
+
+  users CompanyUser[]
+  jobs  Job[]
+
+  categories Category[]
+
+  workflows Workflow[]
+  stages    Stage[]
+
+  forms     Form[]
+  questions Question[]
+
+  scoreCards    ScoreCard[]
+  cardQuestions CardQuestion[]
+
+  emailTemplates EmailTemplate[]
+  candidatePools CandidatePool[]
+
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+}
+
 model Job {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -141,8 +200,8 @@ model Job {
   state   String
   city    String
 
-  remote Boolean
-  hidden Boolean @default(false)
+  remote     Boolean
+  hidden     Boolean @default(false)
   showSalary Boolean @default(false)
 
   currency   String
@@ -154,8 +213,8 @@ model Job {
   validThrough   DateTime?
   description    Json?
 
-  tokens      Token[]
-  memberships Membership[]
+  tokens Token[]
+  users  JobUser[]
 
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?
@@ -170,6 +229,9 @@ model Job {
 
   interviewDetails InterviewDetail[]
   candidates       Candidate[]
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
 }
 
 model InterviewDetail {
@@ -199,15 +261,18 @@ model InterviewDetail {
   @@unique([interviewerId, jobId, workflowStageId])
 }
 
-enum MembershipRole {
+enum JobUserRole {
   OWNER
   ADMIN
   USER
 }
 
-model Membership {
-  id   Int            @id @default(autoincrement())
-  role MembershipRole
+model JobUser {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role JobUserRole
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
@@ -226,12 +291,15 @@ model Category {
   name String
   slug String @unique
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
 
   jobs Job[]
 
-  @@unique([userId, name])
+  @@unique([companyId, name])
 }
 
 model Workflow {
@@ -245,10 +313,13 @@ model Workflow {
   stages WorkflowStage[]
   jobs   Job[]
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
 
-  @@unique([userId, name])
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
+
+  @@unique([companyId, name])
 }
 
 model Stage {
@@ -263,10 +334,13 @@ model Stage {
 
   workflows WorkflowStage[]
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
 
-  @@unique([userId, name])
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
+
+  @@unique([companyId, name])
 }
 
 model WorkflowStage {
@@ -305,10 +379,13 @@ model Form {
   questions FormQuestion[]
   jobs      Job[]
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
 
-  @@unique([userId, name])
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
+
+  @@unique([companyId, name])
 }
 
 model Question {
@@ -326,13 +403,16 @@ model Question {
 
   slug String @unique
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
 
   forms   FormQuestion[]
   answers Answer[]
 
-  @@unique([userId, name])
+  @@unique([companyId, name])
 }
 
 model ScoreCard {
@@ -347,10 +427,13 @@ model ScoreCard {
 
   jobWorkflowStages ScoreCardJobWorkflowStage[]
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
 
-  @@unique([userId, name])
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
+
+  @@unique([companyId, name])
 }
 
 model CardQuestion {
@@ -363,12 +446,15 @@ model CardQuestion {
 
   slug String @unique
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
 
   scoreCards ScoreCardQuestion[]
 
-  @@unique([userId, name])
+  @@unique([companyId, name])
 }
 
 model ScoreCardQuestion {
@@ -660,12 +746,15 @@ model EmailTemplate {
   slug    String @unique
   body    Json
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
 
   emails Email[]
 
-  @@unique([userId, subject])
+  @@unique([companyId, subject])
 }
 
 model Email {
@@ -699,10 +788,13 @@ model CandidatePool {
   name String
   slug String @unique
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  // user   User @relation(fields: [userId], references: [id])
+  // userId Int
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int
 
   candidates Candidate[]
 
-  @@unique([userId, name])
+  @@unique([companyId, name])
 }
