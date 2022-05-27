@@ -12,6 +12,10 @@ import CompanyForm from "app/companies/components/CompanyForm"
 import { EditorState } from "draft-js"
 import updateCompanySession from "app/companies/mutations/updateCompanySession"
 import { CompanyUserRole } from "@prisma/client"
+import Confirm from "./Confirm"
+import getCurrentPlan from "app/companies/queries/getCurrentPlan"
+import canCreateNewCompany from "app/companies/queries/canCreateNewCompany"
+import Guard from "app/guard/ability"
 
 type NavbarProps = {
   user?: ExtendedUser | null
@@ -23,12 +27,14 @@ const Navbar = ({ user }: NavbarProps) => {
   const [profileOpen, setProfileOpen] = useState(false)
   const router = useRouter()
   const session = useSession()
+  const [openConfirm, setOpenConfirm] = useState(false)
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session?.userId || 0, companyId: session?.companyId || 0 },
   })
   const [companyUsers] = useQuery(getCompanyUsers, {
     where: { userId: session?.userId || 0 },
   })
+  const [canCreateCompany] = useQuery(canCreateNewCompany, null)
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState(companyUser)
   useEffect(() => {
@@ -128,6 +134,18 @@ const Navbar = ({ user }: NavbarProps) => {
 
   return (
     <>
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header="Upgrade all companies to the Pro Plan"
+        onSuccess={async () => {
+          router.push(Routes.UserSettingsBillingPage())
+        }}
+        hideConfirm={true}
+        cancelText={"Ok"}
+      >
+        All existing companies should be on PRO plan to add a new company
+      </Confirm>
       <nav className="bg-theme-600 py-2">
         <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
           <Link href={Routes.JobsHome()}>
@@ -231,7 +249,11 @@ const Navbar = ({ user }: NavbarProps) => {
                   <DropdownMenu.Item
                     onSelect={(e) => {
                       e.preventDefault()
-                      router.push(Routes.NewCompany())
+                      if (canCreateCompany) {
+                        router.push(Routes.NewCompany())
+                      } else {
+                        setOpenConfirm(true)
+                      }
                     }}
                     className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
                   >

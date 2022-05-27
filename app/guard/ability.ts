@@ -1,6 +1,7 @@
 import db, { CompanyUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "app/users/utils/checkPlan"
+import { Candidate } from "app/jobs/validations"
 
 type ExtendedResourceTypes =
   | "job"
@@ -214,6 +215,21 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("update", "user", async (args) => {
         return args.where.id === ctx.session.userId
+      })
+
+      can("create", "company", async (args) => {
+        const companyUsers = await db.companyUser.findMany({
+          where: { userId: ctx.session.userId || 0 },
+          include: { company: true },
+        })
+
+        if (companyUsers && companyUsers.length >= 1) {
+          const allCompaniesOnProPlan = companyUsers.every((cu) => checkPlan(cu.company))
+          return allCompaniesOnProPlan
+        } else {
+          // User with no company can create one
+          return true
+        }
       })
 
       can("inviteUser", "company", async (args) => {
@@ -576,8 +592,48 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return forms.every((p) => p.companyId === ctx.session.companyId) === true
       })
 
-      // Anyone can create a candidate without authentication
-      can("update", "candidate")
+      // Allow only 25 candidates on the Free plan
+      can("create", "candidate", async (args) => {
+        const jobId = args?.jobId
+
+        if (!jobId || jobId?.trim() === "") return false
+
+        const job = await db.job.findFirst({
+          where: { id: jobId },
+          include: { company: true, _count: { select: { candidates: true } } },
+        })
+
+        if (!job || !job?.company) return false
+
+        const currentPlan = checkPlan(job.company)
+        if (!currentPlan) {
+          if (job._count.candidates >= 25) {
+            return false
+          }
+        }
+
+        return true
+      })
+      can("update", "candidate", async (args) => {
+        const candidate = await db.candidate.findFirst({
+          where: args.where,
+          include: {
+            job: {
+              include: {
+                // users: true,
+                company: {
+                  include: { users: true },
+                },
+              },
+            },
+          },
+        })
+
+        return (
+          ctx.session?.companyId === candidate?.job?.companyId &&
+          candidate?.job?.company?.users.some((m) => m.userId === ctx.session.userId) === true
+        )
+      })
       can("read", "candidate", async (args) => {
         const candidate = await db.candidate.findFirst({
           where: args.where,

@@ -49,6 +49,8 @@ import Pagination from "app/core/components/Pagination"
 import KanbanBoard from "app/core/components/KanbanBoard"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
+import canCreateNewCandidate from "app/jobs/queries/canCreateNewCandidate"
+import Confirm from "app/core/components/Confirm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -513,6 +515,9 @@ const SingleJobPage = ({
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [isKanban, setKanban] = useState(true)
+  const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const router = useRouter()
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -520,13 +525,31 @@ const SingleJobPage = ({
 
   return (
     <AuthLayout user={user}>
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header="Upgrade to the Pro Plan?"
+        onSuccess={async () => {
+          router.push(Routes.UserSettingsBillingPage())
+        }}
+      >
+        You have reached the maximum candidates limit on the free plan. Upgrade to the PRO plan to
+        add unlimited jobs and candidates.
+      </Confirm>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
-      <Link href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
-        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3">
-          New Candidate
-        </a>
-      </Link>
+      <button
+        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3"
+        onClick={() => {
+          if (canCreateCandidate) {
+            router.push(Routes.NewCandidate({ slug: job?.slug! }))
+          } else {
+            setOpenConfirm(true)
+          }
+        }}
+      >
+        New Candidate
+      </button>
       {canUpdate && (
         <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
           <a

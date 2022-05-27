@@ -8,6 +8,8 @@ import {
   usePaginatedQuery,
   invokeWithMiddleware,
   Image,
+  getSession,
+  ErrorComponent,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -26,6 +28,7 @@ import { Country, State } from "country-state-city"
 import { titleCase } from "app/core/utils/titleCase"
 import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
 import getCompany from "app/companies/queries/getCompany"
+import Guard from "app/guard/ability"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -34,6 +37,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve("blitz.config.js")
   path.resolve(".next/blitz/db.js")
   // End anti-tree-shaking
+
+  const session = await getSession(context.req, context.res)
 
   const company = await invokeWithMiddleware(
     getCompany,
@@ -53,11 +58,29 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     )
 
     if (job) {
-      return {
-        props: {
-          company,
-          job,
-        },
+      const { can: canCreate } = await Guard.can(
+        "create",
+        "candidate",
+        { session },
+        { jobId: job?.id }
+      )
+
+      if (canCreate) {
+        return {
+          props: {
+            company,
+            job,
+          },
+        }
+      } else {
+        return {
+          props: {
+            error: {
+              statusCode: 403,
+              message: "You don't have permission",
+            },
+          },
+        }
       }
     } else {
       return {
@@ -82,8 +105,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const JobDescriptionPage = ({
   company,
   job,
+  error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
 
   return (
     <JobApplicationLayout company={company!} job={job!}>

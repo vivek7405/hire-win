@@ -37,12 +37,26 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
-  const { can: canUpdate } = await Guard.can(
-    "update",
-    "candidate",
-    { session },
-    { where: { slug: context?.params?.slug as string } }
+  const job = await invokeWithMiddleware(
+    getJob,
+    {
+      where: { slug: context?.params?.slug as string },
+    },
+    { ...context }
   )
+
+  if (!job) {
+    return {
+      props: {
+        error: {
+          statusCode: 404,
+          message: "Job not found",
+        },
+      },
+    }
+  }
+
+  const { can: canCreate } = await Guard.can("create", "candidate", { session }, { jobId: job?.id })
 
   const { can: isOwner } = await Guard.can(
     "isOwner",
@@ -53,20 +67,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   if (user) {
     try {
-      if (canUpdate) {
-        const job = await invokeWithMiddleware(
-          getJob,
-          {
-            where: { slug: context?.params?.slug as string },
-          },
-          { ...context }
-        )
-
+      if (canCreate) {
         return {
           props: {
             user: user,
             job: job,
-            canUpdate,
+            canCreate,
             isOwner,
           },
         }
