@@ -13,6 +13,10 @@ import addCalendar from "app/scheduling/calendars/mutations/addCalendar"
 import addSchedule from "app/scheduling/schedules/mutations/addSchedule"
 import { mapValues } from "app/core/utils/map-values"
 import createFactoryCandidatePools from "app/candidate-pools/mutations/createFactoryCandidatePools"
+import stripe from "app/core/utils/stripe"
+import { plans } from "app/core/utils/plans"
+import { PlanName } from "types"
+import provideTrail from "app/core/utils/provideTrial"
 
 type signupProps = {
   name: string
@@ -95,6 +99,8 @@ export default async function signup(
     },
     ctx
   )
+
+  // await provideTrail(user?.id, compId)
 
   return user
 }

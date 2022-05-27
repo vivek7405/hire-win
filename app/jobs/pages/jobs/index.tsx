@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, Suspense } from "react"
+import { useEffect, useState, useMemo, Suspense, useCallback } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -40,6 +40,10 @@ import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPag
 import setJobSalaryVisibility from "app/jobs/mutations/setJobSalaryVisibility"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
+import { loadStripe } from "@stripe/stripe-js"
+import createStripeCheckoutSession from "app/companies/mutations/createStripeCheckoutSession"
+import { plans } from "app/core/utils/plans"
+import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -77,8 +81,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     const { can: canCreate } = await Guard.can("create", "job", { session }, {})
 
     const currentPlan = checkPlan(companyUser.company)
+    const priceId = plans?.find((plan) => plan.name === PlanName.PRO)?.priceId || "0"
 
-    return { props: { user, company: companyUser.company, canCreate, currentPlan } }
+    return { props: { user, company: companyUser.company, canCreate, currentPlan, priceId } }
   } else {
     return {
       redirect: {
@@ -505,12 +510,53 @@ const JobsHome = ({
   company,
   canCreate,
   currentPlan,
+  priceId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [openConfirm, setOpenConfirm] = useState(false)
   const [confirmMessage, setConfirmMessage] = useState(
     "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
   )
+
+  // // Redirect user to stripe checkout if trial has ended
+  // const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
+  // const manageBilling = useCallback(async () => {
+  //   try {
+  //     const url = await createStripeBillingPortalMutation({
+  //       companyId: company?.id || 0,
+  //     })
+
+  //     if (url) window.location.href = url
+  //   } catch (err) {
+  //     toast.error("Unable to open Manage Billing")
+  //   }
+  // }, [company?.id, createStripeBillingPortalMutation])
+  // const [createStripeSessionMutation] = useMutation(createStripeCheckoutSession)
+  // const createSubscription = useCallback(async () => {
+  //   if (priceId && priceId !== "0") {
+  //     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
+  //     const sessionId = await createStripeSessionMutation({
+  //       priceId,
+  //       companyId: company?.id || 0,
+  //       quantity: 1,
+  //     })
+
+  //     sessionId &&
+  //       stripe?.redirectToCheckout({
+  //         sessionId: sessionId,
+  //       })
+  //   }
+  // }, [company?.id, createStripeSessionMutation, priceId])
+  // useEffect(() => {
+  //   if (!currentPlan && priceId !== "0") {
+  //     createSubscription()
+  //     // company?.stripeSubscriptionId ? manageBilling() : createSubscription()
+  //   }
+  // }, [currentPlan, createSubscription, priceId])
+
+  // if (!currentPlan) {
+  //   return <></>
+  // }
 
   return (
     <AuthLayout title="Jobs | hire-win" user={user}>

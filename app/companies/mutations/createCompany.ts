@@ -8,6 +8,7 @@ import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutati
 import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
 import createFactoryCategories from "app/categories/mutations/createFactoryCategories"
 import createFactoryCandidatePools from "app/candidate-pools/mutations/createFactoryCandidatePools"
+import provideTrail from "app/core/utils/provideTrial"
 
 export default resolver.pipe(
   resolver.zod(CompanyObj),
@@ -51,6 +52,8 @@ export default resolver.pipe(
     await createFactoryCandidatePools(companyId)
 
     await ctx.session.$setPublicData({ companyId: company.id || 0 })
+
+    // await provideTrail(ctx?.session?.userId || 0, company.id || 0)
 
     return company
   }
