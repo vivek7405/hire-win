@@ -8,9 +8,23 @@ type ModalProps = {
   children: React.ReactNode
   header: string
   onSuccess: () => void
+  hideConfirm?: boolean
+  confirmText?: string
+  hideCancel?: boolean
+  cancelText?: string
 }
 
-export const Confirm = ({ open, setOpen, children, header, onSuccess }: ModalProps) => {
+export const Confirm = ({
+  open,
+  setOpen,
+  children,
+  header,
+  onSuccess,
+  hideConfirm,
+  hideCancel,
+  confirmText,
+  cancelText,
+}: ModalProps) => {
   return (
     <>
       <AlertDialog.Root open={open} onOpenChange={setOpen}>
@@ -26,18 +40,22 @@ export const Confirm = ({ open, setOpen, children, header, onSuccess }: ModalPro
           </AlertDialog.Title>
           {children}
           <div className="flex mt-4 justify-end">
-            <AlertDialog.Cancel className="mr-2 rounded-sm border border-gray-300 px-4 py-2 bg-white text-gray-700 hover:bg-gray-50">
-              Cancel
-            </AlertDialog.Cancel>
-            <AlertDialog.Action
-              onClick={async (e) => {
-                e.preventDefault()
-                await onSuccess()
-              }}
-              className="rounded-sm border border-transparent px-4 py-2 bg-red-600 text-white hover:bg-red-700"
-            >
-              Confirm
-            </AlertDialog.Action>
+            {!hideCancel && (
+              <AlertDialog.Cancel className="mr-2 rounded-sm border border-gray-300 px-4 py-2 bg-white text-gray-700 hover:bg-gray-50">
+                {cancelText || "Cancel"}
+              </AlertDialog.Cancel>
+            )}
+            {!hideConfirm && (
+              <AlertDialog.Action
+                onClick={async (e) => {
+                  e.preventDefault()
+                  await onSuccess()
+                }}
+                className="rounded-sm border border-transparent px-4 py-2 bg-red-600 text-white hover:bg-red-700"
+              >
+                {confirmText || "Confirm"}
+              </AlertDialog.Action>
+            )}
           </div>
         </AlertDialog.Content>
       </AlertDialog.Root>

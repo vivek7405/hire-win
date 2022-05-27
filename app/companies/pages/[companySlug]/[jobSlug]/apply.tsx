@@ -12,6 +12,7 @@ import {
   Head,
   useSession,
   getSession,
+  ErrorComponent,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -33,6 +34,7 @@ import toast from "react-hot-toast"
 import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getCompany from "app/companies/queries/getCompany"
+import Guard from "app/guard/ability"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -41,6 +43,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve("blitz.config.js")
   path.resolve(".next/blitz/db.js")
   // End anti-tree-shaking
+
+  const session = await getSession(context.req, context.res)
 
   const company = await invokeWithMiddleware(
     getCompany,
@@ -62,12 +66,30 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     )
 
     if (job) {
-      return {
-        props: {
-          company,
-          job,
-          currentPlan,
-        },
+      const { can: canCreate } = await Guard.can(
+        "create",
+        "candidate",
+        { session },
+        { jobId: job?.id }
+      )
+
+      if (canCreate) {
+        return {
+          props: {
+            company,
+            job,
+            currentPlan,
+          },
+        }
+      } else {
+        return {
+          props: {
+            error: {
+              statusCode: 403,
+              message: "You don't have permission",
+            },
+          },
+        }
       }
     } else {
       return {
@@ -93,9 +115,14 @@ const ApplyToJob = ({
   company,
   job,
   currentPlan,
+  error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [createCandidateMutation] = useMutation(createCandidate)
+
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
 
   // Post job to Google if on paid plan
   return (

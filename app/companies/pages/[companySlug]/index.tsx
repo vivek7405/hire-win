@@ -19,7 +19,7 @@ import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 import getUser from "app/users/queries/getUser"
 import SingleFileUploadField from "app/core/components/SingleFileUploadField"
-import { AttachmentObject, CardType, DragDirection, ExtendedJob } from "types"
+import { AttachmentObject, CardType, DragDirection, ExtendedJob, Plan } from "types"
 import { titleCase } from "app/core/utils/titleCase"
 import draftToHtml from "draftjs-to-html"
 import { Country, State } from "country-state-city"
@@ -33,6 +33,7 @@ import getCategoriesUnauthorized from "app/categories/queries/getCategoriesUnaut
 import getSymbolFromCurrency from "currency-symbol-map"
 import getCompany from "app/companies/queries/getCompany"
 import { Company, CompanyUser, Job, JobUser, User } from "@prisma/client"
+import { checkPlan } from "app/users/utils/checkPlan"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -53,7 +54,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // const user = await getCurrentUserServer({ ...context })
 
   if (company) {
-    return { props: { company } }
+    const currentPlan = checkPlan(company)
+    return { props: { company, currentPlan } }
   } else {
     return {
       redirect: {
@@ -67,8 +69,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 type JobsProps = {
   company: Company
+  currentPlan: Plan | null | undefined
 }
-const Jobs = ({ company }: JobsProps) => {
+const Jobs = ({ company, currentPlan }: JobsProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -149,7 +152,10 @@ const Jobs = ({ company }: JobsProps) => {
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
           {jobUsers?.length > 0 && (
             <>
-              {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
+              {categories
+                ?.filter((c) => c.jobs.length > 0)
+                ?.filter((c) => !c.jobs?.some((j) => !currentPlan && j._count.candidates >= 25)) // Filter jobs whose free candidate limit has reached
+                ?.length > 0 && (
                 <div
                   className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
                     selectedCategoryId === "0"
@@ -165,6 +171,7 @@ const Jobs = ({ company }: JobsProps) => {
               )}
               {categories
                 ?.filter((c) => c.jobs.length > 0)
+                ?.filter((c) => !c.jobs?.some((j) => !currentPlan && j._count.candidates >= 25)) // Filter jobs whose free candidate limit has reached
                 ?.map((category) => {
                   return (
                     <div
@@ -197,6 +204,9 @@ const Jobs = ({ company }: JobsProps) => {
             }
           })
           ?.map((job) => {
+            // Filter jobs whose free candidate limit has reached
+            if (!currentPlan && job.candidates.length >= 25) return <></>
+
             return (
               <div key={job.id}>
                 <Card key={job.id} isFull={true}>
@@ -286,7 +296,10 @@ const Jobs = ({ company }: JobsProps) => {
   )
 }
 
-const CareersPage = ({ company }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const CareersPage = ({
+  company,
+  currentPlan,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <JobApplicationLayout company={company} isCareersPage={true}>
       <Suspense
@@ -297,7 +310,7 @@ const CareersPage = ({ company }: InferGetServerSidePropsType<typeof getServerSi
           className="mt-1 mb-8"
           dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
         />
-        <Jobs company={company!} />
+        <Jobs company={company!} currentPlan={currentPlan} />
       </Suspense>
     </JobApplicationLayout>
   )

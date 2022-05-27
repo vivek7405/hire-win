@@ -3,6 +3,7 @@ import db from "db"
 import { Candidate, CandidateInputType } from "app/jobs/validations"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import Guard from "app/guard/ability"
 
 // Candidate can be created without authentication
 async function createCandidate(data: CandidateInputType, ctx: Ctx) {
@@ -14,13 +15,13 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
     async (e) => await db.candidate.findFirst({ where: { slug: e } })
   )
 
-  const membership = await db.jobUser.findFirst({
+  const jobUser = await db.jobUser.findFirst({
     where: { jobId },
     include: {
       job: { include: { workflow: { include: { stages: { include: { stage: true } } } } } },
     },
   })
-  const defaultWorkflowStage = membership?.job?.workflow?.stages?.find(
+  const defaultWorkflowStage = jobUser?.job?.workflow?.stages?.find(
     (ws) => ws.stage.name === "Sourced"
   )
 
@@ -52,4 +53,8 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
   return candidate
 }
 
-export default resolver.pipe(resolver.zod(Candidate), createCandidate)
+export default Guard.authorize(
+  "create",
+  "candidate",
+  resolver.pipe(resolver.zod(Candidate), createCandidate)
+)
