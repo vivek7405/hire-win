@@ -33,6 +33,29 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
   async (ctx, { can, cannot }) => {
     cannot("manage", "all")
 
+    // Allow only 25 candidates on the Free plan
+    can("create", "candidate", async (args) => {
+      const jobId = args?.jobId
+
+      if (!jobId || jobId?.trim() === "") return false
+
+      const job = await db.job.findFirst({
+        where: { id: jobId },
+        include: { company: true, _count: { select: { candidates: true } } },
+      })
+
+      if (!job || !job?.company) return false
+
+      const currentPlan = checkPlan(job.company)
+      if (!currentPlan) {
+        if (job._count.candidates >= 25) {
+          return false
+        }
+      }
+
+      return true
+    })
+
     if (ctx.session.$isAuthorized()) {
       can("create", "job", async (args) => {
         // Check user plan and don't allow to create a new job
@@ -592,28 +615,6 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return forms.every((p) => p.companyId === ctx.session.companyId) === true
       })
 
-      // Allow only 25 candidates on the Free plan
-      can("create", "candidate", async (args) => {
-        const jobId = args?.jobId
-
-        if (!jobId || jobId?.trim() === "") return false
-
-        const job = await db.job.findFirst({
-          where: { id: jobId },
-          include: { company: true, _count: { select: { candidates: true } } },
-        })
-
-        if (!job || !job?.company) return false
-
-        const currentPlan = checkPlan(job.company)
-        if (!currentPlan) {
-          if (job._count.candidates >= 25) {
-            return false
-          }
-        }
-
-        return true
-      })
       can("update", "candidate", async (args) => {
         const candidate = await db.candidate.findFirst({
           where: args.where,
