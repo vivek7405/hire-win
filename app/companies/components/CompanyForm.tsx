@@ -46,7 +46,7 @@ export const CompanyForm = (props: CompanyFormProps) => {
         <LabeledRichTextField
           name="info"
           label="Info"
-          placeholder="This shall appear on Job Boards"
+          placeholder="This shall appear on job boards"
           testid="userUpdateCompanyInfo"
         />
       </Form>

@@ -1,7 +1,7 @@
 import { google } from "googleapis"
 
 export function createGoogleOauth() {
-  const callbackString = process.env.HOME_URL + "/gcalOauth2Callback" // for demo reasons
+  const callbackString = process.env.NEXT_PUBLIC_APP_URL + "/gcalOauth2Callback" // for demo reasons
 
   const client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,

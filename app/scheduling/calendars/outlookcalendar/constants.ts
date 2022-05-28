@@ -10,8 +10,8 @@ export const constants = {
     return process.env.MICROSOFT_CLIENT_SECRET!
   },
   get redirect_uri() {
-    checkEnvVariable("HOME_URL")
-    return process.env.HOME_URL + "/outlookRedirect"
+    checkEnvVariable("NEXT_PUBLIC_APP_URL")
+    return process.env.NEXT_PUBLIC_APP_URL + "/outlookRedirect"
   },
   response_mode: "query",
   scope: "offline_access user.read calendars.ReadWrite",

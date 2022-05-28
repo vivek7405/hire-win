@@ -71,7 +71,7 @@ export const SignupForm = (props: SignupFormProps) => {
           <LabeledTextField
             name="companyName"
             label="Company Name"
-            placeholder="This shall appear on job board"
+            placeholder="This shall appear on job boards"
             testid="signupCompanyName"
           />
         )}

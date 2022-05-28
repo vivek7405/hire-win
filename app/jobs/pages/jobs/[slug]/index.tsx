@@ -51,6 +51,8 @@ import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import canCreateNewCandidate from "app/jobs/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
+import LabeledRatingField from "app/core/components/LabeledRatingField"
+import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -171,6 +173,22 @@ const getBoard = (job, candidates) => {
                         >
                           <a className="text-theme-600 hover:text-theme-900">{c.name}</a>
                         </Link>
+                        <Form
+                          noFormatting={true}
+                          onSubmit={async () => {
+                            return
+                          }}
+                        >
+                          <LabeledRatingField
+                            name="candidateAverageRating"
+                            ratingClass="!flex items-center"
+                            height={5}
+                            value={Math.round(
+                              getScoreAverage(c?.scores?.map((score) => score.rating) || [])
+                            )}
+                            disabled={true}
+                          />
+                        </Form>
                       </div>
                     </span>
                     <div className="pt-2.5">{c.email}</div>
