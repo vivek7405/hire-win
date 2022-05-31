@@ -6,13 +6,16 @@ import {
   GetServerSidePropsContext,
   Link,
   Routes,
+  ErrorComponent,
   InferGetServerSidePropsType,
+  hash256,
 } from "blitz"
 import { SignupForm } from "app/auth/components/SignupForm"
 import transparentLogoColored from "app/assets/logo_transparent_colored.png"
 import path from "path"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import LogoBrand from "app/assets/LogoBrand"
+import getToken from "app/tokens/queries/getToken"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -20,25 +23,51 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/blitz/db.js")
 
   const user = await getCurrentUserServer({ ...context })
-  const companyId = parseInt((context?.params?.companyId as string) || "0")
+  const token = (context?.params?.token as string) || "0"
+  const hashedToken = hash256(token)
+  const tokenFromDB = await getToken({ where: { hashedToken } })
 
-  if (user) {
+  if (tokenFromDB) {
+    if (user) {
+      return {
+        redirect: {
+          destination: "/jobs",
+          permanent: false,
+        },
+        props: {},
+      }
+    }
+
+    switch (tokenFromDB.type) {
+      case "CONFIRM_EMAIL":
+        return { props: { email: tokenFromDB?.sentTo } }
+      case "INVITE_TO_COMPANY":
+        return { props: { email: tokenFromDB?.sentTo, companyId: tokenFromDB?.companyId } }
+      default:
+        return { props: { email: tokenFromDB?.sentTo } }
+    }
+  } else {
     return {
-      redirect: {
-        destination: "/jobs",
-        permanent: false,
+      props: {
+        error: {
+          statusCode: 404,
+          message: "Invalid token",
+        },
       },
-      props: { companyId },
     }
   }
-
-  return { props: { companyId } }
 }
 
-const SignupToExistingCompanyPage = ({
+const SignupWithEmailConfirmedPage = ({
+  email,
   companyId,
+  error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
 
   return (
     <>
@@ -57,7 +86,8 @@ const SignupToExistingCompanyPage = ({
 
         <div className="bg-white rounded p-6 w-full max-w-xl shadow-sm">
           <SignupForm
-            companyId={companyId || 0}
+            email={email}
+            companyId={companyId}
             onSuccess={() => {
               if (router.query.next) {
                 let url = ""
@@ -89,4 +119,4 @@ const SignupToExistingCompanyPage = ({
 
 // SignupPage.redirectAuthenticatedTo = "/"
 
-export default SignupToExistingCompanyPage
+export default SignupWithEmailConfirmedPage

@@ -20,7 +20,7 @@ import provideTrail from "app/core/utils/provideTrial"
 
 type signupProps = {
   name: string
-  email: string
+  email?: string
   companyName?: string
   companyId?: number
   password: string
@@ -29,11 +29,15 @@ export default async function signup(
   { name, email, companyName, companyId, password }: signupProps,
   ctx: Ctx
 ) {
-  const hashedPassword = await SecurePassword.hash(password.trim())
+  if (!email) {
+    throw new Error("Email is required")
+  }
 
   if (!companyId && !companyName) {
     throw new Error("Company name is required")
   }
+
+  const hashedPassword = await SecurePassword.hash(password.trim())
 
   const slug = slugify(companyName || "NA", { strict: true })
   const newSlug = await findFreeSlug(

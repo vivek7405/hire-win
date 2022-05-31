@@ -8,7 +8,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
   // 1. Try to find this token in the database
   const hashedToken = hash256(req.query.token as string)
   const possibleToken = await db.token.findFirst({
-    where: { hashedToken, type: "INVITE_TO_COMPANY_TOKEN" },
+    where: { hashedToken, type: "INVITE_TO_COMPANY" },
     include: {
       user: {
         select: {
@@ -44,29 +44,30 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
       Usually the "token" parameter would come first, but here we need to use "&"
     */
     res.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/signup/${
-        (req.query.companyId as string) || "0"
-      }?next=/api/invitations/company/accept/&token=${req.query.token}&companyId=${
-        req.query.companyId
-      }`
+      `${process.env.NEXT_PUBLIC_APP_URL}/signup/token/${req.query.token}?next=/api/invitations/company/accept/&token=${req.query.token}`
     )
   } else {
-    // 6. If there is a user, create a new membership associated with the project and user
-    await db.companyUser.create({
-      data: {
-        role: CompanyUserRole.USER,
-        company: {
-          connect: {
-            id: parseInt((req.query.companyId as string) || "0"),
-          },
-        },
-        user: {
-          connect: {
-            id: existingUser?.id,
-          },
-        },
-      },
+    // 6. If there is a user and companyUser does not exist, create a new membership associated with the company and user
+    const companyUser = await db.companyUser.findFirst({
+      where: { companyId: possibleToken.companyId || 0, userId: existingUser.id },
     })
+    if (!companyUser) {
+      await db.companyUser.create({
+        data: {
+          role: CompanyUserRole.USER,
+          company: {
+            connect: {
+              id: possibleToken.companyId || 0,
+            },
+          },
+          user: {
+            connect: {
+              id: existingUser.id,
+            },
+          },
+        },
+      })
+    }
 
     // 7. Delete token from database when done
     await db.token.delete({ where: { id: savedToken.id } })

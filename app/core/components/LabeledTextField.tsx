@@ -15,6 +15,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
   ({ label, outerProps, name, ...props }, ref) => {
     const {
       register,
+      setValue,
       formState: { isSubmitting, errors },
     } = useFormContext()
 
@@ -46,7 +47,14 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             {...props}
             data-testid={`${props.testid && `${props.testid}-`}input`}
             className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
-            onChange={props.onChange}
+            onChange={(e) => {
+              try {
+                setValue(name, e.target.value)
+                props.onChange && props.onChange(e)
+              } catch (e) {
+                console.log(`Some error occurred while setting input field value for - ${name}`)
+              }
+            }}
           />
         </div>
       </div>

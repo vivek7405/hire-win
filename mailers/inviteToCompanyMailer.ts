@@ -22,7 +22,7 @@ export async function inviteToCompanyMailer({ to, token, companyId }: InviteToCo
   })
 
   const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
-  const webhookUrl = `${origin}/api/invitations/company/accept?token=${token}&companyId=${company?.id}`
+  const webhookUrl = `${origin}/api/invitations/company/accept?token=${token}`
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
