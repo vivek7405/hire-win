@@ -1,6 +1,6 @@
 import { Ctx, AuthenticationError } from "blitz"
 import db from "db"
-import { Category, CategoryInputType } from "app/categories/validations"
+import { CategoryObj, CategoryInputType } from "app/categories/validations"
 import Guard from "app/guard/ability"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
@@ -8,7 +8,7 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 async function createCategory(data: CategoryInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name } = Category.parse(data)
+  const { name } = CategoryObj.parse(data)
   // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   // if (!user) throw new AuthenticationError()
 

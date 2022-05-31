@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const Stage = z.object({
+export const StageObj = z.object({
   id: z.string().optional(),
   name: z.string().nonempty({ message: "Name can't be empty" }),
   slug: z.string().optional(),
@@ -9,4 +9,4 @@ export const Stage = z.object({
   allowEdit: z.boolean().optional(),
 })
 
-export type StageInputType = z.infer<typeof Stage>
+export type StageInputType = z.infer<typeof StageObj>

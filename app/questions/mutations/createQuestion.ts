@@ -1,12 +1,12 @@
 import { Ctx, AuthenticationError, resolver } from "blitz"
 import db from "db"
 import slugify from "slugify"
-import { Question, QuestionInputType } from "app/questions/validations"
+import { QuestionObj, QuestionInputType } from "app/questions/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 async function createQuestion(data: QuestionInputType, ctx: Ctx) {
-  const { name, placeholder, type, options, acceptedFiles } = Question.parse(data)
+  const { name, placeholder, type, options, acceptedFiles } = QuestionObj.parse(data)
   // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   // if (!user) throw new AuthenticationError()
 
@@ -38,7 +38,7 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
 }
 
 export default resolver.pipe(
-  resolver.zod(Question),
+  resolver.zod(QuestionObj),
   resolver.authorize(),
   Guard.authorize("create", "question", createQuestion)
 )

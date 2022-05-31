@@ -3,7 +3,7 @@ import db from "db"
 import { WorkflowStages, WorkflowStagesInputType } from "app/workflows/validations"
 import Guard from "app/guard/ability"
 import factoryWorkflowStages from "app/stages/utils/factoryWorkflowStages"
-import { Stage, StageInputType } from "app/stages/validations"
+import { StageObj, StageInputType } from "app/stages/validations"
 import createStage from "app/stages/mutations/createStage"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
@@ -12,7 +12,7 @@ import shiftWorkflowStage from "./shiftWorkflowStage"
 async function addNewStageToWorkflow(data: StageInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { workflowId, name } = Stage.parse(data)
+  const { workflowId, name } = StageObj.parse(data)
   // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   // if (!user) throw new AuthenticationError()
 

@@ -189,7 +189,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
 
       {jobUsers?.length > 0 && (
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
+          {categories?.filter((c) => c._count.jobs > 0)?.length > 0 && (
             <div
               className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
                 selectedCategoryId === "0"
@@ -204,7 +204,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
             </div>
           )}
           {categories
-            ?.filter((c) => c.jobs.length > 0)
+            ?.filter((c) => c._count.jobs > 0)
             ?.map((category) => {
               return (
                 <div

@@ -1,19 +1,19 @@
 import { Ctx, resolver } from "blitz"
-import db, { Prisma } from "db"
-import { Question } from "app/questions/validations"
+import db, { Prisma, Question } from "db"
+import { QuestionObj } from "app/questions/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
 import { ExtendedQuestion } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 type UpdateQuestionInput = Pick<Prisma.QuestionUpdateArgs, "where" | "data"> & {
-  initial: ExtendedQuestion
+  initial: Question
 }
 
 async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, placeholder, options, acceptedFiles } = Question.parse(data)
+  const { name, placeholder, options, acceptedFiles } = QuestionObj.parse(data)
 
   const slug = slugify(name, { strict: true })
   const newSlug: string = await findFreeSlug(

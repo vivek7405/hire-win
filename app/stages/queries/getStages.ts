@@ -23,7 +23,7 @@ const getStages = resolver.pipe(
           ...paginateArgs,
           where,
           orderBy,
-          include: { workflows: true },
+          include: { _count: { select: { workflows: true } } },
         }),
     })
 

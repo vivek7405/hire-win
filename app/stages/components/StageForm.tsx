@@ -1,6 +1,6 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
-import { Stage } from "app/stages/validations"
+import { StageObj } from "app/stages/validations"
 
 type StageFormProps = {
   onSuccess?: () => void
@@ -15,7 +15,7 @@ export const StageForm = (props: StageFormProps) => {
     <>
       <Form
         submitText="Submit"
-        schema={Stage}
+        schema={StageObj}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
         testid="stageForm"

@@ -7,6 +7,9 @@ import {
   useRouter,
   usePaginatedQuery,
   useSession,
+  useMutation,
+  useQuery,
+  invalidateQuery,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -17,6 +20,17 @@ import Skeleton from "react-loading-skeleton"
 import { Stage } from "@prisma/client"
 import { CardType, DragDirection } from "types"
 import Cards from "app/core/components/Cards"
+import Card from "app/core/components/Card"
+import Pagination from "app/core/components/Pagination"
+import Debouncer from "app/core/utils/debouncer"
+import deleteStage from "app/stages/mutations/deleteStage"
+import createStage from "app/stages/mutations/createStage"
+import updateStage from "app/stages/mutations/updateStage"
+import { TrashIcon } from "@heroicons/react/outline"
+import Confirm from "app/core/components/Confirm"
+import toast from "react-hot-toast"
+import Modal from "app/core/components/Modal"
+import StageForm from "app/stages/components/StageForm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -41,13 +55,20 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const Stages = ({ user }) => {
+const Stages = () => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
   const session = useSession()
+
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const [stageToDelete, setStageToDelete] = useState(null as any as Stage)
+  const [deleteStageMutation] = useMutation(deleteStage)
+  const [stageToEdit, setStageToEdit] = useState(null as any as Stage)
+  const [openModal, setOpenModal] = useState(false)
+  const [createStageMutation] = useMutation(createStage)
+  const [updateStageMutation] = useMutation(updateStage)
 
   useEffect(() => {
     const search = router.query.search
@@ -81,151 +102,176 @@ export const Stages = ({ user }) => {
     endPage = count
   }
 
-  useMemo(async () => {
-    let data: {}[] = []
-
-    await stages.forEach((stage) => {
-      data = [
-        ...data,
-        {
-          ...stage,
-          canUpdate: stage.companyId === session.companyId,
-        },
-      ]
-
-      setData(data)
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.push({
+      query: {
+        ...router.query,
+        ...searchQuery,
+      },
     })
-  }, [stages, session.companyId])
-
-  // let columns = [
-  //   {
-  //     Header: "Name",
-  //     accessor: "name",
-  //     Cell: (props) => {
-  //       const stage = props.cell.row.original as Stage
-
-  //       return stage.allowEdit ? (
-  //         <Link href={Routes.SingleStagePage({ slug: props.cell.row.original.slug })} passHref>
-  //           <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
-  //             {props.value}
-  //           </a>
-  //         </Link>
-  //       ) : (
-  //         props.value
-  //       )
-  //     },
-  //   },
-  //   // {
-  //   //   Header: "",
-  //   //   accessor: "action",
-  //   //   Cell: (props) => {
-  //   //     return (
-  //   //       <>
-  //   //         {props.cell.row.original.canUpdate && (
-  //   //           <Link
-  //   //             href={Routes.StageSettingsPage({ slug: props.cell.row.original.slug })}
-  //   //             passHref
-  //   //           >
-  //   //             <a className="text-theme-600 hover:text-theme-900">Settings</a>
-  //   //           </Link>
-  //   //         )}
-  //   //       </>
-  //   //     )
-  //   //   },
-  //   // },
-  // ]
-
-  // return (
-  //   <Table
-  //     columns={columns}
-  //     data={data}
-  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-  //     pageIndex={tablePage}
-  //     pageSize={ITEMS_PER_PAGE}
-  //     hasNext={hasMore}
-  //     hasPrevious={tablePage !== 0}
-  //     totalCount={count}
-  //     startPage={startPage}
-  //     endPage={endPage}
-  //   />
-  // )
-
-  const getCards = (stages) => {
-    return stages.map((s) => {
-      return {
-        id: s.id,
-        title: s.name,
-        description: `${s.workflows?.length} ${
-          s.workflows?.length === 1 ? "Workflow" : "Workflows"
-        }`,
-        renderContent: (
-          <>
-            <div className="space-y-2">
-              <div className="font-bold flex md:justify-center lg:justify:center">
-                {s.allowEdit ? (
-                  <Link href={Routes.SingleStagePage({ slug: s.slug })} passHref>
-                    <a
-                      data-testid={`stagelink`}
-                      className="text-theme-600 hover:text-theme-800 overflow-hidden whitespace-nowrap"
-                      title={s.name}
-                    >
-                      {s.name}
-                    </a>
-                  </Link>
-                ) : (
-                  <span>{s.name}</span>
-                )}
-              </div>
-
-              <div className="border-b-2 border-gray-50 w-full"></div>
-
-              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                {`${s.workflows?.length} ${s.workflows?.length === 1 ? "Workflow" : "Workflows"}`}
-              </div>
-            </div>
-          </>
-        ),
-      }
-    }) as CardType[]
   }
 
-  const [cards, setCards] = useState(getCards(data))
-  useEffect(() => {
-    setCards(getCards(data))
-  }, [data])
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
 
   return (
-    <Cards
-      cards={cards}
-      setCards={setCards}
-      mutateCardDropDB={(source, destination, draggableId) => {}}
-      droppableName="categories"
-      isDragDisabled={true}
-      direction={DragDirection.HORIZONTAL}
-      pageIndex={tablePage}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
-      resultName="stage"
-    />
+    <>
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={`Delete Stage - ${stageToDelete?.name}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Deleting Stage`)
+          try {
+            await deleteStageMutation({ id: stageToDelete?.id })
+            toast.success("Stage Deleted", { id: toastId })
+            setOpenConfirm(false)
+            setStageToDelete(null as any)
+            invalidateQuery(getStages)
+          } catch (error) {
+            toast.error(`Deleting stage failed - ${error.toString()}`, { id: toastId })
+          }
+        }}
+      >
+        Are you sure you want to delete the stage?
+      </Confirm>
+
+      <button
+        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+        onClick={(e) => {
+          e.preventDefault()
+          setStageToEdit(null as any)
+          setOpenModal(true)
+        }}
+      >
+        New Stage
+      </button>
+
+      <Modal header="Stage" open={openModal} setOpen={setOpenModal}>
+        <StageForm
+          header={`${stageToEdit ? "Update" : "New"} Stage`}
+          subHeader=""
+          initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
+          onSubmit={async (values) => {
+            const isEdit = stageToEdit ? true : false
+
+            const toastId = toast.loading(isEdit ? "Updating Stage" : "Creating Stage")
+            try {
+              isEdit
+                ? await updateStageMutation({
+                    where: { id: stageToEdit.id },
+                    data: { ...values },
+                    initial: stageToEdit,
+                  })
+                : await createStageMutation({ ...values })
+              await invalidateQuery(getStages)
+              toast.success(isEdit ? "Stage updated successfully" : "Stage added successfully", {
+                id: toastId,
+              })
+              setStageToEdit(null as any)
+              setOpenModal(false)
+            } catch (error) {
+              toast.error(
+                `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                { id: toastId }
+              )
+            }
+          }}
+        />
+      </Modal>
+
+      <input
+        placeholder="Search"
+        type="text"
+        defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+        className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+        onChange={(e) => {
+          execDebouncer(e)
+        }}
+      />
+
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="stage"
+      />
+
+      {stages?.length === 0 ? (
+        <div className="text-xl font-semibold text-neutral-500">No Stages found</div>
+      ) : (
+        <div className="flex flex-wrap justify-center mt-2">
+          {stages.map((s) => {
+            return (
+              <Card key={s.id}>
+                <div className="space-y-2">
+                  <div className="w-full relative">
+                    <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                      {s.allowEdit ? (
+                        <a
+                          className="cursor-pointer text-theme-600 hover:text-theme-800"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setStageToEdit(s)
+                            setOpenModal(true)
+                          }}
+                        >
+                          {s.name}
+                        </a>
+                      ) : (
+                        <span>{s.name}</span>
+                      )}
+                    </div>
+                    <div className="absolute top-0.5 right-0">
+                      <button
+                        id={"delete-" + s.id}
+                        className="float-right text-red-600 hover:text-red-800"
+                        title="Delete Stage"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setStageToDelete(s)
+                          setOpenConfirm(true)
+                        }}
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="border-b-2 border-gray-50 w-full"></div>
+                  <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                    {s._count.workflows} {s._count.workflows === 1 ? "Workflow" : "Workflows"}
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+    </>
   )
 }
 
 const StagesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="StagesHome | hire-win" user={user}>
-      <Link href={Routes.NewStage()} passHref>
+      {/* <Link href={Routes.NewStage()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Stage
         </a>
-      </Link>
+      </Link> */}
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Stages user={user} />
+        <Stages />
       </Suspense>
     </AuthLayout>
   )
