@@ -36,11 +36,12 @@ async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
 
   await db.token.create({
     data: {
-      user: { connect: { id: inviter.userId } },
-      type: "INVITE_TO_JOB_TOKEN",
+      userId: inviter.userId,
+      type: "INVITE_TO_JOB",
       expiresAt,
       hashedToken,
       sentTo: email,
+      jobId: jobId || "0",
     },
   })
 

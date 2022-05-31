@@ -8,7 +8,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
   // 1. Try to find this token in the database
   const hashedToken = hash256(req.query.token as string)
   const possibleToken = await db.token.findFirst({
-    where: { hashedToken, type: "INVITE_TO_JOB_TOKEN" },
+    where: { hashedToken, type: "INVITE_TO_JOB" },
     include: {
       user: {
         select: {
@@ -44,7 +44,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
       Usually the "token" parameter would come first, but here we need to use "&"
     */
     res.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/signup?next=/api/invitations/job/accept/&token=${req.query.token}&jobId=${req.query.jobId}`
+      `${process.env.NEXT_PUBLIC_APP_URL}/login?next=/api/invitations/job/accept/&token=${req.query.token}`
     )
   } else {
     // 6. If there is a user, create a new membership associated with the project and user
@@ -53,7 +53,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
         role: JobUserRole.USER,
         job: {
           connect: {
-            id: req.query.jobId as string,
+            id: possibleToken?.jobId || "0",
           },
         },
         user: {
@@ -70,7 +70,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
     // 8. Fetch job and it's memberships to count it's length to update stripe subscription quantity (NOTE: this is optional, remove if your business model isn't effected by amount of users per project)
     const job = await db.job.findFirst({
       where: {
-        id: req.query.jobId as string,
+        id: possibleToken?.jobId || "0",
       },
       include: {
         users: true,

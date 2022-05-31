@@ -8,7 +8,8 @@ import { z } from "zod"
 
 type SignupFormProps = {
   onSuccess?: () => void
-  companyId?: number
+  companyId?: number | null | undefined
+  email?: string | null | undefined
 }
 
 export const SignupForm = (props: SignupFormProps) => {
@@ -30,7 +31,10 @@ export const SignupForm = (props: SignupFormProps) => {
         submitText="Create Account"
         schema={z.object({
           name: z.string().nonempty({ message: "Required" }),
-          email: z.string().email(),
+          email:
+            !props.email || props.email === ""
+              ? z.string().email().nonempty({ message: "Required" })
+              : z.string().optional(),
           companyName:
             !props.companyId || props.companyId === 0
               ? z.string().nonempty({ message: "Required" })
@@ -42,6 +46,7 @@ export const SignupForm = (props: SignupFormProps) => {
         onSubmit={async (values) => {
           try {
             values["companyId"] = props.companyId || 0
+            values["email"] = props.email || ""
             await signupMutation(values)
             props.onSuccess?.()
           } catch (error) {
@@ -60,13 +65,15 @@ export const SignupForm = (props: SignupFormProps) => {
           placeholder="Enter your name"
           testid="signupName"
         />
-        <LabeledTextField
-          type="email"
-          name="email"
-          label="Email"
-          placeholder="Enter your email"
-          testid="signupEmail"
-        />
+        {(!props.email || props.email === "") && (
+          <LabeledTextField
+            type="email"
+            name="email"
+            label="Email"
+            placeholder="Enter your email"
+            testid="signupEmail"
+          />
+        )}
         {(!props.companyId || props.companyId === 0) && (
           <LabeledTextField
             name="companyName"

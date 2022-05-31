@@ -36,11 +36,12 @@ async function inviteToCompany({ companyId, email }: InviteToCompanyInput, ctx: 
 
   await db.token.create({
     data: {
-      user: { connect: { id: inviter.userId } },
-      type: "INVITE_TO_COMPANY_TOKEN",
+      userId: inviter.userId,
+      type: "INVITE_TO_COMPANY",
       expiresAt,
       hashedToken,
       sentTo: email,
+      companyId: companyId || 0,
     },
   })
 
@@ -48,7 +49,7 @@ async function inviteToCompany({ companyId, email }: InviteToCompanyInput, ctx: 
 
   await buildEmail.send()
 
-  return `${process.env.NEXT_PUBLIC_APP_URL}/api/invitations/company/accept?token=${token}&companyId=${company?.id}`
+  return `${process.env.NEXT_PUBLIC_APP_URL}/api/invitations/company/accept?token=${token}`
 }
 
 export default Guard.authorize("inviteUser", "company", inviteToCompany)
