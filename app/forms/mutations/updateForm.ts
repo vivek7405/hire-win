@@ -1,13 +1,12 @@
 import { Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db, { Form, Prisma } from "db"
 import { FormObj } from "app/forms/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
-import { ExtendedForm } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 type UpdateFormInput = Pick<Prisma.FormUpdateArgs, "where" | "data"> & {
-  initial: ExtendedForm
+  initial: Form
 }
 
 async function updateForm({ where, data, initial }: UpdateFormInput, ctx: Ctx) {

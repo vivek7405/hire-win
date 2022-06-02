@@ -227,7 +227,7 @@ const Categories = () => {
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
                   <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                    {c._count.jobs} {c._count.jobs === 1 ? "Job" : "Jobs"}
+                    {c.jobs.length} {c.jobs.length === 1 ? "Job" : "Jobs"}
                   </div>
                 </div>
               </Card>

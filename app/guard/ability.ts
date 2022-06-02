@@ -2,6 +2,7 @@ import db, { CompanyUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "app/users/utils/checkPlan"
 import { Candidate } from "app/jobs/validations"
+import moment from "moment"
 
 type ExtendedResourceTypes =
   | "job"
@@ -34,6 +35,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
     cannot("manage", "all")
 
     // Allow only 25 candidates on the Free plan
+    // Don't allow if job is archived or expired
     can("create", "candidate", async (args) => {
       const jobId = args?.jobId
 
@@ -45,6 +47,9 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       })
 
       if (!job || !job?.company) return false
+
+      const jobExpired = moment(job.validThrough || undefined).diff(moment()) < 0
+      if (job.archived || jobExpired) return false
 
       const currentPlan = checkPlan(job.company)
       if (!currentPlan) {

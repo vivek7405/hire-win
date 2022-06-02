@@ -11,8 +11,11 @@ const getFormsWOPagination = resolver.pipe(
     const forms = await db.form.findMany({
       where,
       include: {
-        questions: { include: { question: true } },
+        questions: { include: { question: true }, orderBy: { order: "asc" } },
         jobs: true,
+      },
+      orderBy: {
+        createdAt: "asc",
       },
     })
     return forms

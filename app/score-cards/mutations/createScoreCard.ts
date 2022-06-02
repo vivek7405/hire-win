@@ -28,7 +28,7 @@ async function createScoreCard(data: ScoreCardInputType, ctx: Ctx) {
   //   },
   // })
 
-  const scoreCard = await createScoreCardWithFactoryScoreCardQuestions(name, user.id)
+  const scoreCard = await createScoreCardWithFactoryScoreCardQuestions(name, user.id, false)
 
   return scoreCard
 }

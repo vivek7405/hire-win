@@ -82,10 +82,10 @@ export default async function signup(
   const compId = existingCompany?.id || (user.companies && (user.companies[0]?.companyId || 0)) || 0
 
   if (!existingCompany) {
-    await createFormWithFactoryFormQuestions("Default", compId)
-    await createScoreCardWithFactoryScoreCardQuestions("Default", compId)
-    await createWorkflowWithFactoryWorkflowStages("Default", compId)
     await createFactoryCategories(compId)
+    await createWorkflowWithFactoryWorkflowStages("Default", compId, true)
+    await createFormWithFactoryFormQuestions("Default", compId, true)
+    await createScoreCardWithFactoryScoreCardQuestions("Default", compId, true)
     await createFactoryCandidatePools(compId)
   }
 
@@ -100,6 +100,7 @@ export default async function signup(
           ? { startTime: "00:00", endTime: "00:00" }
           : { startTime: "09:00", endTime: "17:00" }
       ),
+      factory: true,
     },
     ctx
   )

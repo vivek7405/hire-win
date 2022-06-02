@@ -5,7 +5,8 @@ import factoryScoreCardQuestions from "../../card-questions/utils/factoryScoreCa
 
 async function createScoreCardWithFactoryScoreCardQuestions(
   scoreCardName: string,
-  companyId: number
+  companyId: number,
+  factoryScoreCard: boolean
 ) {
   const slugScoreCard = slugify(scoreCardName, { strict: true })
   const newSlugScoreCard = await findFreeSlug(
@@ -44,6 +45,7 @@ async function createScoreCardWithFactoryScoreCardQuestions(
       updatedAt: new Date(),
       name: scoreCardName,
       slug: newSlugScoreCard,
+      factory: factoryScoreCard,
       company: {
         connect: {
           id: companyId,

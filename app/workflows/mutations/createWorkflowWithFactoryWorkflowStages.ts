@@ -3,7 +3,11 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryWorkflowStages from "../../stages/utils/factoryWorkflowStages"
 
-async function createWorkflowWithFactoryWorkflowStages(workflowName: string, companyId: number) {
+async function createWorkflowWithFactoryWorkflowStages(
+  workflowName: string,
+  companyId: number,
+  factoryWorkflow: boolean
+) {
   const slugWorkflow = slugify(workflowName, { strict: true })
   const newSlugWorkflow = await findFreeSlug(
     slugWorkflow,
@@ -41,6 +45,7 @@ async function createWorkflowWithFactoryWorkflowStages(workflowName: string, com
       updatedAt: new Date(),
       name: workflowName,
       slug: newSlugWorkflow,
+      factory: factoryWorkflow,
       company: {
         connect: {
           id: companyId,

@@ -216,7 +216,7 @@ const CandidatePools = ({ user }) => {
                     <div className="absolute top-0.5 right-4">
                       <button
                         id={"edit-" + cp.id}
-                        className="float-right text-blue-600 hover:text-blue-800"
+                        className="float-right text-indigo-600 hover:text-indigo-800"
                         title="Edit Candidate Pool"
                         type="button"
                         onClick={(e) => {

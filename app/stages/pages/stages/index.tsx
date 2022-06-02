@@ -229,21 +229,23 @@ const Stages = () => {
                         <span>{s.name}</span>
                       )}
                     </div>
-                    <div className="absolute top-0.5 right-0">
-                      <button
-                        id={"delete-" + s.id}
-                        className="float-right text-red-600 hover:text-red-800"
-                        title="Delete Stage"
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          setStageToDelete(s)
-                          setOpenConfirm(true)
-                        }}
-                      >
-                        <TrashIcon className="w-5 h-5" />
-                      </button>
-                    </div>
+                    {s.allowEdit && (
+                      <div className="absolute top-0.5 right-0">
+                        <button
+                          id={"delete-" + s.id}
+                          className="float-right text-red-600 hover:text-red-800"
+                          title="Delete Stage"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setStageToDelete(s)
+                            setOpenConfirm(true)
+                          }}
+                        >
+                          <TrashIcon className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
                   <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
