@@ -49,9 +49,9 @@ export default Guard.authorize(
 
       const companyId = company?.id || 0
 
-      await createFormWithFactoryFormQuestions("Default", companyId)
-      await createScoreCardWithFactoryScoreCardQuestions("Default", companyId)
-      await createWorkflowWithFactoryWorkflowStages("Default", companyId)
+      await createFormWithFactoryFormQuestions("Default", companyId, true)
+      await createScoreCardWithFactoryScoreCardQuestions("Default", companyId, true)
+      await createWorkflowWithFactoryWorkflowStages("Default", companyId, true)
       await createFactoryCategories(companyId)
       await createFactoryCandidatePools(companyId)
 
