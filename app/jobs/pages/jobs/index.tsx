@@ -206,7 +206,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
           }
         }}
       >
-        Are you sure you want to archive the job?
+        Are you sure you want to {viewArchived ? "Restore" : "Reject"} the job?
       </Confirm>
 
       <input

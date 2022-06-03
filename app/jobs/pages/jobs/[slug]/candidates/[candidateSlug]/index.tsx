@@ -60,7 +60,7 @@ import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInte
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
 import moment from "moment"
-import { ChevronDownIcon } from "@heroicons/react/outline"
+import { BanIcon, ChevronDownIcon } from "@heroicons/react/outline"
 import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview"
 import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
@@ -459,6 +459,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             disabled={true}
           />
         </Form>
+        {candidate?.rejected && (
+          <span title="Rejected">
+            <BanIcon className="h-10 w-10 text-red-800 cursor-not-allowed" />
+          </span>
+        )}
       </div>
 
       <br />

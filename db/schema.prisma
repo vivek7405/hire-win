@@ -625,6 +625,8 @@ model Candidate {
   emails         Email[]
   candidatePools CandidatePool[]
 
+  rejected Boolean @default(false)
+
   @@unique([jobId, email])
 }
 
