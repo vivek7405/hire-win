@@ -25,6 +25,7 @@ import updateJob from "app/jobs/mutations/updateJob"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
+import moment from "moment"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -140,7 +141,7 @@ const JobSettingsPage = ({
             maxSalary: job?.maxSalary,
             salaryType: job?.salaryType,
             employmentType: job?.employmentType,
-            validThrough: job?.validThrough,
+            validThrough: moment(job?.validThrough).local().toDate(),
             description: job?.description
               ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
               : EditorState.createEmpty(),

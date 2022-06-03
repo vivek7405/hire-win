@@ -5,6 +5,7 @@ import slugify from "slugify"
 import Guard from "app/guard/ability"
 import { ExtendedJob } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import moment from "moment"
 
 type UpdateJobInput = Pick<Prisma.JobUpdateArgs, "where" | "data"> & {
   initial: ExtendedJob
@@ -60,7 +61,9 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
       maxSalary,
       salaryType,
       employmentType,
-      validThrough,
+      validThrough: moment(validThrough || undefined)
+        .utc()
+        .toDate(),
       scoreCards: {
         delete: initial?.scoreCards?.map((sc) => {
           return { id: sc.id }

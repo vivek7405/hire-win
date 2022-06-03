@@ -5,6 +5,7 @@ import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { JobUserRole, ScoreCard } from "@prisma/client"
+import moment from "moment"
 
 async function createJob(data: JobInputType, ctx: Ctx) {
   ctx.session.$authorize()
@@ -66,7 +67,9 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       maxSalary,
       salaryType,
       employmentType,
-      validThrough,
+      validThrough: moment(validThrough || undefined)
+        .utc()
+        .toDate(),
       users: {
         create: {
           role: JobUserRole.OWNER,

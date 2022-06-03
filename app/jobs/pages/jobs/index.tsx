@@ -97,13 +97,44 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, viewArchived }) => {
+const Jobs = ({
+  user,
+  company,
+  currentPlan,
+  setOpenConfirm,
+  setConfirmMessage,
+  viewArchived,
+  viewExpired,
+}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
-  const [categories] = useQuery(getCategoriesWOPagination, { where: { companyId: company?.id } })
+
+  const todayDate = new Date(new Date().toDateString())
+  const [utcDateNow, setUTCDateNow] = useState(null as any)
+  useEffect(() => {
+    setUTCDateNow(moment().utc().toDate())
+  }, [])
+
+  const validThrough = utcDateNow
+    ? viewExpired
+      ? { lt: utcDateNow }
+      : { gte: utcDateNow }
+    : todayDate
+
+  const [categories] = useQuery(getCategoriesWOPagination, {
+    where: {
+      companyId: company?.id,
+      jobs: {
+        some: {
+          archived: viewArchived,
+          validThrough,
+        },
+      },
+    },
+  })
 
   useEffect(() => {
     const search = router.query.search
@@ -131,6 +162,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
             userId: user?.id || 0,
             job: {
               archived: viewArchived,
+              validThrough,
               companyId: company?.id || 0,
               categoryId: selectedCategoryId,
             },
@@ -138,7 +170,11 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
           }
         : {
             userId: user?.id,
-            job: { archived: viewArchived, companyId: company?.id || 0 },
+            job: {
+              archived: viewArchived,
+              validThrough,
+              companyId: company?.id || 0,
+            },
             ...query,
           },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -177,7 +213,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
   useEffect(() => {
     invalidateQuery(getCategoriesWOPagination)
-  }, [viewArchived])
+  }, [viewArchived, viewExpired])
 
   return (
     <>
@@ -231,41 +267,36 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
       {jobUsers?.length > 0 && (
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {categories?.filter((c) => c.jobs.find((j) => j.archived === viewArchived))?.length >
-            0 && (
-            <div
-              className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-                selectedCategoryId === "0"
-                  ? "bg-theme-700 cursor-default"
-                  : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
-              }`}
-              onClick={() => {
-                setSelectedCategoryId("0")
-              }}
-            >
-              All
-            </div>
-          )}
-          {categories
-            ?.filter((c) => c.jobs.find((j) => j.archived === viewArchived))
-            ?.map((category) => {
-              return (
-                <div
-                  key={category.id}
-                  className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-                    selectedCategoryId === category.id
-                      ? "bg-theme-700 cursor-default"
-                      : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
-                  }`}
-                  onClick={async () => {
-                    setSelectedCategoryId(category.id)
-                    await invalidateQuery(getJobs)
-                  }}
-                >
-                  {category.name}
-                </div>
-              )
-            })}
+          <div
+            className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+              selectedCategoryId === "0"
+                ? "bg-theme-700 cursor-default"
+                : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+            }`}
+            onClick={() => {
+              setSelectedCategoryId("0")
+            }}
+          >
+            All
+          </div>
+          {categories?.map((category) => {
+            return (
+              <div
+                key={category.id}
+                className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+                  selectedCategoryId === category.id
+                    ? "bg-theme-700 cursor-default"
+                    : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+                }`}
+                onClick={async () => {
+                  setSelectedCategoryId(category.id)
+                  await invalidateQuery(getJobs)
+                }}
+              >
+                {category.name}
+              </div>
+            )
+          })}
         </div>
       )}
 
@@ -580,6 +611,7 @@ const JobsHome = ({
     "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
   )
   const [viewArchived, setViewArchived] = useState(false)
+  const [viewExpired, setViewExpired] = useState(false)
 
   // // Redirect user to stripe checkout if trial has ended
   // const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
@@ -682,11 +714,31 @@ const JobsHome = ({
         </Form>
       </div>
 
+      <div className="float-right text-theme-600 py-2 ml-3">
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <LabeledToggleSwitch
+            name="toggleViewExpired"
+            label="View Expired"
+            flex={true}
+            value={viewExpired}
+            onChange={(switchState) => {
+              setViewExpired(switchState)
+            }}
+          />
+        </Form>
+      </div>
+
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <Jobs
           viewArchived={viewArchived}
+          viewExpired={viewExpired}
           user={user}
           company={company}
           currentPlan={currentPlan}

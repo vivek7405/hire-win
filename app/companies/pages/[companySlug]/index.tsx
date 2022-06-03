@@ -76,7 +76,25 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [query, setQuery] = useState({})
-  const [categories] = useQuery(getCategoriesUnauthorized, { where: { companyId: company?.id } })
+
+  const todayDate = new Date(new Date().toDateString())
+  const [utcDateNow, setUTCDateNow] = useState(null as any)
+  useEffect(() => {
+    setUTCDateNow(moment().utc().toDate())
+  }, [])
+  const validThrough = utcDateNow ? { gte: utcDateNow } : todayDate
+
+  const [categories] = useQuery(getCategoriesUnauthorized, {
+    where: {
+      companyId: company?.id,
+      jobs: {
+        some: {
+          archived: false,
+          validThrough,
+        },
+      },
+    },
+  })
   const [selectedCategoryId, setSelectedCategoryId] = useState("0")
 
   const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getJobs, {
@@ -86,6 +104,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
             // userId: user?.id,
             job: {
               archived: false,
+              validThrough,
               companyId: company?.id,
               categoryId: selectedCategoryId,
               hidden: false,
@@ -94,7 +113,12 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
           }
         : {
             // userId: user?.id,
-            job: { archived: false, companyId: company?.id, hidden: false },
+            job: {
+              archived: false,
+              validThrough,
+              companyId: company?.id,
+              hidden: false,
+            },
             ...query,
           },
     skip: ITEMS_PER_PAGE * Number(tablePage),
