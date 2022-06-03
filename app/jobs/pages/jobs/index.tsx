@@ -97,7 +97,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, viewArchived }) => {
+const Jobs = ({
+  user,
+  company,
+  currentPlan,
+  setOpenConfirm,
+  setConfirmMessage,
+  viewArchived,
+  viewExpired,
+}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -138,7 +146,10 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
           }
         : {
             userId: user?.id,
-            job: { archived: viewArchived, companyId: company?.id || 0 },
+            job: {
+              archived: viewArchived,
+              companyId: company?.id || 0,
+            },
             ...query,
           },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -177,7 +188,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
   useEffect(() => {
     invalidateQuery(getCategoriesWOPagination)
-  }, [viewArchived])
+  }, [viewArchived, viewExpired])
 
   return (
     <>
@@ -231,8 +242,15 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
       {jobUsers?.length > 0 && (
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {categories?.filter((c) => c.jobs.find((j) => j.archived === viewArchived))?.length >
-            0 && (
+          {categories?.filter((c) =>
+            c.jobs.find(
+              (j) =>
+                j.archived === viewArchived &&
+                (viewExpired
+                  ? moment(j.validThrough || undefined).diff(moment()) < 0
+                  : moment(j.validThrough || undefined).diff(moment()) >= 0)
+            )
+          )?.length > 0 && (
             <div
               className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
                 selectedCategoryId === "0"
@@ -247,7 +265,15 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
             </div>
           )}
           {categories
-            ?.filter((c) => c.jobs.find((j) => j.archived === viewArchived))
+            ?.filter((c) =>
+              c.jobs.find(
+                (j) =>
+                  j.archived === viewArchived &&
+                  (viewExpired
+                    ? moment(j.validThrough || undefined).diff(moment()) < 0
+                    : moment(j.validThrough || undefined).diff(moment()) >= 0)
+              )
+            )
             ?.map((category) => {
               return (
                 <div
@@ -271,6 +297,11 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
       <div>
         {jobUsers
+          .filter((ju) =>
+            viewExpired
+              ? moment(ju.job.validThrough || undefined).diff(moment()) < 0
+              : moment(ju.job.validThrough || undefined).diff(moment()) >= 0
+          )
           .map((jobUser) => {
             return {
               ...jobUser.job,
@@ -580,6 +611,7 @@ const JobsHome = ({
     "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
   )
   const [viewArchived, setViewArchived] = useState(false)
+  const [viewExpired, setViewExpired] = useState(false)
 
   // // Redirect user to stripe checkout if trial has ended
   // const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
@@ -682,11 +714,31 @@ const JobsHome = ({
         </Form>
       </div>
 
+      <div className="float-right text-theme-600 py-2 ml-3">
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <LabeledToggleSwitch
+            name="toggleViewExpired"
+            label="View Expired"
+            flex={true}
+            value={viewExpired}
+            onChange={(switchState) => {
+              setViewExpired(switchState)
+            }}
+          />
+        </Form>
+      </div>
+
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <Jobs
           viewArchived={viewArchived}
+          viewExpired={viewExpired}
           user={user}
           company={company}
           currentPlan={currentPlan}
