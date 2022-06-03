@@ -1,6 +1,6 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
-import { Category } from "app/categories/validations"
+import { CategoryObj } from "app/categories/validations"
 
 type CategoryFormProps = {
   onSuccess?: () => void
@@ -15,7 +15,7 @@ export const CategoryForm = (props: CategoryFormProps) => {
     <>
       <Form
         submitText="Submit"
-        schema={Category}
+        schema={CategoryObj}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
         testid="categoryForm"

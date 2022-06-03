@@ -8,6 +8,8 @@ import {
   usePaginatedQuery,
   useQuery,
   useSession,
+  useMutation,
+  invalidateQuery,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -17,9 +19,19 @@ import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection, ExtendedScoreCard } from "types"
-import { CogIcon } from "@heroicons/react/outline"
+import { CogIcon, PencilIcon, TrashIcon } from "@heroicons/react/outline"
 import getScoreCardsWOPagination from "app/score-cards/queries/getScoreCardsWOPagination"
 import groupByKey from "app/core/utils/groupByKey"
+import { ScoreCard } from "@prisma/client"
+import deleteScoreCard from "app/score-cards/mutations/deleteScoreCard"
+import createScoreCard from "app/score-cards/mutations/createScoreCard"
+import updateScoreCard from "app/score-cards/mutations/updateScoreCard"
+import Debouncer from "app/core/utils/debouncer"
+import Confirm from "app/core/components/Confirm"
+import toast from "react-hot-toast"
+import Modal from "app/core/components/Modal"
+import ScoreCardForm from "app/score-cards/components/ScoreCardForm"
+import Card from "app/core/components/Card"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -44,13 +56,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const ScoreCards = ({ user }) => {
-  const ITEMS_PER_PAGE = 12
+const ScoreCards = () => {
   const router = useRouter()
-  const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
   const session = useSession()
+
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const [scoreCardToDelete, setScoreCardToDelete] = useState(null as any as ScoreCard)
+  const [deleteScoreCardMutation] = useMutation(deleteScoreCard)
+  const [scoreCardToEdit, setScoreCardToEdit] = useState(null as any as ScoreCard)
+  const [openModal, setOpenModal] = useState(false)
+  const [createScoreCardMutation] = useMutation(createScoreCard)
+  const [updateScoreCardMutation] = useMutation(updateScoreCard)
 
   useEffect(() => {
     const search = router.query.search
@@ -67,22 +84,6 @@ const ScoreCards = ({ user }) => {
     setQuery(search)
   }, [router.query])
 
-  // const [{ scoreCards, hasMore, count }] = usePaginatedQuery(getScoreCards, {
-  //   where: {
-  //     userId: user?.id,
-  //     ...query,
-  //   },
-  //   skip: ITEMS_PER_PAGE * Number(tablePage),
-  //   take: ITEMS_PER_PAGE,
-  // })
-
-  // let startPage = tablePage * ITEMS_PER_PAGE + 1
-  // let endPage = startPage - 1 + ITEMS_PER_PAGE
-
-  // if (endPage > count) {
-  //   endPage = count
-  // }
-
   const [scoreCards] = useQuery(getScoreCardsWOPagination, {
     where: {
       companyId: session.companyId || 0,
@@ -90,194 +91,199 @@ const ScoreCards = ({ user }) => {
     },
   })
 
-  useMemo(async () => {
-    let data: {}[] = []
-
-    await scoreCards.forEach((scoreCard) => {
-      data = [
-        ...data,
-        {
-          ...scoreCard,
-          canUpdate: scoreCard.companyId === session.companyId,
-        },
-      ]
-
-      setData(data)
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.push({
+      query: {
+        ...router.query,
+        ...searchQuery,
+      },
     })
-  }, [scoreCards, session.companyId])
-
-  // let columns = [
-  //   {
-  //     Header: "Name",
-  //     accessor: "name",
-  //     Cell: (props) => {
-  //       return (
-  //         <Link href={Routes.SingleScoreCardPage({ slug: props.cell.row.original.slug })} passHref>
-  //           <a data-testid={`scoreCardlink`} className="text-theme-600 hover:text-theme-900">
-  //             {props.cell.row.original.name}
-  //           </a>
-  //         </Link>
-  //       )
-  //     },
-  //   },
-  //   {
-  //     Header: "CardQuestions",
-  //     Cell: (props) => {
-  //       return props.cell.row.original.cardQuestions.length
-  //     },
-  //   },
-  //   {
-  //     Header: "",
-  //     accessor: "action",
-  //     Cell: (props) => {
-  //       return (
-  //         <>
-  //           {props.cell.row.original.canUpdate && (
-  //             <Link href={Routes.ScoreCardSettingsPage({ slug: props.cell.row.original.slug })} passHref>
-  //               <a className="text-theme-600 hover:text-theme-900">Settings</a>
-  //             </Link>
-  //           )}
-  //         </>
-  //       )
-  //     },
-  //   },
-  // ]
-
-  // return (
-  //   <Table
-  //     columns={columns}
-  //     data={data}
-  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-  //     pageIndex={tablePage}
-  //     pageSize={ITEMS_PER_PAGE}
-  //     hasNext={hasMore}
-  //     hasPrevious={tablePage !== 0}
-  //     totalCount={count}
-  //     startPage={startPage}
-  //     endPage={endPage}
-  //   />
-  // )
-
-  const getCards = (scoreCards) => {
-    return scoreCards.map((f) => {
-      return {
-        id: f.id,
-        title: f.name,
-        description: `${f.cardQuestions?.length} ${
-          f.cardQuestions?.length === 1 ? "CardQuestion" : "CardQuestions"
-        }`,
-        renderContent: (
-          <>
-            <div className="space-y-2">
-              <div className="w-full relative">
-                <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                  <Link href={Routes.SingleScoreCardPage({ slug: f.slug })} passHref>
-                    <a
-                      data-testid={`scoreCardlink`}
-                      className="text-theme-600 hover:text-theme-800"
-                    >
-                      {f.name}
-                    </a>
-                  </Link>
-                </div>
-                <div className="absolute top-0.5 right-0">
-                  {f.canUpdate && (
-                    <Link href={Routes.ScoreCardSettingsPage({ slug: f.slug })} passHref>
-                      <a className="float-right text-theme-600 hover:text-theme-800">
-                        <CogIcon className="h-6 w-6" />
-                      </a>
-                    </Link>
-                  )}
-                </div>
-              </div>
-              <div className="border-b-2 border-gray-50 w-full"></div>
-              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                {`${f.cardQuestions?.length} ${
-                  f.cardQuestions?.length === 1 ? "Question" : "Questions"
-                } · ${Object.keys(groupByKey(f.jobWorkflowStages, "jobId"))?.length} ${
-                  Object.keys(groupByKey(f.jobWorkflowStages, "jobId"))?.length === 1
-                    ? "Job"
-                    : "Jobs"
-                }`}
-              </div>
-              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
-                {f.cardQuestions
-                  ?.sort((a, b) => {
-                    return a.order - b.order
-                  })
-                  .map((fq) => {
-                    return (
-                      <div
-                        key={fq.id}
-                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
-                      >
-                        <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                          {fq.cardQuestion?.name}
-                        </div>
-                        {/* <div className="text-neutral-600">
-                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
-                      </div> */}
-                      </div>
-                    )
-                  })}
-              </div>
-            </div>
-          </>
-          // <>
-          //   <div>
-          //     <span>
-          //       <div className="w-full relative">
-          //         <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
-          //           <Link href={Routes.SingleScoreCardPage({ slug: f.slug })} passHref>
-          //             <a data-testid={`scoreCardlink`} className="text-theme-600 hover:text-theme-800">
-          //               {f.name}
-          //             </a>
-          //           </Link>
-          //         </div>
-          //         <div className="absolute top-0.5 right-0">
-          //           {f.canUpdate && (
-          //             <Link href={Routes.ScoreCardSettingsPage({ slug: f.slug })} passHref>
-          //               <a className="float-right text-theme-600 hover:text-theme-800">
-          //                 <CogIcon className="h-5 w-5" />
-          //               </a>
-          //             </Link>
-          //           )}
-          //         </div>
-          //       </div>
-          //     </span>
-          //     <div className="pt-2.5">
-          //       {`${f.cardQuestions?.length} ${f.cardQuestions?.length === 1 ? "CardQuestion" : "CardQuestions"}`}
-          //     </div>
-          //   </div>
-          // </>
-        ),
-      }
-    }) as CardType[]
   }
 
-  const [cards, setCards] = useState(getCards(data))
-  useEffect(() => {
-    setCards(getCards(data))
-  }, [data])
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
 
   return (
-    <Cards
-      cards={cards}
-      setCards={setCards}
-      noPagination={true}
-      mutateCardDropDB={(source, destination, draggableId) => {}}
-      droppableName="scoreCards"
-      isDragDisabled={true}
-      direction={DragDirection.VERTICAL}
-      isFull={true}
-    />
+    <>
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={`Delete ScoreCard - ${scoreCardToDelete?.name}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Deleting score card`)
+          try {
+            await deleteScoreCardMutation({ id: scoreCardToDelete?.id })
+            toast.success("Score card deleted", { id: toastId })
+            setOpenConfirm(false)
+            setScoreCardToDelete(null as any)
+            invalidateQuery(getScoreCardsWOPagination)
+          } catch (error) {
+            toast.error(`Deleting score card failed - ${error.toString()}`, { id: toastId })
+          }
+        }}
+      >
+        Are you sure you want to delete the score card?
+      </Confirm>
+
+      <button
+        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+        onClick={(e) => {
+          e.preventDefault()
+          setScoreCardToEdit(null as any)
+          setOpenModal(true)
+        }}
+      >
+        New Score Card
+      </button>
+
+      <Modal header="Score Card" open={openModal} setOpen={setOpenModal}>
+        <ScoreCardForm
+          header={`${scoreCardToEdit ? "Update" : "New"} Score Card`}
+          subHeader=""
+          initialValues={scoreCardToEdit ? { name: scoreCardToEdit?.name } : {}}
+          onSubmit={async (values) => {
+            const isEdit = scoreCardToEdit ? true : false
+
+            const toastId = toast.loading(isEdit ? "Updating Score Card" : "Creating Score Card")
+            try {
+              isEdit
+                ? await updateScoreCardMutation({
+                    where: { id: scoreCardToEdit.id },
+                    data: { ...values },
+                    initial: scoreCardToEdit,
+                  })
+                : await createScoreCardMutation({ ...values })
+              await invalidateQuery(getScoreCardsWOPagination)
+              toast.success(
+                isEdit ? "Score Card updated successfully" : "Score Card added successfully",
+                {
+                  id: toastId,
+                }
+              )
+              setScoreCardToEdit(null as any)
+              setOpenModal(false)
+            } catch (error) {
+              toast.error(
+                `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                { id: toastId }
+              )
+            }
+          }}
+        />
+      </Modal>
+
+      <input
+        placeholder="Search"
+        type="text"
+        defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+        className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+        onChange={(e) => {
+          execDebouncer(e)
+        }}
+      />
+
+      {scoreCards?.length === 0 ? (
+        <div className="text-xl font-semibold text-neutral-500">No Score Cards found</div>
+      ) : (
+        <div className="flex flex-wrap justify-center mt-2">
+          {scoreCards.map((w) => {
+            return (
+              <Card isFull={true} key={w.id}>
+                <div className="space-y-2">
+                  <div className="w-full relative">
+                    <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
+                      <Link href={Routes.SingleScoreCardPage({ slug: w.slug })} passHref>
+                        <a
+                          data-testid={`categorylink`}
+                          className="text-theme-600 hover:text-theme-800"
+                        >
+                          {w.name}
+                        </a>
+                      </Link>
+                    </div>
+                    {!w.factory && (
+                      <>
+                        <div className="absolute top-0.5 right-5">
+                          {w.companyId === session.companyId && (
+                            <button
+                              id={"edit-" + w.id}
+                              className="float-right text-indigo-600 hover:text-indigo-800"
+                              title="Edit ScoreCard"
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setScoreCardToEdit(w)
+                                setOpenModal(true)
+                              }}
+                            >
+                              <PencilIcon className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="absolute top-0.5 right-0">
+                          <button
+                            id={"delete-" + w.id}
+                            className="float-right text-red-600 hover:text-red-800"
+                            title="Delete ScoreCard"
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setScoreCardToDelete(w)
+                              setOpenConfirm(true)
+                            }}
+                          >
+                            <TrashIcon className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="border-b-2 border-gray-50 w-full"></div>
+                  <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                    {`${w.cardQuestions?.length} ${
+                      w.cardQuestions?.length === 1 ? "Question" : "Questions"
+                    } · ${Object.keys(groupByKey(w.jobWorkflowStages, "jobId"))?.length} ${
+                      Object.keys(groupByKey(w.jobWorkflowStages, "jobId"))?.length === 1
+                        ? "Job"
+                        : "Jobs"
+                    }`}
+                  </div>
+                  <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                    {w.cardQuestions
+                      // ?.sort((a, b) => {
+                      //   return a.order - b.order
+                      // })
+                      .map((ws) => {
+                        return (
+                          <div
+                            key={ws.id}
+                            className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
+                          >
+                            <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                              {ws.cardQuestion?.name}
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+    </>
   )
 }
 
 const ScoreCardsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="ScoreCardsHome | hire-win" user={user}>
-      <Link href={Routes.NewScoreCard()} passHref>
+      {/* <Link href={Routes.NewScoreCard()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Score Card
         </a>
@@ -287,12 +293,12 @@ const ScoreCardsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSi
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
           Question Pool
         </a>
-      </Link>
+      </Link> */}
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <ScoreCards user={user} />
+        <ScoreCards />
       </Suspense>
     </AuthLayout>
   )

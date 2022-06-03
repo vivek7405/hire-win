@@ -8,7 +8,7 @@ export const QuestionOption = z.object({
 })
 export type QuestionOptionInputType = z.infer<typeof QuestionOption>
 
-export const Question = z.object({
+export const QuestionObj = z.object({
   id: z.string().optional(),
   name: z.string().nonempty({ message: "Name can't be empty" }),
   placeholder: z.string().optional(),
@@ -19,4 +19,4 @@ export const Question = z.object({
   acceptedFiles: z.string().optional(),
   factory: z.boolean().optional(),
 })
-export type QuestionInputType = z.infer<typeof Question>
+export type QuestionInputType = z.infer<typeof QuestionObj>

@@ -7,8 +7,8 @@ const DeleteForm = z.object({
 })
 
 export default resolver.pipe(resolver.zod(DeleteForm), resolver.authorize(), async ({ id }) => {
-  // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-  const Form = await db.form.deleteMany({ where: { id } })
+  const formQuestion = await db.formQuestion.deleteMany({ where: { formId: id } })
+  const form = await db.form.delete({ where: { id } })
 
-  return Form
+  return form
 })

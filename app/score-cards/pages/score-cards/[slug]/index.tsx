@@ -13,6 +13,7 @@ import {
   useMutation,
   useQuery,
   useSession,
+  invalidateQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -47,7 +48,8 @@ import addExistingScoreCardQuestions from "app/score-cards/mutations/addExisting
 import addNewCardQuestionToScoreCard from "app/score-cards/mutations/addNewCardQuestionToScoreCard"
 import Cards from "app/core/components/Cards"
 import Debouncer from "app/core/utils/debouncer"
-import { ScoreCardQuestionBehaviour } from "@prisma/client"
+import { CardQuestion, ScoreCardQuestionBehaviour } from "@prisma/client"
+import updateCardQuestion from "app/card-questions/mutations/updateCardQuestion"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -105,7 +107,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const CardQuestions = ({ user, scoreCard, companyId }) => {
+export const CardQuestions = ({
+  user,
+  scoreCard,
+  companyId,
+  setCardQuestionToEdit,
+  setOpenAddNewCardQuestion,
+}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -183,18 +191,28 @@ export const CardQuestions = ({ user, scoreCard, companyId }) => {
                 <div className="w-full relative">
                   <div className="font-bold flex justify-between">
                     {!sq.cardQuestion.factory ? (
-                      <Link
-                        href={Routes.SingleCardQuestionPage({ slug: sq.cardQuestion.slug })}
-                        passHref
+                      <a
+                        className="cursor-pointer text-theme-600 hover:text-theme-800"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCardQuestionToEdit(sq.cardQuestion)
+                          setOpenAddNewCardQuestion(true)
+                        }}
                       >
-                        <a
-                          data-testid={`cardQuestionlink`}
-                          className="text-theme-600 hover:text-theme-900"
-                        >
-                          {sq.cardQuestion.name}
-                        </a>
-                      </Link>
+                        {sq.cardQuestion.name}
+                      </a>
                     ) : (
+                      // <Link
+                      //   href={Routes.SingleCardQuestionPage({ slug: sq.cardQuestion.slug })}
+                      //   passHref
+                      // >
+                      //   <a
+                      //     data-testid={`cardQuestionlink`}
+                      //     className="text-theme-600 hover:text-theme-900"
+                      //   >
+                      //     {sq.cardQuestion.name}
+                      //   </a>
+                      // </Link>
                       sq.cardQuestion.name
                     )}
                   </div>
@@ -202,7 +220,7 @@ export const CardQuestions = ({ user, scoreCard, companyId }) => {
                     <div className="absolute top-0.5 right-0">
                       <button
                         className="float-right text-red-600 hover:text-red-800"
-                        title="Remove Card Question"
+                        title="Remove Question"
                         onClick={async (e) => {
                           e.preventDefault()
 
@@ -323,12 +341,12 @@ export const CardQuestions = ({ user, scoreCard, companyId }) => {
         setOpen={setOpenConfirm}
         header={
           Object.entries(scoreCardQuestionToRemove).length
-            ? `Remove Card Question - ${scoreCardQuestionToRemove.cardQuestion.name}?`
-            : "Remove Card Question?"
+            ? `Remove Question - ${scoreCardQuestionToRemove.cardQuestion.name}?`
+            : "Remove Question?"
         }
         onSuccess={async () => {
           const toastId = toast.loading(() => (
-            <span>Removing Card Question {scoreCardQuestionToRemove.cardQuestion.name}</span>
+            <span>Removing Question {scoreCardQuestionToRemove.cardQuestion.name}</span>
           ))
           try {
             await removeCardQuestionFromScoreCardMutation({
@@ -336,9 +354,7 @@ export const CardQuestions = ({ user, scoreCard, companyId }) => {
               order: scoreCardQuestionToRemove.order,
             })
             toast.success(
-              () => (
-                <span>Card Question removed - {scoreCardQuestionToRemove.cardQuestion.name}</span>
-              ),
+              () => <span>Question removed - {scoreCardQuestionToRemove.cardQuestion.name}</span>,
               {
                 id: toastId,
               }
@@ -468,6 +484,8 @@ const SingleScoreCardPage = ({
   const [addExistingScoreCardQuestionsMutation] = useMutation(addExistingScoreCardQuestions)
   const [createCardQuestionMutation] = useMutation(createCardQuestion)
   const [addNewCardQuestionToScoreCardMutation] = useMutation(addNewCardQuestionToScoreCard)
+  const [cardQuestionToEdit, setCardQuestionToEdit] = useState(null as any as CardQuestion)
+  const [updateCardQuestionMutation] = useMutation(updateCardQuestion)
   const router = useRouter()
   const session = useSession()
 
@@ -570,29 +588,57 @@ const SingleScoreCardPage = ({
                 setOpen={setOpenAddNewCardQuestion}
               >
                 <CardQuestionForm
-                  header="Add New Question to Score Card"
+                  editmode={cardQuestionToEdit ? true : false}
+                  header={`${cardQuestionToEdit ? "Update" : "Add New"} Question`}
                   subHeader="Enter Question details"
-                  initialValues={{
-                    name: "",
-                  }}
-                  editmode={false}
+                  initialValues={cardQuestionToEdit ? { name: cardQuestionToEdit?.name } : {}}
                   onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Adding Question</span>)
+                    const isEdit = cardQuestionToEdit ? true : false
+
+                    const toastId = toast.loading(
+                      isEdit ? "Updating Question" : "Adding New Question"
+                    )
                     try {
-                      await addNewCardQuestionToScoreCardMutation({
-                        ...values,
-                        scoreCardId: scoreCard?.id as string,
-                      })
-                      toast.success(() => <span>Question added</span>, {
-                        id: toastId,
-                      })
-                      router.reload()
+                      isEdit
+                        ? await updateCardQuestionMutation({
+                            where: { id: cardQuestionToEdit.id },
+                            data: { ...values },
+                            initial: cardQuestionToEdit,
+                          })
+                        : await createCardQuestionMutation({ ...values })
+                      await invalidateQuery(getScoreCardQuestionsWOPagination)
+                      toast.success(
+                        isEdit ? "Question updated successfully" : "Question added successfully",
+                        {
+                          id: toastId,
+                        }
+                      )
+                      setCardQuestionToEdit(null as any)
+                      setOpenAddNewCardQuestion(false)
                     } catch (error) {
                       toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                        `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                        { id: toastId }
                       )
                     }
                   }}
+                  // onSubmit={async (values) => {
+                  //   const toastId = toast.loading(() => <span>Adding Question</span>)
+                  //   try {
+                  //     await addNewCardQuestionToScoreCardMutation({
+                  //       ...values,
+                  //       scoreCardId: scoreCard?.id as string,
+                  //     })
+                  //     toast.success(() => <span>Question added</span>, {
+                  //       id: toastId,
+                  //     })
+                  //     router.reload()
+                  //   } catch (error) {
+                  //     toast.error(
+                  //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                  //     )
+                  //   }
+                  // }}
                 />
               </Modal>
               <button
@@ -613,7 +659,13 @@ const SingleScoreCardPage = ({
               <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
             }
           >
-            <CardQuestions companyId={session.companyId || 0} scoreCard={scoreCard} user={user} />
+            <CardQuestions
+              companyId={session.companyId || 0}
+              scoreCard={scoreCard}
+              user={user}
+              setCardQuestionToEdit={setCardQuestionToEdit}
+              setOpenAddNewCardQuestion={setOpenAddNewCardQuestion}
+            />
           </Suspense>
         </div>
       )}

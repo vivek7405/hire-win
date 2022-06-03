@@ -29,7 +29,7 @@ import updateCandidatePool from "app/candidate-pools/mutations/updateCandidatePo
 import deleteCandidatePool from "app/candidate-pools/mutations/deleteCandidatePool"
 import Confirm from "app/core/components/Confirm"
 import Card from "app/core/components/Card"
-import { TrashIcon } from "@heroicons/react/outline"
+import { PencilIcon, TrashIcon } from "@heroicons/react/outline"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -130,7 +130,7 @@ const CandidatePools = ({ user }) => {
           setOpenModal(true)
         }}
       >
-        New Template
+        New Candidate Pool
       </button>
 
       <Modal header="Candidate Pool" open={openModal} setOpen={setOpenModal}>
@@ -192,16 +192,6 @@ const CandidatePools = ({ user }) => {
                 <div className="space-y-2">
                   <div className="w-full relative">
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                      {/* <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          setCandidatePoolToEdit(cp)
-                          setOpenModal(true)
-                        }}
-                      >
-                        {cp.name}
-                      </a> */}
                       <Link href={Routes.SingleCandidatePoolPage({ slug: cp.slug })} passHref>
                         <a className="cursor-pointer text-theme-600 hover:text-theme-800">
                           {cp.name}
@@ -221,6 +211,21 @@ const CandidatePools = ({ user }) => {
                         }}
                       >
                         <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="absolute top-0.5 right-4">
+                      <button
+                        id={"edit-" + cp.id}
+                        className="float-right text-indigo-600 hover:text-indigo-800"
+                        title="Edit Candidate Pool"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCandidatePoolToEdit(cp)
+                          setOpenModal(true)
+                        }}
+                      >
+                        <PencilIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </div>

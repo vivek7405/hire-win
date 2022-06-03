@@ -1,13 +1,12 @@
 import { Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db, { Prisma, ScoreCard } from "db"
 import { ScoreCardObj } from "app/score-cards/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
-import { ExtendedScoreCard } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 type UpdateScoreCardInput = Pick<Prisma.ScoreCardUpdateArgs, "where" | "data"> & {
-  initial: ExtendedScoreCard
+  initial: ScoreCard
 }
 
 async function updateScoreCard({ where, data, initial }: UpdateScoreCardInput, ctx: Ctx) {

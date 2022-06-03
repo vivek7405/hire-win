@@ -1,6 +1,6 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
-import { Workflow } from "app/workflows/validations"
+import { WorkflowObj } from "app/workflows/validations"
 
 type WorkflowFormProps = {
   onSuccess?: () => void
@@ -15,7 +15,7 @@ export const WorkflowForm = (props: WorkflowFormProps) => {
     <>
       <Form
         submitText="Submit"
-        schema={Workflow}
+        schema={WorkflowObj}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
         testid="workflowForm"

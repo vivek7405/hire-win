@@ -1,11 +1,12 @@
 import { z } from "zod"
 
-export const Workflow = z.object({
+export const WorkflowObj = z.object({
   id: z.string().optional(),
   name: z.string().nonempty({ message: "Name can't be empty" }),
   slug: z.string().optional(),
+  factory: z.boolean().optional(),
 })
-export type WorkflowInputType = z.infer<typeof Workflow>
+export type WorkflowInputType = z.infer<typeof WorkflowObj>
 
 export const WorkflowStage = z.object({
   id: z.string().optional(),

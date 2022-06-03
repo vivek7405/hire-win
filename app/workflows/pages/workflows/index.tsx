@@ -8,6 +8,8 @@ import {
   usePaginatedQuery,
   useQuery,
   useSession,
+  invalidateQuery,
+  useMutation,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -18,7 +20,17 @@ import Skeleton from "react-loading-skeleton"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection } from "types"
-import { CogIcon } from "@heroicons/react/outline"
+import { CogIcon, PencilIcon, TrashIcon } from "@heroicons/react/outline"
+import Debouncer from "app/core/utils/debouncer"
+import Confirm from "app/core/components/Confirm"
+import toast from "react-hot-toast"
+import Modal from "app/core/components/Modal"
+import WorkflowForm from "app/workflows/components/WorkflowForm"
+import Card from "app/core/components/Card"
+import deleteWorkflow from "app/workflows/mutations/deleteWorkflow"
+import createWorkflow from "app/workflows/mutations/createWorkflow"
+import { Workflow } from "@prisma/client"
+import updateWorkflow from "app/workflows/mutations/updateWorkflow"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -43,13 +55,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Workflows = ({ user }) => {
-  const ITEMS_PER_PAGE = 12
+const Workflows = () => {
   const router = useRouter()
-  const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
   const session = useSession()
+
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const [workflowToDelete, setWorkflowToDelete] = useState(null as any as Workflow)
+  const [deleteWorkflowMutation] = useMutation(deleteWorkflow)
+  const [workflowToEdit, setWorkflowToEdit] = useState(null as any as Workflow)
+  const [openModal, setOpenModal] = useState(false)
+  const [createWorkflowMutation] = useMutation(createWorkflow)
+  const [updateWorkflowMutation] = useMutation(updateWorkflow)
 
   useEffect(() => {
     const search = router.query.search
@@ -66,22 +83,6 @@ const Workflows = ({ user }) => {
     setQuery(search)
   }, [router.query])
 
-  // const [{ workflows, hasMore, count }] = usePaginatedQuery(getWorkflows, {
-  //   where: {
-  //     userId: user?.id,
-  //     ...query,
-  //   },
-  //   skip: ITEMS_PER_PAGE * Number(tablePage),
-  //   take: ITEMS_PER_PAGE,
-  // })
-
-  // let startPage = tablePage * ITEMS_PER_PAGE + 1
-  // let endPage = startPage - 1 + ITEMS_PER_PAGE
-
-  // if (endPage > count) {
-  //   endPage = count
-  // }
-
   const [workflows] = useQuery(getWorkflowsWOPagination, {
     where: {
       companyId: session.companyId || 0,
@@ -89,176 +90,210 @@ const Workflows = ({ user }) => {
     },
   })
 
-  useMemo(async () => {
-    let data: {}[] = []
-
-    await workflows.forEach((workflow) => {
-      data = [
-        ...data,
-        {
-          ...workflow,
-          canUpdate: workflow.companyId === session.companyId,
-        },
-      ]
-
-      setData(data)
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.push({
+      query: {
+        ...router.query,
+        ...searchQuery,
+      },
     })
-  }, [workflows, session.companyId])
-
-  // let columns = [
-  //   {
-  //     Header: "Name",
-  //     accessor: "name",
-  //     Cell: (props) => {
-  //       return (
-  //         <Link href={Routes.SingleWorkflowPage({ slug: props.cell.row.original.slug })} passHref>
-  //           <a data-testid={`workflowlink`} className="text-theme-600 hover:text-theme-900">
-  //             {props.cell.row.original.name}
-  //           </a>
-  //         </Link>
-  //       )
-  //     },
-  //   },
-  //   {
-  //     Header: "Stages",
-  //     Cell: (props) => {
-  //       return props.cell.row.original.stages?.length
-  //     },
-  //   },
-  //   {
-  //     Header: "",
-  //     accessor: "action",
-  //     Cell: (props) => {
-  //       return (
-  //         <>
-  //           {props.cell.row.original.canUpdate && (
-  //             <Link
-  //               href={Routes.WorkflowSettingsPage({ slug: props.cell.row.original.slug })}
-  //               passHref
-  //             >
-  //               <a className="text-theme-600 hover:text-theme-900">Settings</a>
-  //             </Link>
-  //           )}
-  //         </>
-  //       )
-  //     },
-  //   },
-  // ]
-
-  // return (
-  //   <Table
-  //     columns={columns}
-  //     data={data}
-  //     pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-  //     pageIndex={tablePage}
-  //     pageSize={ITEMS_PER_PAGE}
-  //     hasNext={hasMore}
-  //     hasPrevious={tablePage !== 0}
-  //     totalCount={count}
-  //     startPage={startPage}
-  //     endPage={endPage}
-  //   />
-  // )
-
-  const getCards = (workflows) => {
-    return workflows.map((w) => {
-      return {
-        id: w.id,
-        title: w.name,
-        description: `${w.stages?.length} ${w.stages?.length === 1 ? "Stage" : "Stages"}`,
-        renderContent: (
-          <>
-            <div className="space-y-2">
-              <div className="w-full relative">
-                <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                  <Link href={Routes.SingleWorkflowPage({ slug: w.slug })} passHref>
-                    <a data-testid={`categorylink`} className="text-theme-600 hover:text-theme-800">
-                      {w.name}
-                    </a>
-                  </Link>
-                </div>
-                <div className="absolute top-0.5 right-0">
-                  {w.canUpdate && (
-                    <Link href={Routes.WorkflowSettingsPage({ slug: w.slug })} passHref>
-                      <a className="float-right text-theme-600 hover:text-theme-800">
-                        <CogIcon className="h-6 w-6" />
-                      </a>
-                    </Link>
-                  )}
-                </div>
-              </div>
-              <div className="border-b-2 border-gray-50 w-full"></div>
-              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                {`${w.stages?.length} ${w.stages?.length === 1 ? "Stage" : "Stages"} · ${
-                  w.jobs?.length
-                } ${w.jobs?.length === 1 ? "Job" : "Jobs"}`}
-              </div>
-              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
-                {w.stages
-                  ?.sort((a, b) => {
-                    return a.order - b.order
-                  })
-                  .map((ws) => {
-                    return (
-                      <div
-                        key={ws.id}
-                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
-                      >
-                        <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                          {ws.stage?.name}
-                        </div>
-                        {/* <div className="text-neutral-600">
-                        {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
-                      </div> */}
-                      </div>
-                    )
-                  })}
-              </div>
-            </div>
-          </>
-        ),
-      }
-    }) as CardType[]
   }
 
-  const [cards, setCards] = useState(getCards(data))
-  useEffect(() => {
-    setCards(getCards(data))
-  }, [data])
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
 
   return (
-    <Cards
-      cards={cards}
-      setCards={setCards}
-      noPagination={true}
-      mutateCardDropDB={(source, destination, draggableId) => {}}
-      droppableName="categories"
-      isDragDisabled={true}
-      direction={DragDirection.VERTICAL}
-      isFull={true}
-    />
+    <>
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={`Delete Workflow - ${workflowToDelete?.name}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Deleting Workflow`)
+          try {
+            await deleteWorkflowMutation({ id: workflowToDelete?.id })
+            toast.success("Workflow Deleted", { id: toastId })
+            setOpenConfirm(false)
+            setWorkflowToDelete(null as any)
+            invalidateQuery(getWorkflowsWOPagination)
+          } catch (error) {
+            toast.error(`Deleting workflow failed - ${error.toString()}`, { id: toastId })
+          }
+        }}
+      >
+        Are you sure you want to delete the workflow?
+      </Confirm>
+
+      <button
+        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+        onClick={(e) => {
+          e.preventDefault()
+          setWorkflowToEdit(null as any)
+          setOpenModal(true)
+        }}
+      >
+        New Workflow
+      </button>
+
+      <Modal header="Workflow" open={openModal} setOpen={setOpenModal}>
+        <WorkflowForm
+          header={`${workflowToEdit ? "Update" : "New"} Workflow`}
+          subHeader=""
+          initialValues={workflowToEdit ? { name: workflowToEdit?.name } : {}}
+          onSubmit={async (values) => {
+            const isEdit = workflowToEdit ? true : false
+
+            const toastId = toast.loading(isEdit ? "Updating Workflow" : "Creating Workflow")
+            try {
+              isEdit
+                ? await updateWorkflowMutation({
+                    where: { id: workflowToEdit.id },
+                    data: { ...values },
+                    initial: workflowToEdit,
+                  })
+                : await createWorkflowMutation({ ...values })
+              await invalidateQuery(getWorkflowsWOPagination)
+              toast.success(
+                isEdit ? "Workflow updated successfully" : "Workflow added successfully",
+                {
+                  id: toastId,
+                }
+              )
+              setWorkflowToEdit(null as any)
+              setOpenModal(false)
+            } catch (error) {
+              toast.error(
+                `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                { id: toastId }
+              )
+            }
+          }}
+        />
+      </Modal>
+
+      <input
+        placeholder="Search"
+        type="text"
+        defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+        className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+        onChange={(e) => {
+          execDebouncer(e)
+        }}
+      />
+
+      {workflows?.length === 0 ? (
+        <div className="text-xl font-semibold text-neutral-500">No Workflows found</div>
+      ) : (
+        <div className="flex flex-wrap justify-center mt-2">
+          {workflows.map((w) => {
+            return (
+              <Card isFull={true} key={w.id}>
+                <div className="space-y-2">
+                  <div className="w-full relative">
+                    <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
+                      <Link href={Routes.SingleWorkflowPage({ slug: w.slug })} passHref>
+                        <a
+                          data-testid={`categorylink`}
+                          className="text-theme-600 hover:text-theme-800"
+                        >
+                          {w.name}
+                        </a>
+                      </Link>
+                    </div>
+                    {!w.factory && (
+                      <>
+                        <div className="absolute top-0.5 right-5">
+                          {w.companyId === session.companyId && (
+                            <button
+                              id={"edit-" + w.id}
+                              className="float-right text-indigo-600 hover:text-indigo-800"
+                              title="Edit Workflow"
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setWorkflowToEdit(w)
+                                setOpenModal(true)
+                              }}
+                            >
+                              <PencilIcon className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="absolute top-0.5 right-0">
+                          <button
+                            id={"delete-" + w.id}
+                            className="float-right text-red-600 hover:text-red-800"
+                            title="Delete Workflow"
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setWorkflowToDelete(w)
+                              setOpenConfirm(true)
+                            }}
+                          >
+                            <TrashIcon className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="border-b-2 border-gray-50 w-full"></div>
+                  <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                    {`${w.stages?.length} ${w.stages?.length === 1 ? "Stage" : "Stages"} · ${
+                      w.jobs?.length
+                    } ${w.jobs?.length === 1 ? "Job" : "Jobs"}`}
+                  </div>
+                  <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                    {w.stages
+                      // ?.sort((a, b) => {
+                      //   return a.order - b.order
+                      // })
+                      .map((ws) => {
+                        return (
+                          <div
+                            key={ws.id}
+                            className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
+                          >
+                            <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                              {ws.stage?.name}
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+    </>
   )
 }
 
 const WorkflowsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="WorkflowsHome | hire-win" user={user}>
-      <Link href={Routes.NewWorkflow()} passHref>
+      {/* <Link href={Routes.NewWorkflow()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Workflow
         </a>
-      </Link>
+      </Link> */}
 
-      <Link href={Routes.StagesHome()} passHref>
+      {/* <Link href={Routes.StagesHome()} passHref>
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
           Stage Pool
         </a>
-      </Link>
+      </Link> */}
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Workflows user={user} />
+        <Workflows />
       </Suspense>
     </AuthLayout>
   )

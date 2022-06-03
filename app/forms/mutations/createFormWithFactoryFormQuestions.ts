@@ -4,7 +4,11 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryFormQuestions from "../../questions/utils/factoryFormQuestions"
 import { QuestionType } from "@prisma/client"
 
-async function createFormWithFactoryFormQuestions(formName: string, companyId: number) {
+async function createFormWithFactoryFormQuestions(
+  formName: string,
+  companyId: number,
+  factoryForm: boolean
+) {
   const slugForm = slugify(formName, { strict: true })
   const newSlugForm = await findFreeSlug(
     slugForm,
@@ -42,6 +46,7 @@ async function createFormWithFactoryFormQuestions(formName: string, companyId: n
       updatedAt: new Date(),
       name: formName,
       slug: newSlugForm,
+      factory: factoryForm,
       company: {
         connect: {
           id: companyId,

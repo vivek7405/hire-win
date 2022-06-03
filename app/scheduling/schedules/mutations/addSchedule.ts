@@ -8,6 +8,7 @@ export default resolver.pipe(
       name: z.string(),
       timezone: z.string(),
       schedule: z.record(z.object({ startTime: z.string(), endTime: z.string() })),
+      factory: z.boolean().optional(),
     })
   ),
   resolver.authorize(),
@@ -26,6 +27,7 @@ export default resolver.pipe(
             endTime,
           })),
         },
+        factory: scheduleCreate.factory || false,
       },
     })
 

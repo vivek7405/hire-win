@@ -231,6 +231,8 @@ model Job {
   interviewDetails InterviewDetail[]
   candidates       Candidate[]
 
+  archived Boolean @default(false)
+
   company   Company @relation(fields: [companyId], references: [id])
   companyId Int
 }
@@ -320,6 +322,8 @@ model Workflow {
   company   Company @relation(fields: [companyId], references: [id])
   companyId Int
 
+  factory Boolean @default(false)
+
   @@unique([companyId, name])
 }
 
@@ -386,6 +390,8 @@ model Form {
   company   Company @relation(fields: [companyId], references: [id])
   companyId Int
 
+  factory Boolean @default(false)
+
   @@unique([companyId, name])
 }
 
@@ -433,6 +439,8 @@ model ScoreCard {
 
   company   Company @relation(fields: [companyId], references: [id])
   companyId Int
+
+  factory Boolean @default(false)
 
   @@unique([companyId, name])
 }
@@ -617,6 +625,8 @@ model Candidate {
   emails         Email[]
   candidatePools CandidatePool[]
 
+  rejected Boolean @default(false)
+
   @@unique([jobId, email])
 }
 
@@ -694,6 +704,7 @@ model Schedule {
   ownerId          Int
   // meetings       Meeting[]
   interviewDetails InterviewDetail[]
+  factory          Boolean           @default(false)
 
   @@unique([ownerId, name])
 }

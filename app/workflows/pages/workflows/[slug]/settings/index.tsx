@@ -43,7 +43,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       if (canUpdate) {
         const workflow = await invokeWithMiddleware(
           getWorkflow,
-          { where: { slug: context?.params?.slug!, userId: user?.id } },
+          { where: { slug: context?.params?.slug!, companyId: session?.companyId } },
           { ...context }
         )
 

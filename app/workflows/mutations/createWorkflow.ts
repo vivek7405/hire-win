@@ -1,7 +1,7 @@
 import { Ctx, AuthenticationError } from "blitz"
 import db from "db"
 import slugify from "slugify"
-import { Workflow, WorkflowInputType } from "app/workflows/validations"
+import { WorkflowObj, WorkflowInputType } from "app/workflows/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import createWorkflowWithFactoryWorkflowStages from "./createWorkflowWithFactoryWorkflowStages"
@@ -9,7 +9,7 @@ import createWorkflowWithFactoryWorkflowStages from "./createWorkflowWithFactory
 async function createWorkflow(data: WorkflowInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name } = Workflow.parse(data)
+  const { name } = WorkflowObj.parse(data)
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 
@@ -27,7 +27,7 @@ async function createWorkflow(data: WorkflowInputType, ctx: Ctx) {
   //   },
   // })
 
-  const workflow = await createWorkflowWithFactoryWorkflowStages(name, user.id)
+  const workflow = await createWorkflowWithFactoryWorkflowStages(name, user.id, false)
 
   return workflow
 }

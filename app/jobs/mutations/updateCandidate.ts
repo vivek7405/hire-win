@@ -27,7 +27,7 @@ async function updateCandidate({ where, data, initial }: UpdateCandidateInput, c
     slug: initial.name !== data.name ? newSlug : initial.slug,
     jobId: jobId!,
     answers: {
-      update: answers?.map((answer) => {
+      upsert: answers?.map((answer) => {
         return {
           where: {
             candidateId_questionId: {
@@ -35,7 +35,11 @@ async function updateCandidate({ where, data, initial }: UpdateCandidateInput, c
               questionId: answer.questionId!,
             },
           },
-          data: {
+          create: {
+            value: answer.value,
+            questionId: answer.questionId!,
+          },
+          update: {
             value: answer.value,
             questionId: answer.questionId!,
           },

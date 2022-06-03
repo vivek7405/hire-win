@@ -31,7 +31,7 @@ import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
 import setJobHidden from "app/jobs/mutations/setJobHidden"
 import toast from "react-hot-toast"
 import Cards from "app/core/components/Cards"
-import { ExternalLinkIcon } from "@heroicons/react/outline"
+import { ArchiveIcon, CogIcon, ExternalLinkIcon, RefreshIcon } from "@heroicons/react/outline"
 import getCategories from "app/categories/queries/getCategories"
 import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
@@ -44,6 +44,8 @@ import { loadStripe } from "@stripe/stripe-js"
 import createStripeCheckoutSession from "app/companies/mutations/createStripeCheckoutSession"
 import { plans } from "app/core/utils/plans"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
+import updateJob from "app/jobs/mutations/updateJob"
+import setJobArchived from "app/jobs/mutations/setJobArchived"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -95,7 +97,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage }) => {
+const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, viewArchived }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -127,12 +129,16 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
       selectedCategoryId !== "0"
         ? {
             userId: user?.id || 0,
-            job: { companyId: company?.id || 0, categoryId: selectedCategoryId },
+            job: {
+              archived: viewArchived,
+              companyId: company?.id || 0,
+              categoryId: selectedCategoryId,
+            },
             ...query,
           }
         : {
             userId: user?.id,
-            job: { companyId: company?.id || 0 },
+            job: { archived: viewArchived, companyId: company?.id || 0 },
             ...query,
           },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -147,6 +153,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
   }
 
   const [setJobHiddenMutation] = useMutation(setJobHidden)
+  const [setJobArchivedMutation] = useMutation(setJobArchived)
   const [setJobSalaryVisibilityMutation] = useMutation(setJobSalaryVisibility)
 
   const searchQuery = async (e) => {
@@ -165,8 +172,43 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
     return debouncer.execute(e)
   }
 
+  const [openJobArchiveConfirm, setOpenJobArchiveConfirm] = useState(false)
+  const [jobToArchive, setJobToArchive] = useState(null as any)
+
+  useEffect(() => {
+    invalidateQuery(getCategoriesWOPagination)
+  }, [viewArchived])
+
   return (
     <>
+      <Confirm
+        open={openJobArchiveConfirm}
+        setOpen={setOpenJobArchiveConfirm}
+        header={`${viewArchived ? "Restore" : "Archive"} Job - ${jobToArchive?.title}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`${viewArchived ? "Restoring" : "Archiving"} Job`)
+          try {
+            await setJobArchivedMutation({
+              where: { id: jobToArchive?.id },
+              archived: !jobToArchive?.archived,
+            })
+            toast.success(`Job ${viewArchived ? "Restored" : "Archived"}`, { id: toastId })
+            setOpenJobArchiveConfirm(false)
+            setJobToArchive(null as any)
+            setSelectedCategoryId("0")
+            invalidateQuery(getJobs)
+            invalidateQuery(getCategoriesWOPagination)
+          } catch (error) {
+            toast.error(
+              `${viewArchived ? "Restoring" : "Archiving"} job failed - ${error.toString()}`,
+              { id: toastId }
+            )
+          }
+        }}
+      >
+        Are you sure you want to {viewArchived ? "Restore" : "Reject"} the job?
+      </Confirm>
+
       <input
         placeholder="Search"
         type="text"
@@ -189,7 +231,8 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
 
       {jobUsers?.length > 0 && (
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {categories?.filter((c) => c.jobs.length > 0)?.length > 0 && (
+          {categories?.filter((c) => c.jobs.find((j) => j.archived === viewArchived))?.length >
+            0 && (
             <div
               className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
                 selectedCategoryId === "0"
@@ -204,7 +247,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
             </div>
           )}
           {categories
-            ?.filter((c) => c.jobs.length > 0)
+            ?.filter((c) => c.jobs.find((j) => j.archived === viewArchived))
             ?.map((category) => {
               return (
                 <div
@@ -283,8 +326,9 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
                             .fromNow()}
                         </p>
                       </div>
-                      <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-6 mt-6 md:mt-0 lg:mt-0">
+                      <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-4 mt-6 md:mt-0 lg:mt-0">
                         <a
+                          title="Job Settings"
                           className="cursor-pointer text-theme-600 hover:text-theme-800"
                           onClick={(e) => {
                             e.preventDefault()
@@ -300,7 +344,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
                             }
                           }}
                         >
-                          Job Settings
+                          <CogIcon className="h-6 w-6" />
                         </a>
 
                         <Form
@@ -425,6 +469,24 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
                             }}
                           />
                         </Form>
+
+                        <button
+                          id={"archive-" + job?.id}
+                          className="float-right text-red-600 hover:text-red-800"
+                          title={viewArchived ? "Restore Job" : "Archive Job"}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setJobToArchive(job)
+                            setOpenJobArchiveConfirm(true)
+                          }}
+                        >
+                          {viewArchived ? (
+                            <RefreshIcon className="w-6 h-6" />
+                          ) : (
+                            <ArchiveIcon className="w-6 h-6" />
+                          )}
+                        </button>
                       </div>
                     </div>
 
@@ -517,6 +579,7 @@ const JobsHome = ({
   const [confirmMessage, setConfirmMessage] = useState(
     "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
   )
+  const [viewArchived, setViewArchived] = useState(false)
 
   // // Redirect user to stripe checkout if trial has ended
   // const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
@@ -600,10 +663,30 @@ const JobsHome = ({
         </a>
       </Link>
 
+      <div className="float-right text-theme-600 py-2 ml-3">
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <LabeledToggleSwitch
+            name="toggleViewArchived"
+            label="View Archived"
+            flex={true}
+            value={viewArchived}
+            onChange={(switchState) => {
+              setViewArchived(switchState)
+            }}
+          />
+        </Form>
+      </div>
+
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <Jobs
+          viewArchived={viewArchived}
           user={user}
           company={company}
           currentPlan={currentPlan}

@@ -10,9 +10,9 @@ export default resolver.pipe(
   resolver.zod(DeleteScoreCard),
   resolver.authorize(),
   async ({ id }) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const ScoreCard = await db.scoreCard.deleteMany({ where: { id } })
+    const scoreCardQuestion = await db.scoreCardQuestion.deleteMany({ where: { scoreCardId: id } })
+    const scoreCard = await db.scoreCard.delete({ where: { id } })
 
-    return ScoreCard
+    return scoreCard
   }
 )

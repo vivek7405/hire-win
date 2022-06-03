@@ -1,6 +1,6 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
-import { Question } from "app/questions/validations"
+import { QuestionObj } from "app/questions/validations"
 import { QuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useState } from "react"
@@ -35,7 +35,7 @@ export const QuestionForm = (props: QuestionFormProps) => {
     <>
       <Form
         submitText="Submit"
-        schema={Question}
+        schema={QuestionObj}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
         testid="questionForm"

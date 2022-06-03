@@ -84,12 +84,17 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
       selectedCategoryId !== "0"
         ? {
             // userId: user?.id,
-            job: { companyId: company?.id, categoryId: selectedCategoryId, hidden: false },
+            job: {
+              archived: false,
+              companyId: company?.id,
+              categoryId: selectedCategoryId,
+              hidden: false,
+            },
             ...query,
           }
         : {
             // userId: user?.id,
-            job: { companyId: company?.id, hidden: false },
+            job: { archived: false, companyId: company?.id, hidden: false },
             ...query,
           },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -152,7 +157,41 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
           {jobUsers?.length > 0 && (
             <>
+              {categories?.filter((c) => c.jobs.find((j) => !j.archived))?.length > 0 && (
+                <div
+                  className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+                    selectedCategoryId === "0"
+                      ? "bg-theme-700 cursor-default"
+                      : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+                  }`}
+                  onClick={() => {
+                    setSelectedCategoryId("0")
+                  }}
+                >
+                  All
+                </div>
+              )}
               {categories
+                ?.filter((c) => c.jobs.find((j) => !j.archived))
+                ?.map((category) => {
+                  return (
+                    <div
+                      key={category.id}
+                      className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+                        selectedCategoryId === category.id
+                          ? "bg-theme-700 cursor-default"
+                          : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+                      }`}
+                      onClick={async () => {
+                        setSelectedCategoryId(category.id)
+                        await invalidateQuery(getJobs)
+                      }}
+                    >
+                      {category.name}
+                    </div>
+                  )
+                })}
+              {/* {categories
                 ?.filter((c) => c.jobs.length > 0)
                 ?.filter((c) => !c.jobs?.some((j) => !currentPlan && j._count.candidates >= 25)) // Filter jobs whose free candidate limit has reached
                 ?.length > 0 && (
@@ -189,7 +228,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
                       {category.name}
                     </div>
                   )
-                })}
+                })} */}
             </>
           )}
         </div>

@@ -1,4 +1,4 @@
-import React, { Children, Suspense, useEffect, useMemo, useState } from "react"
+import React, { Suspense, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -13,6 +13,7 @@ import {
   useMutation,
   useQuery,
   dynamic,
+  invalidateQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -43,7 +44,6 @@ import updateCandidate from "app/jobs/mutations/updateCandidate"
 import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
 import * as ToggleSwitch from "@radix-ui/react-switch"
 import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
-import getCandidatesWOPagination from "app/jobs/queries/getCandidatesWOPagination"
 import Debouncer from "app/core/utils/debouncer"
 import Pagination from "app/core/components/Pagination"
 import KanbanBoard from "app/core/components/KanbanBoard"
@@ -53,6 +53,8 @@ import canCreateNewCandidate from "app/jobs/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
+import { BanIcon, RefreshIcon } from "@heroicons/react/outline"
+import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -143,7 +145,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const getBoard = (job, candidates) => {
+const getBoard = (
+  job,
+  candidates,
+  viewRejected,
+  setCandidateToReject,
+  setOpenCandidateRejectConfirm
+) => {
   return {
     columns: job?.workflow?.stages
       ?.sort((a, b) => {
@@ -191,7 +199,29 @@ const getBoard = (job, candidates) => {
                         </Form>
                       </div>
                     </span>
-                    <div className="pt-2.5">{c.email}</div>
+                    <div className="pt-2.5 flex justify-between items-center">
+                      <span>{c.email}</span>
+                      <span title="Reject">
+                        {/* <BanIcon className="h-4 w-4 text-red-600 hover:text-red-800 cursor-pointer" /> */}
+                        <button
+                          id={"reject-" + c?.id}
+                          className="float-right text-red-600 hover:text-red-800"
+                          title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setCandidateToReject(c)
+                            setOpenCandidateRejectConfirm(true)
+                          }}
+                        >
+                          {viewRejected ? (
+                            <RefreshIcon className="w-5 h-5" />
+                          ) : (
+                            <BanIcon className="w-5 h-5" />
+                          )}
+                        </button>
+                      </span>
+                    </div>
                   </div>
                 ),
               }
@@ -204,12 +234,15 @@ const getBoard = (job, candidates) => {
 type CandidateProps = {
   job: ExtendedJob
   isKanban: Boolean
+  viewRejected: Boolean
+  setCandidateToReject: any
+  setOpenCandidateRejectConfirm: any
 }
 const Candidates = (props: CandidateProps) => {
   const ITEMS_PER_PAGE = 25
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<ExtendedCandidate[]>([])
+  // const [data, setData] = useState<ExtendedCandidate[]>([])
   const [query, setQuery] = useState({})
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
 
@@ -228,9 +261,14 @@ const Candidates = (props: CandidateProps) => {
     setQuery(search)
   }, [router.query])
 
+  useEffect(() => {
+    invalidateQuery(getCandidates)
+  }, [props.viewRejected])
+
   const [{ candidates, hasMore, count }] = usePaginatedQuery(getCandidates, {
     where: {
       jobId: props.job?.id,
+      rejected: props.viewRejected ? true : false,
       ...query,
     },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -244,14 +282,14 @@ const Candidates = (props: CandidateProps) => {
     endPage = count
   }
 
-  useMemo(async () => {
-    let data: ExtendedCandidate[] = []
+  // useMemo(async () => {
+  //   let data: ExtendedCandidate[] = []
 
-    await candidates.forEach((candidate) => {
-      data = [...data, { ...(candidate as any) }]
-      setData(data)
-    })
-  }, [candidates])
+  //   await candidates.forEach((candidate) => {
+  //     data = [...data, { ...(candidate as any) }]
+  //     setData(data)
+  //   })
+  // }, [candidates])
 
   const getDynamicColumn = (formQuestion) => {
     return {
@@ -421,10 +459,32 @@ const Candidates = (props: CandidateProps) => {
     },
   })
 
-  const [board, setBoard] = useState(getBoard(props.job, candidates) as KanbanBoardType)
+  const [board, setBoard] = useState(
+    getBoard(
+      props.job,
+      candidates,
+      props.viewRejected,
+      props.setCandidateToReject,
+      props.setOpenCandidateRejectConfirm
+    ) as KanbanBoardType
+  )
   useEffect(() => {
-    setBoard(getBoard(props.job, data))
-  }, [props.job, data])
+    setBoard(
+      getBoard(
+        props.job,
+        candidates,
+        props.viewRejected,
+        props.setCandidateToReject,
+        props.setOpenCandidateRejectConfirm
+      )
+    )
+  }, [
+    props.job,
+    candidates,
+    props.viewRejected,
+    props.setCandidateToReject,
+    props.setOpenCandidateRejectConfirm,
+  ])
 
   const updateCandidateStg = async (candidate, selectedWorkflowStageId) => {
     const selectedStageName =
@@ -444,12 +504,13 @@ const Candidates = (props: CandidateProps) => {
         where: { id: candidate?.id },
         data: { workflowStageId: selectedWorkflowStageId },
       })
-      const candidateDataIndex = data.findIndex((c) => c.id === candidate?.id)
-      if (candidateDataIndex >= 0) {
-        let newArr = [...data]
-        newArr[candidateDataIndex] = updatedCandidate
-        setData(newArr)
-      }
+      // const candidateDataIndex = data.findIndex((c) => c.id === candidate?.id)
+      // if (candidateDataIndex >= 0) {
+      //   let newArr = [...data]
+      //   newArr[candidateDataIndex] = updatedCandidate
+      //   setData(newArr)
+      // }
+      invalidateQuery(getCandidates)
       // const candidateData = data.find((c) => c.id === candidate?.id)
       // if (candidateData) {
       //   candidateData.workflowStageId = selectedWorkflowStageId
@@ -485,7 +546,7 @@ const Candidates = (props: CandidateProps) => {
   return !props.isKanban ? (
     <Table
       columns={columns}
-      data={data}
+      data={candidates}
       pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
       pageIndex={tablePage}
       pageSize={ITEMS_PER_PAGE}
@@ -536,6 +597,10 @@ const SingleJobPage = ({
   const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
   const [openConfirm, setOpenConfirm] = useState(false)
   const router = useRouter()
+  const [candidateToReject, setCandidateToReject] = useState(null as any)
+  const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)
+  const [viewRejected, setViewRejected] = useState(false)
+  const [setCandidateRejectedMutation] = useMutation(setCandidateRejected)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -554,6 +619,31 @@ const SingleJobPage = ({
         You have reached the maximum candidates limit on the free plan. Upgrade to the PRO plan to
         add unlimited jobs and candidates.
       </Confirm>
+      <Confirm
+        open={openCandidateRejectConfirm}
+        setOpen={setOpenCandidateRejectConfirm}
+        header={`${viewRejected ? "Restore" : "Reject"} Candidate - ${candidateToReject?.name}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`${viewRejected ? "Restoring" : "Rejecting"} Candidate`)
+          try {
+            await setCandidateRejectedMutation({
+              where: { id: candidateToReject?.id },
+              rejected: !candidateToReject?.rejected,
+            })
+            toast.success(`Candidate ${viewRejected ? "Restored" : "Rejected"}`, { id: toastId })
+            setOpenCandidateRejectConfirm(false)
+            setCandidateToReject(null as any)
+            invalidateQuery(getCandidates)
+          } catch (error) {
+            toast.error(
+              `${viewRejected ? "Restoring" : "Rejecting"} candidate failed - ${error.toString()}`,
+              { id: toastId }
+            )
+          }
+        }}
+      >
+        Are you sure you want to {viewRejected ? "Restore" : "Reject"} the candidate?
+      </Confirm>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
       <button
@@ -568,6 +658,7 @@ const SingleJobPage = ({
       >
         New Candidate
       </button>
+
       {canUpdate && (
         <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
           <a
@@ -578,6 +669,7 @@ const SingleJobPage = ({
           </a>
         </Link>
       )}
+
       <div className="float-right text-theme-600 py-2 ml-3">
         <Form
           noFormatting={true}
@@ -596,6 +688,7 @@ const SingleJobPage = ({
           />
         </Form>
       </div>
+
       <Link
         href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
         passHref
@@ -622,10 +715,36 @@ const SingleJobPage = ({
           </svg>
         </a>
       </Link>
+
+      <div className="float-right text-theme-600 py-2 ml-3">
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <LabeledToggleSwitch
+            name="toggleViewRejected"
+            label="View Rejected"
+            flex={true}
+            value={viewRejected}
+            onChange={(switchState) => {
+              setViewRejected(switchState)
+            }}
+          />
+        </Form>
+      </div>
+
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
-        <Candidates job={job as any} isKanban={isKanban} />
+        <Candidates
+          job={job as any}
+          isKanban={isKanban}
+          viewRejected={viewRejected}
+          setCandidateToReject={setCandidateToReject}
+          setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
+        />
       </Suspense>
     </AuthLayout>
   )

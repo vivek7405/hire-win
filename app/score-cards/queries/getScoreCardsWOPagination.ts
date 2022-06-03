@@ -7,15 +7,14 @@ interface GetScoreCardsInput extends Pick<Prisma.ScoreCardFindManyArgs, "where">
 const getScoreCardsWOPagination = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetScoreCardsInput) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
     const scoreCards = await db.scoreCard.findMany({
       where,
       include: {
-        cardQuestions: { include: { cardQuestion: true } },
+        cardQuestions: { include: { cardQuestion: true }, orderBy: { order: "asc" } },
         jobWorkflowStages: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "asc",
       },
     })
     return scoreCards
