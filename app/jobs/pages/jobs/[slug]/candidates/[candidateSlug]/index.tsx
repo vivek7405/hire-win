@@ -60,7 +60,13 @@ import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInte
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
 import moment from "moment"
-import { BanIcon, ChevronDownIcon, RefreshIcon } from "@heroicons/react/outline"
+import {
+  BanIcon,
+  ChevronDownIcon,
+  CogIcon,
+  PencilAltIcon,
+  RefreshIcon,
+} from "@heroicons/react/outline"
 import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview"
 import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
@@ -478,16 +484,39 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
           passHref
         >
           <a
-            className="float-right underline text-theme-600 py-2 hover:text-theme-800"
+            title="Edit Details"
+            className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800"
             data-testid={`${candidate?.id}-settingsLink`}
           >
-            Settings
+            <PencilAltIcon className="h-6 w-6" />
           </a>
         </Link>
       )}
 
+      <a
+        title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
+        className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800"
+        onClick={(e) => {
+          e.preventDefault()
+          setCandidateToReject(candidate)
+          setOpenCandidateRejectConfirm(true)
+        }}
+      >
+        {candidate?.rejected ? (
+          <RefreshIcon className="w-6 h-6" />
+        ) : (
+          <BanIcon className="w-6 h-6" />
+        )}
+      </a>
+
       <div className="flex items-center space-x-4">
-        <h3 className="font-bold text-5xl text-theme-600">{candidate?.name}</h3>
+        <h3
+          className={`font-bold text-5xl ${
+            candidate?.rejected ? "text-red-600" : "text-theme-600"
+          }`}
+        >
+          {candidate?.name}
+        </h3>
         <Form
           noFormatting={true}
           onSubmit={async () => {
@@ -496,36 +525,15 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         >
           <LabeledRatingField
             name="candidateAverageRating"
-            ratingClass="!flex items-center"
+            ratingClass={`!flex items-center`}
             height={8}
+            color={candidate?.rejected ? "red" : "theme"}
             value={Math.round(
               getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])
             )}
             disabled={true}
           />
         </Form>
-        <button
-          id={"reject-" + candidate?.id}
-          className="float-right text-red-600 hover:text-red-800"
-          title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
-          type="button"
-          onClick={(e) => {
-            e.preventDefault()
-            setCandidateToReject(candidate)
-            setOpenCandidateRejectConfirm(true)
-          }}
-        >
-          {candidate?.rejected ? (
-            <RefreshIcon className="w-7 h-7" />
-          ) : (
-            <BanIcon className="w-7 h-7" />
-          )}
-        </button>
-        {/* {candidate?.rejected && (
-          <span title="Rejected">
-            <BanIcon className="h-10 w-10 text-red-800 cursor-not-allowed" />
-          </span>
-        )} */}
       </div>
 
       <br />

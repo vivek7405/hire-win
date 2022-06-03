@@ -15,12 +15,12 @@ export interface LabeledRatingFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   onChange?: any
   height?: number
   ratingClass?: string
-  isBlack?: boolean
+  color?: string
   value?: number
 }
 
 export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFieldProps>(
-  ({ label, outerProps, name, defaultValue, value, disabled, height, isBlack, ...props }, ref) => {
+  ({ label, outerProps, name, defaultValue, value, disabled, height, color, ...props }, ref) => {
     const {
       control,
       setValue,
@@ -67,14 +67,14 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
                   emptySymbol={
                     <StarIconOutline
                       className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
-                        !isBlack ? "text-theme-600" : ""
+                        !color ? "text-theme-600" : `text-${color}-600`
                       } w-auto ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     />
                   }
                   fullSymbol={
                     <StarIconSolid
                       className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
-                        !isBlack ? "text-theme-600" : ""
+                        !color ? "text-theme-600" : `text-${color}-600`
                       } w-auto ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                     />
                   }

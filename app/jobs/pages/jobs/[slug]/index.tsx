@@ -179,7 +179,15 @@ const getBoard = (
                           })}
                           passHref
                         >
-                          <a className="text-theme-600 hover:text-theme-900">{c.name}</a>
+                          <a
+                            className={`${
+                              c.rejected
+                                ? "text-red-600 hover:text-red-900"
+                                : "text-theme-600 hover:text-theme-900"
+                            }`}
+                          >
+                            {c.name}
+                          </a>
                         </Link>
                         <Form
                           noFormatting={true}
@@ -191,6 +199,7 @@ const getBoard = (
                             name="candidateAverageRating"
                             ratingClass="!flex items-center"
                             height={5}
+                            color={c.rejected ? "red" : "theme"}
                             value={Math.round(
                               getScoreAverage(c?.scores?.map((score) => score.rating) || [])
                             )}
