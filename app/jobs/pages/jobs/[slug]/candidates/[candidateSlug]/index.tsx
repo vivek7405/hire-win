@@ -60,7 +60,7 @@ import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInte
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
 import moment from "moment"
-import { BanIcon, ChevronDownIcon } from "@heroicons/react/outline"
+import { BanIcon, ChevronDownIcon, RefreshIcon } from "@heroicons/react/outline"
 import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview"
 import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
@@ -69,6 +69,7 @@ import Emails from "app/emails/components/Emails"
 import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
 import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
+import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -320,6 +321,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     }
   }, [resume])
 
+  const [candidateToReject, setCandidateToReject] = useState(null as any)
+  const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)
+  const [setCandidateRejectedMutation] = useMutation(setCandidateRejected)
+
   // let ratingsArray = [] as number[]
   // candidate?.scores?.forEach((score) => {
   //   ratingsArray.push(score.rating)
@@ -342,6 +347,46 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
   return (
     <AuthLayout user={user}>
+      <Confirm
+        open={openCandidateRejectConfirm}
+        setOpen={setOpenCandidateRejectConfirm}
+        header={`${candidateToReject?.rejected ? "Restore" : "Reject"} Candidate - ${
+          candidateToReject?.name
+        }`}
+        onSuccess={async () => {
+          const toastId = toast.loading(
+            `${candidateToReject?.rejected ? "Restoring" : "Rejecting"} Candidate`
+          )
+          try {
+            await setCandidateRejectedMutation({
+              where: { id: candidateToReject?.id },
+              rejected: !candidateToReject?.rejected,
+            })
+            setOpenCandidateRejectConfirm(false)
+            setCandidateToReject(null as any)
+            if (candidate) {
+              setCandidate({
+                ...candidate,
+                rejected: !candidateToReject?.rejected,
+                resume: candidate?.resume!,
+              })
+            }
+            toast.success(`Candidate ${candidateToReject?.rejected ? "Restored" : "Rejected"}`, {
+              id: toastId,
+            })
+          } catch (error) {
+            toast.error(
+              `${
+                candidateToReject?.rejected ? "Restoring" : "Rejecting"
+              } candidate failed - ${error.toString()}`,
+              { id: toastId }
+            )
+          }
+        }}
+      >
+        Are you sure you want to {candidateToReject?.rejected ? "Restore" : "Reject"} the candidate?
+      </Confirm>
+
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
 
       <br />
@@ -417,7 +462,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
       <div className="float-right cursor-pointer flex justify-center">
         <a className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm">
-          Move to Stage
+          Move to Next Stage
         </a>
         <a className="text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center">
           <ChevronDownIcon className="w-5 h-5" />
@@ -459,11 +504,28 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             disabled={true}
           />
         </Form>
-        {candidate?.rejected && (
+        <button
+          id={"reject-" + candidate?.id}
+          className="float-right text-red-600 hover:text-red-800"
+          title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            setCandidateToReject(candidate)
+            setOpenCandidateRejectConfirm(true)
+          }}
+        >
+          {candidate?.rejected ? (
+            <RefreshIcon className="w-7 h-7" />
+          ) : (
+            <BanIcon className="w-7 h-7" />
+          )}
+        </button>
+        {/* {candidate?.rejected && (
           <span title="Rejected">
             <BanIcon className="h-10 w-10 text-red-800 cursor-not-allowed" />
           </span>
-        )}
+        )} */}
       </div>
 
       <br />

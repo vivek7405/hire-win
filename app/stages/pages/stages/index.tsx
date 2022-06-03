@@ -154,7 +154,7 @@ const Stages = () => {
       <Modal header="Stage" open={openModal} setOpen={setOpenModal}>
         <StageForm
           header={`${stageToEdit ? "Update" : "New"} Stage`}
-          subHeader=""
+          subHeader="Enter stage details"
           initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
           onSubmit={async (values) => {
             const isEdit = stageToEdit ? true : false

@@ -150,18 +150,20 @@ const CardQuestions = () => {
         New Question
       </button>
 
-      <Modal header="CardQuestion" open={openModal} setOpen={setOpenModal}>
+      <Modal
+        header={`${cardQuestionToEdit ? "Update" : "New"} CardQuestion`}
+        open={openModal}
+        setOpen={setOpenModal}
+      >
         <CardQuestionForm
           editmode={cardQuestionToEdit ? true : false}
-          header={`${cardQuestionToEdit ? "Update" : "New"} CardQuestion`}
-          subHeader=""
+          header={`${cardQuestionToEdit ? "Update" : "New"} Question`}
+          subHeader="Enter Question details"
           initialValues={cardQuestionToEdit ? { name: cardQuestionToEdit?.name } : {}}
           onSubmit={async (values) => {
             const isEdit = cardQuestionToEdit ? true : false
 
-            const toastId = toast.loading(
-              isEdit ? "Updating CardQuestion" : "Creating CardQuestion"
-            )
+            const toastId = toast.loading(isEdit ? "Updating Question" : "Creating Question")
             try {
               isEdit
                 ? await updateCardQuestionMutation({
@@ -172,7 +174,7 @@ const CardQuestions = () => {
                 : await createCardQuestionMutation({ ...values })
               await invalidateQuery(getCardQuestions)
               toast.success(
-                isEdit ? "CardQuestion updated successfully" : "CardQuestion added successfully",
+                isEdit ? "Question updated successfully" : "Question added successfully",
                 {
                   id: toastId,
                 }

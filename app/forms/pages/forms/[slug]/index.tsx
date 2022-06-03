@@ -12,6 +12,7 @@ import {
   useRouter,
   useMutation,
   useQuery,
+  invalidateQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -35,7 +36,7 @@ import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
 import ApplicationForm from "app/jobs/components/ApplicationForm"
-import { FormQuestionBehaviour, QuestionType } from "@prisma/client"
+import { FormQuestionBehaviour, Question, QuestionType } from "@prisma/client"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
@@ -47,6 +48,7 @@ import addExistingFormQuestions from "app/forms/mutations/addExistingFormQuestio
 import addNewQuestionToForm from "app/forms/mutations/addNewQuestionToForm"
 import Cards from "app/core/components/Cards"
 import Debouncer from "app/core/utils/debouncer"
+import updateQuestion from "app/questions/mutations/updateQuestion"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -104,7 +106,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const Questions = ({ user, form }) => {
+export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -180,14 +182,24 @@ export const Questions = ({ user, form }) => {
                 <div className="w-full relative">
                   <div className="font-bold flex justify-between">
                     {!fq.question.factory ? (
-                      <Link href={Routes.SingleQuestionPage({ slug: fq.question.slug })} passHref>
-                        <a
-                          data-testid={`questionlink`}
-                          className="text-theme-600 hover:text-theme-900"
-                        >
-                          {fq.question.name}
-                        </a>
-                      </Link>
+                      // <Link href={Routes.SingleQuestionPage({ slug: fq.question.slug })} passHref>
+                      //   <a
+                      //     data-testid={`questionlink`}
+                      //     className="text-theme-600 hover:text-theme-900"
+                      //   >
+                      //     {fq.question.name}
+                      //   </a>
+                      // </Link>
+                      <a
+                        className="cursor-pointer text-theme-600 hover:text-theme-800"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setQuestionToEdit(fq.question)
+                          setOpenAddNewQuestion(true)
+                        }}
+                      >
+                        {fq.question.name}
+                      </a>
                     ) : (
                       fq.question.name
                     )}
@@ -461,6 +473,8 @@ const SingleFormPage = ({
   const [addExistingFormQuestionsMutation] = useMutation(addExistingFormQuestions)
   const [createQuestionMutation] = useMutation(createQuestion)
   const [addNewQuestionToFormMutation] = useMutation(addNewQuestionToForm)
+  const [questionToEdit, setQuestionToEdit] = useState(null as any as Question)
+  const [updateQuestionMutation] = useMutation(updateQuestion)
   const router = useRouter()
 
   if (error) {
@@ -539,34 +553,63 @@ const SingleFormPage = ({
                 setOpen={setOpenAddNewQuestion}
               >
                 <QuestionForm
-                  header="Add New Question to Form"
+                  editmode={questionToEdit ? true : false}
+                  header={`${questionToEdit ? "Update" : "Add New"} Question`}
                   subHeader="Enter question details"
-                  initialValues={{
-                    name: "",
-                  }}
-                  editmode={false}
+                  initialValues={questionToEdit ? { name: questionToEdit?.name } : {}}
                   onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Adding Question</span>)
+                    const isEdit = questionToEdit ? true : false
+
+                    const toastId = toast.loading(
+                      isEdit ? "Updating Question" : "Creating Question"
+                    )
                     try {
-                      await addNewQuestionToFormMutation({
-                        ...values,
-                        formId: form?.id as string,
-                      })
-                      toast.success(() => <span>Question added</span>, {
-                        id: toastId,
-                      })
-                      router.reload()
+                      isEdit
+                        ? await updateQuestionMutation({
+                            where: { id: questionToEdit.id },
+                            data: { ...values },
+                            initial: questionToEdit,
+                          })
+                        : await createQuestionMutation({ ...values })
+                      await invalidateQuery(getFormQuestionsWOPagination)
+                      toast.success(
+                        isEdit ? "Question updated successfully" : "Question added successfully",
+                        {
+                          id: toastId,
+                        }
+                      )
+                      setQuestionToEdit(null as any)
+                      setOpenAddNewQuestion(false)
                     } catch (error) {
                       toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                        `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                        { id: toastId }
                       )
                     }
                   }}
+                  // onSubmit={async (values) => {
+                  //   const toastId = toast.loading(() => <span>Adding Question</span>)
+                  //   try {
+                  //     await addNewQuestionToFormMutation({
+                  //       ...values,
+                  //       formId: form?.id as string,
+                  //     })
+                  //     toast.success(() => <span>Question added</span>, {
+                  //       id: toastId,
+                  //     })
+                  //     router.reload()
+                  //   } catch (error) {
+                  //     toast.error(
+                  //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                  //     )
+                  //   }
+                  // }}
                 />
               </Modal>
               <button
                 onClick={(e) => {
                   e.preventDefault()
+                  setQuestionToEdit(null as any)
                   setOpenAddNewQuestion(true)
                 }}
                 data-testid={`open-addQuestion-modal`}
@@ -582,7 +625,12 @@ const SingleFormPage = ({
               <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
             }
           >
-            <Questions form={form} user={user} />
+            <Questions
+              form={form}
+              user={user}
+              setQuestionToEdit={setQuestionToEdit}
+              setOpenAddNewQuestion={setOpenAddNewQuestion}
+            />
           </Suspense>
         </div>
       )}

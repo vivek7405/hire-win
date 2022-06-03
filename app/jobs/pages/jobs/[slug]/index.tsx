@@ -630,7 +630,7 @@ const SingleJobPage = ({
               where: { id: candidateToReject?.id },
               rejected: !candidateToReject?.rejected,
             })
-            toast.success(`Job ${viewRejected ? "Restored" : "Rejected"}`, { id: toastId })
+            toast.success(`Candidate ${viewRejected ? "Restored" : "Rejected"}`, { id: toastId })
             setOpenCandidateRejectConfirm(false)
             setCandidateToReject(null as any)
             invalidateQuery(getCandidates)

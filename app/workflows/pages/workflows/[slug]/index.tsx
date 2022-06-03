@@ -13,6 +13,7 @@ import {
   useMutation,
   useQuery,
   useSession,
+  invalidateQuery,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -41,6 +42,8 @@ import createStage from "app/stages/mutations/createStage"
 import addNewStageToWorkflow from "app/workflows/mutations/addNewStageToWorkflow"
 import Debouncer from "app/core/utils/debouncer"
 import Cards from "app/core/components/Cards"
+import { Stage } from "@prisma/client"
+import updateStage from "app/stages/mutations/updateStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -95,7 +98,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const Stages = ({ user, workflow }) => {
+export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -377,12 +380,22 @@ export const Stages = ({ user, workflow }) => {
               <div className="w-full relative">
                 <div className="font-bold flex justify-between">
                   {ws.stage.allowEdit ? (
-                    <Link href={Routes.SingleStagePage({ slug: ws.stage.slug })} passHref>
-                      <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
-                        {ws.stage.name}
-                      </a>
-                    </Link>
+                    <a
+                      className="cursor-pointer text-theme-600 hover:text-theme-800"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setStageToEdit(ws.stage)
+                        setOpenAddNewStage(true)
+                      }}
+                    >
+                      {ws.stage.name}
+                    </a>
                   ) : (
+                    // <Link href={Routes.SingleStagePage({ slug: ws.stage.slug })} passHref>
+                    //   <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
+                    //     {ws.stage.name}
+                    //   </a>
+                    // </Link>
                     ws.stage.name
                   )}
                 </div>
@@ -574,6 +587,8 @@ const SingleWorkflowPage = ({
   const [addExistingWorkflowStagesMutation] = useMutation(addExistingWorkflowStages)
   const [openAddExistingStage, setOpenAddExistingStage] = React.useState(false)
   const [openAddNewStage, setOpenAddNewStage] = React.useState(false)
+  const [stageToEdit, setStageToEdit] = useState(null as any as Stage)
+  const [updateStageMutation] = useMutation(updateStage)
   const router = useRouter()
   const session = useSession()
 
@@ -699,33 +714,60 @@ const SingleWorkflowPage = ({
 
               <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
                 <StageForm
-                  header="Add New Stage to Workflow"
+                  header={`${stageToEdit ? "Update" : "Add New"} Stage`}
                   subHeader="Enter stage details"
-                  initialValues={{
-                    name: "",
-                  }}
+                  initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
                   onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Adding Stage</span>)
+                    const isEdit = stageToEdit ? true : false
+
+                    const toastId = toast.loading(isEdit ? "Updating Stage" : "Creating Stage")
                     try {
-                      await addNewStageToWorkflowMutation({
-                        ...values,
-                        workflowId: workflow?.id as string,
-                      })
-                      toast.success(() => <span>Stage added</span>, {
-                        id: toastId,
-                      })
-                      router.reload()
+                      isEdit
+                        ? await updateStageMutation({
+                            where: { id: stageToEdit.id },
+                            data: { ...values },
+                            initial: stageToEdit,
+                          })
+                        : await createStageMutation({ ...values })
+                      await invalidateQuery(getWorkflowStagesWOPagination)
+                      toast.success(
+                        isEdit ? "Stage updated successfully" : "Stage added successfully",
+                        {
+                          id: toastId,
+                        }
+                      )
+                      setStageToEdit(null as any)
+                      setOpenAddNewStage(false)
                     } catch (error) {
                       toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                        `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                        { id: toastId }
                       )
                     }
                   }}
+                  // onSubmit={async (values) => {
+                  //   const toastId = toast.loading(() => <span>Adding Stage</span>)
+                  //   try {
+                  //     await addNewStageToWorkflowMutation({
+                  //       ...values,
+                  //       workflowId: workflow?.id as string,
+                  //     })
+                  //     toast.success(() => <span>Stage added</span>, {
+                  //       id: toastId,
+                  //     })
+                  //     router.reload()
+                  //   } catch (error) {
+                  //     toast.error(
+                  //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                  //     )
+                  //   }
+                  // }}
                 />
               </Modal>
               <button
                 onClick={(e) => {
                   e.preventDefault()
+                  setStageToEdit(null as any)
                   setOpenAddNewStage(true)
                 }}
                 data-testid={`open-addStage-modal`}
@@ -741,7 +783,12 @@ const SingleWorkflowPage = ({
               <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
             }
           >
-            <Stages workflow={workflow} user={user} />
+            <Stages
+              workflow={workflow}
+              user={user}
+              setStageToEdit={setStageToEdit}
+              setOpenAddNewStage={setOpenAddNewStage}
+            />
           </Suspense>
         </div>
       )}

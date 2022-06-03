@@ -154,7 +154,7 @@ const Questions = () => {
         <QuestionForm
           editmode={questionToEdit ? true : false}
           header={`${questionToEdit ? "Update" : "New"} Question`}
-          subHeader=""
+          subHeader="Enter question details"
           initialValues={questionToEdit ? { name: questionToEdit?.name } : {}}
           onSubmit={async (values) => {
             const isEdit = questionToEdit ? true : false

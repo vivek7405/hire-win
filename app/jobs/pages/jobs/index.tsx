@@ -31,7 +31,7 @@ import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
 import setJobHidden from "app/jobs/mutations/setJobHidden"
 import toast from "react-hot-toast"
 import Cards from "app/core/components/Cards"
-import { ArchiveIcon, ExternalLinkIcon, RefreshIcon } from "@heroicons/react/outline"
+import { ArchiveIcon, CogIcon, ExternalLinkIcon, RefreshIcon } from "@heroicons/react/outline"
 import getCategories from "app/categories/queries/getCategories"
 import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
@@ -326,8 +326,9 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                             .fromNow()}
                         </p>
                       </div>
-                      <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-6 mt-6 md:mt-0 lg:mt-0">
+                      <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-4 mt-6 md:mt-0 lg:mt-0">
                         <a
+                          title="Job Settings"
                           className="cursor-pointer text-theme-600 hover:text-theme-800"
                           onClick={(e) => {
                             e.preventDefault()
@@ -343,7 +344,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                             }
                           }}
                         >
-                          Job Settings
+                          <CogIcon className="h-6 w-6" />
                         </a>
 
                         <Form
@@ -481,9 +482,9 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                           }}
                         >
                           {viewArchived ? (
-                            <RefreshIcon className="w-5 h-5" />
+                            <RefreshIcon className="w-6 h-6" />
                           ) : (
-                            <ArchiveIcon className="w-5 h-5" />
+                            <ArchiveIcon className="w-6 h-6" />
                           )}
                         </button>
                       </div>

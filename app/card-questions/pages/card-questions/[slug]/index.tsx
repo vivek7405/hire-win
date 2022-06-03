@@ -41,7 +41,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const cardQuestion = await invokeWithMiddleware(
         getCardQuestion,
-        { where: { slug: context?.params?.slug!, userId: user?.id } },
+        { where: { slug: context?.params?.slug!, companyId: session?.companyId } },
         { ...context }
       )
 
@@ -94,14 +94,14 @@ const SingleCardQuestionPage = ({
       <Breadcrumbs />
       <br />
       <CardQuestionForm
-        header="CardQuestion Details"
-        subHeader="Update the cardQuestion details"
+        header="Question Details"
+        subHeader="Update the Question details"
         initialValues={{
           name: cardQuestion?.name,
         }}
         editmode={true}
         onSubmit={async (values) => {
-          const toastId = toast.loading(() => <span>Updating CardQuestion</span>)
+          const toastId = toast.loading(() => <span>Updating Question</span>)
           try {
             await updateCardQuestionMutation({
               where: { slug: cardQuestion?.slug },
