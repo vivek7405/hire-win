@@ -9,7 +9,7 @@ const getCategoriesWOPagination = resolver.pipe(
   async ({ where }: GetCategoriesInput) => {
     const categories = await db.category.findMany({
       where,
-      include: { jobs: { select: { id: true, archived: true, validThrough: true } } },
+      include: { jobs: { select: { id: true, archived: true } } },
       orderBy: { name: "asc" },
     })
     return categories

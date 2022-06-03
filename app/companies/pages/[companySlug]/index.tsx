@@ -157,11 +157,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
           {jobUsers?.length > 0 && (
             <>
-              {categories?.filter((c) =>
-                c.jobs.find(
-                  (j) => !j.archived && moment(j.validThrough || undefined).diff(moment()) >= 0
-                )
-              )?.length > 0 && (
+              {categories?.filter((c) => c.jobs.find((j) => !j.archived))?.length > 0 && (
                 <div
                   className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
                     selectedCategoryId === "0"
@@ -176,11 +172,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
                 </div>
               )}
               {categories
-                ?.filter((c) =>
-                  c.jobs.find(
-                    (j) => !j.archived && moment(j.validThrough || undefined).diff(moment()) >= 0
-                  )
-                )
+                ?.filter((c) => c.jobs.find((j) => !j.archived))
                 ?.map((category) => {
                   return (
                     <div
@@ -244,7 +236,6 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
 
       <div>
         {jobUsers
-          .filter((ju) => moment(ju.job.validThrough || undefined).diff(moment()) >= 0)
           .map((jobUser) => {
             return {
               ...jobUser.job,
