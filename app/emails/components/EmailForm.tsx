@@ -21,7 +21,7 @@ export const EmailForm = ({
     <>
       <Form
         submitDisabled={disabled}
-        submitText="Submit"
+        submitText="Send"
         schema={EmailObj}
         header={header}
         subHeader={subHeader}
