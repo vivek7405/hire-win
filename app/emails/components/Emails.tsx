@@ -188,7 +188,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
                 setOpenModal(true)
               }}
             >
-              Send
+              New
             </button>
             {/* <button className="text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center">
               <ChevronDownIcon className="w-5 h-5" />

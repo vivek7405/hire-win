@@ -193,7 +193,7 @@ const KanbanBoard = ({
                                   key={card.id}
                                   draggableId={card.id}
                                   index={index}
-                                  isDragDisabled={false}
+                                  isDragDisabled={card.isDragDisabled}
                                 >
                                   {(provided, { isDragging }) => {
                                     return (
