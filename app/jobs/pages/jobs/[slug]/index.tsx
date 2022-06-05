@@ -53,7 +53,7 @@ import canCreateNewCandidate from "app/jobs/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
-import { BanIcon, RefreshIcon } from "@heroicons/react/outline"
+import { ArrowRightIcon, BanIcon, RefreshIcon } from "@heroicons/react/outline"
 import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -150,7 +150,10 @@ const getBoard = (
   candidates,
   viewRejected,
   setCandidateToReject,
-  setOpenCandidateRejectConfirm
+  setOpenCandidateRejectConfirm,
+  setCandidateToMove,
+  setOpenCandidateMoveConfirm,
+  enableDrag
 ) => {
   return {
     columns: job?.workflow?.stages
@@ -168,68 +171,87 @@ const getBoard = (
                 id: c.id,
                 title: c.name,
                 description: c.email,
+                isDragDisabled: !enableDrag,
                 renderContent: (
                   <div>
-                    <span>
-                      <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
-                        <Link
-                          href={Routes.SingleCandidatePage({
-                            slug: c.job?.slug,
-                            candidateSlug: c.slug,
-                          })}
-                          passHref
+                    <div className="font-bold flex items-center">
+                      <Link
+                        href={Routes.SingleCandidatePage({
+                          slug: c.job?.slug,
+                          candidateSlug: c.slug,
+                        })}
+                        passHref
+                      >
+                        <a
+                          className={`${
+                            c.rejected
+                              ? "text-red-600 hover:text-red-900"
+                              : "text-theme-600 hover:text-theme-900"
+                          }`}
                         >
-                          <a
-                            className={`${
-                              c.rejected
-                                ? "text-red-600 hover:text-red-900"
-                                : "text-theme-600 hover:text-theme-900"
-                            }`}
-                          >
-                            {c.name}
-                          </a>
-                        </Link>
-                        <Form
-                          noFormatting={true}
-                          onSubmit={async () => {
-                            return
-                          }}
-                        >
-                          <LabeledRatingField
-                            name="candidateAverageRating"
-                            ratingClass="!flex items-center"
-                            height={5}
-                            color={c.rejected ? "red" : "theme"}
-                            value={Math.round(
-                              getScoreAverage(c?.scores?.map((score) => score.rating) || [])
-                            )}
-                            disabled={true}
-                          />
-                        </Form>
-                      </div>
-                    </span>
-                    <div className="pt-2.5 flex justify-between items-center">
-                      <span>{c.email}</span>
-                      <span title="Reject">
-                        {/* <BanIcon className="h-4 w-4 text-red-600 hover:text-red-800 cursor-pointer" /> */}
-                        <button
-                          id={"reject-" + c?.id}
-                          className="float-right text-red-600 hover:text-red-800"
-                          title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            setCandidateToReject(c)
-                            setOpenCandidateRejectConfirm(true)
-                          }}
-                        >
-                          {viewRejected ? (
-                            <RefreshIcon className="w-5 h-5" />
-                          ) : (
-                            <BanIcon className="w-5 h-5" />
+                          {c.name}
+                        </a>
+                      </Link>
+                    </div>
+
+                    <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                    <div className="flex items-center">{c.email}</div>
+
+                    <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                    <div className="flex items-center justify-between">
+                      <Form
+                        noFormatting={true}
+                        onSubmit={async () => {
+                          return
+                        }}
+                      >
+                        <LabeledRatingField
+                          name="candidateAverageRating"
+                          ratingClass="!flex items-center"
+                          height={5}
+                          color={c.rejected ? "red" : "theme"}
+                          value={Math.round(
+                            getScoreAverage(c?.scores?.map((score) => score.rating) || [])
                           )}
-                        </button>
-                      </span>
+                          disabled={true}
+                        />
+                      </Form>
+                      <div className="flex items-center space-x-2">
+                        <span title="Reject">
+                          <button
+                            className="float-right text-red-600 hover:text-red-800"
+                            title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setCandidateToReject(c)
+                              setOpenCandidateRejectConfirm(true)
+                            }}
+                          >
+                            {viewRejected ? (
+                              <RefreshIcon className="w-5 h-5" />
+                            ) : (
+                              <BanIcon className="w-5 h-5" />
+                            )}
+                          </button>
+                        </span>
+                        {!viewRejected && (
+                          <span title="Reject">
+                            <button
+                              className="float-right text-theme-600 hover:text-theme-800"
+                              title="Move to next stage"
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setCandidateToMove(c)
+                                setOpenCandidateMoveConfirm(true)
+                              }}
+                            >
+                              <ArrowRightIcon className="w-5 h-5" />
+                            </button>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ),
@@ -242,10 +264,9 @@ const getBoard = (
 
 type CandidateProps = {
   job: ExtendedJob
-  isKanban: Boolean
-  viewRejected: Boolean
-  setCandidateToReject: any
-  setOpenCandidateRejectConfirm: any
+  isKanban: boolean
+  viewRejected: boolean
+  enableDrag: boolean
 }
 const Candidates = (props: CandidateProps) => {
   const ITEMS_PER_PAGE = 25
@@ -254,6 +275,11 @@ const Candidates = (props: CandidateProps) => {
   // const [data, setData] = useState<ExtendedCandidate[]>([])
   const [query, setQuery] = useState({})
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
+  const [candidateToReject, setCandidateToReject] = useState(null as any)
+  const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)
+  const [setCandidateRejectedMutation] = useMutation(setCandidateRejected)
+  const [candidateToMove, setCandidateToMove] = useState(null as any)
+  const [openCandidateMoveConfirm, setOpenCandidateMoveConfirm] = useState(false)
 
   useEffect(() => {
     const search = router.query.search
@@ -473,8 +499,11 @@ const Candidates = (props: CandidateProps) => {
       props.job,
       candidates,
       props.viewRejected,
-      props.setCandidateToReject,
-      props.setOpenCandidateRejectConfirm
+      setCandidateToReject,
+      setOpenCandidateRejectConfirm,
+      setCandidateToMove,
+      setOpenCandidateMoveConfirm,
+      props.enableDrag
     ) as KanbanBoardType
   )
   useEffect(() => {
@@ -483,16 +512,20 @@ const Candidates = (props: CandidateProps) => {
         props.job,
         candidates,
         props.viewRejected,
-        props.setCandidateToReject,
-        props.setOpenCandidateRejectConfirm
+        setCandidateToReject,
+        setOpenCandidateRejectConfirm,
+        setCandidateToMove,
+        setOpenCandidateMoveConfirm,
+        props.enableDrag
       )
     )
   }, [
     props.job,
     candidates,
     props.viewRejected,
-    props.setCandidateToReject,
-    props.setOpenCandidateRejectConfirm,
+    setCandidateToReject,
+    setOpenCandidateRejectConfirm,
+    props.enableDrag,
   ])
 
   const updateCandidateStg = async (candidate, selectedWorkflowStageId) => {
@@ -552,32 +585,105 @@ const Candidates = (props: CandidateProps) => {
     }
   }
 
-  return !props.isKanban ? (
-    <Table
-      columns={columns}
-      data={candidates}
-      pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-      pageIndex={tablePage}
-      pageSize={ITEMS_PER_PAGE}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
-      resultName="candidate"
-    />
-  ) : (
-    <KanbanBoard
-      board={board}
-      setBoard={setBoard}
-      mutateCardDropDB={updateCandidate}
-      pageIndex={tablePage}
-      hasNext={hasMore}
-      hasPrevious={tablePage !== 0}
-      totalCount={count}
-      startPage={startPage}
-      endPage={endPage}
-    />
+  return (
+    <>
+      <Confirm
+        open={openCandidateRejectConfirm}
+        setOpen={setOpenCandidateRejectConfirm}
+        header={`${props.viewRejected ? "Restore" : "Reject"} Candidate - ${
+          candidateToReject?.name
+        }`}
+        onSuccess={async () => {
+          const toastId = toast.loading(
+            `${props.viewRejected ? "Restoring" : "Rejecting"} Candidate`
+          )
+          try {
+            await setCandidateRejectedMutation({
+              where: { id: candidateToReject?.id },
+              rejected: !candidateToReject?.rejected,
+            })
+            toast.success(`Candidate ${props.viewRejected ? "Restored" : "Rejected"}`, {
+              id: toastId,
+            })
+            setOpenCandidateRejectConfirm(false)
+            setCandidateToReject(null as any)
+            invalidateQuery(getCandidates)
+          } catch (error) {
+            toast.error(
+              `${
+                props.viewRejected ? "Restoring" : "Rejecting"
+              } candidate failed - ${error.toString()}`,
+              { id: toastId }
+            )
+          }
+        }}
+      >
+        Are you sure you want to {props.viewRejected ? "Restore" : "Reject"} the candidate?
+      </Confirm>
+      <Confirm
+        open={openCandidateMoveConfirm}
+        setOpen={setOpenCandidateMoveConfirm}
+        header={`Move Candidate - ${candidateToMove?.name} - to next stage`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Moving candidate to next stage`)
+          try {
+            // await moveCandidateMutation({
+            //   where: { id: candidateToMove?.id },
+            //   rejected: !candidateToMove?.rejected,
+            // })
+
+            const workflowStages = props.job?.workflow?.stages?.sort((a, b) => {
+              return a.order - b.order
+            })
+            const currentStageOrder =
+              workflowStages?.find((ws) => ws.id === candidateToMove.workflowStageId)?.order || 0
+            const moveToWorkflowStageId = workflowStages?.find(
+              (ws) => ws.order === currentStageOrder + 1
+            )?.id
+            await updateCandidateStg(candidateToMove, moveToWorkflowStageId)
+            toast.success(`Candidate moved to next stage`, {
+              id: toastId,
+            })
+            setOpenCandidateMoveConfirm(false)
+            setCandidateToMove(null as any)
+            invalidateQuery(getCandidates)
+          } catch (error) {
+            toast.error(`Moving candidate to next stage failed - ${error.toString()}`, {
+              id: toastId,
+            })
+          }
+        }}
+      >
+        Are you sure you want to move the candidate to next stage?
+      </Confirm>
+      {!props.isKanban ? (
+        <Table
+          columns={columns}
+          data={candidates}
+          pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+          pageIndex={tablePage}
+          pageSize={ITEMS_PER_PAGE}
+          hasNext={hasMore}
+          hasPrevious={tablePage !== 0}
+          totalCount={count}
+          startPage={startPage}
+          endPage={endPage}
+          resultName="candidate"
+        />
+      ) : (
+        <KanbanBoard
+          board={board}
+          setBoard={setBoard}
+          mutateCardDropDB={updateCandidate}
+          pageIndex={tablePage}
+          hasNext={hasMore}
+          hasPrevious={tablePage !== 0}
+          totalCount={count}
+          startPage={startPage}
+          endPage={endPage}
+        />
+      )}
+    </>
   )
 }
 
@@ -606,10 +712,8 @@ const SingleJobPage = ({
   const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
   const [openConfirm, setOpenConfirm] = useState(false)
   const router = useRouter()
-  const [candidateToReject, setCandidateToReject] = useState(null as any)
-  const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)
   const [viewRejected, setViewRejected] = useState(false)
-  const [setCandidateRejectedMutation] = useMutation(setCandidateRejected)
+  const [enableDrag, setEnableDrag] = useState(false)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -628,31 +732,7 @@ const SingleJobPage = ({
         You have reached the maximum candidates limit on the free plan. Upgrade to the PRO plan to
         add unlimited jobs and candidates.
       </Confirm>
-      <Confirm
-        open={openCandidateRejectConfirm}
-        setOpen={setOpenCandidateRejectConfirm}
-        header={`${viewRejected ? "Restore" : "Reject"} Candidate - ${candidateToReject?.name}`}
-        onSuccess={async () => {
-          const toastId = toast.loading(`${viewRejected ? "Restoring" : "Rejecting"} Candidate`)
-          try {
-            await setCandidateRejectedMutation({
-              where: { id: candidateToReject?.id },
-              rejected: !candidateToReject?.rejected,
-            })
-            toast.success(`Candidate ${viewRejected ? "Restored" : "Rejected"}`, { id: toastId })
-            setOpenCandidateRejectConfirm(false)
-            setCandidateToReject(null as any)
-            invalidateQuery(getCandidates)
-          } catch (error) {
-            toast.error(
-              `${viewRejected ? "Restoring" : "Rejecting"} candidate failed - ${error.toString()}`,
-              { id: toastId }
-            )
-          }
-        }}
-      >
-        Are you sure you want to {viewRejected ? "Restore" : "Reject"} the candidate?
-      </Confirm>
+
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
       <button
@@ -744,6 +824,25 @@ const SingleJobPage = ({
         </Form>
       </div>
 
+      <div className="float-right text-theme-600 py-2 ml-3">
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <LabeledToggleSwitch
+            name="toggleEnableDrag"
+            label="Enable Drag"
+            flex={true}
+            value={enableDrag}
+            onChange={(switchState) => {
+              setEnableDrag(switchState)
+            }}
+          />
+        </Form>
+      </div>
+
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
@@ -751,8 +850,7 @@ const SingleJobPage = ({
           job={job as any}
           isKanban={isKanban}
           viewRejected={viewRejected}
-          setCandidateToReject={setCandidateToReject}
-          setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
+          enableDrag={enableDrag}
         />
       </Suspense>
     </AuthLayout>
