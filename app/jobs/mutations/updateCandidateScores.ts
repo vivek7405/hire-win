@@ -2,16 +2,10 @@ import { Ctx } from "blitz"
 import db, { Prisma } from "db"
 import { Candidate } from "app/jobs/validations"
 import Guard from "app/guard/ability"
-import { ExtendedCandidate } from "types"
 
-type UpdateCandidateScoresInput = Pick<Prisma.CandidateUpdateArgs, "where" | "data"> & {
-  initial: ExtendedCandidate
-}
+type UpdateCandidateScoresInput = Pick<Prisma.CandidateUpdateArgs, "where" | "data">
 
-async function updateCandidateScores(
-  { where, data, initial }: UpdateCandidateScoresInput,
-  ctx: Ctx
-) {
+async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { id, scores } = Candidate.parse(data)
