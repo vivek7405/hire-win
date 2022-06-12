@@ -76,6 +76,7 @@ import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
 import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
+import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -95,19 +96,20 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   if (user) {
     try {
-      const candidate = await invokeWithMiddleware(
-        getCandidate,
-        {
-          where: { slug: context?.params?.candidateSlug as string },
-        },
-        { ...context }
-      )
+      // const candidate = await invokeWithMiddleware(
+      //   getCandidate,
+      //   {
+      //     where: { slug: context?.params?.candidateSlug as string },
+      //   },
+      //   { ...context }
+      // )
 
       return {
         props: {
           user: user,
           canUpdate: canUpdate,
-          candidate: candidate,
+          candidateSlug: context?.params?.candidateSlug as string,
+          // candidate: candidate,
         },
       }
     } catch (error) {
@@ -223,9 +225,6 @@ const getAnswer = (formQuestion: ExtendedFormQuestion, candidate: ExtendedCandid
 const getCards = (candidate: ExtendedCandidate) => {
   return (
     candidate?.job?.form?.questions
-      ?.sort((a, b) => {
-        return (a?.order || 0) - (b?.order || 0)
-      })
       // ?.filter((q) => !q.question.factory)
       ?.map((fq) => {
         const answer = getAnswer(fq, candidate)
@@ -287,7 +286,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   }
 
   const { user, error, canUpdate } = props
-  const [candidate, setCandidate] = useState(props.candidate)
+  // const [candidate, setCandidate] = useState(props.candidate)
+  const [candidate] = useQuery(getCandidate, { where: { slug: props.candidateSlug as string } })
   const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
   // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
@@ -300,7 +300,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
         ?.scoreCardId || ""
     )
-  }, [candidate, selectedWorkflowStage?.id])
+  }, [candidate, selectedWorkflowStage])
+
+  useEffect(() => {
+    setSelectedWorkflowStage(candidate?.workflowStage)
+  }, [candidate?.workflowStage])
 
   const [file, setFile] = useState(null as any)
   const [cards, setCards] = useState(getCards(candidate!))
@@ -316,6 +320,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   })
   const [candidatePoolsOpen, setCandidatePoolsOpen] = useState(false)
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
+  const [stagesOpen, setStagesOpen] = useState(false)
 
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
@@ -330,6 +335,12 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   const [candidateToReject, setCandidateToReject] = useState(null as any)
   const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)
   const [setCandidateRejectedMutation] = useMutation(setCandidateRejected)
+
+  const [openCandidateMoveConfirm, setOpenCandidateMoveConfirm] = useState(false)
+  const [candidateToMove, setCandidateToMove] = useState(null as any)
+  const [moveToWorkflowStage, setMoveToWorkflowStage] = useState(null as any)
+
+  const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
 
   // let ratingsArray = [] as number[]
   // candidate?.scores?.forEach((score) => {
@@ -351,6 +362,42 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   //   console.log(error)
   // }
 
+  const updateCandidateStg = async (candidate, selectedWorkflowStageId) => {
+    const selectedStageName =
+      candidate?.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId)?.stage
+        ?.name || ""
+
+    const toastId = toast.loading(() => (
+      <span>
+        <b>Setting stage as {selectedStageName}</b>
+        <br />
+        for candidate - {candidate?.name}
+      </span>
+    ))
+
+    try {
+      await updateCandidateStageMutation({
+        where: { id: candidate?.id },
+        data: { workflowStageId: selectedWorkflowStageId },
+      })
+      invalidateQuery(getCandidate)
+      toast.success(
+        () => (
+          <span>
+            <b>Stage changed successfully</b>
+            <br />
+            for candidate - {candidate?.name}
+          </span>
+        ),
+        { id: toastId }
+      )
+    } catch (error) {
+      toast.error("Sorry, we had an unexpected error. Please try again. - " + error.toString(), {
+        id: toastId,
+      })
+    }
+  }
+
   return (
     <AuthLayout user={user}>
       <Confirm
@@ -371,11 +418,12 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             setOpenCandidateRejectConfirm(false)
             setCandidateToReject(null as any)
             if (candidate) {
-              setCandidate({
-                ...candidate,
-                rejected: !candidateToReject?.rejected,
-                resume: candidate?.resume!,
-              })
+              // setCandidate({
+              //   ...candidate,
+              //   rejected: !candidateToReject?.rejected,
+              //   resume: candidate?.resume!,
+              // })
+              invalidateQuery(getCandidate)
             }
             toast.success(`Candidate ${candidateToReject?.rejected ? "Restored" : "Rejected"}`, {
               id: toastId,
@@ -391,6 +439,47 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         }}
       >
         Are you sure you want to {candidateToReject?.rejected ? "Restore" : "Reject"} the candidate?
+      </Confirm>
+
+      <Confirm
+        open={openCandidateMoveConfirm}
+        setOpen={setOpenCandidateMoveConfirm}
+        header={`Move Candidate - ${candidateToMove?.name} - to ${
+          moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"
+        } stage`}
+        onSuccess={async () => {
+          // const toastId = toast.loading(
+          //   `Moving candidate to ${
+          //     moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"
+          //   } stage`
+          // )
+          try {
+            // await moveCandidateMutation({
+            //   where: { id: candidateToMove?.id },
+            //   rejected: !candidateToMove?.rejected,
+            // })
+
+            const workflowStages = candidate?.job?.workflow?.stages
+            const currentStageOrder =
+              workflowStages?.find((ws) => ws.id === candidateToMove.workflowStageId)?.order || 0
+            const nextStage = workflowStages?.find((ws) => ws.order === currentStageOrder + 1)
+            await updateCandidateStg(candidateToMove, moveToWorkflowStage?.id || nextStage?.id)
+            setSelectedWorkflowStage(moveToWorkflowStage!)
+            invalidateQuery(getCandidateInterviewsByStage)
+            setOpenCandidateMoveConfirm(false)
+            setCandidateToMove(null)
+            setMoveToWorkflowStage(null)
+          } catch (error) {
+            toast.error(
+              `Moving candidate to ${
+                moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"
+              } stage failed - ${error.toString()}`
+            )
+          }
+        }}
+      >
+        Are you sure you want to move the candidate to{" "}
+        {moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"} stage?
       </Confirm>
 
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
@@ -467,12 +556,72 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       </DropdownMenu.Root>
 
       <div className="float-right cursor-pointer flex justify-center">
-        <a className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm">
+        <button
+          className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm"
+          onClick={async (e) => {
+            e.preventDefault()
+            setCandidateToMove(candidate)
+            setOpenCandidateMoveConfirm(true)
+          }}
+        >
           Move to Next Stage
-        </a>
-        <a className="text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center">
-          <ChevronDownIcon className="w-5 h-5" />
-        </a>
+        </button>
+        <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
+          <DropdownMenu.Trigger
+            className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
+            disabled={
+              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+                "OWNER" &&
+              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+                "ADMIN"
+            }
+          >
+            <button
+              className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={
+                selectedWorkflowStage?.interviewDetails?.find(
+                  (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                )?.interviewerId !== user?.id &&
+                user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+                  "OWNER" &&
+                user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+                  "ADMIN"
+              }
+            >
+              <ChevronDownIcon className="w-5 h-5" />
+            </button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
+            <DropdownMenu.Arrow className="fill-current" offset={10} />
+            {candidate?.job?.workflow?.stages?.length === 0 && (
+              <DropdownMenu.Item
+                disabled={true}
+                onSelect={(e) => {
+                  e.preventDefault()
+                }}
+                className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
+              >
+                No stages
+              </DropdownMenu.Item>
+            )}
+            {candidate?.job?.workflow?.stages.map((ws) => {
+              return (
+                <DropdownMenu.Item
+                  key={ws.id}
+                  onSelect={async (e) => {
+                    e.preventDefault()
+                    setCandidateToMove(candidate)
+                    setMoveToWorkflowStage(ws)
+                    setOpenCandidateMoveConfirm(true)
+                  }}
+                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                >
+                  {ws.stage?.name}
+                </DropdownMenu.Item>
+              )
+            })}
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
       </div>
 
       {canUpdate && (
@@ -561,31 +710,27 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             >
               <div className="w-full h-full rounded-2xl">
                 <div className="z-10 flex w-full max-w-full overflow-auto bg-theme-50 justify-between sticky top-0">
-                  {candidate?.job?.workflow?.stages
-                    ?.sort((a, b) => {
-                      return a?.order - b?.order
-                    })
-                    ?.map((ws, index) => {
-                      return (
-                        <div
-                          key={`${ws.stage?.name}${index}`}
-                          className={`${index > 0 ? "border-l-2 rounded-bl-md" : ""} ${
-                            index < (candidate?.job?.workflow?.stages?.length || 0) - 1
-                              ? "border-r-2 rounded-br-md"
-                              : ""
-                          } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
-                            selectedWorkflowStage?.id === ws.id ? "!bg-theme-500 !text-white" : ""
-                          }`}
-                          onClick={() => {
-                            setSelectedWorkflowStage(ws)
-                            invalidateQuery(getCandidateInterviewsByStage)
-                            // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
-                          }}
-                        >
-                          {ws.stage?.name}
-                        </div>
-                      )
-                    })}
+                  {candidate?.job?.workflow?.stages?.map((ws, index) => {
+                    return (
+                      <div
+                        key={`${ws.stage?.name}${index}`}
+                        className={`${index > 0 ? "border-l-2 rounded-bl-md" : ""} ${
+                          index < (candidate?.job?.workflow?.stages?.length || 0) - 1
+                            ? "border-r-2 rounded-br-md"
+                            : ""
+                        } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
+                          selectedWorkflowStage?.id === ws.id ? "!bg-theme-500 !text-white" : ""
+                        }`}
+                        onClick={() => {
+                          setSelectedWorkflowStage(ws)
+                          invalidateQuery(getCandidateInterviewsByStage)
+                          // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
+                        }}
+                      >
+                        {ws.stage?.name}
+                      </div>
+                    )
+                  })}
                 </div>
                 <div className="w-full flex items-center justify-center mt-5">
                   <Form noFormatting={true} onSubmit={async (values) => {}}>
@@ -640,9 +785,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                                 selectedWorkflowStage?.id || candidate?.workflowStageId || "0",
                             })
                           }
-                          const updatedCandidate = await updateCandidateScoresMutation({
+                          await updateCandidateScoresMutation({
                             where: { id: candidate?.id },
-                            initial: candidate as any,
                             data: {
                               id: candidate?.id,
                               jobId: candidate?.job?.id,
@@ -650,7 +794,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                               email: candidate?.email,
                               source: candidate?.source,
                               resume: candidate?.resume || undefined,
-                              answers: candidate?.answers || ([] as any),
+                              answers: (candidate?.answers || ([] as any)) as any,
                               scores:
                                 (
                                   candidate?.job?.scoreCards?.find(
@@ -677,7 +821,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                             },
                           })
                           // Stop resume from reloading by assigning previous value since resume won't be changed by this mutation
-                          setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
+                          // setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
+                          await invalidateQuery(getCandidate)
                           toast.success(
                             () => (
                               <span>

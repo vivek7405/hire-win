@@ -11,18 +11,38 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
       job: {
         include: {
           form: {
-            include: { questions: { include: { question: { include: { options: true } } } } },
+            include: {
+              questions: {
+                include: { question: { include: { options: true } } },
+                orderBy: { order: "asc" },
+              },
+            },
           },
-          workflow: { include: { stages: { include: { stage: true, interviewDetails: true } } } },
+          workflow: {
+            include: {
+              stages: {
+                include: { stage: true, interviewDetails: true },
+                orderBy: { order: "asc" },
+              },
+            },
+          },
           scoreCards: {
             include: {
               scoreCard: {
                 include: {
-                  cardQuestions: { include: { cardQuestion: true, scores: true } },
+                  cardQuestions: {
+                    include: { cardQuestion: true, scores: true },
+                    orderBy: { order: "asc" },
+                  },
                   jobWorkflowStages: {
                     include: {
                       scoreCard: {
-                        include: { cardQuestions: { include: { cardQuestion: true } } },
+                        include: {
+                          cardQuestions: {
+                            include: { cardQuestion: true },
+                            orderBy: { order: "asc" },
+                          },
+                        },
                       },
                     },
                   },
