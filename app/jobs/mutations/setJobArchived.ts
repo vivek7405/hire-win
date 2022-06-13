@@ -5,6 +5,7 @@ import slugify from "slugify"
 import Guard from "app/guard/ability"
 import { ExtendedJob } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
+import moment from "moment"
 
 type UpdateJobInput = Pick<Prisma.JobUpdateArgs, "where"> & {
   archived: boolean
@@ -18,9 +19,12 @@ async function setJobArchived({ where, archived }: UpdateJobInput, ctx: Ctx) {
 
   const job = await db.job.update({
     where,
-    data: {
-      archived,
-    },
+    data: archived
+      ? {
+          archived,
+          validThrough: moment().utc().toDate(),
+        }
+      : { archived },
   })
 
   return job

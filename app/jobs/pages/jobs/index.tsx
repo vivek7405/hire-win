@@ -46,6 +46,13 @@ import { plans } from "app/core/utils/plans"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
 import updateJob from "app/jobs/mutations/updateJob"
 import setJobArchived from "app/jobs/mutations/setJobArchived"
+import RadioGroupField from "app/core/components/RadioGroupField"
+
+enum ViewType {
+  Active = "Active",
+  Expired = "Expired",
+  Archived = "Archived",
+}
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -97,29 +104,23 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Jobs = ({
-  user,
-  company,
-  currentPlan,
-  setOpenConfirm,
-  setConfirmMessage,
-  viewArchived,
-  viewExpired,
-}) => {
+const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [query, setQuery] = useState({})
 
+  const [viewType, setViewType] = useState(ViewType.Active)
+
   const todayDate = new Date(new Date().toDateString())
   const [utcDateNow, setUTCDateNow] = useState(null as any)
   useEffect(() => {
     setUTCDateNow(moment().utc().toDate())
-  }, [])
+  }, [viewType])
 
   const validThrough = utcDateNow
-    ? viewExpired
+    ? viewType === ViewType.Expired
       ? { lt: utcDateNow }
       : { gte: utcDateNow }
     : todayDate
@@ -129,8 +130,8 @@ const Jobs = ({
       companyId: company?.id,
       jobs: {
         some: {
-          archived: viewArchived,
-          validThrough,
+          archived: viewType === ViewType.Archived,
+          validThrough: viewType === ViewType.Archived ? {} : validThrough,
         },
       },
     },
@@ -161,8 +162,8 @@ const Jobs = ({
         ? {
             userId: user?.id || 0,
             job: {
-              archived: viewArchived,
-              validThrough,
+              archived: viewType === ViewType.Archived,
+              validThrough: viewType === ViewType.Archived ? {} : validThrough,
               companyId: company?.id || 0,
               categoryId: selectedCategoryId,
             },
@@ -171,8 +172,8 @@ const Jobs = ({
         : {
             userId: user?.id,
             job: {
-              archived: viewArchived,
-              validThrough,
+              archived: viewType === ViewType.Archived,
+              validThrough: viewType === ViewType.Archived ? {} : validThrough,
               companyId: company?.id || 0,
             },
             ...query,
@@ -213,22 +214,29 @@ const Jobs = ({
 
   useEffect(() => {
     invalidateQuery(getCategoriesWOPagination)
-  }, [viewArchived, viewExpired])
+    invalidateQuery(getJobs)
+  }, [viewType])
 
   return (
     <>
       <Confirm
         open={openJobArchiveConfirm}
         setOpen={setOpenJobArchiveConfirm}
-        header={`${viewArchived ? "Restore" : "Archive"} Job - ${jobToArchive?.title}`}
+        header={`${viewType === ViewType.Archived ? "Restore" : "Archive"} Job - ${
+          jobToArchive?.title
+        }`}
         onSuccess={async () => {
-          const toastId = toast.loading(`${viewArchived ? "Restoring" : "Archiving"} Job`)
+          const toastId = toast.loading(
+            `${viewType === ViewType.Archived ? "Restoring" : "Archiving"} Job`
+          )
           try {
             await setJobArchivedMutation({
               where: { id: jobToArchive?.id },
               archived: !jobToArchive?.archived,
             })
-            toast.success(`Job ${viewArchived ? "Restored" : "Archived"}`, { id: toastId })
+            toast.success(`Job ${viewType === ViewType.Archived ? "Restored" : "Archived"}`, {
+              id: toastId,
+            })
             setOpenJobArchiveConfirm(false)
             setJobToArchive(null as any)
             setSelectedCategoryId("0")
@@ -236,24 +244,47 @@ const Jobs = ({
             invalidateQuery(getCategoriesWOPagination)
           } catch (error) {
             toast.error(
-              `${viewArchived ? "Restoring" : "Archiving"} job failed - ${error.toString()}`,
+              `${
+                viewType === ViewType.Archived ? "Restoring" : "Archiving"
+              } job failed - ${error.toString()}`,
               { id: toastId }
             )
           }
         }}
       >
-        Are you sure you want to {viewArchived ? "Restore" : "Reject"} the job?
+        Are you sure you want to {viewType === ViewType.Archived ? "Restore" : "Archive"} the job?{" "}
+        {viewType !== ViewType.Archived &&
+          "This will also expire the job and set the expiry date to current date time."}
       </Confirm>
 
-      <input
-        placeholder="Search"
-        type="text"
-        defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-        className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
-        onChange={(e) => {
-          execDebouncer(e)
-        }}
-      />
+      <div className="flex items-center">
+        <input
+          placeholder="Search"
+          type="text"
+          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+          className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+          onChange={(e) => {
+            execDebouncer(e)
+          }}
+        />
+        <div className="text-theme-600">
+          <Form
+            noFormatting={true}
+            onSubmit={(value) => {
+              return value
+            }}
+          >
+            <RadioGroupField
+              name="View"
+              options={[ViewType.Active, ViewType.Expired, ViewType.Archived]}
+              initialValue={ViewType.Active}
+              onChange={(value) => {
+                setViewType(value)
+              }}
+            />
+          </Form>
+        </div>
+      </div>
 
       <Pagination
         endPage={endPage}
@@ -504,7 +535,7 @@ const Jobs = ({
                         <button
                           id={"archive-" + job?.id}
                           className="float-right text-red-600 hover:text-red-800"
-                          title={viewArchived ? "Restore Job" : "Archive Job"}
+                          title={viewType === ViewType.Archived ? "Restore Job" : "Archive Job"}
                           type="button"
                           onClick={(e) => {
                             e.preventDefault()
@@ -512,7 +543,7 @@ const Jobs = ({
                             setOpenJobArchiveConfirm(true)
                           }}
                         >
-                          {viewArchived ? (
+                          {viewType === ViewType.Archived ? (
                             <RefreshIcon className="w-6 h-6" />
                           ) : (
                             <ArchiveIcon className="w-6 h-6" />
@@ -665,6 +696,7 @@ const JobsHome = ({
       >
         {confirmMessage}
       </Confirm>
+
       {/* <Link href={Routes.NewJob()} passHref> */}
       <a
         className="cursor-pointer float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
@@ -695,7 +727,7 @@ const JobsHome = ({
         </a>
       </Link>
 
-      <div className="float-right text-theme-600 py-2 ml-3">
+      {/* <div className="float-right text-theme-600 py-2 ml-3">
         <Form
           noFormatting={true}
           onSubmit={(value) => {
@@ -731,14 +763,12 @@ const JobsHome = ({
             }}
           />
         </Form>
-      </div>
+      </div> */}
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <Jobs
-          viewArchived={viewArchived}
-          viewExpired={viewExpired}
           user={user}
           company={company}
           currentPlan={currentPlan}
