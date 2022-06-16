@@ -5,7 +5,7 @@ import * as z from "zod"
 export default resolver.pipe(
   resolver.zod(z.object({ interviewDetailId: z.string() })),
   async ({ interviewDetailId }) => {
-    const interviewDetail = await db.interviewDetail.findFirst({
+    const interviewDetail = await db.interviewDetail.findUnique({
       where: {
         id: interviewDetailId,
       },

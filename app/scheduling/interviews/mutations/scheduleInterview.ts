@@ -65,7 +65,9 @@ import bcrypt from "bcrypt"
 export default resolver.pipe(
   resolver.zod(
     z.object({
-      interviewDetailId: z.string(),
+      // interviewDetailId: z.string(),
+      jobId: z.string(),
+      workflowStageId: z.string(),
       candidateId: z.string(),
       startDate: z.date(),
       otherAttendees: z.array(z.string()),
@@ -73,7 +75,12 @@ export default resolver.pipe(
   ),
   async (interviewInfo, ctx: Ctx) => {
     const interviewDetail = await db.interviewDetail.findUnique({
-      where: { id: interviewInfo.interviewDetailId },
+      where: {
+        jobId_workflowStageId: {
+          jobId: interviewInfo.jobId,
+          workflowStageId: interviewInfo.workflowStageId,
+        },
+      },
       include: { interviewer: { include: { calendars: true, defaultCalendars: true } } },
     })
     const candidate = await db.candidate.findUnique({
@@ -139,7 +146,12 @@ export default resolver.pipe(
     })
 
     const interviewDetailFromDb = await db.interviewDetail.findUnique({
-      where: { id: interviewInfo.interviewDetailId },
+      where: {
+        jobId_workflowStageId: {
+          jobId: interviewInfo.jobId,
+          workflowStageId: interviewInfo.workflowStageId,
+        },
+      },
       include: { interviewer: true },
     })
     if (!interviewDetailFromDb) {

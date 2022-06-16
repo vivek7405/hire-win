@@ -1,6 +1,6 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
-import { Prisma, UserRole } from "@prisma/client"
+import { Calendar, DailySchedule, Prisma, Schedule, UserRole } from "@prisma/client"
 
 export enum PlanName {
   PRO,
@@ -177,4 +177,15 @@ export type ExtendedScoreCardQuestion = Prisma.ScoreCardQuestionGetPayload<{
 export type AttachmentObject = {
   Key: string
   Location: string
+}
+
+export type InterviewDetailType = {
+  interviewer: User & { calendars: Calendar[] } & {
+    schedules: (Schedule & {
+      dailySchedules: DailySchedule[]
+    })[]
+  }
+  defaultCalendar: Calendar
+  defaultSchedule: Schedule
+  duration: number
 }

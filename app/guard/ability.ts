@@ -107,11 +107,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return job?.companyId === ctx.session.companyId
       })
       can("readAll", "job", async (args) => {
-        const memberships = await db.jobUser.findMany({
+        const jobUsers = await db.jobUser.findMany({
           where: args.where,
         })
 
-        return memberships.every((p) => p.userId === ctx.session.userId) === true
+        return jobUsers.every((p) => p.userId === ctx.session.userId) === true
       })
       can("update", "job", async (args) => {
         const job = await db.job.findFirst({
@@ -204,13 +204,13 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       })
 
       can("update", "membership", async (args) => {
-        const member = await db.jobUser.findFirst({
+        const jobUser = await db.jobUser.findFirst({
           where: args.where,
         })
 
         const job = await db.job.findFirst({
           where: {
-            id: member?.jobId,
+            id: jobUser?.jobId,
           },
           include: {
             users: true,
@@ -689,7 +689,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           ctx.session.userId === interview?.interviewerId ||
           ctx.session.userId === interview?.organizerId ||
           interview?.interviewDetail?.job?.users?.find(
-            (membership) => membership.userId === ctx.session.userId
+            (jobUser) => jobUser.userId === ctx.session.userId
           )?.role === "OWNER"
         )
       })

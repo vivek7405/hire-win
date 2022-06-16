@@ -11,7 +11,7 @@ interface InviteToJobInput {
 async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const membership = await db.jobUser.findFirst({
+  const jobUser = await db.jobUser.findFirst({
     where: {
       job: {
         id: jobId,
@@ -24,18 +24,18 @@ async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
 
   await db.jobUser.delete({
     where: {
-      id: membership?.id,
+      id: jobUser?.id,
     },
   })
 
-  const job = await db.job.findFirst({
-    where: {
-      id: jobId,
-    },
-    include: {
-      users: true,
-    },
-  })
+  // const job = await db.job.findFirst({
+  //   where: {
+  //     id: jobId,
+  //   },
+  //   include: {
+  //     users: true,
+  //   },
+  // })
 
   // if (job?.stripeSubscriptionId) {
   //   const subscription = await stripe.subscriptions.retrieve(job?.stripeSubscriptionId as string)
@@ -44,7 +44,7 @@ async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
   //     items: [
   //       {
   //         id: subscription.items.data[0]?.id,
-  //         quantity: job?.memberships.length,
+  //         quantity: job?.jobUsers.length,
   //       },
   //     ],
   //   })

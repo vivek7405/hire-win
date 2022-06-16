@@ -24,8 +24,13 @@ async function assignInterviewerToJobStage(
   })
 
   if (interviewer) {
-    const existingInterviewDetail = await db.interviewDetail.findFirst({
-      where: { jobId, workflowStageId },
+    const existingInterviewDetail = await db.interviewDetail.findUnique({
+      where: {
+        jobId_workflowStageId: {
+          jobId,
+          workflowStageId,
+        },
+      },
     })
 
     const scheduleId = interviewer.schedules.find((sch) => sch.name === "Default")?.id || 0

@@ -759,25 +759,6 @@ const SingleJobPage = ({
         </Link>
       )}
 
-      <div className="float-right text-theme-600 py-2 ml-3">
-        <Form
-          noFormatting={true}
-          onSubmit={(value) => {
-            return value
-          }}
-        >
-          <LabeledToggleSwitch
-            name="toggleKanbanLayout"
-            label="Kanban Board"
-            flex={true}
-            value={isKanban}
-            onChange={(switchState) => {
-              setKanban(switchState)
-            }}
-          />
-        </Form>
-      </div>
-
       <Link
         href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
         passHref
@@ -804,6 +785,25 @@ const SingleJobPage = ({
           </svg>
         </a>
       </Link>
+
+      <div className="float-right text-theme-600 py-2 ml-3">
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <LabeledToggleSwitch
+            name="toggleKanbanLayout"
+            label="Kanban Board"
+            flex={true}
+            value={isKanban}
+            onChange={(switchState) => {
+              setKanban(switchState)
+            }}
+          />
+        </Form>
+      </div>
 
       <div className="float-right text-theme-600 py-2 ml-3">
         <Form

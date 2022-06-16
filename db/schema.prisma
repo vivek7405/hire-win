@@ -53,6 +53,8 @@ model User {
   otherAttendeeInterview   Interview?        @relation(fields: [otherAttendeeInterviewId], references: [id])
   otherAttendeeInterviewId Int?
 
+  interviewCandidates CandidateWorkflowStageInterviewer[]
+
   comments Comment[]
   emails   Email[]
 
@@ -261,7 +263,7 @@ model InterviewDetail {
   workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
   workflowStageId String
 
-  @@unique([interviewerId, jobId, workflowStageId])
+  @@unique([jobId, workflowStageId])
 }
 
 enum JobUserRole {
@@ -363,6 +365,8 @@ model WorkflowStage {
 
   scoreCards ScoreCardJobWorkflowStage[]
   scores     Score[]
+
+  interviewers CandidateWorkflowStageInterviewer[]
 
   interviewDetails InterviewDetail[]
   candidates       Candidate[]
@@ -598,6 +602,23 @@ model Answer {
   @@unique([candidateId, questionId, value])
 }
 
+model CandidateWorkflowStageInterviewer {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  interviewer   User @relation(fields: [interviewerId], references: [id])
+  interviewerId Int
+
+  @@unique([candidateId, workflowStageId])
+}
+
 model Candidate {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -619,6 +640,8 @@ model Candidate {
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
+
+  interviewers CandidateWorkflowStageInterviewer[]
 
   interviews     Interview[]
   comments       Comment[]
