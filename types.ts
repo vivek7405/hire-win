@@ -189,3 +189,9 @@ export type InterviewDetailType = {
   defaultSchedule: Schedule
   duration: number
 }
+
+export enum JobViewType {
+  Active = "Active",
+  Expired = "Expired",
+  Archived = "Archived",
+}
