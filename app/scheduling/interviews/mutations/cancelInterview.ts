@@ -49,11 +49,11 @@ const cancelInterview = async (
 
   const interview = await db.interview.delete({
     where: { id: interviewId },
-    include: { interviewDetail: { include: { interviewer: true } }, candidate: true },
+    include: { interviewer: true, candidate: true },
   })
 
-  if (!interview?.interviewDetail) {
-    throw new Error("Interview details doesn't exist for this interview")
+  if (!interview?.interviewer) {
+    throw new Error("Interviewer doesn't exist for this interview")
   }
 
   const buildEmail = await sendInterviewCancellationMailer({ interview })

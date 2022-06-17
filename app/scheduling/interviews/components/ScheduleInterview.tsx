@@ -61,7 +61,7 @@ export default function ScheduleMeeting({
 
   const [slots] = useQuery(getTimeSlots, {
     interviewerId: interviewDetail?.interviewer?.id,
-    scheduleId: interviewDetail?.defaultSchedule?.id,
+    scheduleId: interviewDetail?.schedule?.id,
     duration: interviewDetail?.duration,
     otherAttendees,
     startDateUTC: new Date(moment()?.startOf("month")?.format("YYYY-MM-DD")),

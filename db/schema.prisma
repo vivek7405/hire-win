@@ -230,6 +230,7 @@ model Job {
 
   scoreCards ScoreCardJobWorkflowStage[]
 
+  interviews       Interview[]
   interviewDetails InterviewDetail[]
   candidates       Candidate[]
 
@@ -255,7 +256,7 @@ model InterviewDetail {
   calendar   Calendar? @relation(fields: [calendarId], references: [id])
   calendarId Int?
 
-  interviews Interview[]
+  // interviews Interview[]
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
@@ -368,6 +369,7 @@ model WorkflowStage {
 
   interviewers CandidateWorkflowStageInterviewer[]
 
+  interviews       Interview[]
   interviewDetails InterviewDetail[]
   candidates       Candidate[]
   comments         Comment[]
@@ -733,22 +735,26 @@ model Schedule {
 }
 
 model Interview {
-  id                Int             @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   // meeting      Meeting  @relation(fields: [meetingId], references: [id])
   // meetingId    Int
-  interviewDetail   InterviewDetail @relation(fields: [interviewDetailId], references: [id])
-  interviewDetailId String
-  candidate         Candidate       @relation(fields: [candidateId], references: [id])
-  candidateId       String
+  // interviewDetail   InterviewDetail @relation(fields: [interviewDetailId], references: [id])
+  // interviewDetailId String
+  candidate       Candidate     @relation(fields: [candidateId], references: [id])
+  candidateId     String
+  job             Job           @relation(fields: [jobId], references: [id])
+  jobId           String
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
   // inviteeEmail      String
-  organizer         User            @relation(fields: [organizerId], references: [id], name: "organizerInterviews")
-  organizerId       Int
-  interviewer       User            @relation(fields: [interviewerId], references: [id], name: "interviewerInterviews")
-  interviewerId     Int
-  otherAttendees    User[]
-  startDateUTC      DateTime
-  duration          Int
-  cancelCode        String
+  organizer       User          @relation(fields: [organizerId], references: [id], name: "organizerInterviews")
+  organizerId     Int
+  interviewer     User          @relation(fields: [interviewerId], references: [id], name: "interviewerInterviews")
+  interviewerId   Int
+  otherAttendees  User[]
+  startDateUTC    DateTime
+  duration        Int
+  cancelCode      String
 }
 
 model Comment {

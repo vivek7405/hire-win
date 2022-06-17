@@ -185,8 +185,8 @@ export type InterviewDetailType = {
       dailySchedules: DailySchedule[]
     })[]
   }
-  defaultCalendar: Calendar
-  defaultSchedule: Schedule
+  calendar: Calendar
+  schedule: Schedule
   duration: number
 }
 

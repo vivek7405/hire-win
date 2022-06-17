@@ -16,8 +16,9 @@ export default Queue("api/queues/reminders", async (interviewId: Interview["id"]
   const interview = await db.interview.findUnique({
     where: { id: interviewId },
     include: {
-      interviewDetail: { include: { interviewer: true } },
+      // interviewDetail: { include: { interviewer: true } },
       candidate: { select: { email: true } },
+      interviewer: true,
     },
   })
   if (!interview) {

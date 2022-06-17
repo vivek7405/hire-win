@@ -1,5 +1,6 @@
 import db, { Calendar, Candidate, Interview, InterviewDetail, User } from "db"
 import * as ics from "ics"
+import { InterviewDetailType } from "types"
 
 function durationToIcsDurationObject(durationInMinutes: number): ics.DurationObject {
   return {
@@ -9,14 +10,13 @@ function durationToIcsDurationObject(durationInMinutes: number): ics.DurationObj
 }
 
 export async function createICalendarEvent(
-  interview: Interview & {
-    interviewDetail: Pick<InterviewDetail, "interviewerId" | "duration">
-  } & { candidate: Pick<Candidate, "email" | "name"> },
+  interview: Interview & { candidate: Pick<Candidate, "email" | "name"> },
+  interviewDetail: InterviewDetailType,
   organizer: Pick<User, "email" | "name">,
   otherAttendees: Pick<User, "email" | "name">[]
 ) {
   const interviewer = await db.user.findFirst({
-    where: { id: interview?.interviewDetail?.interviewerId },
+    where: { id: interviewDetail?.interviewer?.id },
   })
 
   const { error, value } = ics.createEvent({
@@ -27,7 +27,7 @@ export async function createICalendarEvent(
       interview.startDateUTC.getHours(),
       interview.startDateUTC.getMinutes(),
     ],
-    duration: durationToIcsDurationObject(interview?.interviewDetail.duration),
+    duration: durationToIcsDurationObject(interviewDetail.duration),
     title: `Interview with ${interview?.candidate?.name}`,
     description: `Interview with ${interview?.candidate?.name}`,
     location: "",

@@ -176,7 +176,7 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
 type CandidateInterviewProps = {
   interview: Interview & { organizer: User } & { interviewer: User } & {
     otherAttendees: User[]
-  } & { interviewDetail: InterviewDetail }
+  }
   user: User & { jobUsers: JobUser[] }
   setOpenConfirm: any
   setInterviewToDelete: any
@@ -194,8 +194,7 @@ const CandidateInterview = ({
         disabled={
           user?.id !== interview?.interviewerId &&
           user?.id !== interview?.organizerId &&
-          user?.jobUsers?.find((JobUser) => JobUser.jobId === interview?.interviewDetail?.jobId)
-            ?.role !== "OWNER"
+          user?.jobUsers?.find((JobUser) => JobUser.jobId === interview?.jobId)?.role !== "OWNER"
         }
         onClick={() => {
           setOpenConfirm(true)

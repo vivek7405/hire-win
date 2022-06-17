@@ -682,15 +682,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       can("cancelInterview", "interview", async (args) => {
         const interview = await db.interview.findUnique({
           where: { id: args.interviewId },
-          include: { interviewDetail: { include: { job: { include: { users: true } } } } },
+          include: { job: { include: { users: true } } },
         })
 
         return (
           ctx.session.userId === interview?.interviewerId ||
           ctx.session.userId === interview?.organizerId ||
-          interview?.interviewDetail?.job?.users?.find(
-            (jobUser) => jobUser.userId === ctx.session.userId
-          )?.role === "OWNER"
+          interview?.job?.users?.find((jobUser) => jobUser.userId === ctx.session.userId)?.role ===
+            "OWNER"
         )
       })
 

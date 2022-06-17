@@ -46,8 +46,8 @@ export default async function getCandidateInterviewDetail({
 
     return {
       interviewer: interviewer,
-      defaultCalendar: interviewer?.calendars?.find((cal) => cal.id === defaultCalendar?.id),
-      defaultSchedule: interviewer?.schedules?.find((sch) => sch.factory === true),
+      calendar: interviewer?.calendars?.find((cal) => cal.id === defaultCalendar?.id),
+      schedule: interviewer?.schedules?.find((sch) => sch.factory === true),
       duration: interviewDetail?.duration || 30,
     } as InterviewDetailType
   }
@@ -76,8 +76,8 @@ export default async function getCandidateInterviewDetail({
 
     return {
       interviewer: interviewDetail?.interviewer,
-      defaultCalendar: interviewDetail?.calendar,
-      defaultSchedule: interviewDetail?.schedule,
+      calendar: interviewDetail?.calendar,
+      schedule: interviewDetail?.schedule,
       duration: interviewDetail?.duration || 30,
     } as InterviewDetailType
   }
@@ -111,8 +111,8 @@ export default async function getCandidateInterviewDetail({
 
     return {
       interviewer: interviewer,
-      defaultCalendar: interviewer?.calendars?.find((cal) => cal.id === defaultCalendar?.id),
-      defaultSchedule: interviewer?.schedules?.find((sch) => sch.factory === true),
+      calendar: interviewer?.calendars?.find((cal) => cal.id === defaultCalendar?.id),
+      schedule: interviewer?.schedules?.find((sch) => sch.factory === true),
       duration: interviewDetail?.duration || 30,
     } as InterviewDetailType
   }

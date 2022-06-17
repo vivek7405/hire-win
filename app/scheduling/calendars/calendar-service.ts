@@ -1,10 +1,11 @@
 import { Interview, Calendar, InterviewDetail, Prisma, User, Candidate } from "db"
+import { InterviewDetailType } from "types"
 import { CaldavService } from "./caldav"
 import { GoogleCalendarService } from "./googlecalendar/googlecalendar"
 import { OutlookCalendarService } from "./outlookcalendar/outlookcalendar"
 
 export type CreateEventInterview = Pick<Interview, "startDateUTC"> & {
-  interviewDetail: Pick<InterviewDetail, "duration" | "jobId" | "workflowStageId" | "interviewerId">
+  interviewDetail: InterviewDetailType
 } & { candidate: Pick<Candidate, "email" | "name"> } & {
   organizer: Pick<User, "email" | "name">
 } & { otherAttendees: Pick<User, "email" | "name">[] } // userIds of attendees
