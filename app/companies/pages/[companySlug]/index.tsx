@@ -94,7 +94,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
   })
   const [selectedCategoryId, setSelectedCategoryId] = useState(null as string | null)
 
-  const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getCompanyJobsForCareersPage, {
+  const [{ jobs, hasMore, count }] = usePaginatedQuery(getCompanyJobsForCareersPage, {
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
     categoryId: selectedCategoryId,
@@ -155,7 +155,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
         />
 
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {jobUsers?.length > 0 && (
+          {jobs?.length > 0 && (
             <>
               {categories?.filter((c) => c.jobs.find((j) => !j.archived))?.length > 0 && (
                 <div
@@ -235,9 +235,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
       </div>
 
       <div>
-        {jobUsers?.map((jobUser) => {
-          const job = jobUser.job
-
+        {jobs?.map((job) => {
           // Filter jobs whose free candidate limit has reached
           if (!currentPlan && job.candidates.length >= 25) return <></>
 

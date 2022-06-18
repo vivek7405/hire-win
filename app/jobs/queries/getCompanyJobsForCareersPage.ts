@@ -24,46 +24,39 @@ async function getCompanyJobsForCareersPage(
   const validThrough = { gte: moment().utc().toDate() }
 
   const where = {
-    userId: ctx.session.userId || 0,
-    job: {
-      archived: false,
-      validThrough,
-      companyId: ctx.session.companyId || 0,
-      categoryId: categoryId || {},
-      title: {
-        contains: JSON.parse(searchString),
-        mode: "insensitive",
-      },
+    archived: false,
+    validThrough,
+    companyId: ctx.session.companyId || 0,
+    categoryId: categoryId || {},
+    title: {
+      contains: JSON.parse(searchString),
+      mode: "insensitive",
     },
   } as any
 
   const {
-    items: jobUsers,
+    items: jobs,
     hasMore,
     count,
   } = await paginate({
     skip,
     take,
-    count: () => db.jobUser.count({ where }),
+    count: () => db.job.count({ where }),
     query: (paginateArgs) =>
-      db.jobUser.findMany({
+      db.job.findMany({
         ...paginateArgs,
         where,
         orderBy,
         include: {
-          job: {
-            include: {
-              category: true,
-              candidates: true,
-              workflow: { include: { stages: { include: { stage: true } } } },
-            },
-          },
+          category: true,
+          candidates: true,
+          workflow: { include: { stages: { include: { stage: true } } } },
         },
       }),
   })
 
   return {
-    jobUsers,
+    jobs,
     hasMore,
     count,
   }

@@ -28,6 +28,7 @@ type KanbanBoardProps = {
   endPage: any
   noMarginRight?: boolean
   noPagination?: boolean
+  resultName?: string
 }
 
 function pickPropOut(object, prop) {
@@ -75,6 +76,7 @@ const KanbanBoard = ({
   endPage,
   noMarginRight,
   noPagination,
+  resultName,
 }: KanbanBoardProps) => {
   const router = useRouter()
 
@@ -143,6 +145,7 @@ const KanbanBoard = ({
           pageIndex={controlledPageIndex}
           startPage={startPage}
           totalCount={totalCount}
+          resultName={resultName}
         />
       )}
 

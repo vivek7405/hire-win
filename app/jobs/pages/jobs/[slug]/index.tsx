@@ -681,6 +681,7 @@ const Candidates = (props: CandidateProps) => {
           totalCount={count}
           startPage={startPage}
           endPage={endPage}
+          resultName="candidate"
         />
       )}
     </>
