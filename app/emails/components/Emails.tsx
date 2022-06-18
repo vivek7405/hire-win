@@ -255,7 +255,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
                         setEmailToView(null as any)
                         setOpenModal(true)
                       }}
-                      className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                      className="text-left w-auto max-w-xs whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500 truncate"
                     >
                       {et.subject}
                     </DropdownMenu.Item>

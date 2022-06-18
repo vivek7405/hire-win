@@ -196,7 +196,7 @@ const EmailTemplates = ({ user }) => {
                   <div className="w-full relative">
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
                       <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800"
+                        className="cursor-pointer text-theme-600 hover:text-theme-800 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setEmailTemplateToEdit(et)
