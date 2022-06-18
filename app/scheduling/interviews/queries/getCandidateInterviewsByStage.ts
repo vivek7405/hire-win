@@ -9,8 +9,8 @@ export default async function getCandidateInterviewsByStage({
   workflowStageId,
 }: GetCandidateInterviewsByStageInput) {
   const candidateStageInterviews = await db.interview.findMany({
-    where: { candidateId, AND: { interviewDetail: { workflowStageId } } },
-    include: { organizer: true, interviewer: true, otherAttendees: true, interviewDetail: true },
+    where: { candidateId, workflowStageId },
+    include: { organizer: true, interviewer: true, otherAttendees: true },
     orderBy: { startDateUTC: "asc" },
   })
 

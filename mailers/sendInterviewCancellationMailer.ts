@@ -9,7 +9,7 @@ import { convert } from "html-to-text"
 import db, { Candidate, Interview, InterviewDetail, User } from "db"
 
 type SendInterviewCancellationMailerInput = {
-  interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } } & {
+  interview: Interview & { interviewer: User } & {
     candidate: Candidate
   }
 }
@@ -31,9 +31,9 @@ export async function sendInterviewCancellationMailer({
     to: interview?.candidate?.email,
     subject: "Interview cancelled",
     html: `
-      <h1>Your interview with ${interview?.interviewDetail?.interviewer?.name} has been cancelled.</h1>
+      <h1>Your interview with ${interview?.interviewer?.name} has been cancelled.</h1>
       <br />
-      <p>For any queries, please contact the interviewer on the following email: ${interview?.interviewDetail?.interviewer?.email}</p>      
+      <p>For any queries, please contact the interviewer on the following email: ${interview?.interviewer?.email}</p>      
     `,
   }
 

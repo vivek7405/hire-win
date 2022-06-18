@@ -14,7 +14,6 @@ import {
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
-import getJobs from "app/jobs/queries/getJobs"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 import getUser from "app/users/queries/getUser"
@@ -29,11 +28,12 @@ import Cards from "app/core/components/Cards"
 import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
-import getCategoriesUnauthorized from "app/categories/queries/getCategoriesUnauthorized"
 import getSymbolFromCurrency from "currency-symbol-map"
 import getCompany from "app/companies/queries/getCompany"
 import { Company, CompanyUser, Job, JobUser, User } from "@prisma/client"
 import { checkPlan } from "app/users/utils/checkPlan"
+import getCompanyJobsForCareersPage from "app/jobs/queries/getCompanyJobsForCareersPage"
+import getCompanyJobCategoriesForFilter from "app/categories/queries/getCompanyJobCategoriesForFilter"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -75,54 +75,30 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
-  const [query, setQuery] = useState({})
+  // const [query, setQuery] = useState({})
+  const [searchString, setSearchString] = useState((router.query.search as string) || '""')
 
-  const todayDate = new Date(new Date().toDateString())
-  const [utcDateNow, setUTCDateNow] = useState(null as any)
   useEffect(() => {
-    setUTCDateNow(moment().utc().toDate())
-  }, [])
-  const validThrough = utcDateNow ? { gte: utcDateNow } : todayDate
+    setSearchString((router.query.search as string) || '""')
+  }, [router.query])
 
-  const [categories] = useQuery(getCategoriesUnauthorized, {
-    where: {
-      companyId: company?.id,
-      jobs: {
-        some: {
-          archived: false,
-          validThrough,
-        },
-      },
-    },
+  // const todayDate = new Date(new Date().toDateString())
+  // const [utcDateNow, setUTCDateNow] = useState(null as any)
+  // useEffect(() => {
+  //   setUTCDateNow(moment().utc().toDate())
+  // }, [])
+  // const validThrough = utcDateNow ? { gte: utcDateNow } : todayDate
+
+  const [categories] = useQuery(getCompanyJobCategoriesForFilter, {
+    searchString,
   })
-  const [selectedCategoryId, setSelectedCategoryId] = useState("0")
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null as string | null)
 
-  const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getJobs, {
-    where:
-      selectedCategoryId !== "0"
-        ? {
-            // userId: user?.id,
-            job: {
-              archived: false,
-              validThrough,
-              companyId: company?.id,
-              categoryId: selectedCategoryId,
-              hidden: false,
-            },
-            ...query,
-          }
-        : {
-            // userId: user?.id,
-            job: {
-              archived: false,
-              validThrough,
-              companyId: company?.id,
-              hidden: false,
-            },
-            ...query,
-          },
+  const [{ jobs, hasMore, count }] = usePaginatedQuery(getCompanyJobsForCareersPage, {
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
+    categoryId: selectedCategoryId,
+    searchString,
   })
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
@@ -132,22 +108,22 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
     endPage = count
   }
 
-  useEffect(() => {
-    const search = router.query.search
-      ? {
-          AND: {
-            job: {
-              title: {
-                contains: JSON.parse(router.query.search as string),
-                mode: "insensitive",
-              },
-            },
-          },
-        }
-      : {}
+  // useEffect(() => {
+  //   const search = router.query.search
+  //     ? {
+  //         AND: {
+  //           job: {
+  //             title: {
+  //               contains: JSON.parse(router.query.search as string),
+  //               mode: "insensitive",
+  //             },
+  //           },
+  //         },
+  //       }
+  //     : {}
 
-    setQuery(search)
-  }, [router.query])
+  //   setQuery(search)
+  // }, [router.query])
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -179,17 +155,17 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
         />
 
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          {jobUsers?.length > 0 && (
+          {jobs?.length > 0 && (
             <>
               {categories?.filter((c) => c.jobs.find((j) => !j.archived))?.length > 0 && (
                 <div
                   className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-                    selectedCategoryId === "0"
+                    selectedCategoryId === null
                       ? "bg-theme-700 cursor-default"
                       : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
                   }`}
                   onClick={() => {
-                    setSelectedCategoryId("0")
+                    setSelectedCategoryId(null)
                   }}
                 >
                   All
@@ -208,7 +184,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
                       }`}
                       onClick={async () => {
                         setSelectedCategoryId(category.id)
-                        await invalidateQuery(getJobs)
+                        await invalidateQuery(getCompanyJobsForCareersPage)
                       }}
                     >
                       {category.name}
@@ -259,91 +235,84 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
       </div>
 
       <div>
-        {jobUsers
-          .map((jobUser) => {
-            return {
-              ...jobUser.job,
-              canUpdate: jobUser.role === "OWNER" || jobUser.role === "ADMIN",
-            }
-          })
-          ?.map((job) => {
-            // Filter jobs whose free candidate limit has reached
-            if (!currentPlan && job.candidates.length >= 25) return <></>
+        {jobs?.map((job) => {
+          // Filter jobs whose free candidate limit has reached
+          if (!currentPlan && job.candidates.length >= 25) return <></>
 
-            return (
-              <div key={job.id}>
-                <Card key={job.id} isFull={true}>
-                  <Link
-                    href={Routes.JobDescriptionPage({
-                      companySlug: company?.slug,
-                      jobSlug: job.slug,
-                    })}
-                    passHref
-                  >
-                    <div className="bg-gray-50 cursor-pointer w-full rounded overflow-hidden hover:shadow hover:drop-shadow">
-                      <div className="flex flex-wrap items-center justify-between">
-                        <div className="px-6 py-4">
-                          <div className="font-bold text-xl text-theme-700 whitespace-normal">
-                            {job?.title}
-                          </div>
-                          <p className="text-gray-500 text-sm">
-                            Posted{" "}
-                            {moment(job.createdAt || undefined)
-                              .local()
-                              .fromNow()}
-                            ,{" "}
-                            {moment(job.validThrough || undefined)
-                              .local()
-                              .fromNow()
-                              .includes("ago")
-                              ? "expired"
-                              : "expires"}{" "}
-                            {moment(job.validThrough || undefined)
-                              .local()
-                              .fromNow()}
-                          </p>
+          return (
+            <div key={job.id}>
+              <Card isFull={true}>
+                <Link
+                  href={Routes.JobDescriptionPage({
+                    companySlug: company?.slug,
+                    jobSlug: job.slug,
+                  })}
+                  passHref
+                >
+                  <div className="bg-gray-50 cursor-pointer w-full rounded overflow-hidden hover:shadow hover:drop-shadow">
+                    <div className="flex flex-wrap items-center justify-between">
+                      <div className="px-6 py-4">
+                        <div className="font-bold text-xl text-theme-700 whitespace-normal">
+                          {job?.title}
                         </div>
-                        <div className="px-6 py-4">
-                          {job.showSalary && (
-                            <p className="text-gray-500 text-sm">
-                              {getSymbolFromCurrency(job.currency)}
-                              {job.minSalary} - {getSymbolFromCurrency(job.currency)}
-                              {job.maxSalary}
-                            </p>
-                          )}
-                        </div>
+                        <p className="text-gray-500 text-sm">
+                          Posted{" "}
+                          {moment(job.createdAt || undefined)
+                            .local()
+                            .fromNow()}
+                          ,{" "}
+                          {moment(job.validThrough || undefined)
+                            .local()
+                            .fromNow()
+                            .includes("ago")
+                            ? "expired"
+                            : "expires"}{" "}
+                          {moment(job.validThrough || undefined)
+                            .local()
+                            .fromNow()}
+                        </p>
                       </div>
-                      <div className="px-6 pt-4 pb-2 flex flex-wrap">
-                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                          <span>{job?.city},&nbsp;</span>
-                          <span>
-                            {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
-                            ,&nbsp;
-                          </span>
-                          <span>{Country.getCountryByCode(job?.country!)?.name}</span>
-                        </span>
-                        {job?.category && (
-                          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                            {job.category?.name}
-                          </span>
-                        )}
-                        {job?.employmentType && (
-                          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                            {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
-                          </span>
-                        )}
-                        {job?.remote && (
-                          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                            {job?.remote && "Remote"}
-                          </span>
+                      <div className="px-6 py-4">
+                        {job.showSalary && (
+                          <p className="text-gray-500 text-sm">
+                            {getSymbolFromCurrency(job.currency)}
+                            {job.minSalary} - {getSymbolFromCurrency(job.currency)}
+                            {job.maxSalary}
+                          </p>
                         )}
                       </div>
                     </div>
-                  </Link>
-                </Card>
-              </div>
-            )
-          })}
+                    <div className="px-6 pt-4 pb-2 flex flex-wrap">
+                      <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        <span>{job?.city},&nbsp;</span>
+                        <span>
+                          {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
+                          ,&nbsp;
+                        </span>
+                        <span>{Country.getCountryByCode(job?.country!)?.name}</span>
+                      </span>
+                      {job?.category && (
+                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                          {job.category?.name}
+                        </span>
+                      )}
+                      {job?.employmentType && (
+                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                          {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
+                        </span>
+                      )}
+                      {job?.remote && (
+                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                          {job?.remote && "Remote"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              </Card>
+            </div>
+          )
+        })}
       </div>
 
       <Pagination

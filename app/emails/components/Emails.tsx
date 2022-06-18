@@ -17,6 +17,7 @@ import getEmailTemplates from "app/email-templates/queries/getEmailTemplates"
 import { EmailTemplatePlaceholders } from "types"
 import getInterviewDetail from "app/scheduling/interviews/queries/getInterviewDetail"
 import { JsonValue } from "aws-sdk/clients/glue"
+import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
 
 interface ETValues {
   [key: string]: string
@@ -39,10 +40,16 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
     where: { companyId: session.companyId || 0 },
   })
   const [selectedEmailTemplate, setSelectedEmailTemplate] = useState(null as any as EmailTemplate)
-  const interviewDetailId =
-    selectedWorkflowStage?.interviewDetails?.find((int) => int.jobId === candidate?.jobId)?.id ||
-    "0"
-  const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
+  // const interviewDetailId =
+  //   selectedWorkflowStage?.interviewDetails?.find((int) => int.jobId === candidate?.jobId)?.id ||
+  //   "0"
+  // const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
+
+  const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
+    workflowStageId: selectedWorkflowStage?.id,
+    candidateId: candidate?.id,
+    jobId: candidate?.jobId,
+  })
 
   const replaceEmailTemplatePlaceHolders = (body: JSON) => {
     if (body) {
@@ -55,13 +62,18 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
             etValues[etPlaceholder] = candidate?.name
             break
           case EmailTemplatePlaceholders.Company_Name:
-            etValues[etPlaceholder] = user?.companyName
+            etValues[etPlaceholder] = user?.companies?.find(
+              (cu) => cu.company?.id === session?.companyId
+            )?.company?.name
             break
           case EmailTemplatePlaceholders.Interviewer_Name:
             etValues[etPlaceholder] = interviewDetail?.interviewer?.name || ""
             break
           case EmailTemplatePlaceholders.Job_Title:
             etValues[etPlaceholder] = candidate?.job?.title
+            break
+          case EmailTemplatePlaceholders.Job_Stage:
+            etValues[etPlaceholder] = candidate?.workflowStage?.stage?.name
             break
           case EmailTemplatePlaceholders.Sender_Name:
             etValues[etPlaceholder] = user?.name
@@ -159,9 +171,9 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
               selectedWorkflowStage?.interviewDetails?.find(
                 (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
               )?.interviewerId !== user?.id &&
-              user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)
                 ?.role !== "OWNER" &&
-              user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)
                 ?.role !== "ADMIN"
             }
             onClick={() => {
@@ -174,13 +186,13 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
             <button
               className="disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm"
               disabled={
-                selectedWorkflowStage?.interviewDetails?.find(
-                  (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                )?.interviewerId !== user?.id &&
-                user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                  ?.role !== "OWNER" &&
-                user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                  ?.role !== "ADMIN"
+                // selectedWorkflowStage?.interviewDetails?.find(
+                //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                // )?.interviewerId !== user?.id &&
+                interviewDetail?.interviewer?.id !== user?.id &&
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                  "OWNER" &&
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
               }
               onClick={() => {
                 setSelectedEmailTemplate(null as any)
@@ -201,13 +213,14 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
               <DropdownMenu.Trigger
                 className="disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
                 disabled={
-                  selectedWorkflowStage?.interviewDetails?.find(
-                    (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                  )?.interviewerId !== user?.id &&
-                  user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                    ?.role !== "OWNER" &&
-                  user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                    ?.role !== "ADMIN"
+                  // selectedWorkflowStage?.interviewDetails?.find(
+                  //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                  // )?.interviewerId !== user?.id &&
+                  interviewDetail?.interviewer?.id !== user?.id &&
+                  user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                    "OWNER" &&
+                  user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                    "ADMIN"
                 }
               >
                 {/* <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100">
@@ -216,13 +229,14 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
                 <button
                   className="disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={
-                    selectedWorkflowStage?.interviewDetails?.find(
-                      (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                    )?.interviewerId !== user?.id &&
-                    user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                      ?.role !== "OWNER" &&
-                    user?.memberships?.find((membership) => membership.jobId === candidate?.jobId)
-                      ?.role !== "ADMIN"
+                    // selectedWorkflowStage?.interviewDetails?.find(
+                    //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                    // )?.interviewerId !== user?.id &&
+                    interviewDetail?.interviewer?.id !== user?.id &&
+                    user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                      "OWNER" &&
+                    user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                      "ADMIN"
                   }
                 >
                   <ChevronDownIcon className="w-5 h-5" />

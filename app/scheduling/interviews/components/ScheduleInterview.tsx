@@ -1,4 +1,5 @@
 import { TrashIcon } from "@heroicons/react/outline"
+import { Calendar, Schedule, User } from "@prisma/client"
 import Card from "app/core/components/Card"
 import Form from "app/core/components/Form"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
@@ -17,6 +18,7 @@ import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import Skeleton from "react-loading-skeleton"
 import { DatePickerCalendar } from "react-nice-dates"
+import { InterviewDetailType } from "types"
 import scheduleInterview from "../mutations/scheduleInterview"
 import getCandidateInterviewsByStage from "../queries/getCandidateInterviewsByStage"
 import getInterviewDetail from "../queries/getInterviewDetail"
@@ -27,17 +29,19 @@ import { areDatesOnSameDay } from "../utils/comparison"
 import AvailableTimeSlotsSelection from "./AvailableTimeSlotsSelection"
 
 type ScheduleMeetingProps = {
-  interviewDetailId: string
+  interviewDetail: InterviewDetailType
   candidateId: string
+  workflowStageId: string
   setOpenScheduleInterviewModal: any
 }
 export default function ScheduleMeeting({
-  interviewDetailId,
+  interviewDetail,
   candidateId,
+  workflowStageId,
   setOpenScheduleInterviewModal,
 }: ScheduleMeetingProps) {
   //   const [meeting] = useQuery(getMeeting, { username: username, slug: meetingSlug })
-  const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
+  // const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
   const [selectedDay, setSelectedDay] = useState<Date>(new Date())
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot>()
   const [scheduleInterviewMutation] = useMutation(scheduleInterview)
@@ -52,11 +56,13 @@ export default function ScheduleMeeting({
   const session = useSession()
   const [organizer] = useQuery(getUser, { where: { id: session?.userId! } })
   const [candidate] = useQuery(getCandidate, { where: { id: candidateId } })
-  const [job] = useQuery(getJob, { where: { id: interviewDetail?.jobId } })
+  const [job] = useQuery(getJob, { where: { id: candidate?.jobId } })
   const [otherAttendees, setOtherAttendees] = useState([] as string[])
 
   const [slots] = useQuery(getTimeSlots, {
-    interviewDetailId: interviewDetailId,
+    interviewerId: interviewDetail?.interviewer?.id,
+    scheduleId: interviewDetail?.schedule?.id,
+    duration: interviewDetail?.duration,
     otherAttendees,
     startDateUTC: new Date(moment()?.startOf("month")?.format("YYYY-MM-DD")),
     endDateUTC: new Date(moment()?.endOf("month")?.format("YYYY-MM-DD")),
@@ -143,7 +149,8 @@ export default function ScheduleMeeting({
 
     try {
       await scheduleInterviewMutation({
-        interviewDetailId,
+        jobId: candidate?.jobId,
+        workflowStageId,
         candidateId,
         startDate: selectedTimeSlot.start,
         otherAttendees,

@@ -57,13 +57,18 @@ async function getTakenSlots(
 export default resolver.pipe(
   resolver.zod(
     z.object({
-      interviewDetailId: z.string(),
+      interviewerId: z.number()?.optional(),
+      scheduleId: z.number()?.optional(),
+      duration: z.number()?.optional(),
       otherAttendees: z.array(z.string()), // user ids - numbers as strings
       startDateUTC: z.date(),
       endDateUTC: z.date(),
     })
   ),
-  async ({ interviewDetailId, otherAttendees, startDateUTC, endDateUTC }, ctx: Ctx) => {
+  async (
+    { interviewerId, scheduleId, duration, otherAttendees, startDateUTC, endDateUTC },
+    ctx: Ctx
+  ) => {
     // const meeting = await db.meeting.findFirst({
     //   where: { link: meetingSlug, ownerName: ownerName },
     //   include: { schedule: { include: { dailySchedules: true } } },
@@ -76,15 +81,25 @@ export default resolver.pipe(
 
     // if (!meetingOwner) return null
 
-    const interviewDetail = await db.interviewDetail.findFirst({
-      where: { id: interviewDetailId },
-      include: {
-        interviewer: { include: { calendars: true, schedules: true } },
-        schedule: { include: { dailySchedules: true } },
-      },
+    // const interviewDetail = await db.interviewDetail.findUnique({
+    //   where: { id: interviewDetailId },
+    //   include: {
+    //     interviewer: { include: { calendars: true, schedules: true } },
+    //     schedule: { include: { dailySchedules: true } },
+    //   },
+    // })
+
+    const interviewer = await db.user.findFirst({
+      where: { id: interviewerId },
+      include: { calendars: true },
     })
 
-    const schedule = interviewDetail?.schedule.dailySchedules.reduce(
+    const interviewerSchedule = await db.schedule.findFirst({
+      where: { id: scheduleId },
+      include: { dailySchedules: true },
+    })
+
+    const schedule = interviewerSchedule?.dailySchedules.reduce(
       (res: Schedule, item: DailySchedule) => {
         res[Days[item.day]] = {
           start: timeStringToPartialTime(item.startTime),
@@ -95,7 +110,7 @@ export default resolver.pipe(
       {}
     )
 
-    const calendars = interviewDetail?.interviewer?.calendars || []
+    const calendars = interviewer?.calendars || []
     if (calendars.length === 0) return null
 
     let takenTimeSlots = await getTakenSlots(calendars, startDateUTC, endDateUTC)
@@ -129,25 +144,25 @@ export default resolver.pipe(
 
     const between = {
       start: applySchedule(
-        utcToZonedTime(startDateUTC, interviewDetail?.schedule?.timezone || ""),
+        utcToZonedTime(startDateUTC, interviewerSchedule?.timezone || ""),
         schedule!,
         "start",
-        interviewDetail?.schedule?.timezone || ""
+        interviewerSchedule?.timezone || ""
       ),
       end: applySchedule(
-        utcToZonedTime(endDateUTC, interviewDetail?.schedule?.timezone || ""),
+        utcToZonedTime(endDateUTC, interviewerSchedule?.timezone || ""),
         schedule!,
         "end",
-        interviewDetail?.schedule?.timezone || ""
+        interviewerSchedule?.timezone || ""
       ),
     }
 
     const availableSlots = computeAvailableSlots({
       between,
-      durationInMilliseconds: (interviewDetail?.duration || 30) * 60 * 1000,
+      durationInMilliseconds: (duration || 30) * 60 * 1000,
       takenSlots: [
         ...takenTimeSlots,
-        ...scheduleToTakenSlots(schedule!, between, interviewDetail?.schedule?.timezone || ""),
+        ...scheduleToTakenSlots(schedule!, between, interviewerSchedule?.timezone || ""),
       ],
     })
 

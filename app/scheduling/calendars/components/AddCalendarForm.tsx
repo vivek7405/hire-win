@@ -16,7 +16,7 @@ interface AddCalendarProps {
 }
 const AddCalendarForm = (props: AddCalendarProps) => {
   const [createCalendar] = useMutation(addCalendarMutation)
-  const [calendarType, setCalendarType] = useState("caldav")
+  const [calendarType, setCalendarType] = useState("google")
   const [error, setError] = useState({ error: false, message: "" })
   const [message, setMessage] = useState("")
 
@@ -89,10 +89,11 @@ const AddCalendarForm = (props: AddCalendarProps) => {
         <LabeledReactSelectField
           name="type"
           label="Type"
+          defaultValue={calendarType}
           options={[
-            { label: "CalDav", value: "caldav" },
             { label: "Google Calendar", value: "google" },
             { label: "Microsoft Outlook", value: "outlook" },
+            { label: "CalDav", value: "caldav" },
           ]}
           onChange={(value) => {
             setCalendarType(value as any)

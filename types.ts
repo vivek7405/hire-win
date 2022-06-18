@@ -1,6 +1,6 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
-import { Prisma, UserRole } from "@prisma/client"
+import { Calendar, DailySchedule, Prisma, Schedule, UserRole } from "@prisma/client"
 
 export enum PlanName {
   PRO,
@@ -14,6 +14,7 @@ export enum DragDirection {
 export enum EmailTemplatePlaceholders {
   Candidate_Name = "Candidate_Name",
   Job_Title = "Job_Title",
+  Job_Stage = "Job_Stage",
   Company_Name = "Company_Name",
   Sender_Name = "Sender_Name",
   Interviewer_Name = "Interviewer_Name",
@@ -177,4 +178,21 @@ export type ExtendedScoreCardQuestion = Prisma.ScoreCardQuestionGetPayload<{
 export type AttachmentObject = {
   Key: string
   Location: string
+}
+
+export type InterviewDetailType = {
+  interviewer: User & { calendars: Calendar[] } & {
+    schedules: (Schedule & {
+      dailySchedules: DailySchedule[]
+    })[]
+  }
+  calendar: Calendar
+  schedule: Schedule
+  duration: number
+}
+
+export enum JobViewType {
+  Active = "Active",
+  Expired = "Expired",
+  Archived = "Archived",
 }

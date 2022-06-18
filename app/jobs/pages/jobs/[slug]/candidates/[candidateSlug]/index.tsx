@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react"
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -42,6 +42,7 @@ import {
   Interview,
   InterviewDetail,
   JobUser,
+  JobUserRole,
   QuestionType,
   ScoreCardJobWorkflowStage,
   User,
@@ -61,6 +62,7 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
 import moment from "moment"
 import {
+  ArrowRightIcon,
   BanIcon,
   ChevronDownIcon,
   CogIcon,
@@ -77,6 +79,10 @@ import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
 import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
+import getJobMembers from "app/jobs/queries/getJobMembers"
+import getCandidateWorkflowStageInterviewer from "app/jobs/queries/getCandidateWorkflowStageInterviewer"
+import setCandidateInterviewer from "app/jobs/mutations/setCandidateInterviewer"
+import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -342,6 +348,37 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
 
+  // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
+  //   where: { candidateId: candidate.id, workflowStageId: selectedWorkflowStage?.id },
+  // })
+
+  // const getExistingCandidateInterviewer = useCallback(() => {
+  //   const existingInterviewDetail = selectedWorkflowStage?.interviewDetails?.find(
+  //     (int) => int.workflowStageId === selectedWorkflowStage?.id && int.jobId === candidate?.jobId
+  //   )
+  //   const existingJobInterviewer: User | null | undefined = jobData?.users?.find(
+  //     (member) => member?.userId === existingInterviewDetail?.interviewerId
+  //   )?.user
+
+  //   return (
+  //     candidateWorkflowStageInterviewer?.interviewer?.id?.toString() ||
+  //     existingJobInterviewer?.id?.toString() ||
+  //     jobData?.users?.find((member) => member?.role === "OWNER")?.userId?.toString()
+  //   )
+  // }, [
+  //   candidate?.jobId,
+  //   candidateWorkflowStageInterviewer?.interviewer?.id,
+  //   jobData?.users,
+  //   selectedWorkflowStage?.id,
+  //   selectedWorkflowStage?.interviewDetails,
+  // ])
+
+  const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
+    workflowStageId: candidate?.workflowStageId!, // selectedWorkflowStage?.id!,
+    candidateId: candidate?.id,
+    jobId: candidate?.jobId,
+  })
+
   // let ratingsArray = [] as number[]
   // candidate?.scores?.forEach((score) => {
   //   ratingsArray.push(score.rating)
@@ -494,22 +531,19 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         <DropdownMenu.Trigger
           className="float-right ml-6 disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
           disabled={
-            user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
-              "OWNER" &&
-            user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
-              "ADMIN"
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
           }
         >
           <button
             className="flex px-2 py-1 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={
-              selectedWorkflowStage?.interviewDetails?.find(
-                (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-              )?.interviewerId !== user?.id &&
-              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
-                "OWNER" &&
-              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
-                "ADMIN"
+              // selectedWorkflowStage?.interviewDetails?.find(
+              //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+              // )?.interviewerId !== user?.id &&
+              interviewDetail?.interviewer?.id !== user?.id &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
             }
           >
             Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
@@ -557,7 +591,12 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
       <div className="float-right cursor-pointer flex justify-center">
         <button
-          className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm"
+          className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={
+            // interviewDetail?.interviewer?.id !== user?.id &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+          }
           onClick={async (e) => {
             e.preventDefault()
             setCandidateToMove(candidate)
@@ -570,22 +609,18 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
           <DropdownMenu.Trigger
             className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
             disabled={
-              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
-                "OWNER" &&
-              user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
-                "ADMIN"
+              // interviewDetail?.interviewer?.id !== user?.id &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
             }
           >
             <button
               className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={
-                selectedWorkflowStage?.interviewDetails?.find(
-                  (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                )?.interviewerId !== user?.id &&
-                user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
+                // interviewDetail?.interviewer?.id !== user?.id &&
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
                   "OWNER" &&
-                user?.jobs?.find((membership) => membership.jobId === candidate?.jobId)?.role !==
-                  "ADMIN"
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
               }
             >
               <ChevronDownIcon className="w-5 h-5" />
@@ -632,19 +667,28 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
           })}
           passHref
         >
-          <a
+          <button
             title="Edit Details"
-            className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800"
+            className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+            }
             data-testid={`${candidate?.id}-settingsLink`}
           >
             <PencilAltIcon className="h-6 w-6" />
-          </a>
+          </button>
         </Link>
       )}
 
-      <a
+      <button
         title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
-        className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800"
+        className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={
+          interviewDetail?.interviewer?.id !== user?.id &&
+          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+        }
         onClick={(e) => {
           e.preventDefault()
           setCandidateToReject(candidate)
@@ -656,7 +700,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         ) : (
           <BanIcon className="w-6 h-6" />
         )}
-      </a>
+      </button>
 
       <div className="flex items-center space-x-4">
         <h3
@@ -666,6 +710,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         >
           {candidate?.name}
         </h3>
+
         <Form
           noFormatting={true}
           onSubmit={async () => {
@@ -683,6 +728,52 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             disabled={true}
           />
         </Form>
+
+        {/* <label className="text-neutral-500">assigned to <span className="text-theme-600 font-semibold">{interviewDetail?.interviewer?.name}</span> for </label> */}
+        {/* <select
+          className="border border-gray-300 px-2 py-2 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          name="interviewerId"
+          placeholder={`Interviewer for ${selectedWorkflowStage?.stage?.name}`}
+          disabled={
+            jobData?.users?.find((usr) => usr.id === session.userId)?.role === JobUserRole.USER
+          }
+          value={interviewDetail?.interviewer?.id?.toString()}
+          onChange={async (e) => {
+            const selectedInterviewerId = e.target.value
+            const toastId = toast.loading(() => <span>Updating Interviewer</span>)
+            try {
+              await setCandidateInterviewerMutation({
+                candidateId: candidate?.id,
+                workflowStageId: selectedWorkflowStage?.id || "0",
+                interviewerId: parseInt(selectedInterviewerId || "0"),
+              })
+
+              await invalidateQuery(getCandidateInterviewDetail)
+
+              toast.success(() => <span>Interviewer assigned to candidate stage</span>, {
+                id: toastId,
+              })
+            } catch (error) {
+              toast.error(
+                "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+              )
+            }
+          }}
+        >
+          {jobData?.users.map((jobUser) => {
+            return (
+              <option key={jobUser?.userId?.toString()!} value={jobUser?.userId?.toString()!}>
+                {jobUser?.user?.name!}
+              </option>
+            )
+          })}
+        </select> */}
+
+        <div className="px-3 py-1 rounded-lg border-2 border-theme-600 text-theme-700 font-semibold flex items-center justify-center space-x-2">
+          <span>{candidate?.workflowStage?.stage?.name}</span>
+          <ArrowRightIcon className="w-4 h-4" />
+          <span>{interviewDetail?.interviewer?.name}</span>
+        </div>
       </div>
 
       <br />
@@ -757,9 +848,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                   {candidateToggleView === CandidateToggleView.Scores && (
                     <ScoreCard
                       submitDisabled={
-                        selectedWorkflowStage?.interviewDetails?.find(
-                          (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                        )?.interviewerId !== user?.id
+                        interviewDetail?.interviewer?.id !== user?.id
+                        // selectedWorkflowStage?.interviewDetails?.find(
+                        //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                        // )?.interviewerId !== user?.id
                       }
                       key={selectedWorkflowStage?.id}
                       candidate={candidate}

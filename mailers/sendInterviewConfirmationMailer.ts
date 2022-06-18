@@ -8,11 +8,11 @@ import previewEmail from "preview-email"
 import { convert } from "html-to-text"
 import db, { Candidate, Interview, InterviewDetail, User } from "db"
 import { createICalendarEvent } from "app/scheduling/interviews/utils/createCalendarEvent"
+import { InterviewDetailType } from "types"
 
 type SendInterviewConfirmationMailerInput = {
-  interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } } & {
-    candidate: Candidate
-  }
+  interview: Interview & { candidate: Pick<Candidate, "email" | "name"> }
+  interviewDetail: InterviewDetailType
   organizer: Pick<User, "email" | "name">
   otherAttendees: Pick<User, "email" | "name">[]
   cancelLink: string
@@ -20,6 +20,7 @@ type SendInterviewConfirmationMailerInput = {
 
 export async function sendInterviewConfirmationMailer({
   interview,
+  interviewDetail,
   organizer,
   otherAttendees,
   cancelLink,
@@ -38,9 +39,9 @@ export async function sendInterviewConfirmationMailer({
     to: interview?.candidate?.email,
     subject: "Interview confirmation",
     html: `
-      <h1>Your interview has been scheduled with ${interview?.interviewDetail?.interviewer?.name}.</h1>
+      <h1>Your interview has been scheduled with ${interviewDetail?.interviewer?.name}.</h1>
       <br />
-      <p>You must have got a meeting invite. If not, contact the interviewer on the following email: ${interview?.interviewDetail?.interviewer?.email}</p>
+      <p>You must have got a meeting invite. If not, contact the interviewer on the following email: ${interviewDetail?.interviewer?.email}</p>
       <br />
       <p>You may cancel the meeting by clicking on the following link: ${cancelLink}</p>
     `,
@@ -64,7 +65,12 @@ export async function sendInterviewConfirmationMailer({
             Attachments: [
               {
                 Name: "appointment.ics",
-                Content: createICalendarEvent(interview, organizer, otherAttendees),
+                Content: createICalendarEvent(
+                  interview,
+                  interviewDetail,
+                  organizer,
+                  otherAttendees
+                ),
                 ContentType: "text/calendar",
               },
             ],

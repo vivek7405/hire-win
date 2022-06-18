@@ -10,7 +10,7 @@ import db, { Interview, InterviewDetail, User } from "db"
 
 type SendInterviewReminderMailerInput = {
   to: string
-  interview: Interview & { interviewDetail: InterviewDetail & { interviewer: User } }
+  interview: Interview & { interviewer: User }
 }
 
 export async function sendInterviewReminderMailer({
@@ -31,9 +31,9 @@ export async function sendInterviewReminderMailer({
     to,
     subject: "Interview reminder",
     html: `
-      <h1>You have an interview with ${interview?.interviewDetail?.interviewer?.name} in 1 hour</h1>
+      <h1>You have an interview with ${interview?.interviewer?.name} in 1 hour</h1>
       <br />
-      <p>You must have got a meeting invite. If not, contact the interviewer on the following email: ${interview?.interviewDetail?.interviewer?.email}</p>
+      <p>You must have got a meeting invite. If not, contact the interviewer on the following email: ${interview?.interviewer?.email}</p>
     `,
   }
 

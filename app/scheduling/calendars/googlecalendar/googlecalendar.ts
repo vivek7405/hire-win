@@ -31,7 +31,7 @@ export class GoogleCalendarService implements CalendarService {
     })
 
     const interviewer = await db.user.findFirst({
-      where: { id: interview?.interviewDetail.interviewerId },
+      where: { id: interview?.interviewDetail?.interviewer?.id },
     })
 
     await this.calendar.events.insert({

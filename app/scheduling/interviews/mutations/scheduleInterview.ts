@@ -11,6 +11,8 @@ import getCalendar from "../queries/getCalendar"
 import { sendInterviewConfirmationMailer } from "mailers/sendInterviewConfirmationMailer"
 import moment from "moment"
 import bcrypt from "bcrypt"
+import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
+import { InterviewDetailType } from "types"
 
 // async function sendConfirmationMail(
 //   interview: Interview,
@@ -65,20 +67,42 @@ import bcrypt from "bcrypt"
 export default resolver.pipe(
   resolver.zod(
     z.object({
-      interviewDetailId: z.string(),
+      // interviewDetailId: z.string(),
+      jobId: z.string(),
+      workflowStageId: z.string(),
       candidateId: z.string(),
       startDate: z.date(),
       otherAttendees: z.array(z.string()),
     })
   ),
   async (interviewInfo, ctx: Ctx) => {
-    const interviewDetail = await db.interviewDetail.findUnique({
-      where: { id: interviewInfo.interviewDetailId },
-      include: { interviewer: { include: { calendars: true, defaultCalendars: true } } },
-    })
+    // const interviewDetail = await db.interviewDetail.findUnique({
+    //   where: {
+    //     jobId_workflowStageId: {
+    //       jobId: interviewInfo.jobId,
+    //       workflowStageId: interviewInfo.workflowStageId,
+    //     },
+    //   },
+    //   include: { interviewer: { include: { calendars: true, defaultCalendars: true } } },
+    // })
+
+    const interviewDetail = (await getCandidateInterviewDetail({
+      workflowStageId: interviewInfo.workflowStageId,
+      candidateId: interviewInfo.candidateId,
+      jobId: interviewInfo.jobId,
+    })) as InterviewDetailType
+
     const candidate = await db.candidate.findUnique({
       where: { id: interviewInfo.candidateId },
       select: { id: true, email: true, name: true },
+    })
+    const job = await db.job.findUnique({
+      where: { id: interviewInfo.jobId },
+      select: { id: true },
+    })
+    const workflowStage = await db.workflowStage.findUnique({
+      where: { id: interviewInfo.workflowStageId },
+      select: { id: true },
     })
     const organizer = await db.user.findUnique({
       where: { id: ctx.session.userId || 0 },
@@ -89,17 +113,11 @@ export default resolver.pipe(
       select: { id: true, email: true, name: true },
     })
 
-    if (!interviewDetail || !candidate || !organizer) {
+    if (!interviewDetail || !candidate || !job || !workflowStage || !organizer) {
       throw new NotFoundError()
     }
 
-    const defaultCalendarId = interviewDetail?.interviewer?.defaultCalendars?.find(
-      (cal) => cal.userId === interviewDetail?.interviewer?.id
-    )?.calendarId
-    const interviewerCalendar = await invoke(
-      getCalendar,
-      interviewDetail.calendarId || defaultCalendarId || 0
-    )
+    const interviewerCalendar = await invoke(getCalendar, interviewDetail.calendar?.id || 0)
     if (!interviewerCalendar) {
       throw new Error("An error occured: Interviewer doesn't have a connected calendar")
     }
@@ -111,12 +129,14 @@ export default resolver.pipe(
     const hashedCode = await bcrypt.hash(cancelCode, 10)
     const interview = await db.interview.create({
       data: {
-        interviewDetail: {
-          connect: { id: interviewDetail.id },
-        },
+        // interviewDetail: {
+        //   connect: { id: interviewDetail.id },
+        // },
         candidate: { connect: { id: candidate.id } },
+        job: { connect: { id: job.id } },
+        workflowStage: { connect: { id: workflowStage.id } },
         organizer: { connect: { id: organizer.id } },
-        interviewer: { connect: { id: interviewDetail.interviewerId } },
+        interviewer: { connect: { id: interviewDetail.interviewer?.id } },
         otherAttendees: {
           connect: otherAttendees?.map((attendee) => {
             return { id: attendee.id }
@@ -126,7 +146,7 @@ export default resolver.pipe(
         duration: interviewDetail.duration,
         cancelCode: hashedCode,
       },
-      include: { interviewDetail: { include: { interviewer: true } }, candidate: true },
+      include: { candidate: true },
     })
 
     const calendarService = await getCalendarService(interviewerCalendar)
@@ -139,7 +159,12 @@ export default resolver.pipe(
     })
 
     const interviewDetailFromDb = await db.interviewDetail.findUnique({
-      where: { id: interviewInfo.interviewDetailId },
+      where: {
+        jobId_workflowStageId: {
+          jobId: interviewInfo.jobId,
+          workflowStageId: interviewInfo.workflowStageId,
+        },
+      },
       include: { interviewer: true },
     })
     if (!interviewDetailFromDb) {
@@ -153,6 +178,7 @@ export default resolver.pipe(
 
     const buildEmail = await sendInterviewConfirmationMailer({
       interview,
+      interviewDetail,
       organizer,
       otherAttendees,
       cancelLink,

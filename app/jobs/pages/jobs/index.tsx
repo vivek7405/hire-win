@@ -15,13 +15,20 @@ import {
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
-import getJobs from "app/jobs/queries/getJobs"
 import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 import Guard from "app/guard/ability"
 import Confirm from "app/core/components/Confirm"
 import { checkPlan } from "app/users/utils/checkPlan"
-import { CardType, DragDirection, ExtendedJob, ExtendedWorkflowStage, Plan, PlanName } from "types"
+import {
+  CardType,
+  DragDirection,
+  ExtendedJob,
+  ExtendedWorkflowStage,
+  JobViewType,
+  Plan,
+  PlanName,
+} from "types"
 import { Candidate, Category, Stage, WorkflowStage } from "@prisma/client"
 import moment from "moment"
 import { Country, State } from "country-state-city"
@@ -36,7 +43,6 @@ import getCategories from "app/categories/queries/getCategories"
 import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
-import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
 import setJobSalaryVisibility from "app/jobs/mutations/setJobSalaryVisibility"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
@@ -47,12 +53,8 @@ import createStripeBillingPortal from "app/companies/mutations/createStripeBilli
 import updateJob from "app/jobs/mutations/updateJob"
 import setJobArchived from "app/jobs/mutations/setJobArchived"
 import RadioGroupField from "app/core/components/RadioGroupField"
-
-enum ViewType {
-  Active = "Active",
-  Expired = "Expired",
-  Archived = "Archived",
-}
+import getUserJobsByViewTypeAndCategory from "app/jobs/queries/getUserJobsByViewTypeAndCategory"
+import getUserJobCategoriesByViewType from "app/categories/queries/getUserJobCategoriesByViewType"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -104,82 +106,101 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage }) => {
+const CategoryFilterButtons = ({
+  selectedCategoryId,
+  setSelectedCategoryId,
+  viewType,
+  searchString,
+}) => {
+  const [categories] = useQuery(getUserJobCategoriesByViewType, {
+    viewType,
+    searchString,
+  })
+
+  return (
+    <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
+      <div
+        className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+          selectedCategoryId === null
+            ? "bg-theme-700 cursor-default"
+            : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+        }`}
+        onClick={() => {
+          setSelectedCategoryId(null)
+        }}
+      >
+        All
+      </div>
+      {categories?.map((category) => {
+        return (
+          <div
+            key={category.id}
+            className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+              selectedCategoryId === category.id
+                ? "bg-theme-700 cursor-default"
+                : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+            }`}
+            onClick={async () => {
+              setSelectedCategoryId(category.id)
+              await invalidateQuery(getUserJobsByViewTypeAndCategory)
+            }}
+          >
+            {category.name}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, viewType }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
-  const [query, setQuery] = useState({})
-
-  const [viewType, setViewType] = useState(ViewType.Active)
-
-  const todayDate = new Date(new Date().toDateString())
-  const [utcDateNow, setUTCDateNow] = useState(null as any)
-  useEffect(() => {
-    setUTCDateNow(moment().utc().toDate())
-  }, [viewType])
-
-  const validThrough = utcDateNow
-    ? viewType === ViewType.Expired
-      ? { lt: utcDateNow }
-      : { gte: utcDateNow }
-    : todayDate
-
-  const [categories] = useQuery(getCategoriesWOPagination, {
-    where: {
-      companyId: company?.id,
-      jobs: {
-        some: {
-          archived: viewType === ViewType.Archived,
-          validThrough: viewType === ViewType.Archived ? {} : validThrough,
-        },
-      },
-    },
-  })
+  const [searchString, setSearchString] = useState((router.query.search as string) || '""')
+  // const [query, setQuery] = useState({})
 
   useEffect(() => {
-    const search = router.query.search
-      ? {
-          AND: {
-            job: {
-              title: {
-                contains: JSON.parse(router.query.search as string),
-                mode: "insensitive",
-              },
-            },
-          },
-        }
-      : {}
-
-    setQuery(search)
+    setSearchString((router.query.search as string) || '""')
   }, [router.query])
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState("0")
+  // const todayDate = new Date(new Date().toDateString())
+  // const [utcDateNow, setUTCDateNow] = useState(null as any)
+  // useEffect(() => {
+  //   setUTCDateNow(moment().utc().toDate())
+  // }, [viewType])
+  // const validThrough = utcDateNow
+  //   ? viewType === JobViewType.Expired
+  //     ? { lt: utcDateNow }
+  //     : { gte: utcDateNow }
+  //   : todayDate
 
-  const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getJobs, {
-    where:
-      selectedCategoryId !== "0"
-        ? {
-            userId: user?.id || 0,
-            job: {
-              archived: viewType === ViewType.Archived,
-              validThrough: viewType === ViewType.Archived ? {} : validThrough,
-              companyId: company?.id || 0,
-              categoryId: selectedCategoryId,
-            },
-            ...query,
-          }
-        : {
-            userId: user?.id,
-            job: {
-              archived: viewType === ViewType.Archived,
-              validThrough: viewType === ViewType.Archived ? {} : validThrough,
-              companyId: company?.id || 0,
-            },
-            ...query,
-          },
+  // useEffect(() => {
+  //   const search = router.query.search
+  //     ? {
+  //         AND: {
+  //           job: {
+  //             title: {
+  //               contains: JSON.parse(router.query.search as string),
+  //               mode: "insensitive",
+  //             },
+  //           },
+  //         },
+  //       }
+  //     : {}
+
+  //   setQuery(search)
+  // }, [router.query])
+
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null as string | null)
+
+  const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getUserJobsByViewTypeAndCategory, {
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
+    searchString,
+    viewType,
+    categoryId: selectedCategoryId,
   })
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
@@ -193,28 +214,12 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
   const [setJobArchivedMutation] = useMutation(setJobArchived)
   const [setJobSalaryVisibilityMutation] = useMutation(setJobSalaryVisibility)
 
-  const searchQuery = async (e) => {
-    const searchQuery = { search: JSON.stringify(e.target.value) }
-    router.push({
-      query: {
-        ...router.query,
-        ...searchQuery,
-      },
-    })
-  }
-
-  const debouncer = new Debouncer((e) => searchQuery(e), 500)
-  const execDebouncer = (e) => {
-    e.persist()
-    return debouncer.execute(e)
-  }
-
   const [openJobArchiveConfirm, setOpenJobArchiveConfirm] = useState(false)
   const [jobToArchive, setJobToArchive] = useState(null as any)
 
   useEffect(() => {
-    invalidateQuery(getCategoriesWOPagination)
-    invalidateQuery(getJobs)
+    invalidateQuery(getUserJobCategoriesByViewType)
+    invalidateQuery(getUserJobsByViewTypeAndCategory)
   }, [viewType])
 
   return (
@@ -222,69 +227,41 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
       <Confirm
         open={openJobArchiveConfirm}
         setOpen={setOpenJobArchiveConfirm}
-        header={`${viewType === ViewType.Archived ? "Restore" : "Archive"} Job - ${
+        header={`${viewType === JobViewType.Archived ? "Restore" : "Archive"} Job - ${
           jobToArchive?.title
         }`}
         onSuccess={async () => {
           const toastId = toast.loading(
-            `${viewType === ViewType.Archived ? "Restoring" : "Archiving"} Job`
+            `${viewType === JobViewType.Archived ? "Restoring" : "Archiving"} Job`
           )
           try {
             await setJobArchivedMutation({
               where: { id: jobToArchive?.id },
               archived: !jobToArchive?.archived,
             })
-            toast.success(`Job ${viewType === ViewType.Archived ? "Restored" : "Archived"}`, {
+            toast.success(`Job ${viewType === JobViewType.Archived ? "Restored" : "Archived"}`, {
               id: toastId,
             })
             setOpenJobArchiveConfirm(false)
             setJobToArchive(null as any)
             setSelectedCategoryId("0")
-            invalidateQuery(getJobs)
-            invalidateQuery(getCategoriesWOPagination)
+            invalidateQuery(getUserJobsByViewTypeAndCategory)
+            invalidateQuery(getUserJobCategoriesByViewType)
           } catch (error) {
             toast.error(
               `${
-                viewType === ViewType.Archived ? "Restoring" : "Archiving"
+                viewType === JobViewType.Archived ? "Restoring" : "Archiving"
               } job failed - ${error.toString()}`,
               { id: toastId }
             )
           }
         }}
       >
-        Are you sure you want to {viewType === ViewType.Archived ? "Restore" : "Archive"} the job?{" "}
-        {viewType !== ViewType.Archived &&
+        Are you sure you want to {viewType === JobViewType.Archived ? "Restore" : "Archive"} the
+        job?{" "}
+        {viewType !== JobViewType.Archived &&
           "This will also expire the job and set the expiry date to current date time."}
       </Confirm>
-
-      <div className="flex items-center">
-        <input
-          placeholder="Search"
-          type="text"
-          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
-          onChange={(e) => {
-            execDebouncer(e)
-          }}
-        />
-        <div className="text-theme-600">
-          <Form
-            noFormatting={true}
-            onSubmit={(value) => {
-              return value
-            }}
-          >
-            <RadioGroupField
-              name="View"
-              options={[ViewType.Active, ViewType.Expired, ViewType.Archived]}
-              initialValue={ViewType.Active}
-              onChange={(value) => {
-                setViewType(value)
-              }}
-            />
-          </Form>
-        </div>
-      </div>
 
       <Pagination
         endPage={endPage}
@@ -297,38 +274,31 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
       />
 
       {jobUsers?.length > 0 && (
-        <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
-          <div
-            className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-              selectedCategoryId === "0"
-                ? "bg-theme-700 cursor-default"
-                : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
-            }`}
-            onClick={() => {
-              setSelectedCategoryId("0")
-            }}
-          >
-            All
-          </div>
-          {categories?.map((category) => {
-            return (
+        <Suspense
+          fallback={
+            <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
               <div
-                key={category.id}
                 className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-                  selectedCategoryId === category.id
+                  selectedCategoryId === null
                     ? "bg-theme-700 cursor-default"
                     : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
                 }`}
-                onClick={async () => {
-                  setSelectedCategoryId(category.id)
-                  await invalidateQuery(getJobs)
+                onClick={() => {
+                  setSelectedCategoryId(null)
                 }}
               >
-                {category.name}
+                All
               </div>
-            )
-          })}
-        </div>
+            </div>
+          }
+        >
+          <CategoryFilterButtons
+            selectedCategoryId={selectedCategoryId}
+            setSelectedCategoryId={setSelectedCategoryId}
+            viewType={viewType}
+            searchString={searchString}
+          />
+        </Suspense>
       )}
 
       <div>
@@ -347,7 +317,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
               }) || []
 
             return (
-              <>
+              <div key={job.id}>
                 <Card isFull={true}>
                   <div className="bg-gray-50 w-full rounded">
                     <div className="flex items-center justify-between flex-wrap px-6 py-4">
@@ -535,7 +505,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
                         <button
                           id={"archive-" + job?.id}
                           className="float-right text-red-600 hover:text-red-800"
-                          title={viewType === ViewType.Archived ? "Restore Job" : "Archive Job"}
+                          title={viewType === JobViewType.Archived ? "Restore Job" : "Archive Job"}
                           type="button"
                           onClick={(e) => {
                             e.preventDefault()
@@ -543,7 +513,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
                             setOpenJobArchiveConfirm(true)
                           }}
                         >
-                          {viewType === ViewType.Archived ? (
+                          {viewType === JobViewType.Archived ? (
                             <RefreshIcon className="w-6 h-6" />
                           ) : (
                             <ArchiveIcon className="w-6 h-6" />
@@ -621,7 +591,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage })
                     </div>
                   </div>
                 </Card>
-              </>
+              </div>
             )
           })}
       </div>
@@ -643,6 +613,23 @@ const JobsHome = ({
   )
   const [viewArchived, setViewArchived] = useState(false)
   const [viewExpired, setViewExpired] = useState(false)
+  const [viewType, setViewType] = useState(JobViewType.Active)
+
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.push({
+      query: {
+        ...router.query,
+        ...searchQuery,
+      },
+    })
+  }
+
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
 
   // // Redirect user to stripe checkout if trial has ended
   // const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
@@ -697,35 +684,68 @@ const JobsHome = ({
         {confirmMessage}
       </Confirm>
 
-      {/* <Link href={Routes.NewJob()} passHref> */}
-      <a
-        className="cursor-pointer float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-        onClick={(e) => {
-          e.preventDefault()
-          if (canCreate) {
-            return router.push(Routes.NewJob())
-          } else {
-            setConfirmMessage(
-              "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
-            )
-            setOpenConfirm(true)
-          }
-        }}
-      >
-        New Job
-      </a>
-      {/* </Link> */}
+      <div className="flex items-center w-full justify-between">
+        <div className="flex items-center">
+          <input
+            placeholder="Search"
+            type="text"
+            defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+            className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+            onChange={(e) => {
+              execDebouncer(e)
+            }}
+          />
+          <div className="text-theme-600">
+            <Form
+              noFormatting={true}
+              onSubmit={(value) => {
+                return value
+              }}
+            >
+              <RadioGroupField
+                name="View"
+                options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
+                initialValue={JobViewType.Active}
+                onChange={(value) => {
+                  setViewType(value)
+                }}
+              />
+            </Form>
+          </div>
+        </div>
 
-      <Link href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
-        >
-          <span>View Careers Page</span>
-          <ExternalLinkIcon className="w-4 h-4 ml-1" />
-        </a>
-      </Link>
+        <div className="flex items-center">
+          <Link href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
+            >
+              <span>View Careers Page</span>
+              <ExternalLinkIcon className="w-4 h-4 ml-1" />
+            </a>
+          </Link>
+
+          {/* <Link href={Routes.NewJob()} passHref> */}
+          <a
+            className="cursor-pointer text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+            onClick={(e) => {
+              e.preventDefault()
+              if (canCreate) {
+                return router.push(Routes.NewJob())
+              } else {
+                setConfirmMessage(
+                  "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+                )
+                setOpenConfirm(true)
+              }
+            }}
+          >
+            New Job
+          </a>
+          {/* </Link> */}
+        </div>
+      </div>
 
       {/* <div className="float-right text-theme-600 py-2 ml-3">
         <Form
@@ -769,6 +789,7 @@ const JobsHome = ({
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <Jobs
+          viewType={viewType}
           user={user}
           company={company}
           currentPlan={currentPlan}

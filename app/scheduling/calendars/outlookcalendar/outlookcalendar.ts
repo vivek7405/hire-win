@@ -36,7 +36,7 @@ export class OutlookCalendarService implements CalendarService {
     const endDate = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
 
     const interviewer = await db.user.findFirst({
-      where: { id: interview?.interviewDetail.interviewerId },
+      where: { id: interview?.interviewDetail?.interviewer?.id },
     })
 
     const body = {

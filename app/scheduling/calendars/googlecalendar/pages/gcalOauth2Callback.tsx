@@ -1,9 +1,11 @@
 import addGoogleCalendarCredentialsMutation from "app/scheduling/calendars/googlecalendar/mutations/createCalendarCredentials"
 import AuthLayout from "app/core/layouts/AuthLayout"
-import { BlitzPage, Link, useMutation, useRouterQuery } from "blitz"
+import { BlitzPage, Link, Router, Routes, useMutation, useRouter, useRouterQuery } from "blitz"
 import { Suspense, useState } from "react"
 import Form from "app/core/components/Form"
 import LabeledTextField from "app/core/components/LabeledTextField"
+import UserSettingsCalendarsPage from "app/pages/settings/calendars"
+import toast from "react-hot-toast"
 
 /**
  * This gets a code as a query parameter. This code needs to be sent to googleapi which returns a refresh_token. The refresh_token is used to generate a session_access_token.
@@ -13,6 +15,7 @@ function OAuthCallbackPage() {
   const [isCalendarAdded, setIsCalendarAdded] = useState(false)
   const [addGoogleCalendarCredentials] = useMutation(addGoogleCalendarCredentialsMutation)
   const [calendarName, setCalendarName] = useState("Your Google Calendar")
+  const router = useRouter()
   let { code } = useRouterQuery()
 
   const handleOAuthCode = async () => {
@@ -31,33 +34,38 @@ function OAuthCallbackPage() {
 
   const SettingsLink = () => {
     return (
-      <Link href={"/calendars"}>
+      <Link href={Routes.UserSettingsCalendarsPage()}>
         <a>Go to Calendar Settings</a>
       </Link>
     )
   }
 
   if (isError) {
-    return (
-      <>
-        <h1>An error has occurred</h1>
-        <p>
-          Please try again. Notice that this Google Calendar might already be connected to your
-          account. If so please edit or delete it in the calendar settings.
-        </p>
-        <SettingsLink />
-      </>
-    )
+    router.push(Routes.UserSettingsCalendarsPage())
+    toast.error("Something went wrong while adding calendar")
+    // return (
+    //   <>
+    //     <h1>An error has occurred</h1>
+    //     <p>
+    //       Please try again. Notice that this Google Calendar might already be connected to your
+    //       account. If so please edit or delete it in the calendar settings.
+    //     </p>
+    //     <SettingsLink />
+    //   </>
+    // )
   }
 
   if (isCalendarAdded) {
-    return (
-      <>
-        <h3>Great! {calendarName} has been added.</h3>
-        <SettingsLink />
-      </>
-    )
+    router.push(Routes.UserSettingsCalendarsPage())
+    toast.success("Calendar added successfully")
+    // return (
+    //   <>
+    //     <h3>Great! {calendarName} has been added.</h3>
+    //     <SettingsLink />
+    //   </>
+    // )
   }
+
   return (
     <>
       {/* <h1>Your Authentication was succesful.</h1>
