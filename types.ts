@@ -14,6 +14,7 @@ export enum DragDirection {
 export enum EmailTemplatePlaceholders {
   Candidate_Name = "Candidate_Name",
   Job_Title = "Job_Title",
+  Job_Stage = "Job_Stage",
   Company_Name = "Company_Name",
   Sender_Name = "Sender_Name",
   Interviewer_Name = "Interviewer_Name",

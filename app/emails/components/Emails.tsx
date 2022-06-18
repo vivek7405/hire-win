@@ -62,13 +62,18 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
             etValues[etPlaceholder] = candidate?.name
             break
           case EmailTemplatePlaceholders.Company_Name:
-            etValues[etPlaceholder] = user?.companyName
+            etValues[etPlaceholder] = user?.companies?.find(
+              (cu) => cu.company?.id === session?.companyId
+            )?.company?.name
             break
           case EmailTemplatePlaceholders.Interviewer_Name:
             etValues[etPlaceholder] = interviewDetail?.interviewer?.name || ""
             break
           case EmailTemplatePlaceholders.Job_Title:
             etValues[etPlaceholder] = candidate?.job?.title
+            break
+          case EmailTemplatePlaceholders.Job_Stage:
+            etValues[etPlaceholder] = candidate?.workflowStage?.stage?.name
             break
           case EmailTemplatePlaceholders.Sender_Name:
             etValues[etPlaceholder] = user?.name
