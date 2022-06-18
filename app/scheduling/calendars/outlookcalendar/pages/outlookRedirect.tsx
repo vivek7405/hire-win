@@ -1,8 +1,9 @@
 import Form from "app/core/components/Form"
 import LabeledTextField from "app/core/components/LabeledTextField"
 import AuthLayout from "app/core/layouts/AuthLayout"
-import { BlitzPage, Link, useRouterQuery, invoke } from "blitz"
+import { BlitzPage, Link, useRouterQuery, invoke, Routes, useRouter } from "blitz"
 import { Suspense, useState } from "react"
+import toast from "react-hot-toast"
 import handleOAuthCode from "../mutations/handleOAuthCode"
 
 /**
@@ -12,6 +13,7 @@ function OAuthCallbackPage() {
   const [isError, setIsError] = useState(false)
   const [isCalenderAdded, setIsCalenderAdded] = useState(false)
   const [calendarName, setCalendarName] = useState("Your Outlook Calendar")
+  const router = useRouter()
 
   let { code } = useRouterQuery()
   const handleCode = async () => {
@@ -27,33 +29,43 @@ function OAuthCallbackPage() {
   }
   const SettingsLink = () => {
     return (
-      <Link href={"/settings"}>
+      <Link href={Routes.UserSettingsCalendarsPage()}>
         <a>Go to Calendar Settings</a>
       </Link>
     )
   }
 
+  if (isError) {
+    router.push(Routes.UserSettingsCalendarsPage())
+    toast.error("Something went wrong while adding calendar")
+    // return (
+    //   <>
+    //     <h1>An error has occurred</h1>
+    //     <p>
+    //       Please try again. Notice that this Microsoft Calendar might already be connected to
+    //       hire-win. If so please edit or delete it in the calendar settings.
+    //     </p>
+    //     <SettingsLink />
+    //   </>
+    // )
+  }
+
+  if (isCalenderAdded) {
+    router.push(Routes.UserSettingsCalendarsPage())
+    toast.success("Calendar added successfully")
+    // return (
+    //   <>
+    //     <h3>Great! {calendarName} has been added.</h3>
+    //     <SettingsLink />
+    //   </>
+    // )
+  }
+
   return (
     <>
-      {isError ? (
-        <>
-          <h1>An error has occurred</h1>
-          <p>
-            Please try again. Notice that this Microsoft Calendar might already be connected to
-            hire-win. If so please edit or delete it in the calendar settings.
-          </p>
-          <SettingsLink />
-        </>
-      ) : isCalenderAdded ? (
-        <>
-          <h3>Great! {calendarName} has been added.</h3>
-          <SettingsLink />
-        </>
-      ) : (
-        <>
-          {/* <h1>Your Authentication was succesful.</h1>
+      {/* <h1>Your Authentication was succesful.</h1>
           <h3>Last step. Please choose a name for your new Calendar.</h3> */}
-          {/* <Form>
+      {/* <Form>
             <Form.Group controlId="formGoogleCalendarName">
               <Form.Label>Calendar Name</Form.Label>
               <Form.Control
@@ -76,24 +88,22 @@ function OAuthCallbackPage() {
           >
             Add Calendar
           </Button> */}
-          <Form
-            submitText="Submit"
-            header="Your Authentication was succesful"
-            subHeader="Last step. Please choose a name for your new Calendar."
-            onSubmit={async (values) => {
-              await handleCode()
-              if (!isError) setIsCalenderAdded(true)
-            }}
-          >
-            <LabeledTextField
-              name="name"
-              label="Calendar Name"
-              placeholder="Enter a name you'd like for your calendar"
-              onChange={(e) => setCalendarName(e.target.value)}
-            />
-          </Form>
-        </>
-      )}
+      <Form
+        submitText="Submit"
+        header="Your Authentication was succesful"
+        subHeader="Last step. Please choose a name for your new Calendar."
+        onSubmit={async (values) => {
+          await handleCode()
+          if (!isError) setIsCalenderAdded(true)
+        }}
+      >
+        <LabeledTextField
+          name="name"
+          label="Calendar Name"
+          placeholder="Enter a name you'd like for your calendar"
+          onChange={(e) => setCalendarName(e.target.value)}
+        />
+      </Form>
     </>
   )
 }
