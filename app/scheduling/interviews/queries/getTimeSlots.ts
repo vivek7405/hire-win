@@ -94,6 +94,11 @@ export default resolver.pipe(
       include: { calendars: true },
     })
 
+    const organizer = await db.user.findFirst({
+      where: { id: ctx.session.userId! },
+      include: { calendars: true },
+    })
+
     const interviewerSchedule = await db.schedule.findFirst({
       where: { id: scheduleId },
       include: { dailySchedules: true },
@@ -114,6 +119,14 @@ export default resolver.pipe(
     if (calendars.length === 0) return null
 
     let takenTimeSlots = await getTakenSlots(calendars, startDateUTC, endDateUTC)
+
+    if (organizer?.id !== interviewer?.id) {
+      if (organizer?.calendars) {
+        await takenTimeSlots.push(
+          ...(await getTakenSlots(organizer?.calendars, startDateUTC, endDateUTC))
+        )
+      }
+    }
 
     if (otherAttendees) {
       // ctx.session.$authorize()

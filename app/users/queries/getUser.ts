@@ -26,6 +26,7 @@ async function getUser({ where }: GetUserInput, ctx: Ctx) {
           },
         },
       },
+      calendars: true,
     },
   })
 

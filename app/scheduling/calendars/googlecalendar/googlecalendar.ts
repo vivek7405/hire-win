@@ -22,7 +22,7 @@ export class GoogleCalendarService implements CalendarService {
 
   public async createEvent(interview: CreateEventInterview) {
     const startDate = interview.startDateUTC
-    const endDate = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
+    const endDate = addMinutes(interview.startDateUTC, interview.duration)
 
     const randomRequestId = uniqueNamesGenerator({
       dictionaries: [adjectives, colors, animals],
@@ -31,7 +31,7 @@ export class GoogleCalendarService implements CalendarService {
     })
 
     const interviewer = await db.user.findFirst({
-      where: { id: interview?.interviewDetail?.interviewer?.id },
+      where: { id: interview?.interviewer?.id },
     })
 
     await this.calendar.events.insert({
@@ -49,7 +49,7 @@ export class GoogleCalendarService implements CalendarService {
         end: {
           dateTime: endDate.toISOString(),
         },
-        organizer: { email: interview?.organizer?.email },
+        organizer: { email: interview?.organizer?.email, displayName: interview?.organizer?.name },
         attendees: [
           { email: interviewer?.email, displayName: interviewer?.name },
           { email: interview.candidate.email, displayName: interview.candidate.name },

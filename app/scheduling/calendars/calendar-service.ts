@@ -4,11 +4,19 @@ import { CaldavService } from "./caldav"
 import { GoogleCalendarService } from "./googlecalendar/googlecalendar"
 import { OutlookCalendarService } from "./outlookcalendar/outlookcalendar"
 
-export type CreateEventInterview = Pick<Interview, "startDateUTC"> & {
-  interviewDetail: InterviewDetailType
-} & { candidate: Pick<Candidate, "email" | "name"> } & {
-  organizer: Pick<User, "email" | "name">
-} & { otherAttendees: Pick<User, "email" | "name">[] } // userIds of attendees
+// export type CreateEventInterview = Pick<Interview, "startDateUTC"> & {
+//   interviewDetail: InterviewDetailType
+// } & { candidate: Pick<Candidate, "id" | "email" | "name"> } & {
+//   organizer: Pick<User, "id" | "email" | "name">
+// } & { otherAttendees: Pick<User, "id" | "email" | "name">[] } // userIds of attendees
+
+export type CreateEventInterview = {
+  organizer: Pick<User, "id" | "email" | "name">
+} & { interviewer: Pick<User, "id" | "email" | "name"> } & {
+  candidate: Pick<Candidate, "id" | "email" | "name">
+} & { otherAttendees: Pick<User, "id" | "email" | "name">[] } & {
+  startDateUTC: Date
+} & { duration: number }
 
 export interface ExternalEvent {
   title?: string

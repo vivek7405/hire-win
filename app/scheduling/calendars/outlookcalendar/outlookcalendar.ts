@@ -33,10 +33,10 @@ export class OutlookCalendarService implements CalendarService {
   public async createEvent(interview: CreateEventInterview) {
     const url = "https://graph.microsoft.com/v1.0/me/calendar/events"
     const startDate = interview.startDateUTC
-    const endDate = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
+    const endDate = addMinutes(interview.startDateUTC, interview.duration)
 
     const interviewer = await db.user.findFirst({
-      where: { id: interview?.interviewDetail?.interviewer?.id },
+      where: { id: interview?.interviewer?.id },
     })
 
     const body = {

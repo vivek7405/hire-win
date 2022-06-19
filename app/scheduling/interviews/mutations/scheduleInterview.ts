@@ -106,7 +106,13 @@ export default resolver.pipe(
     })
     const organizer = await db.user.findUnique({
       where: { id: ctx.session.userId || 0 },
-      select: { id: true, email: true, name: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        calendars: true,
+        defaultCalendars: true,
+      },
     })
     const otherAttendees = await db.user.findMany({
       where: { id: { in: interviewInfo.otherAttendees?.map((userId) => parseInt(userId)) } },
@@ -117,15 +123,32 @@ export default resolver.pipe(
       throw new NotFoundError()
     }
 
-    const interviewerCalendar = await invoke(getCalendar, interviewDetail.calendar?.id || 0)
-    if (!interviewerCalendar) {
-      throw new Error("An error occured: Interviewer doesn't have a connected calendar")
-    }
+    // const interviewerCalendar = await invoke(getCalendar, interviewDetail.calendar?.id || 0)
+    // if (!interviewerCalendar) {
+    //   throw new Error("An error occured: Interviewer doesn't have a connected calendar")
+    // }
 
-    const cancelCode = uuid.v4()
+    const organizerDefaultCalendarId = organizer?.defaultCalendars?.find(
+      (cal) => cal.userId === organizer?.id
+    )?.calendarId
+    const organizerCalendar = await invoke(getCalendar, organizerDefaultCalendarId || 0)
+    if (!organizerCalendar) {
+      throw new Error("An error occured: Organizer doesn't have a connected calendar")
+    }
 
     const startDateUTC = moment(interviewInfo.startDate).utc().toDate()
 
+    const calendarService = await getCalendarService(organizerCalendar)
+    await calendarService.createEvent({
+      organizer,
+      interviewer: interviewDetail.interviewer,
+      candidate,
+      otherAttendees: otherAttendees,
+      startDateUTC,
+      duration: interviewDetail.duration,
+    })
+
+    const cancelCode = uuid.v4()
     const hashedCode = await bcrypt.hash(cancelCode, 10)
     const interview = await db.interview.create({
       data: {
@@ -149,32 +172,21 @@ export default resolver.pipe(
       include: { candidate: true },
     })
 
-    const calendarService = await getCalendarService(interviewerCalendar)
-    await calendarService.createEvent({
-      ...interview,
-      interviewDetail,
-      candidate,
-      organizer,
-      otherAttendees: otherAttendees,
-    })
-
-    const interviewDetailFromDb = await db.interviewDetail.findUnique({
-      where: {
-        jobId_workflowStageId: {
-          jobId: interviewInfo.jobId,
-          workflowStageId: interviewInfo.workflowStageId,
-        },
-      },
-      include: { interviewer: true },
-    })
-    if (!interviewDetailFromDb) {
-      throw new Error("Interview details not found")
-    }
+    // const interviewDetailFromDb = await db.interviewDetail.findUnique({
+    //   where: {
+    //     jobId_workflowStageId: {
+    //       jobId: interviewInfo.jobId,
+    //       workflowStageId: interviewInfo.workflowStageId,
+    //     },
+    //   },
+    //   include: { interviewer: true },
+    // })
+    // if (!interviewDetailFromDb) {
+    //   throw new Error("Interview details not found")
+    // }
 
     const cancelLink =
       process.env.NEXT_PUBLIC_APP_URL + "/cancelInterview/" + interview.id + "/" + cancelCode
-    console.log("CANCEL LINK CANCEL LINK")
-    console.log(cancelLink)
 
     const buildEmail = await sendInterviewConfirmationMailer({
       interview,
