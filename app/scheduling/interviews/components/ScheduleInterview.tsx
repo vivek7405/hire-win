@@ -102,6 +102,15 @@ export default function ScheduleMeeting({
     )
   }
 
+  if ((organizer?.calendars?.length || 0) === 0) {
+    return (
+      <h2 className="text-center p-10 bg-white">
+        You cannot schedule an interview since you, the organizer ({organizer?.name}) has no
+        calendars connected.
+      </h2>
+    )
+  }
+
   if ((interviewDetail?.interviewer?.calendars?.length || 0) === 0) {
     return (
       <h2 className="text-center p-10 bg-white">

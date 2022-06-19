@@ -1,18 +1,55 @@
 import db, { Calendar, DailySchedule, Schedule, User } from "db"
 import { InterviewDetailType } from "types"
 
-type getCandidateInterviewerInput = {
+type GetInterviewDetailsInputType = {
   workflowStageId: string
   candidateId: string
   jobId: string
 }
 
-export default async function getCandidateInterviewDetail({
+export default async function getCandidateInterviewDetail(
+  interviewDetailsInput: GetInterviewDetailsInputType
+) {
+  // if candidate specific interviewer is assigned
+  const candidateSpecificInterviewDetails = await getCandidateSpecificInterviewDetails(
+    interviewDetailsInput
+  )
+
+  // job stage interview details as per job settings
+  const jobStageInterviewDetails = await getJobStageInterviewDetails(interviewDetailsInput)
+
+  if (candidateSpecificInterviewDetails) {
+    // If both candidate specific and job stage interviewer are same, use the job stage interviewing details
+    if (jobStageInterviewDetails) {
+      if (
+        candidateSpecificInterviewDetails?.interviewer?.id ===
+        jobStageInterviewDetails?.interviewer?.id
+      ) {
+        return jobStageInterviewDetails
+      }
+    }
+
+    return candidateSpecificInterviewDetails
+  }
+
+  if (jobStageInterviewDetails) {
+    return jobStageInterviewDetails
+  }
+
+  // If no interviewer assignment found
+  const jobOwnerInterviewDetails = await getJobOwnerInterviewDetails(interviewDetailsInput)
+  if (jobOwnerInterviewDetails) {
+    return jobOwnerInterviewDetails
+  }
+
+  return null
+}
+
+const getCandidateSpecificInterviewDetails = async ({
   workflowStageId,
   candidateId,
   jobId,
-}: getCandidateInterviewerInput) {
-  // If interviewer is assigned for individual candidate, return interviewer
+}: GetInterviewDetailsInputType) => {
   const candidateWorkflowStageInterviewer = await db.candidateWorkflowStageInterviewer.findUnique({
     where: {
       candidateId_workflowStageId: {
@@ -52,7 +89,14 @@ export default async function getCandidateInterviewDetail({
     } as InterviewDetailType
   }
 
-  // If interviewer is assigned for job workflowStage, return interviewer
+  return null
+}
+
+const getJobStageInterviewDetails = async ({
+  workflowStageId,
+  candidateId,
+  jobId,
+}: GetInterviewDetailsInputType) => {
   const workflowStage = await db.workflowStage.findFirst({
     where: { id: workflowStageId },
     include: {
@@ -82,7 +126,14 @@ export default async function getCandidateInterviewDetail({
     } as InterviewDetailType
   }
 
-  // If no interviewer assignment found, return the job owner as interviewer
+  return null
+}
+
+const getJobOwnerInterviewDetails = async ({
+  workflowStageId,
+  candidateId,
+  jobId,
+}: GetInterviewDetailsInputType) => {
   const jobUsers = await db.jobUser.findMany({
     where: { jobId },
     include: {
@@ -116,6 +167,4 @@ export default async function getCandidateInterviewDetail({
       duration: interviewDetail?.duration || 30,
     } as InterviewDetailType
   }
-
-  return null
 }

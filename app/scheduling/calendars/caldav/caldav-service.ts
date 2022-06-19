@@ -306,7 +306,7 @@ export class CaldavService implements CalendarService {
 
   public async createEvent(interview: CreateEventInterview) {
     const start = interview.startDateUTC
-    const end = addMinutes(interview.startDateUTC, interview.interviewDetail.duration)
+    const end = addMinutes(interview.startDateUTC, interview.duration)
 
     const dateNow = new Date()
     const uid = uuidv4()
