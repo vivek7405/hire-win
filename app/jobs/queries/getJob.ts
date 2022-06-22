@@ -17,6 +17,10 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
               stage: true,
               scoreCards: { include: { scoreCard: true } },
               interviewDetails: true,
+              jobUserScheduleCalendars: true,
+            },
+            orderBy: {
+              order: "asc",
             },
           },
         },

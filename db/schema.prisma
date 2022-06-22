@@ -58,6 +58,8 @@ model User {
   comments Comment[]
   emails   Email[]
 
+  jobUserScheduleCalendars JobUserScheduleCalendar[]
+
   // emailTemplates EmailTemplate[]
   // candidatePools CandidatePool[]
 }
@@ -230,9 +232,10 @@ model Job {
 
   scoreCards ScoreCardJobWorkflowStage[]
 
-  interviews       Interview[]
-  interviewDetails InterviewDetail[]
-  candidates       Candidate[]
+  interviews               Interview[]
+  interviewDetails         InterviewDetail[]
+  jobUserScheduleCalendars JobUserScheduleCalendar[]
+  candidates               Candidate[]
 
   archived Boolean @default(false)
 
@@ -250,14 +253,6 @@ model InterviewDetail {
 
   duration Int
 
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  scheduleId Int
-
-  calendar   Calendar? @relation(fields: [calendarId], references: [id])
-  calendarId Int?
-
-  // interviews Interview[]
-
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
@@ -265,6 +260,29 @@ model InterviewDetail {
   workflowStageId String
 
   @@unique([jobId, workflowStageId])
+}
+
+model JobUserScheduleCalendar {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+
+  calendar   Calendar? @relation(fields: [calendarId], references: [id])
+  calendarId Int?
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+
+  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
+  workflowStageId String
+
+  @@unique([jobId, workflowStageId, userId])
 }
 
 enum JobUserRole {
@@ -369,11 +387,12 @@ model WorkflowStage {
 
   interviewers CandidateWorkflowStageInterviewer[]
 
-  interviews       Interview[]
-  interviewDetails InterviewDetail[]
-  candidates       Candidate[]
-  comments         Comment[]
-  emails           Email[]
+  interviews               Interview[]
+  interviewDetails         InterviewDetail[]
+  jobUserScheduleCalendars JobUserScheduleCalendar[]
+  candidates               Candidate[]
+  comments                 Comment[]
+  emails                   Email[]
 
   @@unique([workflowId, stageId])
   @@unique([workflowId, stageId, order])
@@ -677,18 +696,18 @@ enum CalendarType {
 }
 
 model Calendar {
-  id                Int               @id @default(autoincrement())
-  name              String
-  caldavAddress     String?
-  username          String?
-  encryptedPassword String?
-  refreshToken      String?
-  owner             User              @relation(fields: [ownerId], references: [id])
-  ownerId           Int
-  type              CalendarType
-  defaultCalendars  DefaultCalendar[]
+  id                       Int                       @id @default(autoincrement())
+  name                     String
+  caldavAddress            String?
+  username                 String?
+  encryptedPassword        String?
+  refreshToken             String?
+  owner                    User                      @relation(fields: [ownerId], references: [id])
+  ownerId                  Int
+  type                     CalendarType
+  defaultCalendars         DefaultCalendar[]
   // meetings          Meeting[]
-  interviewDetails  InterviewDetail[]
+  jobUserScheduleCalendars JobUserScheduleCalendar[]
 
   @@unique([ownerId, name])
 }
@@ -721,15 +740,14 @@ model DailySchedule {
 }
 
 model Schedule {
-  id               Int               @id @default(autoincrement())
-  name             String
-  timezone         String
-  dailySchedules   DailySchedule[]
-  owner            User              @relation(fields: [ownerId], references: [id])
-  ownerId          Int
-  // meetings       Meeting[]
-  interviewDetails InterviewDetail[]
-  factory          Boolean           @default(false)
+  id                       Int                       @id @default(autoincrement())
+  name                     String
+  timezone                 String
+  dailySchedules           DailySchedule[]
+  owner                    User                      @relation(fields: [ownerId], references: [id])
+  ownerId                  Int
+  jobUserScheduleCalendars JobUserScheduleCalendar[]
+  factory                  Boolean                   @default(false)
 
   @@unique([ownerId, name])
 }

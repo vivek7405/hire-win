@@ -1,10 +1,6 @@
-import { AuthenticationError, Ctx } from "blitz"
-import db, { InterviewDetail, Prisma } from "db"
-import { Job } from "app/jobs/validations"
-import slugify from "slugify"
+import { Ctx } from "blitz"
+import db from "db"
 import Guard from "app/guard/ability"
-import { ExtendedJob } from "types"
-import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 type InterviewDetailInputProps = {
   jobId: string
@@ -33,15 +29,11 @@ async function assignInterviewerToJobStage(
       },
     })
 
-    const scheduleId = interviewer.schedules.find((sch) => sch.name === "Default")?.id || 0
-    const calendarId =
-      interviewer.defaultCalendars.find((cal) => cal.userId === interviewerId)?.calendarId || null
-
     if (existingInterviewDetail) {
       // update
       const updatedInterviewDetail = await db.interviewDetail.update({
         where: { id: existingInterviewDetail.id },
-        data: { interviewerId, scheduleId, calendarId }, // assign default schedule and default calendar when an interviewer is updated
+        data: { interviewerId },
       })
 
       return updatedInterviewDetail
@@ -49,9 +41,9 @@ async function assignInterviewerToJobStage(
       const duration = 30
 
       // create
-      if (jobId && workflowStageId && interviewerId && scheduleId && calendarId) {
+      if (jobId && workflowStageId && interviewerId) {
         const createdInterviewDetail = await db.interviewDetail.create({
-          data: { jobId, workflowStageId, interviewerId, scheduleId, calendarId, duration },
+          data: { jobId, workflowStageId, interviewerId, duration },
         })
         return createdInterviewDetail
       }

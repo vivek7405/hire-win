@@ -132,6 +132,190 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
+const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
+  const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
+  const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
+  const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
+  const [calendars] = useQuery(getCalendars, { where: { ownerId: user?.id } })
+  const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
+
+  return (
+    <>
+      <div className="mb-6 flex flex-col justify-center items-center">
+        <h3 className="font-semibold text-lg">{header}</h3>
+        {(workflowStages?.length || 0) > 0 ? (
+          <div className="mt-5 w-full flex flex-col items-center justify-center space-y-2">
+            <div className="flex">
+              <div className="overflow-auto p-1 w-32 flex flex-col items-center justify-center">
+                <div className="overflow-hidden text-sm font-bold whitespace-nowrap w-full text-center">
+                  Stages
+                </div>
+              </div>
+
+              <div className="w-32 my-2 flex flex-col items-center justify-center">
+                <ArrowSmRightIcon className="h-6 w-auto text-neutral-500 invisible" />
+              </div>
+
+              <div className="overflow-auto p-1 w-32 flex flex-col items-center justify-center">
+                <div className="overflow-hidden text-sm font-bold whitespace-nowrap w-full text-center">
+                  Schedules
+                </div>
+              </div>
+
+              {calendars?.length > 0 && (
+                <>
+                  <div className="w-32 my-2 flex flex-col items-center justify-center">
+                    <ArrowSmRightIcon className="h-6 w-auto text-neutral-500 invisible" />
+                  </div>
+
+                  <div className="overflow-auto p-1 w-32 flex flex-col items-center justify-center">
+                    <div className="overflow-hidden text-sm font-bold whitespace-nowrap w-full text-center">
+                      Calendars
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {workflowStages?.map((ws, index) => {
+              const existingScheduleCalendar = ws.jobUserScheduleCalendars?.find(
+                (int) => int.workflowStageId === ws.id && int.jobId === job.id
+              )
+              const existingInterviewer: User | null | undefined = job?.users?.find(
+                (member) => member?.userId === existingScheduleCalendar?.userId
+              )?.user
+
+              const defaultInterviewerId =
+                existingInterviewer?.id?.toString() ||
+                job?.users?.find((member) => member?.role === "OWNER")?.userId?.toString()
+
+              return defaultInterviewerId !== user?.id?.toString() ? (
+                <></>
+              ) : (
+                <div key={ws.id} className="flex">
+                  <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
+                    <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                      {ws.stage?.name}
+                    </div>
+                  </div>
+
+                  <div className="w-32 my-2 flex flex-col items-center justify-center">
+                    <ArrowSmRightIcon className="h-6 w-auto text-neutral-500" />
+                  </div>
+
+                  <div className="w-32 flex flex-col items-center justify-center">
+                    <select
+                      className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
+                      name={`schedules.${index}.id`}
+                      placeholder={`Select Schedule`}
+                      // disabled={existingInterviewDetail && !existingInterviewer}
+                      defaultValue={
+                        existingScheduleCalendar?.scheduleId ||
+                        schedules?.find((schedule) => schedule.name === "Default")?.id
+                      }
+                      onChange={async (e) => {
+                        const selectedScheduleId = e.target.value
+                        const toastId = toast.loading(() => <span>Updating Schedule</span>)
+                        try {
+                          const assignedSchedule = await assignScheduleToJobStageMutation({
+                            jobId: job?.id,
+                            workflowStageId: ws.id,
+                            scheduleId: parseInt(selectedScheduleId || "0"),
+                          })
+                          // if (existingScheduleCalendar && assignedSchedule) {
+                          //   existingScheduleCalendar.scheduleId = assignedSchedule.scheduleId
+                          //   setJobData(jobData)
+                          // }
+                          await invalidateQuery(getJob)
+
+                          toast.success(() => <span>Schedule assigned to stage</span>, {
+                            id: toastId,
+                          })
+                        } catch (error) {
+                          toast.error(
+                            `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
+                            { id: toastId }
+                          )
+                        }
+                      }}
+                    >
+                      {schedules?.map((schedule) => {
+                        return (
+                          <option key={schedule.id} value={schedule.id}>
+                            {schedule.name}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
+
+                  {calendars?.length > 0 && (
+                    <>
+                      <div className="w-32 my-2 flex flex-col items-center justify-center">
+                        <ArrowSmRightIcon className="h-6 w-auto text-neutral-500" />
+                      </div>
+
+                      <div className="w-32 flex flex-col items-center justify-center">
+                        <select
+                          className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
+                          name={`calendars.${index}.id`}
+                          placeholder={`Select Calendar`}
+                          // disabled={existingInterviewDetail && !existingInterviewer}
+                          defaultValue={
+                            existingScheduleCalendar?.calendarId || defaultCalendar?.calendarId
+                          }
+                          onChange={async (e) => {
+                            const selectedCalendarId = e.target.value
+                            const toastId = toast.loading(() => <span>Updating Calendar</span>)
+                            try {
+                              const assignedCalendar = await assignCalendarToJobStageMutation({
+                                jobId: job?.id,
+                                workflowStageId: ws.id,
+                                calendarId: parseInt(selectedCalendarId || "0"),
+                              })
+                              // if (existingScheduleCalendar && assignedCalendar) {
+                              //   existingScheduleCalendar.calendarId = assignedCalendar.calendarId
+                              //   setJobData(jobData)
+                              // }
+                              await invalidateQuery(getJob)
+
+                              toast.success(() => <span>Calendar assigned to stage</span>, {
+                                id: toastId,
+                              })
+                            } catch (error) {
+                              toast.error(
+                                `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
+                                { id: toastId }
+                              )
+                            }
+                          }}
+                        >
+                          {calendars?.map((cal) => {
+                            return (
+                              <option key={cal.id} value={cal.id}>
+                                {cal.name}
+                              </option>
+                            )
+                          })}
+                        </select>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div>
+            <br />
+            There are no stages assigned to you for interview
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
 const JobSettingsSchedulingPage = ({
   user,
   job,
@@ -147,14 +331,6 @@ const JobSettingsSchedulingPage = ({
   const [removeFromJobMutation] = useMutation(removeFromJob)
   const [changePermissionMutation] = useMutation(updateMemberRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
-  const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
-  const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
-  const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
-  const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
-  const [calendars] = useQuery(getCalendars, { where: { ownerId: user?.id } })
-  const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
-
-  const [jobData, setJobData] = useState(job)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -162,7 +338,7 @@ const JobSettingsSchedulingPage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
-      <JobSettingsLayout job={jobData!} isOwner={isOwner}>
+      <JobSettingsLayout job={job!} isOwner={isOwner}>
         <div className="bg-white mt-5 md:mt-0 md:col-span-2">
           <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
             <div className="flex justify-between items-center mb-6">
@@ -175,7 +351,28 @@ const JobSettingsSchedulingPage = ({
             </div>
 
             <div className="flex flex-col overflow-auto rounded-sm">
-              <div className="mb-6 flex flex-col justify-center items-center">
+              <ScheduleCalendarAssignment
+                job={job}
+                user={user}
+                workflowStages={job?.workflow?.stages?.filter((ws) =>
+                  ws.interviewDetails?.some(
+                    (int) => int.jobId === job?.id && int.interviewerId === user?.id
+                  )
+                )}
+                header={"Stages assigned to you"}
+              />
+              <br />
+              <ScheduleCalendarAssignment
+                job={job}
+                user={user}
+                workflowStages={job?.workflow?.stages?.filter((ws) =>
+                  ws.interviewDetails?.some(
+                    (int) => int.jobId === job?.id && int.interviewerId !== user?.id
+                  )
+                )}
+                header={"Other Stages"}
+              />
+              {/* <div className="mb-6 flex flex-col justify-center items-center">
                 <h3 className="font-semibold text-lg">Stages assigned to you</h3>
                 {(jobData?.workflow?.stages?.filter((ws) =>
                   ws.interviewDetails?.some(
@@ -216,15 +413,17 @@ const JobSettingsSchedulingPage = ({
                     </div>
 
                     {jobData?.workflow?.stages
-                      ?.sort((a, b) => {
-                        return a.order - b.order
-                      })
+                      ?.filter((ws) =>
+                        ws.interviewDetails?.some(
+                          (int) => int.jobId === job?.id && int.interviewerId === user?.id
+                        )
+                      )
                       .map((ws, index) => {
-                        const existingInterviewDetail = ws.interviewDetails?.find(
+                        const existingScheduleCalendar = ws.jobUserScheduleCalendars?.find(
                           (int) => int.workflowStageId === ws.id && int.jobId === jobData.id
                         )
                         const existingInterviewer: User | null | undefined = jobData?.users?.find(
-                          (member) => member?.userId === existingInterviewDetail?.interviewerId
+                          (member) => member?.userId === existingScheduleCalendar?.userId
                         )?.user
 
                         const defaultInterviewerId =
@@ -254,7 +453,7 @@ const JobSettingsSchedulingPage = ({
                                 placeholder={`Select Schedule`}
                                 // disabled={existingInterviewDetail && !existingInterviewer}
                                 defaultValue={
-                                  existingInterviewDetail?.scheduleId ||
+                                  existingScheduleCalendar?.scheduleId ||
                                   schedules?.find((schedule) => schedule.name === "Default")?.id
                                 }
                                 onChange={async (e) => {
@@ -270,8 +469,8 @@ const JobSettingsSchedulingPage = ({
                                         scheduleId: parseInt(selectedScheduleId || "0"),
                                       }
                                     )
-                                    if (existingInterviewDetail && assignedSchedule) {
-                                      existingInterviewDetail.scheduleId =
+                                    if (existingScheduleCalendar && assignedSchedule) {
+                                      existingScheduleCalendar.scheduleId =
                                         assignedSchedule.scheduleId
                                       setJobData(jobData)
                                     }
@@ -310,7 +509,7 @@ const JobSettingsSchedulingPage = ({
                                     placeholder={`Select Calendar`}
                                     // disabled={existingInterviewDetail && !existingInterviewer}
                                     defaultValue={
-                                      existingInterviewDetail?.calendarId ||
+                                      existingScheduleCalendar?.calendarId ||
                                       defaultCalendar?.calendarId
                                     }
                                     onChange={async (e) => {
@@ -325,8 +524,8 @@ const JobSettingsSchedulingPage = ({
                                             workflowStageId: ws.id,
                                             calendarId: parseInt(selectedCalendarId || "0"),
                                           })
-                                        if (existingInterviewDetail && assignedCalendar) {
-                                          existingInterviewDetail.calendarId =
+                                        if (existingScheduleCalendar && assignedCalendar) {
+                                          existingScheduleCalendar.calendarId =
                                             assignedCalendar.calendarId
                                           setJobData(jobData)
                                         }
@@ -366,7 +565,7 @@ const JobSettingsSchedulingPage = ({
                     There are no stages assigned to you for interview
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
