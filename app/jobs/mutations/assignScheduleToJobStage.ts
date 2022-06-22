@@ -7,59 +7,61 @@ import { ExtendedJob } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { customTsParser } from "@blitzjs/installer"
 
-type InterviewDetailInputProps = {
+type ScheduleCalendarInputProps = {
   jobId: string
   workflowStageId: string
   scheduleId: number
 }
 
 async function assignScheduleToJobStage(
-  { jobId, workflowStageId, scheduleId }: InterviewDetailInputProps,
+  { jobId, workflowStageId, scheduleId }: ScheduleCalendarInputProps,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
   const user = await db.user.findFirst({
     where: { id: ctx.session.userId },
-    include: { defaultCalendars: true, schedules: true },
+    include: { defaultCalendars: true, schedules: true, calendars: true },
   })
 
-  const existingInterviewDetail = await db.interviewDetail.findUnique({
+  const existingScheduleCalendar = await db.jobUserScheduleCalendar.findUnique({
     where: {
-      jobId_workflowStageId: {
+      jobId_workflowStageId_userId: {
         jobId,
         workflowStageId,
+        userId: user?.id || 0,
       },
     },
   })
 
-  if (existingInterviewDetail) {
+  if (existingScheduleCalendar) {
     // update
-    const updatedInterviewDetail = await db.interviewDetail.update({
-      where: { id: existingInterviewDetail.id },
+    const updatedScheduleCalendar = await db.jobUserScheduleCalendar.update({
+      where: { id: existingScheduleCalendar.id },
       data: { scheduleId },
     })
 
-    return updatedInterviewDetail
+    return updatedScheduleCalendar
   } else {
-    const scheduleId = user?.schedules.find((sch) => sch.name === "Default")?.id || 0
-    const calendarId =
+    const schId =
+      user?.schedules?.find((sch) => sch.ownerId === user?.id && sch.id === scheduleId)?.id || null
+    const defaultScheduleId =
+      user?.schedules?.find((sch) => sch.factory && sch.name === "Default")?.id || 0
+    const defaultCalendarId =
       user?.defaultCalendars.find((cal) => cal.userId === user.id)?.calendarId || null
-    const duration = 30
 
     // create
-    if (jobId && workflowStageId && scheduleId && calendarId) {
-      const createdInterviewDetail = await db.interviewDetail.create({
+    if (jobId && workflowStageId && defaultCalendarId && (schId || defaultScheduleId)) {
+      const createdScheduleCalendar = await db.jobUserScheduleCalendar.create({
         data: {
           jobId,
           workflowStageId,
-          interviewerId: ctx.session.userId,
-          scheduleId,
-          calendarId,
-          duration,
+          userId: user?.id || 0,
+          scheduleId: schId || defaultScheduleId,
+          calendarId: defaultCalendarId,
         },
       })
-      return createdInterviewDetail
+      return createdScheduleCalendar
     }
   }
 

@@ -21,45 +21,46 @@ async function assignCalendarToJobStage(
 
   const user = await db.user.findFirst({
     where: { id: ctx.session.userId },
-    include: { defaultCalendars: true, schedules: true },
+    include: { defaultCalendars: true, schedules: true, calendars: true },
   })
 
-  const existingInterviewDetail = await db.interviewDetail.findUnique({
+  const existingScheduleCalendar = await db.jobUserScheduleCalendar.findUnique({
     where: {
-      jobId_workflowStageId: {
+      jobId_workflowStageId_userId: {
         jobId,
         workflowStageId,
+        userId: user?.id || 0,
       },
     },
   })
 
-  if (existingInterviewDetail) {
+  if (existingScheduleCalendar) {
     // update
-    const updatedInterviewDetail = await db.interviewDetail.update({
-      where: { id: existingInterviewDetail.id },
+    const updatedScheduleCalendar = await db.jobUserScheduleCalendar.update({
+      where: { id: existingScheduleCalendar.id },
       data: { calendarId },
     })
 
-    return updatedInterviewDetail
+    return updatedScheduleCalendar
   } else {
-    const scheduleId = user?.schedules.find((sch) => sch.name === "Default")?.id || 0
-    const calendarId =
-      user?.defaultCalendars.find((cal) => cal.userId === user.id)?.calendarId || null
-    const duration = 30
+    const defaultScheduleId = user?.schedules.find((sch) => sch.name === "Default")?.id || 0
+    const calId =
+      user?.calendars?.find((cal) => cal.ownerId === user.id && cal.id === calendarId)?.id || null
+    const defaultCalendarId =
+      user?.defaultCalendars?.find((cal) => cal.userId === user.id)?.calendarId || null
 
     // create
-    if (jobId && workflowStageId && scheduleId && calendarId) {
-      const createdInterviewDetail = await db.interviewDetail.create({
+    if (jobId && workflowStageId && defaultScheduleId && (calId || defaultCalendarId)) {
+      const createdScheduleCalendar = await db.jobUserScheduleCalendar.create({
         data: {
           jobId,
           workflowStageId,
-          interviewerId: ctx.session.userId,
-          scheduleId,
-          calendarId,
-          duration,
+          userId: ctx.session.userId,
+          scheduleId: defaultScheduleId,
+          calendarId: calId || defaultCalendarId,
         },
       })
-      return createdInterviewDetail
+      return createdScheduleCalendar
     }
   }
 

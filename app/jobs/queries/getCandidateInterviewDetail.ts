@@ -65,13 +65,28 @@ const getCandidateSpecificInterviewDetails = async ({
           defaultCalendars: { include: { calendar: true } },
         },
       },
+      workflowStage: {
+        include: {
+          jobUserScheduleCalendars: {
+            include: {
+              schedule: { include: { dailySchedules: true } },
+              calendar: true,
+            },
+          },
+        },
+      },
     },
   })
   if (candidateWorkflowStageInterviewer) {
     const interviewer = candidateWorkflowStageInterviewer?.interviewer
-    const defaultCalendar = interviewer?.defaultCalendars?.find(
+    const defaultCalendarId = interviewer?.defaultCalendars?.find(
       (def) => def.userId === interviewer?.id
-    )?.calendar
+    )?.calendar?.id
+    const defaultScheduleId = interviewer?.schedules?.find((sch) => sch.factory === true)?.id
+    const scheduleCalendar =
+      candidateWorkflowStageInterviewer?.workflowStage?.jobUserScheduleCalendars?.find(
+        (schCal) => schCal.jobId === jobId && schCal.userId === interviewer?.id
+      )
     const interviewDetail = await db.interviewDetail.findUnique({
       where: {
         jobId_workflowStageId: {
@@ -83,8 +98,12 @@ const getCandidateSpecificInterviewDetails = async ({
 
     return {
       interviewer: interviewer,
-      calendar: interviewer?.calendars?.find((cal) => cal.id === defaultCalendar?.id),
-      schedule: interviewer?.schedules?.find((sch) => sch.factory === true),
+      calendar: interviewer?.calendars?.find(
+        (cal) => cal.id === (scheduleCalendar?.calendarId || defaultCalendarId)
+      ),
+      schedule: interviewer?.schedules?.find(
+        (sch) => sch.id === (scheduleCalendar?.scheduleId || defaultScheduleId)
+      ),
       duration: interviewDetail?.duration || 30,
     } as InterviewDetailType
   }
@@ -109,6 +128,10 @@ const getJobStageInterviewDetails = async ({
               defaultCalendars: { include: { calendar: true } },
             },
           },
+        },
+      },
+      jobUserScheduleCalendars: {
+        include: {
           schedule: { include: { dailySchedules: true } },
           calendar: true,
         },
@@ -117,11 +140,14 @@ const getJobStageInterviewDetails = async ({
   })
   if (workflowStage) {
     const interviewDetail = workflowStage.interviewDetails?.find((int) => int.jobId === jobId)
+    const scheduleCalendar = workflowStage.jobUserScheduleCalendars?.find(
+      (int) => int.jobId === jobId && int.userId === interviewDetail?.interviewerId
+    )
 
     return {
       interviewer: interviewDetail?.interviewer,
-      calendar: interviewDetail?.calendar,
-      schedule: interviewDetail?.schedule,
+      calendar: scheduleCalendar?.calendar,
+      schedule: scheduleCalendar?.schedule,
       duration: interviewDetail?.duration || 30,
     } as InterviewDetailType
   }
@@ -148,9 +174,23 @@ const getJobOwnerInterviewDetails = async ({
   })
   if (jobUsers) {
     const interviewer = jobUsers?.find((user) => user?.role === "OWNER")?.user
-    const defaultCalendar = interviewer?.defaultCalendars?.find(
+    const defaultCalendarId = interviewer?.defaultCalendars?.find(
       (def) => def.userId === interviewer?.id
-    )?.calendar
+    )?.calendar?.id
+    const defaultScheduleId = interviewer?.schedules?.find((sch) => sch.factory === true)?.id
+    const scheduleCalendar = await db.jobUserScheduleCalendar.findUnique({
+      where: {
+        jobId_workflowStageId_userId: {
+          jobId,
+          workflowStageId,
+          userId: interviewer?.id || 0,
+        },
+      },
+      include: {
+        schedule: { include: { dailySchedules: true } },
+        calendar: true,
+      },
+    })
     const interviewDetail = await db.interviewDetail.findUnique({
       where: {
         jobId_workflowStageId: {
@@ -162,8 +202,12 @@ const getJobOwnerInterviewDetails = async ({
 
     return {
       interviewer: interviewer,
-      calendar: interviewer?.calendars?.find((cal) => cal.id === defaultCalendar?.id),
-      schedule: interviewer?.schedules?.find((sch) => sch.factory === true),
+      calendar: interviewer?.calendars?.find(
+        (cal) => cal.id === (scheduleCalendar?.calendarId || defaultCalendarId)
+      ),
+      schedule: interviewer?.schedules?.find(
+        (sch) => sch.id === (scheduleCalendar?.scheduleId || defaultScheduleId)
+      ),
       duration: interviewDetail?.duration || 30,
     } as InterviewDetailType
   }

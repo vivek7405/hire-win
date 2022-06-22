@@ -13,6 +13,7 @@ import moment from "moment"
 import bcrypt from "bcrypt"
 import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
 import { InterviewDetailType } from "types"
+import getScheduleCalendar from "../queries/getScheduleCalendar"
 
 // async function sendConfirmationMail(
 //   interview: Interview,
@@ -128,10 +129,24 @@ export default resolver.pipe(
     //   throw new Error("An error occured: Interviewer doesn't have a connected calendar")
     // }
 
+    const scheduleCalendar = await getScheduleCalendar(
+      {
+        jobId: job.id,
+        workflowStageId: workflowStage.id,
+        userId: organizer.id,
+      },
+      ctx
+    )
+
     const organizerDefaultCalendarId = organizer?.defaultCalendars?.find(
       (cal) => cal.userId === organizer?.id
     )?.calendarId
-    const organizerCalendar = await invoke(getCalendar, organizerDefaultCalendarId || 0)
+
+    const organizerCalendar = await invoke(
+      getCalendar,
+      scheduleCalendar?.calendarId || organizerDefaultCalendarId || 0
+    )
+
     if (!organizerCalendar) {
       throw new Error("An error occured: Organizer doesn't have a connected calendar")
     }

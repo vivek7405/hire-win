@@ -28,18 +28,18 @@ import { areDatesOnSameDay } from "../utils/comparison"
 // import { InterviewInput } from "../validations"
 import AvailableTimeSlotsSelection from "./AvailableTimeSlotsSelection"
 
-type ScheduleMeetingProps = {
+type ScheduleInterviewProps = {
   interviewDetail: InterviewDetailType
   candidateId: string
   workflowStageId: string
   setOpenScheduleInterviewModal: any
 }
-export default function ScheduleMeeting({
+export default function ScheduleInterview({
   interviewDetail,
   candidateId,
   workflowStageId,
   setOpenScheduleInterviewModal,
-}: ScheduleMeetingProps) {
+}: ScheduleInterviewProps) {
   //   const [meeting] = useQuery(getMeeting, { username: username, slug: meetingSlug })
   // const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
   const [selectedDay, setSelectedDay] = useState<Date>(new Date())
