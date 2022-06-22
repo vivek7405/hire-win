@@ -53,8 +53,8 @@ const getCandidateSpecificInterviewDetails = async ({
   const candidateWorkflowStageInterviewer = await db.candidateWorkflowStageInterviewer.findUnique({
     where: {
       candidateId_workflowStageId: {
-        candidateId,
-        workflowStageId,
+        candidateId: candidateId || "0",
+        workflowStageId: workflowStageId || "0",
       },
     },
     include: {
