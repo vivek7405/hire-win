@@ -3,16 +3,16 @@ import { resolver } from "blitz"
 import * as z from "zod"
 
 export default resolver.pipe(resolver.zod(z.number()), resolver.authorize(), async (scheduleId) => {
-  const interviewsDependingOnSchedule = await db.interviewDetail.count({
-    where: { scheduleId: scheduleId },
+  const scheduleCalendar = await db.jobUserScheduleCalendar.count({
+    where: { scheduleId },
   })
 
-  if (interviewsDependingOnSchedule > 0) {
+  if (scheduleCalendar > 0) {
     return "error"
   }
 
   await db.dailySchedule.deleteMany({
-    where: { scheduleId: scheduleId },
+    where: { scheduleId },
   })
   await db.schedule.delete({
     where: { id: scheduleId },
