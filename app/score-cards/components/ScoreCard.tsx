@@ -121,12 +121,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
               ) >= 0
           )
 
-          // const disabled = props.workflowStageId !== props.candidate?.workflowStageId
-          const disabled =
-            !props.preview &&
-            props.workflowStage?.interviewDetails?.find(
-              (int) => int.jobId === props.candidate?.jobId && int.interviewerId === props.userId
-            )?.interviewerId !== props.userId
+          const disabled = !props.preview && props.submitDisabled
 
           return (
             <div key={q.id}>
