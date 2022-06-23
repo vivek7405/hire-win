@@ -605,7 +605,10 @@ const SingleScoreCardPage = ({
                             data: { ...values },
                             initial: cardQuestionToEdit,
                           })
-                        : await createCardQuestionMutation({ ...values })
+                        : await addNewCardQuestionToScoreCardMutation({
+                            scoreCardId: scoreCard?.id,
+                            ...values,
+                          })
                       await invalidateQuery(getScoreCardQuestionsWOPagination)
                       toast.success(
                         isEdit ? "Question updated successfully" : "Question added successfully",
@@ -644,6 +647,7 @@ const SingleScoreCardPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
+                  setCardQuestionToEdit(null)
                   setOpenAddNewCardQuestion(true)
                 }}
                 data-testid={`open-addCardQuestion-modal`}

@@ -18,7 +18,7 @@ import Table from "app/core/components/Table"
 import Skeleton from "react-loading-skeleton"
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection } from "types"
-import { Question } from "@prisma/client"
+import { Question, QuestionOption } from "@prisma/client"
 import deleteQuestion from "app/questions/mutations/deleteQuestion"
 import createQuestion from "app/questions/mutations/createQuestion"
 import updateQuestion from "app/questions/mutations/updateQuestion"
@@ -64,7 +64,9 @@ const Questions = () => {
   const [openConfirm, setOpenConfirm] = useState(false)
   const [questionToDelete, setQuestionToDelete] = useState(null as any as Question)
   const [deleteQuestionMutation] = useMutation(deleteQuestion)
-  const [questionToEdit, setQuestionToEdit] = useState(null as any as Question)
+  const [questionToEdit, setQuestionToEdit] = useState(
+    null as any as Question & { options: QuestionOption[] }
+  )
   const [openModal, setOpenModal] = useState(false)
   const [createQuestionMutation] = useMutation(createQuestion)
   const [updateQuestionMutation] = useMutation(updateQuestion)
@@ -128,12 +130,12 @@ const Questions = () => {
           try {
             await deleteQuestionMutation({ id: questionToDelete?.id })
             toast.success("Question Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setQuestionToDelete(null as any)
             invalidateQuery(getQuestions)
           } catch (error) {
             toast.error(`Deleting question failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setQuestionToDelete(null as any)
         }}
       >
         Are you sure you want to delete the question?
@@ -155,7 +157,19 @@ const Questions = () => {
           editmode={questionToEdit ? true : false}
           header={`${questionToEdit ? "Update" : "New"} Question`}
           subHeader="Enter question details"
-          initialValues={questionToEdit ? { name: questionToEdit?.name } : {}}
+          initialValues={
+            questionToEdit
+              ? {
+                  name: questionToEdit?.name,
+                  type: questionToEdit?.type,
+                  placeholder: questionToEdit?.placeholder,
+                  acceptedFiles: questionToEdit?.acceptedFiles,
+                  options: questionToEdit?.options?.map((op) => {
+                    return { id: op.id, text: op.text }
+                  }),
+                }
+              : {}
+          }
           onSubmit={async (values) => {
             const isEdit = questionToEdit ? true : false
 

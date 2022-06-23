@@ -8,6 +8,9 @@ const getEmailTemplates = resolver.pipe(
   async ({ where }: GetEmailTemplatesInput, ctx: Ctx) => {
     const emailTemplates = await db.emailTemplate.findMany({
       where,
+      include: {
+        _count: { select: { emails: true } },
+      },
       orderBy: { createdAt: "asc" },
     })
     return emailTemplates

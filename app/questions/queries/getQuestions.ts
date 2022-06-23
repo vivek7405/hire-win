@@ -25,6 +25,7 @@ const getQuestions = resolver.pipe(
           orderBy,
           include: {
             forms: { include: { form: true } },
+            options: true,
           },
         }),
     })

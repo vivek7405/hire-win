@@ -117,12 +117,12 @@ const Categories = () => {
           try {
             await deleteCategoryMutation({ where: { id: categoryToDelete?.id } })
             toast.success("Category Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setCategoryToDelete(null as any)
             invalidateQuery(getCategoriesWOPagination)
           } catch (error) {
             toast.error(`Deleting category failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setCategoryToDelete(null as any)
         }}
       >
         Are you sure you want to delete the category?

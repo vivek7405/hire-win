@@ -14,7 +14,7 @@ import createFormQuestion from "./createFormQuestion"
 async function addNewQuestionToForm(data: QuestionInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { formId, name } = QuestionObj.parse(data)
+  const { formId } = QuestionObj.parse(data)
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 

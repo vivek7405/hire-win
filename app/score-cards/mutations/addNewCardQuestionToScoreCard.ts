@@ -15,16 +15,51 @@ async function addNewCardQuestionToScoreCard(data: CardQuestionInputType, ctx: C
   ctx.session.$authorize()
 
   const { scoreCardId, name } = CardQuestion.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
+  // if (!user) throw new AuthenticationError()
 
-  const cardQuestion = await createQuestion(data, ctx)
-  const scoreCardQuestion = await createScoreCardQuestion(
-    { scoreCardId, cardQuestionId: cardQuestion.id },
-    ctx
+  const slug = slugify(name, { strict: true })
+  const newSlug = await findFreeSlug(
+    slug,
+    async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
   )
 
-  return scoreCardQuestion
+  const existingCardQuestion = await db.cardQuestion.findFirst({
+    where: { name, companyId: ctx.session.companyId || 0 },
+  })
+  const order = (await db.scoreCardQuestion.count({ where: { scoreCardId: scoreCardId } })) + 1
+
+  // Add New or connect existing cardQuestion and put it to the last position
+  const scoreCard = await db.scoreCard.update({
+    where: { id: scoreCardId },
+    data: {
+      cardQuestions: {
+        create: [
+          {
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            order,
+            cardQuestion: {
+              connectOrCreate: {
+                where: { id: existingCardQuestion?.id || "" },
+                create: {
+                  name,
+                  slug: newSlug,
+                  company: {
+                    connect: {
+                      id: ctx.session.companyId || 0,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
+    },
+  })
+
+  return scoreCard
 }
 
 export default Guard.authorize("create", "scoreCardQuestion", addNewCardQuestionToScoreCard)

@@ -36,7 +36,7 @@ import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
 import ApplicationForm from "app/jobs/components/ApplicationForm"
-import { FormQuestionBehaviour, Question, QuestionType } from "@prisma/client"
+import { FormQuestionBehaviour, Question, QuestionOption, QuestionType } from "@prisma/client"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
@@ -473,7 +473,9 @@ const SingleFormPage = ({
   const [addExistingFormQuestionsMutation] = useMutation(addExistingFormQuestions)
   const [createQuestionMutation] = useMutation(createQuestion)
   const [addNewQuestionToFormMutation] = useMutation(addNewQuestionToForm)
-  const [questionToEdit, setQuestionToEdit] = useState(null as any as Question)
+  const [questionToEdit, setQuestionToEdit] = useState(
+    null as any as Question & { options: QuestionOption[] }
+  )
   const [updateQuestionMutation] = useMutation(updateQuestion)
   const router = useRouter()
 
@@ -556,7 +558,19 @@ const SingleFormPage = ({
                   editmode={questionToEdit ? true : false}
                   header={`${questionToEdit ? "Update" : "Add New"} Question`}
                   subHeader="Enter question details"
-                  initialValues={questionToEdit ? { name: questionToEdit?.name } : {}}
+                  initialValues={
+                    questionToEdit
+                      ? {
+                          name: questionToEdit?.name,
+                          type: questionToEdit?.type,
+                          placeholder: questionToEdit?.placeholder,
+                          acceptedFiles: questionToEdit?.acceptedFiles,
+                          options: questionToEdit?.options?.map((op) => {
+                            return { id: op.id, text: op.text }
+                          }),
+                        }
+                      : {}
+                  }
                   onSubmit={async (values) => {
                     const isEdit = questionToEdit ? true : false
 
@@ -570,7 +584,7 @@ const SingleFormPage = ({
                             data: { ...values },
                             initial: questionToEdit,
                           })
-                        : await createQuestionMutation({ ...values })
+                        : await addNewQuestionToFormMutation({ formId: form?.id, ...values })
                       await invalidateQuery(getFormQuestionsWOPagination)
                       toast.success(
                         isEdit ? "Question updated successfully" : "Question added successfully",
