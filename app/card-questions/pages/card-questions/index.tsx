@@ -128,12 +128,12 @@ const CardQuestions = () => {
           try {
             await deleteCardQuestionMutation({ id: cardQuestionToDelete?.id })
             toast.success("Question Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setCardQuestionToDelete(null as any)
             invalidateQuery(getCardQuestions)
           } catch (error) {
             toast.error(`Deleting question failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setCardQuestionToDelete(null as any)
         }}
       >
         Are you sure you want to delete the Question?

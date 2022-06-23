@@ -484,7 +484,7 @@ const SingleScoreCardPage = ({
   const [addExistingScoreCardQuestionsMutation] = useMutation(addExistingScoreCardQuestions)
   const [createCardQuestionMutation] = useMutation(createCardQuestion)
   const [addNewCardQuestionToScoreCardMutation] = useMutation(addNewCardQuestionToScoreCard)
-  const [cardQuestionToEdit, setCardQuestionToEdit] = useState(null as any as CardQuestion)
+  const [cardQuestionToEdit, setCardQuestionToEdit] = useState(null as CardQuestion | null)
   const [updateCardQuestionMutation] = useMutation(updateCardQuestion)
   const router = useRouter()
   const session = useSession()
@@ -601,11 +601,14 @@ const SingleScoreCardPage = ({
                     try {
                       isEdit
                         ? await updateCardQuestionMutation({
-                            where: { id: cardQuestionToEdit.id },
+                            where: { id: cardQuestionToEdit?.id },
                             data: { ...values },
-                            initial: cardQuestionToEdit,
+                            initial: cardQuestionToEdit!,
                           })
-                        : await createCardQuestionMutation({ ...values })
+                        : await addNewCardQuestionToScoreCardMutation({
+                            scoreCardId: scoreCard?.id,
+                            ...values,
+                          })
                       await invalidateQuery(getScoreCardQuestionsWOPagination)
                       toast.success(
                         isEdit ? "Question updated successfully" : "Question added successfully",
@@ -613,7 +616,7 @@ const SingleScoreCardPage = ({
                           id: toastId,
                         }
                       )
-                      setCardQuestionToEdit(null as any)
+                      setCardQuestionToEdit(null)
                       setOpenAddNewCardQuestion(false)
                     } catch (error) {
                       toast.error(
@@ -644,6 +647,7 @@ const SingleScoreCardPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
+                  setCardQuestionToEdit(null)
                   setOpenAddNewCardQuestion(true)
                 }}
                 data-testid={`open-addCardQuestion-modal`}

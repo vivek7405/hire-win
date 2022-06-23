@@ -361,6 +361,7 @@ const Step5Workflow = (props: Step5WorkflowProps) => {
             }}
           />
         </div>
+        <label className="font-medium text-xl text-neutral-600">Score Cards</label>
         <div className="w-full flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-2 lg:space-y-0 lg:space-x-2">
           {workflows
             .find((w) => w.id === selectedWorkflowId)
@@ -444,7 +445,7 @@ const Step6Form = (props: Step6FormProps) => {
   return (
     <div>
       <div className="flex flex-col space-y-6 w-full items-center">
-        <div className="w-full md:w-1/3 lg:w-1/3">
+        <div className="w-full md:w-1/2 lg:w-1/2">
           <div className="invisible w-0 h-0 overflow-hidden">
             <Step1Basic />
             <Step2Extra companyId={props.companyId} category={props.category} />
@@ -477,21 +478,22 @@ const Step6Form = (props: Step6FormProps) => {
             }}
           />
         </div>
-        <div className="w-full md:w-1/3 lg:w-1/3 bg-white min-h-screen max-h-screen border-8 border-neutral-300 rounded-3xl relative top-0">
-          <div className="w-full h-full overflow-auto rounded-3xl">
-            <ApplicationForm
-              header="Job Application Form"
-              subHeader="Preview"
-              formId={selectedFormId!}
-              preview={true}
-              onSubmit={async (values) => {
-                toast.error("Can't submit the form in preview mode")
-              }}
-              submitDisabled={true}
-              formQuestions={formQuestions}
-            />
+        <div className="w-full md:w-1/2 lg:w-1/2">
+          <div className="w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl relative top-0">
+            <div className="w-full h-full rounded-2xl">
+              <ApplicationForm
+                header="Job Application Form"
+                subHeader="Preview"
+                formId={selectedFormId!}
+                preview={true}
+                onSubmit={async (values) => {
+                  toast.error("Can't submit the form in preview mode")
+                }}
+                submitDisabled={true}
+                formQuestions={formQuestions}
+              />
+            </div>
           </div>
-          <div className="bg-neutral-300 rounded-2xl h-1 w-1/2 absolute left-1/4 bottom-2" />
         </div>
       </div>
     </div>

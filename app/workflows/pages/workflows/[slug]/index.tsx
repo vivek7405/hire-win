@@ -728,7 +728,10 @@ const SingleWorkflowPage = ({
                             data: { ...values },
                             initial: stageToEdit,
                           })
-                        : await createStageMutation({ ...values })
+                        : await addNewStageToWorkflowMutation({
+                            workflowId: workflow?.id,
+                            ...values,
+                          })
                       await invalidateQuery(getWorkflowStagesWOPagination)
                       toast.success(
                         isEdit ? "Stage updated successfully" : "Stage added successfully",

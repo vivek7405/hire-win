@@ -129,12 +129,12 @@ const Stages = () => {
           try {
             await deleteStageMutation({ id: stageToDelete?.id })
             toast.success("Stage Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setStageToDelete(null as any)
             invalidateQuery(getStages)
           } catch (error) {
             toast.error(`Deleting stage failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setStageToDelete(null as any)
         }}
       >
         Are you sure you want to delete the stage?

@@ -109,12 +109,12 @@ const EmailTemplates = ({ user }) => {
           try {
             await deleteEmailTemplateMutation(emailTemplateToDelete?.id)
             toast.success("Email Template Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setEmailTemplateToDelete(null as any)
             invalidateQuery(getEmailTemplates)
           } catch (error) {
             toast.error(`Deleting email template failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setEmailTemplateToDelete(null as any)
         }}
       >
         Are you sure you want to delete the email template?
@@ -224,7 +224,7 @@ const EmailTemplates = ({ user }) => {
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
                   <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                    0 Emails
+                    {et._count?.emails} {et._count?.emails === 1 ? "Email" : "Emails"}
                   </div>
                 </div>
               </Card>
