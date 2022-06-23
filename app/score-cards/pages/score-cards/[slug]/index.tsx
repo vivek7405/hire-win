@@ -601,9 +601,9 @@ const SingleScoreCardPage = ({
                     try {
                       isEdit
                         ? await updateCardQuestionMutation({
-                            where: { id: cardQuestionToEdit.id },
+                            where: { id: cardQuestionToEdit?.id },
                             data: { ...values },
-                            initial: cardQuestionToEdit,
+                            initial: cardQuestionToEdit!,
                           })
                         : await addNewCardQuestionToScoreCardMutation({
                             scoreCardId: scoreCard?.id,
