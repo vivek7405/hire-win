@@ -616,7 +616,7 @@ const SingleScoreCardPage = ({
                           id: toastId,
                         }
                       )
-                      setCardQuestionToEdit(null as any)
+                      setCardQuestionToEdit(null)
                       setOpenAddNewCardQuestion(false)
                     } catch (error) {
                       toast.error(
