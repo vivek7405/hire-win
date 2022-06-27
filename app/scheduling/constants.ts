@@ -1,12 +1,15 @@
+import { z } from "zod"
+import { SchedulesObj } from "./schedules/validations"
+
 export const initialSchedule = {
-  monday: { blocked: false, start: "09:00", end: "17:00" },
-  tuesday: { blocked: false, start: "09:00", end: "17:00" },
-  wednesday: { blocked: false, start: "09:00", end: "17:00" },
-  thursday: { blocked: false, start: "09:00", end: "17:00" },
-  friday: { blocked: false, start: "09:00", end: "17:00" },
-  saturday: { blocked: true, start: "09:00", end: "17:00" },
-  sunday: { blocked: true, start: "09:00", end: "17:00" },
-}
+  monday: { blocked: false, startTime: "09:00", endTime: "17:00" },
+  tuesday: { blocked: false, startTime: "09:00", endTime: "17:00" },
+  wednesday: { blocked: false, startTime: "09:00", endTime: "17:00" },
+  thursday: { blocked: false, startTime: "09:00", endTime: "17:00" },
+  friday: { blocked: false, startTime: "09:00", endTime: "17:00" },
+  saturday: { blocked: true, startTime: "09:00", endTime: "17:00" },
+  sunday: { blocked: true, startTime: "09:00", endTime: "17:00" },
+} as z.infer<typeof SchedulesObj>
 
 export const messages = {
   noName: "Please enter a name",

@@ -1,4 +1,4 @@
-import { ScheduleInput } from "../validations"
+import { isScheduleWellFormed, scheduleDays, ScheduleInput } from "../validations"
 // import { SearchableDropdown } from "app/components/SearchableDropdown"
 import getScheduleNames from "app/scheduling/schedules/queries/getScheduleNames"
 import getSchedules from "app/scheduling/schedules/queries/getSchedules"
@@ -16,55 +16,6 @@ import Form from "app/core/components/Form"
 import CheckboxField from "app/core/components/CheckboxField"
 import getSchedulesWOPagination from "../queries/getSchedulesWOPagination"
 import { initialSchedule } from "app/scheduling/constants"
-
-const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const
-type Schedules = Record<typeof days[number], { start: string; end: string }>
-
-export const isScheduleWellFormed = (schedules: Schedules) => {
-  return Object.values(schedules).every(({ start, end }) => isBefore(start, end))
-}
-
-export const isBefore = (startTime: string, endTime: string) => {
-  const start = parseTime(startTime)
-  const end = parseTime(endTime)
-
-  if (!start || !end) {
-    return false
-  }
-
-  if (start[0] === end[0]) {
-    // handle explicitly blocked dates ("00:00 - 00:00")
-    if (start[0] === 0) {
-      return start[1] === 0 && end[1] === 0
-    }
-    return start[1] < end[1]
-  }
-
-  return start[0] < end[0]
-}
-
-export const parseTime = (time: string): [start: number, end: number] | null => {
-  const parts = time.split(":")
-  if (parts.length !== 2) {
-    return null
-  }
-
-  const [hours, minutes] = parts.map((v) => parseInt(v))
-
-  if (hours && minutes) {
-    if (hours < 0 || hours > 23) {
-      return null
-    }
-
-    if (minutes < 0 || minutes > 59) {
-      return null
-    }
-
-    return [hours, minutes]
-  } else {
-    return [0, 0]
-  }
-}
 
 const AddSchedule = () => {
   const [createScheduleMutation] = useMutation(addSchedule)
@@ -110,9 +61,7 @@ const AddSchedule = () => {
       await createScheduleMutation({
         name: name,
         timezone,
-        schedule: mapValues(schedule, ({ blocked, start, end }) =>
-          blocked ? { startTime: "00:00", endTime: "00:00" } : { startTime: start, endTime: end }
-        ),
+        schedule,
       })
       // await invalidateQuery(getSchedules)
       await invalidateQuery(getScheduleNames)
@@ -134,12 +83,12 @@ const AddSchedule = () => {
           onSubmit={async (values) => {
             alert(JSON.stringify(values))
             // submit()
-          }}          
+          }}
         /> */}
         <Form
           submitText="Submit"
           // schema={AddSchedule}
-          initialValues={{}}
+          // initialValues={{}}
           onSubmit={async (values) => {
             submit()
           }}
@@ -165,12 +114,12 @@ const AddSchedule = () => {
               return { label: tz, value: tz }
             })}
           />
-          {days.map((day) => {
+          {scheduleDays.map((day) => {
             return (
               <div key={day}>
-                <label>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
+                <label className="font-medium capitalize">{day}</label>
                 <CheckboxField
-                  name="blockAllDay"
+                  name={`${day}.blocked`}
                   checked={schedule[day].blocked}
                   type="checkbox"
                   label="Not available"
@@ -178,25 +127,27 @@ const AddSchedule = () => {
                     scheduleChanged(!schedule[day].blocked, day, "blocked")
                   }}
                 />
-                <label>&nbsp;</label>
                 {!schedule[day].blocked && (
-                  <LabeledTextField
-                    name="startTime"
-                    value={schedule[day].start}
-                    onChange={(e) => {
-                      scheduleChanged(e.currentTarget.value, day, "start")
-                    }}
-                  />
-                )}
-                <label>&nbsp;</label>
-                {!schedule[day].blocked && (
-                  <LabeledTextField
-                    name="endTime"
-                    value={schedule[day].end}
-                    onChange={(e) => {
-                      scheduleChanged(e.currentTarget.value, day, "end")
-                    }}
-                  />
+                  <div className="w-full flex mt-2 space-x-2">
+                    <div className="w-full">
+                      <LabeledTextField
+                        name={`${day}.startTime`}
+                        value={schedule[day].startTime}
+                        onChange={(e) => {
+                          scheduleChanged(e.currentTarget.value, day, "startTime")
+                        }}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <LabeledTextField
+                        name={`${day}.endTime`}
+                        value={schedule[day].endTime}
+                        onChange={(e) => {
+                          scheduleChanged(e.currentTarget.value, day, "endTime")
+                        }}
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
             )

@@ -3,28 +3,39 @@ import { Form } from "app/core/components/Form"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import timezones from "../timezones"
 import CheckboxField from "app/core/components/CheckboxField"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { initialSchedule } from "app/scheduling/constants"
+import { scheduleDays, SchedulesObj } from "../validations"
+import { z } from "zod"
 // import { AddSchedule } from "app/categories/validations"
 
 type AddScheduleFormProps = {
   onSuccess?: () => void
-  initialValues?: {}
+  initialValues?: any
   onSubmit: any
   header: string
   subHeader: string
 }
 
-const initialSchedule = {
-  monday: { blocked: false, start: "09:00", end: "17:00" },
-  tuesday: { blocked: false, start: "09:00", end: "17:00" },
-  wednesday: { blocked: false, start: "09:00", end: "17:00" },
-  thursday: { blocked: false, start: "09:00", end: "17:00" },
-  friday: { blocked: false, start: "09:00", end: "17:00" },
-  saturday: { blocked: true, start: "09:00", end: "17:00" },
-  sunday: { blocked: true, start: "09:00", end: "17:00" },
-}
-
 export const AddScheduleForm = (props: AddScheduleFormProps) => {
+  // const scheduleChanged = (value: any, day: string, type: string) => {
+  //   setSchedule({
+  //     ...schedule,
+  //     [day]: { ...schedule[day], [type]: value },
+  //   })
+  // }
+
+  // const days = [
+  //   "monday",
+  //   "tuesday",
+  //   "wednesday",
+  //   "thursday",
+  //   "friday",
+  //   "saturday",
+  //   "sunday",
+  // ] as const
+
+  const [schedule, setSchedule] = useState(props.initialValues || initialSchedule)
   const scheduleChanged = (value: any, day: string, type: string) => {
     setSchedule({
       ...schedule,
@@ -32,22 +43,16 @@ export const AddScheduleForm = (props: AddScheduleFormProps) => {
     })
   }
 
-  const [schedule, setSchedule] = useState(initialSchedule)
-  const days = [
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-    "sunday",
-  ] as const
-
   return (
     <>
       <Form
         submitText="Submit"
-        // schema={AddSchedule}
+        schema={SchedulesObj.merge(
+          z.object({
+            name: z.string().nonempty({ message: "Required" }),
+            timezone: z.string().optional(),
+          })
+        )}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
         testid="addScheduleForm"
@@ -67,42 +72,46 @@ export const AddScheduleForm = (props: AddScheduleFormProps) => {
         <LabeledReactSelectField
           name="timezone"
           placeholder="Change time zone"
+          defaultValue={Intl.DateTimeFormat().resolvedOptions().timeZone}
           options={timezones.map((tz) => {
             return { label: tz, value: tz }
           })}
         />
-        {days.map((day) => {
+        {scheduleDays.map((day) => {
           return (
             <div key={day}>
-              <label>{day.charAt(0).toUpperCase() + day.slice(1)}</label>
+              <label className="font-medium capitalize">{day}</label>
               <CheckboxField
-                name="blockAllDay"
-                checked={schedule[day].blocked}
+                name={`${day}.blocked`}
                 type="checkbox"
                 label="Not available"
-                onChange={(e: any): void => {
-                  scheduleChanged(!schedule[day].blocked, day, "blocked")
+                // checked={schedule[day]?.blocked}
+                onChange={(checked) => {
+                  scheduleChanged(checked, day, "blocked")
                 }}
+                defaultValue={schedule[day]?.blocked}
               />
-              <label>&nbsp;</label>
-              {!schedule[day].blocked && (
-                <LabeledTextField
-                  name="startTime"
-                  value={schedule[day].start}
-                  onChange={(e) => {
-                    scheduleChanged(e.currentTarget.value, day, "start")
-                  }}
-                />
-              )}
-              <label>&nbsp;</label>
-              {!schedule[day].blocked && (
-                <LabeledTextField
-                  name="endTime"
-                  value={schedule[day].end}
-                  onChange={(e) => {
-                    scheduleChanged(e.currentTarget.value, day, "end")
-                  }}
-                />
+              {!schedule[day]?.blocked && (
+                <div className="w-full flex mt-2 space-x-2">
+                  <div className="w-full">
+                    <LabeledTextField
+                      name={`${day}.startTime`}
+                      // value={schedule[day].startTime}
+                      // onChange={(e) => {
+                      //   scheduleChanged(e.currentTarget.value, day, "startTime")
+                      // }}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <LabeledTextField
+                      name={`${day}.endTime`}
+                      // value={schedule[day].endTime}
+                      // onChange={(e) => {
+                      //   scheduleChanged(e.currentTarget.value, day, "endTime")
+                      // }}
+                    />
+                  </div>
+                </div>
               )}
             </div>
           )

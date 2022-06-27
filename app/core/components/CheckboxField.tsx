@@ -1,5 +1,5 @@
 import { forwardRef, PropsWithoutRef, useMemo } from "react"
-import { useFormContext } from "react-hook-form"
+import { Controller, useFormContext } from "react-hook-form"
 import toast from "react-hot-toast"
 
 export interface CheckboxFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
@@ -7,12 +7,14 @@ export interface CheckboxFieldProps extends PropsWithoutRef<JSX.IntrinsicElement
   label: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
+  onChange?: any
 }
 
 export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
   ({ label, outerProps, name, ...props }, ref) => {
     const {
       register,
+      control,
       formState: { isSubmitting, errors },
     } = useFormContext()
 
@@ -30,7 +32,7 @@ export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
     return (
       <div {...outerProps}>
         <div className="mt-1 flex pt-2">
-          <input
+          {/* <input
             id={name}
             type="checkbox"
             disabled={isSubmitting}
@@ -38,6 +40,30 @@ export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
             {...props}
             data-testid={`${props.testid && `${props.testid}-`}input`}
             className="align-middle text-theme-600 border border-gray-300 px-2 py-2 block sm:text-sm rounded focus:ring-theme-500"
+          /> */}
+          <Controller
+            name={name}
+            control={control}
+            defaultValue={props.defaultValue || false}
+            render={({ field: { onChange, value } }) => {
+              return (
+                <input
+                  id={name}
+                  type="checkbox"
+                  disabled={props.disabled || isSubmitting}
+                  // {...register(`${name}` as const)}
+                  {...props}
+                  data-testid={`${props.testid && `${props.testid}-`}input`}
+                  className="align-middle text-theme-600 border border-gray-300 px-2 py-2 block sm:text-sm rounded focus:ring-theme-500"
+                  onChange={(e) => {
+                    onChange(e)
+                    props.onChange && props.onChange(e.currentTarget.checked)
+                  }}
+                  checked={!!value || false}
+                  value={value}
+                />
+              )
+            }}
           />
           <label
             htmlFor={name}

@@ -1,15 +1,28 @@
 import { TrashIcon } from "@heroicons/react/outline"
-import { Schedule } from "@prisma/client"
+import { DailySchedule, Schedule } from "@prisma/client"
 import Card from "app/core/components/Card"
 import Confirm from "app/core/components/Confirm"
 import Modal from "app/core/components/Modal"
 import Debouncer from "app/core/utils/debouncer"
+import { initialSchedule } from "app/scheduling/constants"
 import { invalidateQuery, useMutation, useQuery, useRouter } from "blitz"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
+import addSchedule from "../mutations/addSchedule"
 import deleteSchedule from "../mutations/deleteSchedule"
+import getScheduleNames from "../queries/getScheduleNames"
 import getSchedulesWOPagination from "../queries/getSchedulesWOPagination"
+import {
+  isScheduleWellFormed,
+  scheduleDays,
+  ScheduleInput,
+  ScheduleInputType,
+  SchedulesObj,
+} from "../validations"
+import AddScheduleForm from "./AddScheduleForm"
 import AddScheduleModal from "./AddScheduleModal"
+import { z } from "zod"
+import updateSchedule from "../mutations/updateSchedule"
 
 const Schedules = ({ user }) => {
   // const [schedules] = useQuery(getSchedules, null)
@@ -22,6 +35,9 @@ const Schedules = ({ user }) => {
   const [scheduleToDelete, setScheduleToDelete] = useState(null as any as Schedule)
   const router = useRouter()
   const [query, setQuery] = useState({})
+  const [openAddSchedule, setOpenAddSchedule] = useState(false)
+  const [addScheduleMutation] = useMutation(addSchedule)
+  const [updateScheduleMutation] = useMutation(updateSchedule)
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -73,6 +89,28 @@ const Schedules = ({ user }) => {
     }
   }
 
+  const [scheduleToEdit, setScheduleToEdit] = useState(
+    null as (Schedule & { dailySchedules: DailySchedule[] }) | null
+  )
+
+  const getFormDailyScheduleFromDBObj = (
+    schedule: Schedule & { dailySchedules: DailySchedule[] }
+  ) => {
+    let dailySchedule = {}
+    scheduleDays.forEach((day) => {
+      const daySchedule = schedule?.dailySchedules?.find((sch) => sch.day === day)
+      dailySchedule = {
+        ...dailySchedule,
+        [day]: {
+          startTime: daySchedule?.startTime,
+          endTime: daySchedule?.endTime,
+          blocked: daySchedule?.startTime === daySchedule?.endTime,
+        },
+      }
+    })
+    return dailySchedule
+  }
+
   return (
     <>
       <Modal header="Schedule Details" open={detailsModalVisible} setOpen={setDetailsModalVisible}>
@@ -87,7 +125,7 @@ const Schedules = ({ user }) => {
           {selectedScheduleForDetails?.dailySchedules?.map((dailySchedule) => {
             return (
               <div key={dailySchedule.day} className="mt-4">
-                <b>{dailySchedule.day.charAt(0).toUpperCase() + dailySchedule.day.slice(1)}</b>
+                <b className="capitalize">{dailySchedule.day}</b>
                 <br />
                 {dailySchedule.startTime === dailySchedule.endTime
                   ? "Not available"
@@ -96,6 +134,82 @@ const Schedules = ({ user }) => {
             )
           })}
         </div>
+      </Modal>
+
+      <Modal
+        header={`${scheduleToEdit ? "Edit" : "Add a new"} Schedule`}
+        open={openAddSchedule}
+        setOpen={setOpenAddSchedule}
+      >
+        <AddScheduleForm
+          header={`${scheduleToEdit ? "Edit" : "Add a new"} Schedule`}
+          subHeader=""
+          initialValues={
+            scheduleToEdit
+              ? {
+                  name: scheduleToEdit.name,
+                  timezone: scheduleToEdit.timezone,
+                  ...getFormDailyScheduleFromDBObj(scheduleToEdit),
+                }
+              : { name: "", ...initialSchedule }
+          }
+          onSubmit={async (values) => {
+            const toastId = toast.loading(`${scheduleToEdit ? "Updating" : "Creating"} Schedule`)
+
+            const name = values.name
+            const timezone = values.timezone
+            const schedule = (({
+              monday,
+              tuesday,
+              wednesday,
+              thursday,
+              friday,
+              saturday,
+              sunday,
+            }) => ({
+              monday,
+              tuesday,
+              wednesday,
+              thursday,
+              friday,
+              saturday,
+              sunday,
+            }))(values) as z.infer<typeof SchedulesObj>
+
+            const inputObj = {
+              name,
+              timezone,
+              schedule,
+            } as ScheduleInputType
+
+            if (!isScheduleWellFormed(schedule)) {
+              toast.error(
+                "Please check the entered times and its format of hour:minutes, e.g. 09:30",
+                { id: toastId }
+              )
+              return
+            }
+
+            // alert(JSON.stringify(inputObj))
+
+            try {
+              scheduleToEdit
+                ? await updateScheduleMutation({ ...inputObj, id: scheduleToEdit.id })
+                : await addScheduleMutation(inputObj)
+              await invalidateQuery(getScheduleNames)
+              await invalidateQuery(getSchedulesWOPagination)
+              toast.success(`Schedule ${scheduleToEdit ? "updated" : "created"} successfully`, {
+                id: toastId,
+              })
+            } catch (error) {
+              toast.error(`Something went wrong - ${error.message}`, {
+                id: toastId,
+              })
+            }
+
+            setOpenAddSchedule(false)
+          }}
+        />
       </Modal>
 
       <Confirm
@@ -128,7 +242,17 @@ const Schedules = ({ user }) => {
           }}
         />
         <div className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
-          <AddScheduleModal />
+          {/* <AddScheduleModal /> */}
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              setScheduleToEdit(null)
+              setOpenAddSchedule(true)
+            }}
+            className="whitespace-nowrap"
+          >
+            New Schedule
+          </button>
         </div>
       </div>
 
@@ -141,8 +265,10 @@ const Schedules = ({ user }) => {
                   <a
                     className="cursor-pointer text-theme-600 hover:text-theme-800"
                     onClick={() => {
-                      setSelectedScheduleForDetails(s)
-                      setDetailsModalVisible(true)
+                      // setSelectedScheduleForDetails(s)
+                      // setDetailsModalVisible(true)
+                      setScheduleToEdit(s)
+                      setOpenAddSchedule(true)
                     }}
                   >
                     {s.name}
@@ -190,8 +316,8 @@ const Schedules = ({ user }) => {
                       key={ds.id}
                       className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
                     >
-                      <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                        {ds.day.charAt(0).toUpperCase() + ds.day.slice(1)}
+                      <div className="capitalize overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                        {ds.day}
                         <br />
                         {ds.startTime === ds.endTime
                           ? "Not available"
