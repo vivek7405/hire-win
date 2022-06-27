@@ -23,7 +23,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
-import getCandidate from "app/jobs/queries/getCandidate"
+import getCandidate from "app/candidates/queries/getCandidate"
 import {
   AttachmentObject,
   CardType,
@@ -54,7 +54,7 @@ import toast from "react-hot-toast"
 import { titleCase } from "app/core/utils/titleCase"
 import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
-import updateCandidateScores from "app/jobs/mutations/updateCandidateScores"
+import updateCandidateScores from "app/candidates/mutations/updateCandidateScores"
 import linkScoreCardWithJobWorkflowStage from "app/jobs/mutations/linkScoreCardWithJobWorkflowStage"
 import Modal from "app/core/components/Modal"
 import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInterview"
@@ -77,12 +77,12 @@ import Emails from "app/emails/components/Emails"
 import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
 import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
-import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
-import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
+import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
+import updateCandidateStage from "app/candidates/mutations/updateCandidateStage"
 import getJobMembers from "app/jobs/queries/getJobMembers"
-import getCandidateWorkflowStageInterviewer from "app/jobs/queries/getCandidateWorkflowStageInterviewer"
-import setCandidateInterviewer from "app/jobs/mutations/setCandidateInterviewer"
-import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
+import getCandidateWorkflowStageInterviewer from "app/candidates/queries/getCandidateWorkflowStageInterviewer"
+import setCandidateInterviewer from "app/candidates/mutations/setCandidateInterviewer"
+import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

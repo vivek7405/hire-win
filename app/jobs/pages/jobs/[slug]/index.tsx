@@ -22,7 +22,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import Table from "app/core/components/Table"
-import getCandidates from "app/jobs/queries/getCandidates"
+import getCandidates from "app/candidates/queries/getCandidates"
 import {
   AttachmentObject,
   ExtendedAnswer,
@@ -40,8 +40,8 @@ import Form from "app/core/components/Form"
 import LabeledSelectField from "app/core/components/LabeledSelectField"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import toast from "react-hot-toast"
-import updateCandidate from "app/jobs/mutations/updateCandidate"
-import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
+import updateCandidate from "app/candidates/mutations/updateCandidate"
+import updateCandidateStage from "app/candidates/mutations/updateCandidateStage"
 import * as ToggleSwitch from "@radix-ui/react-switch"
 import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
 import Debouncer from "app/core/utils/debouncer"
@@ -49,12 +49,12 @@ import Pagination from "app/core/components/Pagination"
 import KanbanBoard from "app/core/components/KanbanBoard"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
-import canCreateNewCandidate from "app/jobs/queries/canCreateNewCandidate"
+import canCreateNewCandidate from "app/candidates/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import { ArrowRightIcon, BanIcon, RefreshIcon } from "@heroicons/react/outline"
-import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
+import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

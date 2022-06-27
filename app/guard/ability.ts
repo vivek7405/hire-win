@@ -1,7 +1,6 @@
 import db, { CompanyUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "app/users/utils/checkPlan"
-import { Candidate } from "app/jobs/validations"
 import moment from "moment"
 
 type ExtendedResourceTypes =

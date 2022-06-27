@@ -11,7 +11,7 @@ import getCalendar from "../queries/getCalendar"
 import { sendInterviewConfirmationMailer } from "mailers/sendInterviewConfirmationMailer"
 import moment from "moment"
 import bcrypt from "bcrypt"
-import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
+import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
 import { InterviewDetailType } from "types"
 import getScheduleCalendar from "../queries/getScheduleCalendar"
 

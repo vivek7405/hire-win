@@ -1,6 +1,6 @@
 import { AuthenticationError, Ctx } from "blitz"
 import db, { Prisma } from "db"
-import { Candidate } from "app/jobs/validations"
+import { Candidate } from "app/candidates/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
 import { ExtendedCandidate } from "types"

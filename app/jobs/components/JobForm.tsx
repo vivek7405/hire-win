@@ -1,9 +1,9 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
+import { Job } from "app/jobs/validations"
 import {
-  Job,
   ScoreCardJobWorkflowStageObj,
   ScoreCardJobWorkflowStageObjInputType,
-} from "app/jobs/validations"
+} from "app/score-cards/validations"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { useQuery } from "blitz"
 import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
@@ -24,7 +24,7 @@ import { Country, State, City } from "country-state-city"
 import CheckboxField from "app/core/components/CheckboxField"
 import { titleCase } from "app/core/utils/titleCase"
 import LabeledTextValidatedField from "app/core/components/LabeledTextValidatedField"
-import ApplicationForm from "./ApplicationForm"
+import ApplicationForm from "../../candidates/components/ApplicationForm"
 import toast from "react-hot-toast"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import MultiStepForm from "app/core/components/MultiStepForm"

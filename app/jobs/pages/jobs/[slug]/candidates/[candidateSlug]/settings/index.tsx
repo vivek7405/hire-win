@@ -18,10 +18,10 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "app/guard/ability"
 
-import ApplicationForm from "app/jobs/components/ApplicationForm"
+import ApplicationForm from "app/candidates/components/ApplicationForm"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import updateCandidate from "app/jobs/mutations/updateCandidate"
-import getCandidate from "app/jobs/queries/getCandidate"
+import updateCandidate from "app/candidates/mutations/updateCandidate"
+import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, ExtendedAnswer } from "types"
 import { QuestionType } from "@prisma/client"
 

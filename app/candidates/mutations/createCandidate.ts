@@ -1,6 +1,6 @@
 import { Ctx, resolver } from "blitz"
 import db from "db"
-import { Candidate, CandidateInputType } from "app/jobs/validations"
+import { Candidate, CandidateInputType } from "app/candidates/validations"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import Guard from "app/guard/ability"
