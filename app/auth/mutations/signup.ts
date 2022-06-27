@@ -95,11 +95,7 @@ export default async function signup(
     {
       name: "Default",
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      schedule: mapValues(initialSchedule, ({ blocked, start, end }) =>
-        blocked
-          ? { startTime: "00:00", endTime: "00:00" }
-          : { startTime: "09:00", endTime: "17:00" }
-      ),
+      schedule: initialSchedule,
       factory: true,
     },
     ctx
