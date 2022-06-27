@@ -19,7 +19,7 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
 import Table from "app/core/components/Table"
-import getCandidates from "app/jobs/queries/getCandidates"
+import getCandidates from "app/candidates/queries/getCandidates"
 import {
   AttachmentObject,
   ExtendedAnswer,

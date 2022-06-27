@@ -23,3 +23,20 @@ export const ScoreCardQuestions = z.object({
   cardQuestionIds: z.string().array(),
 })
 export type ScoreCardQuestionsInputType = z.infer<typeof ScoreCardQuestions>
+
+export const Score = z.object({
+  id: z.string().nullable().optional(),
+  rating: z.number(),
+  note: z.string().nullable().optional(),
+  scoreCardQuestionId: z.string(),
+  workflowStageId: z.string(),
+})
+export type ScoreInputType = z.infer<typeof Score>
+
+export const ScoreCardJobWorkflowStageObj = z.object({
+  id: z.string().nullable().optional(),
+  scoreCardId: z.string(),
+  jobId: z.string().optional(),
+  workflowStageId: z.string(),
+})
+export type ScoreCardJobWorkflowStageObjInputType = z.infer<typeof ScoreCardJobWorkflowStageObj>

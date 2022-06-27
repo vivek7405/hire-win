@@ -23,7 +23,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
-import getCandidate from "app/jobs/queries/getCandidate"
+import getCandidate from "app/candidates/queries/getCandidate"
 import {
   AttachmentObject,
   CardType,
@@ -54,7 +54,7 @@ import toast from "react-hot-toast"
 import { titleCase } from "app/core/utils/titleCase"
 import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
-import updateCandidateScores from "app/jobs/mutations/updateCandidateScores"
+import updateCandidateScores from "app/candidates/mutations/updateCandidateScores"
 import linkScoreCardWithJobWorkflowStage from "app/jobs/mutations/linkScoreCardWithJobWorkflowStage"
 import Modal from "app/core/components/Modal"
 import ScheduleInterview from "app/scheduling/interviews/components/ScheduleInterview"
@@ -77,12 +77,15 @@ import Emails from "app/emails/components/Emails"
 import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
 import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
-import setCandidateRejected from "app/jobs/mutations/setCandidateRejected"
-import updateCandidateStage from "app/jobs/mutations/updateCandidateStage"
+import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
+import updateCandidateStage from "app/candidates/mutations/updateCandidateStage"
 import getJobMembers from "app/jobs/queries/getJobMembers"
-import getCandidateWorkflowStageInterviewer from "app/jobs/queries/getCandidateWorkflowStageInterviewer"
-import setCandidateInterviewer from "app/jobs/mutations/setCandidateInterviewer"
-import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
+import getCandidateWorkflowStageInterviewer from "app/candidates/queries/getCandidateWorkflowStageInterviewer"
+import setCandidateInterviewer from "app/candidates/mutations/setCandidateInterviewer"
+import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
+import ApplicationForm from "app/candidates/components/ApplicationForm"
+import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
+import updateCandidate from "app/candidates/mutations/updateCandidate"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -318,6 +321,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     setCards(getCards(candidate!))
   }, [candidate])
 
+  const router = useRouter()
   const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
@@ -345,8 +349,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   const [openCandidateMoveConfirm, setOpenCandidateMoveConfirm] = useState(false)
   const [candidateToMove, setCandidateToMove] = useState(null as any)
   const [moveToWorkflowStage, setMoveToWorkflowStage] = useState(null as any)
+  const [openEditModal, setOpenEditModal] = useState(false)
 
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
+  const [updateCandidateMutation] = useMutation(updateCandidate)
 
   // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
   //   where: { candidateId: candidate.id, workflowStageId: selectedWorkflowStage?.id },
@@ -437,6 +443,59 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
   return (
     <AuthLayout user={user}>
+      <Modal header="Update Candidate" open={openEditModal} setOpen={setOpenEditModal}>
+        <Suspense fallback="Loading...">
+          <ApplicationForm
+            header="Update Candidate"
+            subHeader=""
+            formId={candidate?.job?.formId || ""}
+            preview={false}
+            initialValues={getCandidateInitialValues(candidate)}
+            onSubmit={async (values) => {
+              const toastId = toast.loading(`Updating Candidate`)
+              try {
+                const updatedCandidate = await updateCandidateMutation({
+                  where: { id: candidate?.id },
+                  initial: candidate as any,
+                  data: {
+                    id: candidate?.id,
+                    jobId: candidate?.job?.id,
+                    name: values.Name,
+                    email: values.Email,
+                    resume: values.Resume,
+                    source: candidate?.source,
+                    answers:
+                      (candidate?.job?.form?.questions?.map((fq) => {
+                        const val = values[fq.question?.name] || ""
+                        return {
+                          questionId: fq.questionId,
+                          value: typeof val === "string" ? val : JSON.stringify(val),
+                        }
+                      }) as any) || ([] as any),
+                  },
+                })
+                toast.success(`Candidate updated`, { id: toastId })
+                if (updatedCandidate?.slug === candidate?.slug) {
+                  await invalidateQuery(getCandidate)
+                  setOpenEditModal(false)
+                } else {
+                  setOpenEditModal(false)
+                  router.replace(
+                    Routes.SingleCandidatePage({
+                      slug: candidate?.job?.slug,
+                      candidateSlug: updatedCandidate?.slug,
+                    })
+                  )
+                }
+              } catch (error) {
+                toast.error("Something went wrong - " + error.toString(), { id: toastId })
+                setOpenEditModal(false)
+              }
+            }}
+          />
+        </Suspense>
+      </Modal>
+
       <Confirm
         open={openCandidateRejectConfirm}
         setOpen={setOpenCandidateRejectConfirm}
@@ -660,25 +719,40 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
       </div>
 
       {canUpdate && (
-        <Link
-          href={Routes.CandidateSettingsPage({
-            slug: candidate?.job?.slug!,
-            candidateSlug: candidate?.slug!,
-          })}
-          passHref
+        <button
+          title="Edit Details"
+          className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+          }
+          data-testid={`${candidate?.id}-settingsLink`}
+          onClick={(e) => {
+            e.preventDefault()
+            setOpenEditModal(true)
+          }}
         >
-          <button
-            title="Edit Details"
-            className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
-            }
-            data-testid={`${candidate?.id}-settingsLink`}
-          >
-            <PencilAltIcon className="h-6 w-6" />
-          </button>
-        </Link>
+          <PencilAltIcon className="h-6 w-6" />
+        </button>
+        // <Link
+        //   href={Routes.CandidateSettingsPage({
+        //     slug: candidate?.job?.slug!,
+        //     candidateSlug: candidate?.slug!,
+        //   })}
+        //   passHref
+        // >
+        //   <button
+        //     title="Edit Details"
+        //     className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        //     disabled={
+        //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
+        //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+        //     }
+        //     data-testid={`${candidate?.id}-settingsLink`}
+        //   >
+        //     <PencilAltIcon className="h-6 w-6" />
+        //   </button>
+        // </Link>
       )}
 
       <button

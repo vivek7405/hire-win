@@ -17,7 +17,7 @@ import getEmailTemplates from "app/email-templates/queries/getEmailTemplates"
 import { EmailTemplatePlaceholders } from "types"
 import getInterviewDetail from "app/scheduling/interviews/queries/getInterviewDetail"
 import { JsonValue } from "aws-sdk/clients/glue"
-import getCandidateInterviewDetail from "app/jobs/queries/getCandidateInterviewDetail"
+import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
 
 interface ETValues {
   [key: string]: string

@@ -20,3 +20,10 @@ export const QuestionObj = z.object({
   factory: z.boolean().optional(),
 })
 export type QuestionInputType = z.infer<typeof QuestionObj>
+
+export const Answer = z.object({
+  id: z.string().optional(),
+  value: z.string(),
+  questionId: z.string().optional(),
+})
+export type AnswerInputType = z.infer<typeof Answer>

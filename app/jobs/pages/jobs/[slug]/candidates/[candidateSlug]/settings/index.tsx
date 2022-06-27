@@ -18,12 +18,13 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "app/guard/ability"
 
-import ApplicationForm from "app/jobs/components/ApplicationForm"
+import ApplicationForm from "app/candidates/components/ApplicationForm"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import updateCandidate from "app/jobs/mutations/updateCandidate"
-import getCandidate from "app/jobs/queries/getCandidate"
+import updateCandidate from "app/candidates/mutations/updateCandidate"
+import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, ExtendedAnswer } from "types"
 import { QuestionType } from "@prisma/client"
+import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -111,40 +112,6 @@ const CandidateSettingsPage = ({
   const router = useRouter()
   const [updateCandidateMutation] = useMutation(updateCandidate)
 
-  function getInitialValues() {
-    const initialValues: any = {}
-
-    candidate?.answers?.forEach((answer) => {
-      if (answer) {
-        const val = answer.value
-        const type = answer?.question?.type
-
-        switch (type) {
-          case QuestionType.Multiple_select:
-            const selectedOptionIds: String[] = JSON.parse(val)
-            initialValues[answer?.question?.name] = selectedOptionIds
-            break
-          case QuestionType.Attachment:
-            const attachmentObj: AttachmentObject = JSON.parse(val)
-            initialValues[answer?.question?.name] = attachmentObj
-            break
-          case QuestionType.Checkbox:
-            const isChecked: boolean = val === "true"
-            initialValues[answer?.question?.name] = isChecked
-            break
-          case QuestionType.Rating:
-            initialValues[answer?.question?.name] = val ? parseInt(val) : 0
-            break
-          default:
-            initialValues[answer?.question?.name] = val
-            break
-        }
-      }
-    })
-
-    return initialValues
-  }
-
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -157,7 +124,7 @@ const CandidateSettingsPage = ({
         preview={false}
         header="Candidate Details"
         subHeader="Update candidate details"
-        initialValues={getInitialValues()}
+        initialValues={getCandidateInitialValues(candidate as any)}
         onSubmit={async (values) => {
           const toastId = toast.loading(() => <span>Updating Candidate</span>)
           try {

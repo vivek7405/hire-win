@@ -24,8 +24,8 @@ import updateJob from "app/jobs/mutations/updateJob"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
-import ApplicationForm from "app/jobs/components/ApplicationForm"
-import createCandidate from "app/jobs/mutations/createCandidate"
+import ApplicationForm from "app/candidates/components/ApplicationForm"
+import createCandidate from "app/candidates/mutations/createCandidate"
 import { CandidateSource } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {

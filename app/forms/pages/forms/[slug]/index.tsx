@@ -35,7 +35,7 @@ import { CardType, DragDirection, ExtendedFormQuestion, ShiftDirection } from "t
 import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
-import ApplicationForm from "app/jobs/components/ApplicationForm"
+import ApplicationForm from "app/candidates/components/ApplicationForm"
 import { FormQuestionBehaviour, Question, QuestionOption, QuestionType } from "@prisma/client"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
