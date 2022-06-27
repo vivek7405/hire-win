@@ -33,7 +33,16 @@ import {
   CardType,
   KanbanColumnType,
 } from "types"
-import { QuestionType } from "@prisma/client"
+import {
+  Answer,
+  Candidate,
+  CandidateSource,
+  Form as FormDB,
+  FormQuestion,
+  Job,
+  Question,
+  QuestionType,
+} from "@prisma/client"
 import Skeleton from "react-loading-skeleton"
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
 import Form from "app/core/components/Form"
@@ -53,8 +62,12 @@ import canCreateNewCandidate from "app/candidates/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
-import { ArrowRightIcon, BanIcon, RefreshIcon } from "@heroicons/react/outline"
+import { ArrowRightIcon, BanIcon, PencilIcon, RefreshIcon } from "@heroicons/react/outline"
 import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
+import Modal from "app/core/components/Modal"
+import ApplicationForm from "app/candidates/components/ApplicationForm"
+import createCandidate from "app/candidates/mutations/createCandidate"
+import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -153,7 +166,9 @@ const getBoard = (
   setOpenCandidateRejectConfirm,
   setCandidateToMove,
   setOpenCandidateMoveConfirm,
-  enableDrag
+  enableDrag,
+  setCandidateToEdit,
+  setOpenModal
 ) => {
   return {
     columns: job?.workflow?.stages
@@ -219,6 +234,20 @@ const getBoard = (
                       <div className="flex items-center space-x-2">
                         <span title="Reject">
                           <button
+                            className="float-right text-theme-600 hover:text-theme-800"
+                            title={"Edit Candidate"}
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setCandidateToEdit(c)
+                              setOpenModal(true)
+                            }}
+                          >
+                            <PencilIcon className="w-5 h-5" />
+                          </button>
+                        </span>
+                        <span title="Reject">
+                          <button
                             className="float-right text-red-600 hover:text-red-800"
                             title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
                             type="button"
@@ -267,6 +296,8 @@ type CandidateProps = {
   isKanban: boolean
   viewRejected: boolean
   enableDrag: boolean
+  setCandidateToEdit: any
+  setOpenModal: any
 }
 const Candidates = (props: CandidateProps) => {
   const ITEMS_PER_PAGE = 25
@@ -503,7 +534,9 @@ const Candidates = (props: CandidateProps) => {
       setOpenCandidateRejectConfirm,
       setCandidateToMove,
       setOpenCandidateMoveConfirm,
-      props.enableDrag
+      props.enableDrag,
+      props.setCandidateToEdit,
+      props.setOpenModal
     ) as KanbanBoardType
   )
   useEffect(() => {
@@ -516,7 +549,9 @@ const Candidates = (props: CandidateProps) => {
         setOpenCandidateRejectConfirm,
         setCandidateToMove,
         setOpenCandidateMoveConfirm,
-        props.enableDrag
+        props.enableDrag,
+        props.setCandidateToEdit,
+        props.setOpenModal
       )
     )
   }, [
@@ -526,6 +561,8 @@ const Candidates = (props: CandidateProps) => {
     setCandidateToReject,
     setOpenCandidateRejectConfirm,
     props.enableDrag,
+    props.setCandidateToEdit,
+    props.setOpenModal,
   ])
 
   const updateCandidateStg = async (candidate, selectedWorkflowStageId) => {
@@ -715,6 +752,20 @@ const SingleJobPage = ({
   const router = useRouter()
   const [viewRejected, setViewRejected] = useState(false)
   const [enableDrag, setEnableDrag] = useState(false)
+  const [candidateToEdit, setCandidateToEdit] = useState(
+    null as
+      | (Candidate & {
+          job: Job & {
+            form: FormDB & { questions: (FormQuestion & { question: Question })[] }
+          }
+        } & {
+          answers: (Answer & { question: Question })[]
+        })
+      | null
+  )
+  const [openModal, setOpenModal] = useState(false)
+  const [createCandidateMutation] = useMutation(createCandidate)
+  const [updateCandidateMutation] = useMutation(updateCandidate)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -734,13 +785,76 @@ const SingleJobPage = ({
         add unlimited jobs and candidates.
       </Confirm>
 
+      <Modal
+        header={`${candidateToEdit ? "Update" : "Create"} Candidate`}
+        open={openModal}
+        setOpen={setOpenModal}
+      >
+        <ApplicationForm
+          header={`${candidateToEdit ? "Update" : "Create"} Candidate`}
+          subHeader=""
+          formId={job?.formId || ""}
+          preview={false}
+          initialValues={candidateToEdit ? getCandidateInitialValues(candidateToEdit) : {}}
+          onSubmit={async (values) => {
+            const toastId = toast.loading(`${candidateToEdit ? "Updating" : "Creating"} Candidate`)
+            try {
+              candidateToEdit
+                ? await updateCandidateMutation({
+                    where: { id: candidateToEdit?.id },
+                    initial: candidateToEdit as any,
+                    data: {
+                      id: candidateToEdit?.id,
+                      jobId: candidateToEdit?.job?.id,
+                      name: values.Name,
+                      email: values.Email,
+                      resume: values.Resume,
+                      source: candidateToEdit?.source,
+                      answers:
+                        (candidateToEdit?.job?.form?.questions?.map((fq) => {
+                          const val = values[fq.question?.name] || ""
+                          return {
+                            questionId: fq.questionId,
+                            value: typeof val === "string" ? val : JSON.stringify(val),
+                          }
+                        }) as any) || ([] as any),
+                    },
+                  })
+                : await createCandidateMutation({
+                    jobId: job?.id,
+                    name: values.Name,
+                    email: values.Email,
+                    resume: values.Resume,
+                    source: CandidateSource.Manual,
+                    answers:
+                      job?.form?.questions?.map((fq) => {
+                        const val = values[fq.question?.name] || ""
+                        return {
+                          questionId: fq.questionId,
+                          value: typeof val === "string" ? val : JSON.stringify(val),
+                        }
+                      }) || [],
+                  })
+              toast.success(`Candidate ${candidateToEdit ? "updated" : "created"}`, { id: toastId })
+              invalidateQuery(getCandidates)
+            } catch (error) {
+              toast.error("Something went wrong - " + error.toString(), { id: toastId })
+            }
+            setOpenModal(false)
+          }}
+        />
+      </Modal>
+
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
       <button
         className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3"
-        onClick={() => {
+        onClick={(e) => {
           if (canCreateCandidate) {
-            router.push(Routes.NewCandidate({ slug: job?.slug! }))
+            // router.push(Routes.NewCandidate({ slug: job?.slug! }))
+            e.preventDefault()
+            setCandidateToEdit(null as any)
+            setOpenModal(true)
           } else {
             setOpenConfirm(true)
           }
@@ -852,6 +966,8 @@ const SingleJobPage = ({
           isKanban={isKanban}
           viewRejected={viewRejected}
           enableDrag={enableDrag}
+          setCandidateToEdit={setCandidateToEdit}
+          setOpenModal={setOpenModal}
         />
       </Suspense>
     </AuthLayout>
