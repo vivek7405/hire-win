@@ -10,10 +10,11 @@ export interface LabeledReactSelectFieldProps
   placeholder?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
-  options: { label: string; value?: string }[]
+  options: { label: string; value?: string; color?: string }[]
   disabled?: boolean
   defaultValue?: any
   isMulti?: boolean
+  isColored?: boolean
 }
 
 export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReactSelectFieldProps>(
@@ -34,6 +35,21 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
           id: errors[name],
         })
     }, [errors, name])
+
+    const colorRect = (color = "transparent") => ({
+      alignItems: "center",
+      display: "flex",
+
+      ":before": {
+        backgroundColor: color,
+        borderRadius: 3,
+        content: '" "',
+        display: "block",
+        marginRight: 8,
+        height: 20,
+        width: 50,
+      },
+    })
 
     return (
       <div {...outerProps}>
@@ -87,12 +103,33 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
                   //   options.find(option => option.value === defaultValue)}
                   isMulti={props.isMulti}
                   styles={{
-                    input: (base) => ({
-                      ...base,
-                      "input:focus": {
-                        boxShadow: "none !important",
-                      },
-                    }),
+                    // input: (base) => ({
+                    //   ...base,
+                    //   "input:focus": {
+                    //     boxShadow: "none !important",
+                    //   },
+                    // }),
+                    placeholder: (styles) =>
+                      props.isColored ? { ...styles, ...colorRect("#ccc") } : { ...styles },
+                    singleValue: (styles, state) =>
+                      state.data.color
+                        ? { ...styles, ...colorRect(state.data.color) }
+                        : { ...styles },
+                    input: (styles) =>
+                      props.isColored
+                        ? {
+                            ...styles,
+                            ...colorRect(),
+                            "input:focus": {
+                              boxShadow: "none !important",
+                            },
+                          }
+                        : {
+                            ...styles,
+                            "input:focus": {
+                              boxShadow: "none !important",
+                            },
+                          },
                     control: (base, state) => ({
                       ...base,
                       borderWidth: state.isFocused ? "2px" : "1px",
@@ -108,10 +145,17 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
                       backgroundColor: state.isDisabled
                         ? undefined
                         : state.isSelected
-                        ? "var(--theme-500)"
+                        ? state.data.color || "var(--theme-500)"
                         : state.isFocused
-                        ? "var(--theme-100)"
+                        ? state.data.color
+                          ? `${state.data.color}50`
+                          : "var(--theme-100)"
                         : undefined,
+                      color: state.isDisabled
+                        ? "#ccc"
+                        : state.isSelected
+                        ? "white"
+                        : state.data.color || "black",
                     }),
                   }}
                 />
