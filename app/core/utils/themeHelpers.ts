@@ -15,8 +15,16 @@ export function getTailwindColors(onlyThemeColors = false) {
           colors[colorsKey][nestedKey].includes("#")
         ) {
           if (onlyThemeColors) {
+            // Only colors with weight 600
             if (parseInt(nestedKey, 10) === 600) {
-              tailwindcolors[`${colorsKey}-${nestedKey}`] = colors[colorsKey][nestedKey]
+              // Convert to pascal case and then add a space between pascal case words
+              const pascalCaseWithSpace = (colorsKey.charAt(0).toUpperCase() + colorsKey.slice(1))
+                .replace(/([A-Z])/g, " $1")
+                .trim()
+              // Return only the colors with single word
+              if (pascalCaseWithSpace.split(" ")?.length === 1) {
+                tailwindcolors[`${colorsKey}-${nestedKey}`] = colors[colorsKey][nestedKey]
+              }
             }
           } else {
             tailwindcolors[`${colorsKey}-${nestedKey}`] = colors[colorsKey][nestedKey]
