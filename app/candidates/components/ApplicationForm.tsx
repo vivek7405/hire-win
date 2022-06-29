@@ -15,6 +15,7 @@ import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
 import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import { ExtendedFormQuestion, ExtendedQuestion } from "types"
+import { AttachmentZodObj } from "../validations"
 
 type ApplicationFormProps = {
   onSuccess?: () => void
@@ -36,11 +37,19 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
   const formQuestions = props.formQuestions || queryFormQuestions
 
   const getZodType = (fq: ExtendedFormQuestion, zodType) => {
-    return fq.behaviour === "REQUIRED"
-      ? zodType.nonempty
-        ? zodType.nonempty({ message: "Required" })
-        : zodType
-      : zodType.optional()
+    const type = zodType?._def?.typeName as string
+    switch (type) {
+      case "ZodBoolean":
+        return fq.behaviour === "REQUIRED"
+          ? zodType.refine((val) => val === true, { message: "Required" })
+          : zodType.optional()
+      default:
+        return fq.behaviour === "REQUIRED"
+          ? zodType.nonempty
+            ? zodType.nonempty({ message: "Required" })
+            : zodType
+          : zodType.optional()
+    }
   }
 
   const getValidationObj = (fq: ExtendedFormQuestion) => {
@@ -48,7 +57,17 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
 
     switch (q.type) {
       case QuestionType.Attachment:
-        return { [q.name]: getZodType(fq, z.any()) }
+        return {
+          [q.name]:
+            fq.behaviour === "REQUIRED"
+              ? AttachmentZodObj.refine(
+                  (obj) => obj !== null && obj.Key !== "" && obj.Location !== "",
+                  {
+                    message: "Required",
+                  }
+                )
+              : AttachmentZodObj,
+        }
       case QuestionType.Checkbox:
         return { [q.name]: getZodType(fq, z.boolean()) }
       case QuestionType.Multiple_select:
