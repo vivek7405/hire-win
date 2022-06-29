@@ -1,9 +1,10 @@
-import React, { PropsWithoutRef } from "react"
+import React, { PropsWithoutRef, useMemo } from "react"
 import { useFormContext, Controller } from "react-hook-form"
 import axios from "axios"
 import { useDropzone } from "react-dropzone"
 import { TrashIcon } from "@heroicons/react/outline"
 import { AttachmentObject } from "types"
+import toast from "react-hot-toast"
 
 export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   /** Field name. */
@@ -18,17 +19,34 @@ export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElem
 }
 
 export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFileUploadProps>(
-  ({ label, outerProps, defaultValue, ...props }, ref) => {
-    const { setValue, watch, handleSubmit } = useFormContext()
+  ({ label, name, outerProps, defaultValue, ...props }, ref) => {
+    const {
+      control,
+      setValue,
+      watch,
+      handleSubmit,
+      formState: { isSubmitting, errors },
+    } = useFormContext()
 
-    const file: AttachmentObject = watch(`${props.name}` as const)
+    const file: AttachmentObject = watch(`${name}` as const)
+
+    useMemo(() => {
+      const error = Array.isArray(errors[name])
+        ? errors[name].join(", ")
+        : errors[name]?.message || errors[name]
+
+      error &&
+        toast.error(`${name.charAt(0).toUpperCase() + name.slice(1)}: ${error}`, {
+          id: errors[name],
+        })
+    }, [errors, name])
 
     const onDrop = React.useCallback(
       async (droppedFiles) => {
         const resp = await fileUpload(droppedFiles[0])
-        setValue(`${props.name}` as const, resp.data, { shouldValidate: true })
+        setValue(`${name}` as const, resp.data, { shouldValidate: true })
       },
-      [setValue, props.name]
+      [setValue, name]
     )
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -59,14 +77,15 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
         },
       }
       await axios.post(url, file, config)
-      setValue(`${props.name}` as const, {}, { shouldValidate: false })
+      setValue(`${name}` as const, {}, { shouldValidate: false })
       props.onSubmit && handleSubmit(props.onSubmit)()
     }
 
     return (
       <div className="w-full" {...outerProps}>
         <Controller
-          name={`${props.name}` as const}
+          name={`${name}` as const}
+          control={control}
           defaultValue={defaultValue || { Key: "", Location: "" }}
           render={() => (
             <>

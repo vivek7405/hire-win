@@ -3,16 +3,18 @@ import { Answer } from "app/questions/validations"
 import { Score } from "app/score-cards/validations"
 import { z } from "zod"
 
+export const AttachmentZodObj = z
+  .object({
+    Key: z.string().optional(),
+    Location: z.string().optional(),
+  })
+  .nullable()
+
 export const Candidate = z.object({
   id: z.string().optional(),
   name: z.string(),
   email: z.string(),
-  resume: z
-    .object({
-      Location: z.string().optional(),
-      Key: z.string().optional(),
-    })
-    .nullable(),
+  resume: AttachmentZodObj,
   slug: z.string().optional(),
   answers: z.array(Answer),
   scores: z.array(Score).optional(),

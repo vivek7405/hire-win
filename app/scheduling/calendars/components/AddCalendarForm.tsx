@@ -1,7 +1,6 @@
 import addCalendarMutation from "../mutations/addCalendar"
 import { invalidateQuery, useMutation, Link } from "blitz"
 import getCalendars from "../queries/getCalendars"
-import styles from "./AddCalendar.module.css"
 import { useState } from "react"
 import { ConnectGoogleCalendarButton } from "app/scheduling/calendars/googlecalendar/components/ConnectGoogleCalendarButton"
 import { ConnectOutlookCalendarButton } from "app/scheduling/calendars/outlookcalendar/components/ConnectOutlookCalendarButton"
