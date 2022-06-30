@@ -565,14 +565,20 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                     </div>
 
                     <div className="px-6 pt-4 pb-2 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
-                      <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                        <span>{job?.city},&nbsp;</span>
-                        <span>
-                          {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
-                          ,&nbsp;
+                      {(job?.city || job?.state || job?.country) && (
+                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                          {job?.city && <span>{job?.city},&nbsp;</span>}
+                          {job?.state && job?.country && (
+                            <span>
+                              {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
+                              ,&nbsp;
+                            </span>
+                          )}
+                          {job?.country && (
+                            <span>{Country.getCountryByCode(job?.country!)?.name}</span>
+                          )}
                         </span>
-                        <span>{Country.getCountryByCode(job?.country!)?.name}</span>
-                      </span>
+                      )}
                       {job?.category && (
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                           {job.category?.name}
