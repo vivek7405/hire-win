@@ -86,6 +86,7 @@ import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInte
 import ApplicationForm from "app/candidates/components/ApplicationForm"
 import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
 import updateCandidate from "app/candidates/mutations/updateCandidate"
+import Card from "app/core/components/Card"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -211,7 +212,7 @@ const getAnswer = (formQuestion: ExtendedFormQuestion, candidate: ExtendedCandid
         return answer?.question?.options?.find((op) => val === op.id)?.text
       case QuestionType.Attachment:
         const attachmentObj: AttachmentObject = JSON.parse(val)
-        return (
+        return attachmentObj && attachmentObj?.Key?.trim() !== "" ? (
           <a
             href={attachmentObj.Location}
             className="text-theme-600 hover:text-theme-500"
@@ -220,7 +221,7 @@ const getAnswer = (formQuestion: ExtendedFormQuestion, candidate: ExtendedCandid
           >
             {attachmentObj.Key}
           </a>
-        )
+        ) : null
       case QuestionType.Long_text:
         return <p className="max-w-md overflow-auto">{val}</p>
       default:
@@ -856,9 +857,36 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
-          <div className="w-full md:w-1/2 lg:w-2/3 p-2 flex flex-col space-y-1 border-2 border-theme-400 rounded-lg">
-            {file && <PDFViewer file={file} scale={1.29} />}
-            <Cards
+          <div className="w-full md:w-1/2 lg:w-2/3 flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg">
+            <div className="px-2 md:px-0 lg:px-0">
+              {file && <PDFViewer file={file} scale={1.29} />}
+            </div>
+            <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
+              {candidate?.job?.form?.questions?.map((fq) => {
+                const answer = getAnswer(fq, candidate)
+                if (fq?.question?.name === "Resume") {
+                  console.log("RESUME RESUME RESUME")
+                  console.log(answer)
+                }
+
+                return (
+                  <Card key={fq.id}>
+                    <div className="space-y-2">
+                      <div className="w-full relative">
+                        <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                          <span className="truncate">{fq.question.name}</span>
+                        </div>
+                      </div>
+                      <div className="border-b-2 border-gray-50 w-full"></div>
+                      <div className="flex md:justify-center lg:justify-center">
+                        <span className="truncate">{answer || "NA"}</span>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+            {/* <Cards
               cards={cards}
               setCards={setCards}
               noPagination={true}
@@ -867,7 +895,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
               isDragDisabled={true}
               direction={DragDirection.HORIZONTAL}
               noSearch={true}
-            />
+            /> */}
           </div>
           <div className="w-full md:w-1/2 lg:w-1/3">
             <div
