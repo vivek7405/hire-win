@@ -949,12 +949,12 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                 >
                   {candidateToggleView === CandidateToggleView.Scores && (
                     <ScoreCard
-                      submitDisabled={
-                        interviewDetail?.interviewer?.id !== user?.id
-                        // selectedWorkflowStage?.interviewDetails?.find(
-                        //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-                        // )?.interviewerId !== user?.id
-                      }
+                      // submitDisabled={
+                      //   interviewDetail?.interviewer?.id !== user?.id
+                      //   // selectedWorkflowStage?.interviewDetails?.find(
+                      //   //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+                      //   // )?.interviewerId !== user?.id
+                      // }
                       key={selectedWorkflowStage?.id}
                       candidate={candidate}
                       header="Score Card"
