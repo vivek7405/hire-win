@@ -22,12 +22,13 @@ import {
 import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline"
 import getScoreCard from "../queries/getScoreCard"
 import { Candidate } from "@prisma/client"
+import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
 
 type ScoreCardProps = {
   onSuccess?: () => void
   initialValues?: any
   onSubmit: any
-  submitDisabled?: boolean
+  // submitDisabled?: boolean
   header: string
   subHeader?: string
   scoreCardId: string
@@ -44,6 +45,15 @@ export const ScoreCard = (props: ScoreCardProps) => {
   const [defaultScoreCard] = useQuery(getScoreCard, {
     where: { companyId: props.companyId, name: "Default" },
   })
+
+  const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
+    workflowStageId: props?.workflowStage?.id!, // selectedWorkflowStage?.id!,
+    candidateId: props.candidate?.id || "0",
+    jobId: props.candidate?.jobId || "0",
+  })
+
+  const isScoreDisabled = interviewDetail?.interviewer?.id !== props.userId
+  const disabled = !props.preview && isScoreDisabled
 
   const [queryScoreCardQuestions] = useQuery(getScoreCardQuestionsWOPagination, {
     where: { scoreCardId: props.scoreCardId || defaultScoreCard?.id },
@@ -92,7 +102,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
     <>
       <Form
         submitText="Submit"
-        submitDisabled={props.submitDisabled}
+        submitDisabled={disabled}
         isSubmitTop={true}
         schema={zodObj}
         initialValues={props.initialValues}
@@ -120,8 +130,6 @@ export const ScoreCard = (props: ScoreCardProps) => {
                   jws.jobId === (props.candidate?.jobId || "0")
               ) >= 0
           )
-
-          const disabled = !props.preview && props.submitDisabled
 
           return (
             <div key={q.id}>
