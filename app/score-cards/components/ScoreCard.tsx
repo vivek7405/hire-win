@@ -47,7 +47,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
   })
 
   const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
-    workflowStageId: props?.workflowStage?.id!, // selectedWorkflowStage?.id!,
+    workflowStageId: props?.workflowStage?.id || "0", // selectedWorkflowStage?.id!,
     candidateId: props.candidate?.id || "0",
     jobId: props.candidate?.jobId || "0",
   })
