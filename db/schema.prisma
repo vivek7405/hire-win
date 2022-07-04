@@ -803,6 +803,7 @@ model EmailTemplate {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  name    String
   subject String
   slug    String @unique
   body    Json

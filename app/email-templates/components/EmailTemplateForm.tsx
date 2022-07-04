@@ -25,6 +25,7 @@ export const EmailTemplateForm = ({
         initialValues={initialValues}
         onSubmit={onSubmit}
       >
+        <LabeledTextField name="name" label="Name" placeholder="Template name" />
         <LabeledTextField name="subject" label="Subject" placeholder="Email subject" />
         <LabeledRichTextField name="body" label="Body" showTemplatePlaceholders={true} />
       </Form>

@@ -137,6 +137,7 @@ const EmailTemplates = ({ user }) => {
           initialValues={
             emailTemplateToEdit
               ? {
+                  name: emailTemplateToEdit.name,
                   subject: emailTemplateToEdit.subject,
                   body: EditorState.createWithContent(
                     convertFromRaw(emailTemplateToEdit?.body || {})
@@ -203,7 +204,7 @@ const EmailTemplates = ({ user }) => {
                           setOpenModal(true)
                         }}
                       >
-                        {et.subject}
+                        {et.name}
                       </a>
                     </div>
                     <div className="absolute top-0.5 right-0">

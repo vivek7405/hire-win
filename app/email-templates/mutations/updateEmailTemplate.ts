@@ -14,8 +14,8 @@ export default async function updateEmailTemplate(
 ) {
   ctx.session.$authorize()
 
-  const { subject, body } = EmailTemplateObj.parse(data)
-  const slug = slugify(subject, { strict: true })
+  const { name, subject, body } = EmailTemplateObj.parse(data)
+  const slug = slugify(name, { strict: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })
@@ -24,9 +24,10 @@ export default async function updateEmailTemplate(
   const emailTemplate = await db.emailTemplate.update({
     where,
     data: {
+      name,
       subject,
       body,
-      slug: initial.subject !== subject ? newSlug : initial.slug,
+      slug: initial.name !== name ? newSlug : initial.slug,
     },
   })
 
