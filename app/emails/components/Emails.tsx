@@ -341,7 +341,7 @@ const CandidateEmail = ({
       <br />
       CC: {email.cc || "NA"}
       <br />
-      Template Used: {email?.templateUsed?.subject || "NA"}
+      Template Used: {email?.templateUsed?.name || "NA"}
     </div>
   )
 }
