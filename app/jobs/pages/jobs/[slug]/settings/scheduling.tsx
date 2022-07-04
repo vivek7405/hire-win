@@ -365,10 +365,11 @@ const JobSettingsSchedulingPage = ({
               <ScheduleCalendarAssignment
                 job={job}
                 user={user}
-                workflowStages={job?.workflow?.stages?.filter((ws) =>
-                  ws.interviewDetails?.some(
-                    (int) => int.jobId === job?.id && int.interviewerId !== user?.id
-                  )
+                workflowStages={job?.workflow?.stages?.filter(
+                  (ws) =>
+                    !ws.interviewDetails?.some(
+                      (int) => int.jobId === job?.id && int.interviewerId === user?.id
+                    )
                 )}
                 header={"Other Stages"}
               />
