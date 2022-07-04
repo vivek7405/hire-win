@@ -32,7 +32,7 @@ export default async function getCandidateInterviewDetail(
     return candidateSpecificInterviewDetails
   }
 
-  if (jobStageInterviewDetails) {
+  if (jobStageInterviewDetails && jobStageInterviewDetails.interviewer) {
     return jobStageInterviewDetails
   }
 
