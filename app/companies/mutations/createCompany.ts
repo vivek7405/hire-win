@@ -3,13 +3,9 @@ import db, { CompanyUserRole } from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { CompanyObj } from "../validations"
-import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWithFactoryFormQuestions"
-import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
-import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
-import createFactoryCategories from "app/categories/mutations/createFactoryCategories"
-import createFactoryCandidatePools from "app/candidate-pools/mutations/createFactoryCandidatePools"
 import provideTrail from "app/core/utils/provideTrial"
 import Guard from "app/guard/ability"
+import createFactoryItems from "app/core/utils/createFactoryItems"
 
 export default Guard.authorize(
   "create",
@@ -49,11 +45,7 @@ export default Guard.authorize(
 
       const companyId = company?.id || 0
 
-      await createFormWithFactoryFormQuestions("Default", companyId, true)
-      await createScoreCardWithFactoryScoreCardQuestions("Default", companyId, true)
-      await createWorkflowWithFactoryWorkflowStages("Default", companyId, true)
-      await createFactoryCategories(companyId)
-      await createFactoryCandidatePools(companyId)
+      await createFactoryItems(companyId)
 
       await ctx.session.$setPublicData({ companyId: company.id || 0 })
 

@@ -3,20 +3,16 @@ import db from "db"
 import { Signup } from "app/auth/validations"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWithFactoryFormQuestions"
 import { CompanyUserRole, UserRole } from "@prisma/client"
-import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
-import createFactoryCategories from "app/categories/mutations/createFactoryCategories"
-import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
 import { initialSchedule } from "app/scheduling/constants"
 import addCalendar from "app/scheduling/calendars/mutations/addCalendar"
 import addSchedule from "app/scheduling/schedules/mutations/addSchedule"
 import { mapValues } from "app/core/utils/map-values"
-import createFactoryCandidatePools from "app/candidate-pools/mutations/createFactoryCandidatePools"
 import stripe from "app/core/utils/stripe"
 import { plans } from "app/core/utils/plans"
 import { PlanName } from "types"
 import provideTrail from "app/core/utils/provideTrial"
+import createFactoryItems from "app/core/utils/createFactoryItems"
 
 type signupProps = {
   name: string
@@ -82,11 +78,7 @@ export default async function signup(
   const compId = existingCompany?.id || (user.companies && (user.companies[0]?.companyId || 0)) || 0
 
   if (!existingCompany) {
-    await createFactoryCategories(compId)
-    await createWorkflowWithFactoryWorkflowStages("Default", compId, true)
-    await createFormWithFactoryFormQuestions("Default", compId, true)
-    await createScoreCardWithFactoryScoreCardQuestions("Default", compId, true)
-    await createFactoryCandidatePools(compId)
+    await createFactoryItems(compId)
   }
 
   await ctx.session.$create({ userId: user.id, role: user.role as UserRole, companyId: compId })
