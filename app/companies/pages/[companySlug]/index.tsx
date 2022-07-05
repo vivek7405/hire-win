@@ -202,7 +202,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
                       : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
                   }`}
                   onClick={() => {
-                    setSelectedCategoryId("0")
+                    setSelectedCategoryId(null)
                   }}
                 >
                   All
