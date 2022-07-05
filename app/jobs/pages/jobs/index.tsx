@@ -244,7 +244,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
             })
             setOpenJobArchiveConfirm(false)
             setJobToArchive(null as any)
-            setSelectedCategoryId("0")
+            setSelectedCategoryId(null)
             invalidateQuery(getUserJobsByViewTypeAndCategory)
             invalidateQuery(getUserJobCategoriesByViewType)
           } catch (error) {
