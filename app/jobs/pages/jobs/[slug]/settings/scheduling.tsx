@@ -179,19 +179,9 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
 
             {workflowStages?.map((ws, index) => {
               const existingScheduleCalendar = ws.jobUserScheduleCalendars?.find(
-                (int) => int.workflowStageId === ws.id && int.jobId === job.id
+                (int) => int.jobId === job.id && int.userId === user?.id
               )
-              const existingInterviewer: User | null | undefined = job?.users?.find(
-                (member) => member?.userId === existingScheduleCalendar?.userId
-              )?.user
-
-              const defaultInterviewerId =
-                existingInterviewer?.id?.toString() ||
-                job?.users?.find((member) => member?.role === "OWNER")?.userId?.toString()
-
-              return defaultInterviewerId !== user?.id?.toString() ? (
-                <></>
-              ) : (
+              return (
                 <div key={ws.id} className="flex">
                   <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
                     <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
@@ -208,7 +198,6 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
                       className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
                       name={`schedules.${index}.id`}
                       placeholder={`Select Schedule`}
-                      // disabled={existingInterviewDetail && !existingInterviewer}
                       defaultValue={
                         existingScheduleCalendar?.scheduleId ||
                         schedules?.find((schedule) => schedule.name === "Default")?.id
@@ -217,15 +206,11 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
                         const selectedScheduleId = e.target.value
                         const toastId = toast.loading(() => <span>Updating Schedule</span>)
                         try {
-                          const assignedSchedule = await assignScheduleToJobStageMutation({
+                          await assignScheduleToJobStageMutation({
                             jobId: job?.id,
                             workflowStageId: ws.id,
                             scheduleId: parseInt(selectedScheduleId || "0"),
                           })
-                          // if (existingScheduleCalendar && assignedSchedule) {
-                          //   existingScheduleCalendar.scheduleId = assignedSchedule.scheduleId
-                          //   setJobData(jobData)
-                          // }
                           await invalidateQuery(getJob)
 
                           toast.success(() => <span>Schedule assigned to stage</span>, {
@@ -260,7 +245,6 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
                           className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
                           name={`calendars.${index}.id`}
                           placeholder={`Select Calendar`}
-                          // disabled={existingInterviewDetail && !existingInterviewer}
                           defaultValue={
                             existingScheduleCalendar?.calendarId || defaultCalendar?.calendarId
                           }
@@ -268,15 +252,11 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
                             const selectedCalendarId = e.target.value
                             const toastId = toast.loading(() => <span>Updating Calendar</span>)
                             try {
-                              const assignedCalendar = await assignCalendarToJobStageMutation({
+                              await assignCalendarToJobStageMutation({
                                 jobId: job?.id,
                                 workflowStageId: ws.id,
                                 calendarId: parseInt(selectedCalendarId || "0"),
                               })
-                              // if (existingScheduleCalendar && assignedCalendar) {
-                              //   existingScheduleCalendar.calendarId = assignedCalendar.calendarId
-                              //   setJobData(jobData)
-                              // }
                               await invalidateQuery(getJob)
 
                               toast.success(() => <span>Calendar assigned to stage</span>, {
