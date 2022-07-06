@@ -591,8 +591,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         <DropdownMenu.Trigger
           className="float-right ml-6 disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
           disabled={
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.OWNER &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.ADMIN
           }
         >
           <button
@@ -601,9 +603,11 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
               // selectedWorkflowStage?.interviewDetails?.find(
               //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
               // )?.interviewerId !== user?.id &&
-              interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+              // interviewDetail?.interviewer?.id !== user?.id &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.OWNER &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.ADMIN
             }
           >
             Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
@@ -654,8 +658,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
           className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={
             // interviewDetail?.interviewer?.id !== user?.id &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.OWNER &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.ADMIN
           }
           onClick={async (e) => {
             e.preventDefault()
@@ -670,8 +676,10 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
             disabled={
               // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.OWNER &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.ADMIN
             }
           >
             <button
@@ -679,8 +687,9 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
               disabled={
                 // interviewDetail?.interviewer?.id !== user?.id &&
                 user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  "OWNER" &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+                  JobUserRole.OWNER &&
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                  JobUserRole.ADMIN
               }
             >
               <ChevronDownIcon className="w-5 h-5" />
@@ -719,7 +728,31 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         </DropdownMenu.Root>
       </div>
 
-      {canUpdate && (
+      <button
+        title="Edit Details"
+        className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={
+          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+            JobUserRole.OWNER &&
+          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+            JobUserRole.ADMIN
+        }
+        data-testid={`${candidate?.id}-settingsLink`}
+        onClick={(e) => {
+          e.preventDefault()
+          setOpenEditModal(true)
+        }}
+      >
+        <PencilAltIcon className="h-6 w-6" />
+      </button>
+
+      {/* <Link
+        href={Routes.CandidateSettingsPage({
+          slug: candidate?.job?.slug!,
+          candidateSlug: candidate?.slug!,
+        })}
+        passHref
+      >
         <button
           title="Edit Details"
           className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -728,41 +761,20 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
             user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
           }
           data-testid={`${candidate?.id}-settingsLink`}
-          onClick={(e) => {
-            e.preventDefault()
-            setOpenEditModal(true)
-          }}
         >
           <PencilAltIcon className="h-6 w-6" />
         </button>
-        // <Link
-        //   href={Routes.CandidateSettingsPage({
-        //     slug: candidate?.job?.slug!,
-        //     candidateSlug: candidate?.slug!,
-        //   })}
-        //   passHref
-        // >
-        //   <button
-        //     title="Edit Details"
-        //     className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
-        //     disabled={
-        //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-        //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
-        //     }
-        //     data-testid={`${candidate?.id}-settingsLink`}
-        //   >
-        //     <PencilAltIcon className="h-6 w-6" />
-        //   </button>
-        // </Link>
-      )}
+      </Link> */}
 
       <button
         title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
         className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={
-          interviewDetail?.interviewer?.id !== user?.id &&
-          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+          // interviewDetail?.interviewer?.id !== user?.id &&
+          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+            JobUserRole.OWNER &&
+          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+            JobUserRole.ADMIN
         }
         onClick={(e) => {
           e.preventDefault()

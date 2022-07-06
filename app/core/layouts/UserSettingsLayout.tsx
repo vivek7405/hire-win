@@ -59,7 +59,7 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
           icon: OfficeBuildingIcon,
         }
       : null,
-    companyUser?.role === CompanyUserRole.OWNER
+    companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
       ? {
           name: "Members",
           href: `/settings/members`,

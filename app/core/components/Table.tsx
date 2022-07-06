@@ -87,7 +87,7 @@ const Table = ({
         </div>
       )}
 
-      <div className="flex flex-col overflow-auto">
+      <div className="flex flex-col overflow-x-auto overflow-y-hidden">
         <table className="table min-w-full border border-gray-200" {...getTableProps()}>
           <thead className="border-b border-gray-200">
             {headerGroups.map((headerGroup, i) => (

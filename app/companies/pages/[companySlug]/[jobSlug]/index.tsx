@@ -58,14 +58,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     )
 
     if (job) {
-      const { can: canCreate } = await Guard.can(
-        "create",
-        "candidate",
+      const { can: canAccess } = await Guard.can(
+        "access",
+        "jobListing",
         { session },
         { jobId: job?.id }
       )
 
-      if (canCreate) {
+      if (canAccess) {
         return {
           props: {
             company,

@@ -1,4 +1,4 @@
-import db, { CompanyUserRole } from "db"
+import db, { CompanyUserRole, JobUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "app/users/utils/checkPlan"
 import moment from "moment"
@@ -26,8 +26,15 @@ type ExtendedResourceTypes =
   | "candidatePool"
   | "company"
   | "companyUser"
+  | "jobListing"
 
-type ExtendedAbilityTypes = "readAll" | "isOwner" | "isAdmin" | "inviteUser" | "cancelInterview"
+type ExtendedAbilityTypes =
+  | "access"
+  | "readAll"
+  | "isOwner"
+  | "isAdmin"
+  | "inviteUser"
+  | "cancelInterview"
 
 const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
   async (ctx, { can, cannot }) => {
@@ -35,7 +42,51 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
     // Allow only 25 candidates on the Free plan
     // Don't allow if job is archived or expired
+    const isFreePlanCandidateLimitAvailable = async (args) => {
+      const jobId = args?.jobId
+
+      if (!jobId || jobId?.trim() === "") return false
+
+      const job = await db.job.findFirst({
+        where: { id: jobId },
+        include: { company: true, _count: { select: { candidates: true } } },
+      })
+
+      if (!job || !job?.company) return false
+
+      const currentPlan = checkPlan(job.company)
+      if (!currentPlan) {
+        if (job._count.candidates >= 25) {
+          return false
+        }
+      }
+
+      return true
+    }
+
     can("create", "candidate", async (args) => {
+      const jobId = args?.jobId
+
+      if (!jobId || jobId?.trim() === "") return false
+
+      const job = await db.job.findFirst({
+        where: { id: jobId },
+        include: { company: true, users: true, _count: { select: { candidates: true } } },
+      })
+
+      if (!job || !job?.company) return false
+
+      const owner = job.users.find((p) => p.role === JobUserRole.OWNER)
+      const admins = job.users.filter((m) => m.role === JobUserRole.ADMIN)
+
+      return (
+        (admins?.some((a) => a.userId === ctx.session.userId) ||
+          owner?.userId === ctx.session.userId) &&
+        isFreePlanCandidateLimitAvailable(args)
+      )
+    })
+
+    can("access", "jobListing", async (args) => {
       const jobId = args?.jobId
 
       if (!jobId || jobId?.trim() === "") return false
@@ -50,14 +101,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       const jobExpired = moment(job.validThrough || undefined).diff(moment()) < 0
       if (job.archived || jobExpired) return false
 
-      const currentPlan = checkPlan(job.company)
-      if (!currentPlan) {
-        if (job._count.candidates >= 25) {
-          return false
-        }
-      }
-
-      return true
+      return isFreePlanCandidateLimitAvailable(args)
     })
 
     if (ctx.session.$isAuthorized()) {
@@ -116,12 +160,12 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const job = await db.job.findFirst({
           where: args.where,
           include: {
-            company: {
-              include: {
-                users: true,
-              },
-            },
-            // users: true,
+            // company: {
+            //   include: {
+            //     users: true,
+            //   },
+            // },
+            users: true,
           },
         })
 
@@ -139,8 +183,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           if (!currentPlan) return false
         }
 
-        const owner = job?.company?.users.find((u) => u.role === "OWNER")
-        const admins = job?.company?.users.filter((u) => u.role === "ADMIN")
+        const owner = job?.users.find((u) => u.role === JobUserRole.OWNER)
+        const admins = job?.users.filter((u) => u.role === JobUserRole.ADMIN)
 
         return (
           ctx.session.companyId === job?.companyId &&
@@ -167,8 +211,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const currentPlan = checkPlan(company)
         if (!currentPlan) return false
 
-        const owner = job?.users.find((p) => p.role === "OWNER")
-        const admins = job?.users.filter((m) => m.role === "ADMIN")
+        const owner = job?.users.find((p) => p.role === JobUserRole.OWNER)
+        const admins = job?.users.filter((m) => m.role === JobUserRole.ADMIN)
 
         return (
           admins?.some((a) => a.userId === ctx.session.userId) ||
@@ -184,7 +228,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
-        const owner = job?.users.find((p) => p.role === "OWNER")
+        const owner = job?.users.find((p) => p.role === JobUserRole.OWNER)
 
         return owner?.userId === ctx.session.userId
       })
@@ -197,7 +241,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
-        const admins = job?.users.filter((m) => m.role === "ADMIN")
+        const admins = job?.users.filter((m) => m.role === JobUserRole.ADMIN)
 
         return admins?.some((a) => a.userId === ctx.session.userId) === true
       })
@@ -216,7 +260,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
-        const owner = job?.users.find((p) => p.role === "OWNER")
+        const owner = job?.users.find((p) => p.role === JobUserRole.OWNER)
 
         return owner?.userId === ctx.session.userId
       })
@@ -235,7 +279,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
-        const owner = company?.users.find((p) => p.role === "OWNER")
+        const owner = company?.users.find((p) => p.role === CompanyUserRole.OWNER)
 
         return owner?.userId === ctx.session.userId
       })
@@ -279,8 +323,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const currentPlan = checkPlan(company)
         if (!currentPlan) return false
 
-        const owner = company?.users.find((u) => u.role === "OWNER")
-        const admins = company?.users.filter((u) => u.role === "ADMIN")
+        const owner = company?.users.find((u) => u.role === CompanyUserRole.OWNER)
+        const admins = company?.users.filter((u) => u.role === CompanyUserRole.ADMIN)
 
         return (
           admins?.some((a) => a.userId === ctx.session.userId) ||
@@ -310,7 +354,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
-        const owner = company?.users.find((p) => p.role === "OWNER")
+        const owner = company?.users.find((p) => p.role === CompanyUserRole.OWNER)
 
         return owner?.userId === ctx.session.userId
       })
@@ -323,7 +367,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
-        const admins = company?.users.filter((m) => m.role === "ADMIN")
+        const admins = company?.users.filter((m) => m.role === CompanyUserRole.ADMIN)
 
         return admins?.some((a) => a.userId === ctx.session.userId) === true
       })
@@ -344,6 +388,18 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       can("create", "category")
       can("update", "category")
       can("read", "category", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         const category = await db.category.findFirst({
           where: args.where,
         })
@@ -351,6 +407,18 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return category?.companyId === ctx.session.companyId
       })
       can("readAll", "category", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         const category = await db.category.findMany({
           where: args.where,
         })
@@ -425,6 +493,18 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       can("create", "workflow")
       can("update", "workflow")
       can("read", "workflow", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         const workflow = await db.workflow.findFirst({
           where: args.where,
         })
@@ -432,6 +512,18 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return workflow?.companyId === ctx.session.companyId
       })
       can("readAll", "workflow", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         const workflows = await db.workflow.findMany({
           where: args.where,
         })
@@ -506,6 +598,18 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return scoreCard?.companyId === ctx.session.companyId
       })
       can("readAll", "scoreCard", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         const scoreCards = await db.scoreCard.findMany({
           where: args.where,
         })
@@ -605,6 +709,18 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       can("create", "form")
       can("update", "form")
       can("read", "form", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         const form = await db.form.findFirst({
           where: args.where,
         })
@@ -612,6 +728,18 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return form?.companyId === ctx.session.companyId
       })
       can("readAll", "form", async (args) => {
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || 0,
+              companyId: ctx.session.companyId || 0,
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         const forms = await db.form.findMany({
           where: args.where,
         })
@@ -625,7 +753,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           include: {
             job: {
               include: {
-                // users: true,
+                users: true,
                 company: {
                   include: { users: true },
                 },
@@ -634,9 +762,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           },
         })
 
+        const owner = candidate?.job?.users.find((p) => p.role === JobUserRole.OWNER)
+        const admins = candidate?.job?.users.filter((m) => m.role === JobUserRole.ADMIN)
+
         return (
           ctx.session?.companyId === candidate?.job?.companyId &&
-          candidate?.job?.company?.users.some((m) => m.userId === ctx.session.userId) === true
+          candidate?.job?.company?.users.some((m) => m.userId === ctx.session.userId) === true &&
+          (admins?.some((a) => a.userId === ctx.session.userId) ||
+            owner?.userId === ctx.session.userId)
         )
       })
       can("read", "candidate", async (args) => {
@@ -688,7 +821,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           ctx.session.userId === interview?.interviewerId ||
           ctx.session.userId === interview?.organizerId ||
           interview?.job?.users?.find((jobUser) => jobUser.userId === ctx.session.userId)?.role ===
-            "OWNER"
+            JobUserRole.OWNER
         )
       })
 

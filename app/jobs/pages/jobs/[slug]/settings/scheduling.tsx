@@ -318,7 +318,7 @@ const JobSettingsSchedulingPage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
-      <JobSettingsLayout job={job!} isOwner={isOwner}>
+      <JobSettingsLayout job={job!}>
         <div className="bg-white mt-5 md:mt-0 md:col-span-2">
           <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
             <div className="flex justify-between items-center mb-6">

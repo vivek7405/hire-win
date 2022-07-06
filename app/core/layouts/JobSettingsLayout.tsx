@@ -12,10 +12,9 @@ import { ExtendedJob } from "types"
 type LayoutProps = {
   children: ReactNode
   job: ExtendedJob
-  isOwner?: boolean
 }
 
-const JobSettingsLayout = ({ job, children, isOwner }: LayoutProps) => {
+const JobSettingsLayout = ({ job, children }: LayoutProps) => {
   const router = useRouter()
 
   const subNavigation = [

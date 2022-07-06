@@ -42,66 +42,81 @@ const Navbar = ({ user }: NavbarProps) => {
   }, [companyUser])
 
   const [logoutMutation] = useMutation(logout)
+
+  const isOwnerOrAdmin =
+    companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
+
   const nav = [
     {
       name: "Jobs",
       href: Routes.JobsHome().pathname,
-      current: router.route === Routes.JobsHome().pathname,
-    },
-    {
-      name: "Categories",
-      href: Routes.CategoriesHome().pathname,
-      current: router.route === Routes.CategoriesHome().pathname,
-    },
-    {
-      name: "Workflows",
-      href: Routes.WorkflowsHome().pathname,
-      current: router.route === Routes.WorkflowsHome().pathname,
-    },
-    {
-      name: "Forms",
-      href: Routes.FormsHome().pathname,
-      current: router.route === Routes.FormsHome().pathname,
-    },
-    {
-      name: "Score Cards",
-      href: Routes.ScoreCardsHome().pathname,
-      current: router.route === Routes.ScoreCardsHome().pathname,
-    },
-    {
-      name: "Email Templates",
-      href: Routes.EmailTemplatesHome().pathname,
-      current: router.route === Routes.EmailTemplatesHome().pathname,
-    },
-    {
-      name: "Candidate Pools",
-      href: Routes.CandidatePoolsHome().pathname,
-      current: router.route === Routes.CandidatePoolsHome().pathname,
+      focus: router.route.includes(Routes.JobsHome().pathname),
     },
   ]
+  if (isOwnerOrAdmin) {
+    nav.push(
+      {
+        name: "Categories",
+        href: Routes.CategoriesHome().pathname,
+        focus: router.route.includes(Routes.CategoriesHome().pathname),
+      },
+      {
+        name: "Workflows",
+        href: Routes.WorkflowsHome().pathname,
+        focus:
+          router.route.includes(Routes.WorkflowsHome().pathname) ||
+          router.route.includes(Routes.StagesHome().pathname),
+      },
+      {
+        name: "Forms",
+        href: Routes.FormsHome().pathname,
+        focus:
+          router.route.includes(Routes.FormsHome().pathname) ||
+          router.route.includes(Routes.QuestionsHome().pathname),
+      },
+      {
+        name: "Score Cards",
+        href: Routes.ScoreCardsHome().pathname,
+        focus:
+          router.route.includes(Routes.ScoreCardsHome().pathname) ||
+          router.route.includes(Routes.CardQuestionsHome().pathname),
+      },
+      {
+        name: "Email Templates",
+        href: Routes.EmailTemplatesHome().pathname,
+        focus: router.route.includes(Routes.EmailTemplatesHome().pathname),
+      },
+      {
+        name: "Candidate Pools",
+        href: Routes.CandidatePoolsHome().pathname,
+        focus: router.route.includes(Routes.CandidatePoolsHome().pathname),
+      }
+    )
+  }
+
   let dropDownNav = [
     {
       name: "Settings",
       href: Routes.UserSettingsPage().pathname,
-      current: router.route === "/settings",
+      focus: router.route === "/settings",
     },
     selectedCompanyUser?.role === CompanyUserRole.OWNER ||
     selectedCompanyUser?.role === CompanyUserRole.ADMIN
       ? {
           name: "Members",
           href: Routes.UserSettingsMembersPage().pathname,
-          current: router.route === Routes.UserSettingsMembersPage().pathname,
+          focus: router.route === Routes.UserSettingsMembersPage().pathname,
         }
       : null,
     {
       name: "Schedules",
       href: Routes.UserSettingsSchedulesPage().pathname,
-      current: router.route === "/settings/schedules",
+      focus: router.route === "/settings/schedules",
     },
     {
       name: "Calendars",
       href: Routes.UserSettingsCalendarsPage().pathname,
-      current: router.route === Routes.UserSettingsCalendarsPage().pathname,
+      focus: router.route === Routes.UserSettingsCalendarsPage().pathname,
     },
     {
       name: "Sign Out",
@@ -161,7 +176,7 @@ const Navbar = ({ user }: NavbarProps) => {
                   <Link href={item.href} passHref key={i}>
                     <a
                       className={`${
-                        item.current
+                        item.focus
                           ? "text-white bg-theme-800"
                           : "text-neutral-50 hover:text-neutral-200"
                       } px-3 py-2 rounded-md text-sm font-medium`}
@@ -314,7 +329,7 @@ const Navbar = ({ user }: NavbarProps) => {
                 <Link href={item.href} passHref key={i}>
                   <a
                     className={`${
-                      item.current
+                      item.focus
                         ? "text-white bg-theme-800"
                         : "text-neutral-50 hover:text-neutral-200"
                     } px-3 py-2 rounded-md text-sm font-medium w-full block`}
