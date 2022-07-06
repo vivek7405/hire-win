@@ -43,12 +43,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { where: { slug: context?.params?.slug as string } }
   )
 
-  const { can: isOwner } = await Guard.can(
-    "isOwner",
-    "job",
-    { session },
-    { where: { slug: context?.params?.slug as string } }
-  )
+  // const { can: isOwner } = await Guard.can(
+  //   "isOwner",
+  //   "job",
+  //   { session },
+  //   { where: { slug: context?.params?.slug as string } }
+  // )
 
   if (user) {
     try {
@@ -66,7 +66,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             job: job,
             canUpdate,
-            isOwner,
           },
         }
       } else {
@@ -107,7 +106,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const JobSettingsPage = ({
   user,
   job,
-  isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -120,7 +118,7 @@ const JobSettingsPage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
-      <JobSettingsLayout job={job!} isOwner={isOwner}>
+      <JobSettingsLayout job={job!}>
         <JobForm
           companyId={session.companyId || 0}
           user={user}

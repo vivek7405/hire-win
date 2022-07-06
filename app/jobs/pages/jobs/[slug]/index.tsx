@@ -37,11 +37,16 @@ import {
   Answer,
   Candidate,
   CandidateSource,
+  Company,
+  CompanyUser,
   Form as FormDB,
   FormQuestion,
   Job,
+  JobUser,
+  JobUserRole,
   Question,
   QuestionType,
+  User,
 } from "@prisma/client"
 import Skeleton from "react-loading-skeleton"
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
@@ -160,6 +165,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 const getBoard = (
   job,
+  user,
   candidates,
   viewRejected,
   setCandidateToReject,
@@ -231,56 +237,61 @@ const getBoard = (
                           disabled={true}
                         />
                       </Form>
-                      <div className="flex items-center space-x-2">
-                        <span title="Reject">
-                          <button
-                            className="float-right text-theme-600 hover:text-theme-800"
-                            title={"Edit Candidate"}
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setCandidateToEdit(c)
-                              setOpenModal(true)
-                            }}
-                          >
-                            <PencilIcon className="w-5 h-5" />
-                          </button>
-                        </span>
-                        <span title="Reject">
-                          <button
-                            className="float-right text-red-600 hover:text-red-800"
-                            title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setCandidateToReject(c)
-                              setOpenCandidateRejectConfirm(true)
-                            }}
-                          >
-                            {viewRejected ? (
-                              <RefreshIcon className="w-5 h-5" />
-                            ) : (
-                              <BanIcon className="w-5 h-5" />
-                            )}
-                          </button>
-                        </span>
-                        {!viewRejected && (
-                          <span title="Reject">
+                      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
+                        JobUserRole.OWNER ||
+                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
+                          JobUserRole.ADMIN) && (
+                        <div className="flex items-center space-x-2">
+                          <span>
                             <button
                               className="float-right text-theme-600 hover:text-theme-800"
-                              title="Move to next stage"
+                              title={"Edit Candidate"}
                               type="button"
                               onClick={(e) => {
                                 e.preventDefault()
-                                setCandidateToMove(c)
-                                setOpenCandidateMoveConfirm(true)
+                                setCandidateToEdit(c)
+                                setOpenModal(true)
                               }}
                             >
-                              <ArrowRightIcon className="w-5 h-5" />
+                              <PencilIcon className="w-5 h-5" />
                             </button>
                           </span>
-                        )}
-                      </div>
+                          <span>
+                            <button
+                              className="float-right text-red-600 hover:text-red-800"
+                              title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setCandidateToReject(c)
+                                setOpenCandidateRejectConfirm(true)
+                              }}
+                            >
+                              {viewRejected ? (
+                                <RefreshIcon className="w-5 h-5" />
+                              ) : (
+                                <BanIcon className="w-5 h-5" />
+                              )}
+                            </button>
+                          </span>
+                          {!viewRejected && (
+                            <span>
+                              <button
+                                className="float-right text-theme-600 hover:text-theme-800"
+                                title="Move to next stage"
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  setCandidateToMove(c)
+                                  setOpenCandidateMoveConfirm(true)
+                                }}
+                              >
+                                <ArrowRightIcon className="w-5 h-5" />
+                              </button>
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ),
@@ -293,6 +304,16 @@ const getBoard = (
 
 type CandidateProps = {
   job: ExtendedJob
+  user:
+    | (User & {
+        companies: (CompanyUser & {
+          company: Company
+        })[]
+        jobs: (JobUser & {
+          job: Job
+        })[]
+      })
+    | undefined
   isKanban: boolean
   viewRejected: boolean
   enableDrag: boolean
@@ -442,34 +463,64 @@ const Candidates = (props: CandidateProps) => {
     },
     {
       Header: "Stage",
-      accessor: "workflowStage",
-      Cell: (props) => {
-        const candidate = props.cell.row.original as ExtendedCandidate
-        const stages =
-          candidate?.job.workflow?.stages?.sort((a, b) => {
-            return a.order - b.order
-          }) || []
-        const workflowStage = props.value as ExtendedWorkflowStage
-        const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
+      accessor: "workflowStage.stage.name",
+      // Cell: (props) => {
+      //   const candidate = props.cell.row.original as ExtendedCandidate
+      //   const stages =
+      //     candidate?.job.workflow?.stages?.sort((a, b) => {
+      //       return a.order - b.order
+      //     }) || []
+      //   const workflowStage = props.value as ExtendedWorkflowStage
+      //   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
 
-        return (
-          <Form noFormatting={true} onSubmit={async (values) => {}}>
-            <LabeledSelectField
-              name={`candidate-${candidate?.id}-stage`}
-              defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
-              value={workflowStage?.id}
-              options={stages.map((ws) => {
-                return { label: ws?.stage?.name, value: ws?.id }
-              })}
-              onChange={async (e) => {
-                const selectedWorkflowStageId = e.target.value || ("" as string)
-                updateCandidateStg(candidate, selectedWorkflowStageId)
-              }}
-            />
-          </Form>
-        )
-      },
+      //   return (
+      //     <Form noFormatting={true} onSubmit={async (values) => {}}>
+      //       <LabeledSelectField
+      //         name={`candidate-${candidate?.id}-stage`}
+      //         defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
+      //         value={workflowStage?.id}
+      //         options={stages.map((ws) => {
+      //           return { label: ws?.stage?.name, value: ws?.id }
+      //         })}
+      //         onChange={async (e) => {
+      //           const selectedWorkflowStageId = e.target.value || ("" as string)
+      //           updateCandidateStg(candidate, selectedWorkflowStageId)
+      //         }}
+      //       />
+      //     </Form>
+      //   )
+      // },
     },
+    // {
+    //   Header: "Stage",
+    //   accessor: "workflowStage",
+    //   Cell: (props) => {
+    //     const candidate = props.cell.row.original as ExtendedCandidate
+    //     const stages =
+    //       candidate?.job.workflow?.stages?.sort((a, b) => {
+    //         return a.order - b.order
+    //       }) || []
+    //     const workflowStage = props.value as ExtendedWorkflowStage
+    //     const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
+
+    //     return (
+    //       <Form noFormatting={true} onSubmit={async (values) => {}}>
+    //         <LabeledSelectField
+    //           name={`candidate-${candidate?.id}-stage`}
+    //           defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
+    //           value={workflowStage?.id}
+    //           options={stages.map((ws) => {
+    //             return { label: ws?.stage?.name, value: ws?.id }
+    //           })}
+    //           onChange={async (e) => {
+    //             const selectedWorkflowStageId = e.target.value || ("" as string)
+    //             updateCandidateStg(candidate, selectedWorkflowStageId)
+    //           }}
+    //         />
+    //       </Form>
+    //     )
+    //   },
+    // },
     {
       Header: "Source",
       accessor: "source",
@@ -505,29 +556,35 @@ const Candidates = (props: CandidateProps) => {
       columns.push(getDynamicColumn(formQuestion))
     })
 
-  columns.push({
-    Header: "",
-    accessor: "action",
-    Cell: (props) => {
-      return (
-        <>
-          <Link
-            href={Routes.CandidateSettingsPage({
-              slug: props.cell.row.original.job?.slug,
-              candidateSlug: props.cell.row.original.slug,
-            })}
-            passHref
-          >
-            <a className="text-theme-600 hover:text-theme-900">Settings</a>
-          </Link>
-        </>
-      )
-    },
-  })
+  // const setCandidateToEdit = props.setCandidateToEdit
+  // const setOpenModal = props.setOpenModal
+  // columns.push({
+  //   Header: "",
+  //   accessor: "action",
+  //   Cell: (props) => {
+  //     return (
+  //       <>
+  //         <button
+  //           className="float-right text-theme-600 hover:text-theme-800"
+  //           title={"Edit Candidate"}
+  //           type="button"
+  //           onClick={(e) => {
+  //             e.preventDefault()
+  //             setCandidateToEdit(props.cell.row.original as any)
+  //             setOpenModal(true)
+  //           }}
+  //         >
+  //           <PencilIcon className="w-5 h-5" />
+  //         </button>
+  //       </>
+  //     )
+  //   },
+  // })
 
   const [board, setBoard] = useState(
     getBoard(
       props.job,
+      props.user,
       candidates,
       props.viewRejected,
       setCandidateToReject,
@@ -543,6 +600,7 @@ const Candidates = (props: CandidateProps) => {
     setBoard(
       getBoard(
         props.job,
+        props.user,
         candidates,
         props.viewRejected,
         setCandidateToReject,
@@ -556,6 +614,7 @@ const Candidates = (props: CandidateProps) => {
     )
   }, [
     props.job,
+    props.user,
     candidates,
     props.viewRejected,
     setCandidateToReject,
@@ -847,8 +906,13 @@ const SingleJobPage = ({
 
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
+
       <button
-        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3"
+        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={
+          user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.OWNER &&
+          user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
+        }
         onClick={(e) => {
           if (canCreateCandidate) {
             // router.push(Routes.NewCandidate({ slug: job?.slug! }))
@@ -863,16 +927,21 @@ const SingleJobPage = ({
         New Candidate
       </button>
 
-      {canUpdate && (
-        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
-          <a
-            className="float-right underline text-theme-600 ml-3 py-2 hover:text-theme-800"
-            data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
-          >
-            Job Settings
-          </a>
-        </Link>
-      )}
+      <Link
+        href={
+          canUpdate
+            ? Routes.JobSettingsPage({ slug: job?.slug! })
+            : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
+        }
+        passHref
+      >
+        <a
+          className="float-right underline text-theme-600 ml-3 py-2 hover:text-theme-800"
+          data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
+        >
+          Job Settings
+        </a>
+      </Link>
 
       <Link
         href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
@@ -914,7 +983,7 @@ const SingleJobPage = ({
             flex={true}
             value={isKanban}
             onChange={(switchState) => {
-              setKanban(switchState)
+              setKanban(!isKanban)
             }}
           />
         </Form>
@@ -933,36 +1002,40 @@ const SingleJobPage = ({
             flex={true}
             value={viewRejected}
             onChange={(switchState) => {
-              setViewRejected(switchState)
+              setViewRejected(!viewRejected)
             }}
           />
         </Form>
       </div>
 
-      <div className="float-right text-theme-600 py-2 ml-3">
-        <Form
-          noFormatting={true}
-          onSubmit={(value) => {
-            return value
-          }}
-        >
-          <LabeledToggleSwitch
-            name="toggleEnableDrag"
-            label="Enable Drag"
-            flex={true}
-            value={enableDrag}
-            onChange={(switchState) => {
-              setEnableDrag(switchState)
+      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.OWNER ||
+        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.ADMIN) && (
+        <div className="float-right text-theme-600 py-2 ml-3">
+          <Form
+            noFormatting={true}
+            onSubmit={(value) => {
+              return value
             }}
-          />
-        </Form>
-      </div>
+          >
+            <LabeledToggleSwitch
+              name="toggleEnableDrag"
+              label="Enable Drag"
+              flex={true}
+              value={enableDrag}
+              onChange={(switchState) => {
+                setEnableDrag(!enableDrag)
+              }}
+            />
+          </Form>
+        </div>
+      )}
 
       <Suspense
         fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
       >
         <Candidates
           job={job as any}
+          user={user}
           isKanban={isKanban}
           viewRejected={viewRejected}
           enableDrag={enableDrag}
