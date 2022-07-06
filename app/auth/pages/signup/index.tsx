@@ -62,8 +62,8 @@ const SignupPage: BlitzPage = () => {
         <div className="bg-white rounded p-6 w-full max-w-xl shadow-sm">
           <div className="flex flex-col space-y-6">
             <div className="text-center">
-              <h1 className="text-gray-800 text-xl font-medium">Start Your Journey</h1>
-              <p className="text-gray-400 text-sm">
+              <h1 className="text-gray-800 text-2xl font-medium">Start Your Journey</h1>
+              <p className="text-gray-500">
                 Already have an account?{" "}
                 <Link href={Routes.LoginPage()} passHref>
                   <a className="text-theme-600 hover:text-theme-900 font-medium">Login</a>

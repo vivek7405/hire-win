@@ -19,7 +19,7 @@ export const SignupForm = (props: SignupFormProps) => {
     <div className="flex flex-col space-y-6">
       <div className="text-center">
         <h1 className="text-gray-800 text-xl font-medium">Start Your Journey</h1>
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-500">
           Already have an account?{" "}
           <Link href={Routes.LoginPage()} passHref>
             <a className="text-theme-600 hover:text-theme-900 font-medium">Login</a>

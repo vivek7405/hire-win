@@ -102,7 +102,7 @@ const LoginPage: BlitzPage = () => {
         </div>
 
         <div>
-          <p className="text-gray-400">
+          <p className="text-gray-500">
             Forgot your password?{" "}
             <Link href={Routes.ForgotPasswordPage()} passHref>
               <a className="text-theme-600 hover:text-theme-900 font-medium">Reset Password</a>
