@@ -91,6 +91,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
 
   const [categories] = useQuery(getCompanyJobCategoriesForFilter, {
     searchString,
+    companyId: company?.id,
   })
   const [selectedCategoryId, setSelectedCategoryId] = useState(null as string | null)
 
@@ -99,6 +100,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
     take: ITEMS_PER_PAGE,
     categoryId: selectedCategoryId,
     searchString,
+    companyId: company?.id,
   })
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1

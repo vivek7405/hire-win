@@ -8,31 +8,32 @@ import { JobViewType } from "types"
 
 type GetCategoriesInput = {
   searchString: string
+  companyId: number | null
 }
-const getCompanyJobCategoriesForFilter = resolver.pipe(
-  resolver.authorize(),
-  async ({ searchString }: GetCategoriesInput, ctx: Ctx) => {
-    const validThrough = { gte: moment().utc().toDate() }
+const getCompanyJobCategoriesForFilter = async (
+  { searchString, companyId }: GetCategoriesInput,
+  ctx: Ctx
+) => {
+  const validThrough = { gte: moment().utc().toDate() }
 
-    const categories = await db.category.findMany({
-      where: {
-        companyId: ctx.session.companyId || 0,
-        jobs: {
-          some: {
-            archived: false,
-            validThrough,
-            title: {
-              contains: JSON.parse(searchString),
-              mode: "insensitive",
-            },
+  const categories = await db.category.findMany({
+    where: {
+      companyId: companyId || 0,
+      jobs: {
+        some: {
+          archived: false,
+          validThrough,
+          title: {
+            contains: JSON.parse(searchString),
+            mode: "insensitive",
           },
         },
       },
-      include: { jobs: { select: { id: true, archived: true } } },
-      orderBy: { name: "asc" },
-    })
-    return categories
-  }
-)
+    },
+    include: { jobs: { select: { id: true, archived: true } } },
+    orderBy: { name: "asc" },
+  })
+  return categories
+}
 
 export default getCompanyJobCategoriesForFilter
