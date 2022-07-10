@@ -3,6 +3,7 @@ import Card from "app/core/components/Card"
 import Confirm from "app/core/components/Confirm"
 import Form from "app/core/components/Form"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
+import LabeledTextField from "app/core/components/LabeledTextField"
 import Modal from "app/core/components/Modal"
 import Debouncer from "app/core/utils/debouncer"
 import { invalidateQuery, useMutation, useQuery, useRouter } from "blitz"
@@ -14,32 +15,13 @@ import updateDefaultCalendar from "../mutations/updateDefaultCalendar"
 import getCalendars from "../queries/getCalendars"
 import getDefaultCalendarByUser from "../queries/getDefaultCalendarByUser"
 import AddCalendarForm from "./AddCalendarForm"
+import { z } from "zod"
+import updateCalendarName from "../mutations/updateCalendarName"
 
 type CalendarProps = {
   user: User
 }
 const Calendars = ({ user }: CalendarProps) => {
-  // const columns = [
-  //   {
-  //     Header: "Name",
-  //     accessor: "name",
-  //   },
-  //   {
-  //     Header: "Type",
-  //     accessor: "type",
-  //     Cell: (props) => {
-  //       let val = props.value.includes("Caldav") ? "Caldav" : props.value
-  //       val = val.includes("Google") ? "Google" : val
-  //       val = val.includes("Outlook") ? "Outlook" : val
-  //       return val
-  //     },
-  //   },
-  //   {
-  //     Header: "Status",
-  //     accessor: "status",
-  //   },
-  // ]
-
   const [updateDefaultCalendarMutation] = useMutation(updateDefaultCalendar)
   const [showAddCalendarModal, setShowAddCalendarModal] = useState(false)
   const [query, setQuery] = useState({})
@@ -75,12 +57,11 @@ const Calendars = ({ user }: CalendarProps) => {
 
   const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
   const [deleteCalendarMutation] = useMutation(deleteCalendar)
+  const [updateCalendarNameMutation] = useMutation(updateCalendarName)
   const [calendarToDelete, setCalendarToDelete] = useState(null as any as Calendar)
   const [openConfirm, setOpenConfirm] = useState(false)
-
-  // if (error) {
-  //   return <ErrorComponent statusCode={error.statusCode} title={error.message} />
-  // }
+  const [openNameUpdateModal, setOpenNameUpdateModal] = useState(false)
+  const [calendarToUpdateName, setCalendarToUpdateName] = useState(null as any as Calendar | null)
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -113,6 +94,36 @@ const Calendars = ({ user }: CalendarProps) => {
         />
       </Modal>
 
+      <Modal
+        header="Add a new Schedule"
+        open={openNameUpdateModal}
+        setOpen={setOpenNameUpdateModal}
+      >
+        <Form
+          header="Update Calendar Name"
+          subHeader=""
+          submitText="Submit"
+          initialValues={{ name: calendarToUpdateName?.name || "" }}
+          schema={z.object({ name: z.string().nonempty({ message: "Required" }) })}
+          onSubmit={async (values) => {
+            const toastId = toast.loading(`Updating Calendar Name to ${calendarToUpdateName?.name}`)
+            try {
+              await updateCalendarNameMutation({
+                calendarId: calendarToUpdateName?.id || 0,
+                calendarName: values.name || "",
+              })
+              toast.success("Calendar Name Updated", { id: toastId })
+              await invalidateQuery(getCalendars)
+            } catch (error) {
+              toast.error(`Updating calendar name failed - ${error.toString()}`, { id: toastId })
+            }
+            setOpenNameUpdateModal(false)
+          }}
+        >
+          <LabeledTextField name="name" />
+        </Form>
+      </Modal>
+
       <div className="flex justify-between">
         <input
           placeholder="Search"
@@ -143,11 +154,11 @@ const Calendars = ({ user }: CalendarProps) => {
               try {
                 await deleteCalendarMutation(calendarToDelete?.id)
                 toast.success("Calendar Deleted", { id: toastId })
-                setOpenConfirm(false)
                 await invalidateQuery(getCalendars)
               } catch (error) {
                 toast.error(`Deleting calendar failed - ${error.toString()}`, { id: toastId })
               }
+              setOpenConfirm(false)
             }}
           >
             Are you sure you want to delete the calendar?
@@ -231,11 +242,17 @@ const Calendars = ({ user }: CalendarProps) => {
               <Card key={cal.id}>
                 <div className="space-y-2">
                   <div className="w-full relative">
-                    <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                      {/* {cal.name} */}
-                      <a className="cursor-pointer text-theme-600 hover:text-theme-800">
-                        {cal.name}
-                      </a>
+                    <div className="flex md:justify-center lg:justify:center items-center">
+                      <button
+                        onClick={() => {
+                          setCalendarToUpdateName(cal as any)
+                          setOpenNameUpdateModal(true)
+                        }}
+                      >
+                        <span className="cursor-pointer text-theme-600 font-bold hover:text-theme-800">
+                          {cal.name}
+                        </span>
+                      </button>
                     </div>
                     <div className="absolute top-0.5 right-0">
                       <button
