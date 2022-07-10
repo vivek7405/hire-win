@@ -8,7 +8,7 @@ export default resolver.pipe(resolver.zod(z.number()), resolver.authorize(), asy
   })
 
   if (scheduleCalendar > 0) {
-    return "error"
+    throw new Error("Can't delete, schedule is being used.")
   }
 
   await db.dailySchedule.deleteMany({
@@ -18,5 +18,5 @@ export default resolver.pipe(resolver.zod(z.number()), resolver.authorize(), asy
     where: { id: scheduleId },
   })
 
-  return "success"
+  return true
 })

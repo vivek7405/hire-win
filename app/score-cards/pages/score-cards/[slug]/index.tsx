@@ -365,7 +365,7 @@ export const CardQuestions = ({
               { id: toastId }
             )
           }
-          router.reload()
+          setOpenConfirm(false)
         }}
       >
         Are you sure you want to remove this Question from the Score Card?
