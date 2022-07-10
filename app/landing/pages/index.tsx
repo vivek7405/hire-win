@@ -282,7 +282,31 @@ export default function Home() {
             <div className="w-full text-center pt-2">
               <div className="mt-1">
                 <span className="text-2xl md:text-3xl lg:text-3xl font-bold">
-                  <span className="bg-yellow-300">Tweets</span> from our customers
+                  <span className="bg-yellow-300 underline hover:bg-fuchsia-300">
+                    <a target="_blank" rel="noreferrer" href="https://twitter.com/hire_win">
+                      Tweets
+                    </a>
+                  </span>{" "}
+                  from our customers
+                </span>
+              </div>
+
+              <div className="mt-10">
+                <span className="text-lg font-semibold">
+                  {`We're just getting started, no reviews yet ☹️`}
+                </span>
+                <br />
+                <span className="text-lg font-semibold">
+                  You may be the{" "}
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://twitter.com/hire_win"
+                    className="underline hover:bg-fuchsia-300"
+                  >
+                    first one
+                  </a>
+                  !
                 </span>
               </div>
             </div>
@@ -292,7 +316,7 @@ export default function Home() {
         <section id="support" className="bg-gray-100 py-8 mt-16">
           <div className="container mx-auto px-2 pb-6 text-neutral-800">
             <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
-              Still not convinced?
+              Friendly folks standing by!
             </h2>
             <div className="w-full mb-4">
               <div className="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
@@ -304,6 +328,9 @@ export default function Home() {
                   Write us at <span className="bg-yellow-300">support@hire.win</span> for any
                   queries
                 </span>
+              </div>
+              <div className="mt-10 px-28">
+                {`If it's an issue with your account or you need to report a bug, make sure you attach a screenshot with appropriate details. We'll respond to you as soon as we can!`}
               </div>
             </div>
           </div>

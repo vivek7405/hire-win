@@ -4,6 +4,7 @@ import Navbar from "app/core/components/Navbar"
 import { ExtendedUser } from "types"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import LogoBrand from "app/assets/LogoBrand"
+import moment from "moment"
 
 type LayoutProps = {
   title?: string
@@ -104,6 +105,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                       </a>
                     </Link>
                   </li>
+                  <li className="mr-3">
+                    <Link href={`${Routes.Home().pathname}/#support`}>
+                      <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
+                        Support
+                      </a>
+                    </Link>
+                  </li>
                 </ul>
                 <Link href={Routes.LoginPage()}>
                   <a>
@@ -122,9 +130,9 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
           <div className="container mx-auto mb-auto h-full mt-3">{children}</div>
 
           <footer className="text-neutral-900">
-            <div className="container mx-auto mt-8">
-              <div className="w-full flex flex-col md:flex-row lg:flex-row py-6">
-                <div className="flex-1 mb-6">
+            <div className="container mx-auto my-8">
+              <div className="w-full flex flex-col py-6 items-center justify-center space-y-4">
+                <div>
                   <Link href={Routes.Home()}>
                     <a className="text-orange-600 no-underline hover:no-underline font-bold text-2xl lg:text-4xl">
                       #hireWIN
@@ -132,22 +140,27 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   </Link>
                 </div>
 
-                <div className="flex-1">
+                <div className="flex space-x-4 font-bold">
+                  <Link href={Routes.Terms()}>
+                    <a className="hover:underline">TERMS</a>
+                  </Link>
+                  <Link href={Routes.Privacy()}>
+                    <a className="hover:underline">PRIVACY</a>
+                  </Link>
+                </div>
+
+                <div className="italic">Copyright ©2022 hire.win - All rights reserved</div>
+
+                <div className="italic">Enjoy the rest of your {moment().format("dddd")}!</div>
+
+                {/* <div className="flex-1">
                   <p className="uppercase font-extrabold md:mb-6">Links</p>
                   <ul className="list-reset mb-6">
                     <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                      <Link href={Routes.FAQ()}>
-                        <a className="cursor-pointer font-light no-underline hover:underline">
-                          FAQ
-                        </a>
-                      </Link>
+                      <a className="cursor-pointer font-light no-underline hover:underline">FAQ</a>
                     </li>
                     <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                      <Link href={Routes.Help()}>
-                        <a className="cursor-pointer font-light no-underline hover:underline">
-                          Help
-                        </a>
-                      </Link>
+                      <a className="cursor-pointer font-light no-underline hover:underline">Help</a>
                     </li>
                     <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                       <Link href={Routes.Support()}>
@@ -177,7 +190,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                     </li>
                   </ul>
                 </div>
-                {/* <div className="flex-1">
+                <div className="flex-1">
                   <p className="uppercase font-extrabold md:mb-6">Social</p>
                   <ul className="list-reset mb-6">
                     <li className="mt-2 inline-block mr-2 md:block md:mr-0">
@@ -196,31 +209,27 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                       </a>
                     </li>
                   </ul>
-                </div> */}
+                </div>
                 <div className="flex-1">
                   <p className="uppercase font-extrabold md:mb-6">Company</p>
                   <ul className="list-reset mb-6">
-                    {/* <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
                       <a className="cursor-pointer font-light no-underline hover:underline">
                         Official Blog
                       </a>
-                    </li> */}
-                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                      <Link href={Routes.AboutUs()}>
-                        <a className="cursor-pointer font-light no-underline hover:underline">
-                          About Us
-                        </a>
-                      </Link>
                     </li>
                     <li className="mt-2 inline-block mr-2 md:block md:mr-0">
-                      <Link href={Routes.Contact()}>
-                        <a className="cursor-pointer font-light no-underline hover:underline">
-                          Contact
-                        </a>
-                      </Link>
+                      <a className="cursor-pointer font-light no-underline hover:underline">
+                        About Us
+                      </a>
+                    </li>
+                    <li className="mt-2 inline-block mr-2 md:block md:mr-0">
+                      <a className="cursor-pointer font-light no-underline hover:underline">
+                        Contact
+                      </a>
                     </li>
                   </ul>
-                </div>
+                </div> */}
               </div>
             </div>
           </footer>
