@@ -217,6 +217,7 @@ const Candidates = (props: CandidateProps) => {
         return (
           <>
             <Link
+              prefetch={true}
               href={Routes.SingleCandidatePage({
                 slug: props.cell.row.original.job?.slug,
                 candidateSlug: props.cell.row.original.slug,
@@ -271,6 +272,7 @@ const Candidates = (props: CandidateProps) => {
       return (
         <>
           <Link
+            prefetch={true}
             href={Routes.CandidateSettingsPage({
               slug: props.cell.row.original.job?.slug,
               candidateSlug: props.cell.row.original.slug,
@@ -314,13 +316,13 @@ const CandidatesHome = ({
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
-      <Link href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
+      <Link prefetch={true} href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Candidate
         </a>
       </Link>
       {canUpdate && (
-        <Link href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
+        <Link prefetch={true} href={Routes.JobSettingsPage({ slug: job?.slug! })} passHref>
           <a
             className="float-right underline text-theme-600 mr-8 py-2 hover:text-theme-800"
             data-testid={`${job?.title && `${job?.title}-`}settingsLink`}

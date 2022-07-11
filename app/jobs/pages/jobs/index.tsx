@@ -721,7 +721,7 @@ const JobsHome = ({
         </div>
 
         <div className="flex items-center">
-          <Link href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
+          <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
             <a
               target="_blank"
               rel="noopener noreferrer"
