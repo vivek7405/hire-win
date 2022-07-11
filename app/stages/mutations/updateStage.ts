@@ -15,7 +15,7 @@ async function updateStage({ where, data, initial }: UpdateStageInput, ctx: Ctx)
 
   const { name } = StageObj.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.stage.findFirst({ where: { slug: e } })

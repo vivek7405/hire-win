@@ -5,7 +5,7 @@ import factoryCategories from "../utils/factoryCategories"
 
 async function createFactoryCategories(companyId: number) {
   const getSlug = async (q) => {
-    const slug = slugify(q.name, { strict: true })
+    const slug = slugify(q.name, { strict: true, lower: true })
     const newSlug = await findFreeSlug(
       slug,
       async (e) => await db.category.findFirst({ where: { slug: e } })

@@ -14,7 +14,7 @@ export default resolver.pipe(
       throw new Error("Email body can't be empty")
     }
 
-    const slug = slugify(subject, { strict: true })
+    const slug = slugify(subject, { strict: true, lower: true })
     const newSlug = await findFreeSlug(
       slug,
       async (e) => await db.email.findFirst({ where: { slug: e } })

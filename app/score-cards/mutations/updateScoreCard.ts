@@ -14,7 +14,7 @@ async function updateScoreCard({ where, data, initial }: UpdateScoreCardInput, c
 
   const { name } = ScoreCardObj.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.scoreCard.findFirst({ where: { slug: e } })

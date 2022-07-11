@@ -15,7 +15,7 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
 
   const { name, placeholder, options, acceptedFiles } = QuestionObj.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.question.findFirst({ where: { slug: e } })

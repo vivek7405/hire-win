@@ -15,7 +15,7 @@ async function updateCandidatePool({ where, data, initial }: UpdateCandidatePool
 
   const { name } = CandidatePoolObj.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.candidatePool.findFirst({ where: { slug: e } })

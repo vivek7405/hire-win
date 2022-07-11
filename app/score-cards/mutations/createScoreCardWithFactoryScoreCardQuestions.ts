@@ -8,14 +8,14 @@ async function createScoreCardWithFactoryScoreCardQuestions(
   companyId: number,
   factoryScoreCard: boolean
 ) {
-  const slugScoreCard = slugify(scoreCardName, { strict: true })
+  const slugScoreCard = slugify(scoreCardName, { strict: true, lower: true })
   const newSlugScoreCard = await findFreeSlug(
     slugScoreCard,
     async (e) => await db.scoreCard.findFirst({ where: { slug: e } })
   )
 
   const getCardQuestionSlug = async (fq) => {
-    const slugCardQuestion = slugify(fq.cardQuestion.name, { strict: true })
+    const slugCardQuestion = slugify(fq.cardQuestion.name, { strict: true, lower: true })
     const newSlugCardQuestion = await findFreeSlug(
       slugCardQuestion,
       async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })

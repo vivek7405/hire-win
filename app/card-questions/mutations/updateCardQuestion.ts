@@ -15,7 +15,7 @@ async function updateCardQuestion({ where, data, initial }: UpdateCardQuestionIn
 
   const { name } = CardQuestionObj.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })

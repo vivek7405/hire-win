@@ -9,7 +9,7 @@ import Guard from "app/guard/ability"
 async function createCandidate(data: CandidateInputType, ctx: Ctx) {
   const { name, email, resume, answers, jobId, source } = Candidate.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug = await findFreeSlug(
     slug,
     async (e) => await db.candidate.findFirst({ where: { slug: e } })

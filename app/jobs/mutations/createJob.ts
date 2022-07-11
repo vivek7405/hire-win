@@ -35,7 +35,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
   })
   if (!user) throw new AuthenticationError()
 
-  const slug = slugify(title, { strict: true })
+  const slug = slugify(title, { strict: true, lower: true })
   const newSlug = await findFreeSlug(
     slug,
     async (e) => await db.job.findFirst({ where: { slug: e } })

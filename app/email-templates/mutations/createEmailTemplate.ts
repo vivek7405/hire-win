@@ -8,7 +8,7 @@ export default resolver.pipe(
   resolver.zod(EmailTemplateObj),
   resolver.authorize(),
   async ({ name, subject, body }, ctx: Ctx) => {
-    const slug = slugify(name, { strict: true })
+    const slug = slugify(name, { strict: true, lower: true })
     const newSlug = await findFreeSlug(
       slug,
       async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })

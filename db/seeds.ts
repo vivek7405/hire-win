@@ -19,11 +19,11 @@ async function createUsers() {
     try {
       const hashedPassword = await SecurePassword.hash(user.password.trim())
 
-      const slug = slugify(`${user.companyName}`, { strict: true })
-      const newSlug: string = await findFreeSlug(
-        slug,
-        async (e) => await db.company.findFirst({ where: { slug: e } })
-      )
+      // const slug = slugify(`${user.companyName}`, { strict: true, lower: true })
+      // const newSlug: string = await findFreeSlug(
+      //   slug,
+      //   async (e) => await db.company.findFirst({ where: { slug: e } })
+      // )
 
       const createdUser = await db.user.create({
         data: {
