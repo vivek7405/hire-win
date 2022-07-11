@@ -163,7 +163,7 @@ const Navbar = ({ user }: NavbarProps) => {
       </Confirm>
       <nav className="bg-theme-600 py-2">
         <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
-          <Link href={Routes.JobsHome()}>
+          <Link prefetch={true} href={Routes.JobsHome()}>
             <a className="w-12 h-12">
               <Logo fill="white" strokeWidth={0.1} />
             </a>
@@ -173,7 +173,7 @@ const Navbar = ({ user }: NavbarProps) => {
             <div className="space-x-2 flex">
               {nav.map((item, i) => {
                 return (
-                  <Link href={item.href} passHref key={i}>
+                  <Link prefetch={true} href={item.href} passHref key={i}>
                     <a
                       className={`${
                         item.focus
@@ -326,7 +326,7 @@ const Navbar = ({ user }: NavbarProps) => {
           <div className="p-5 flex flex-col lg:hidden">
             {nav.map((item, i) => {
               return (
-                <Link href={item.href} passHref key={i}>
+                <Link prefetch={true} href={item.href} passHref key={i}>
                   <a
                     className={`${
                       item.focus
@@ -346,7 +346,7 @@ const Navbar = ({ user }: NavbarProps) => {
               if (!item) return <></>
 
               return item.href.length ? (
-                <Link href={item.href} passHref key={i}>
+                <Link prefetch={true} href={item.href} passHref key={i}>
                   <a
                     data-testid={`${item.name}-navLink`}
                     className={`px-4 py-2 text-sm text-neutral-50 hover:text-neutral-200`}
