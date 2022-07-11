@@ -5,31 +5,15 @@ import LogoBrand from "app/assets/LogoBrand"
 import { useState } from "react"
 import LandingLayout from "app/core/layouts/LandingLayout"
 
-// export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-//   path.resolve("next.config.js")
-//   path.resolve("blitz.config.js")
-//   path.resolve(".next/blitz/db.js")
+export async function getStaticProps(context: GetStaticPropsContext) {
+  path.resolve("next.config.js")
+  path.resolve("blitz.config.js")
+  path.resolve(".next/blitz/db.js")
 
-//   const user = await getCurrentUserServer({ ...context })
-
-//   if (user) {
-//     return {
-//       redirect: {
-//         destination: "/jobs",
-//         permanent: false,
-//       },
-//       props: {},
-//     }
-//   }
-
-//   return { props: {} }
-// }
-
-// export async function getStaticProps(context: GetStaticPropsContext) {
-//   return {
-//     props: {},
-//   }
-// }
+  return {
+    props: {},
+  }
+}
 
 export default function Terms() {
   return (

@@ -146,6 +146,9 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                 <Link href={Routes.Privacy()}>
                   <a className="hover:underline">PRIVACY</a>
                 </Link>
+                <Link href={Routes.Cookies()}>
+                  <a className="hover:underline">COOKIES</a>
+                </Link>
               </div>
 
               <div className="italic">Copyright ©2022 hire.win - All rights reserved</div>
