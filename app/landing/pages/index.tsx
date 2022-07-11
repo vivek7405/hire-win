@@ -32,6 +32,7 @@ import LandingLayout from "app/core/layouts/LandingLayout"
 // }
 
 export default function Home() {
+  const screenshotsBucketURL = "https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots"
   const [imageIndex, setImageIndex] = useState(0)
   const imageArray = [
     <Image
@@ -40,98 +41,98 @@ export default function Home() {
       objectFit="contain"
       key="jobs"
       alt="Dashboard Job Listing"
-      src="/screenshots/Jobs.png"
+      src={`${screenshotsBucketURL}/Jobs.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="kanban board"
       alt="Dashboard Job Listing"
-      src="/screenshots/Kanban Board.png"
+      src={`${screenshotsBucketURL}/Kanban-Board.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="candidates table"
       alt="Dashboard Job Listing"
-      src="/screenshots/Candidates Table.png"
+      src={`${screenshotsBucketURL}/Candidates-Table.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="job edit"
       alt="Dashboard Job Listing"
-      src="/screenshots/Job Edit.png"
+      src={`${screenshotsBucketURL}/Job-Edit.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="job members"
       alt="Dashboard Job Listing"
-      src="/screenshots/Job Members.png"
+      src={`${screenshotsBucketURL}/Job-Members.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="candidate detail"
       alt="Dashboard Job Listing"
-      src="/screenshots/Candidate Detail.png"
+      src={`${screenshotsBucketURL}/Candidate-Detail.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="form"
       alt="Dashboard Job Listing"
-      src="/screenshots/Form.png"
+      src={`${screenshotsBucketURL}/Form.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="workflows"
       alt="Dashboard Job Listing"
-      src="/screenshots/Workflows.png"
+      src={`${screenshotsBucketURL}/Workflows.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="workflow"
       alt="Dashboard Job Listing"
-      src="/screenshots/Workflow.png"
+      src={`${screenshotsBucketURL}/Workflow.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="score card"
       alt="Dashboard Job Listing"
-      src="/screenshots/Score Card.png"
+      src={`${screenshotsBucketURL}/Score-Card.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="interview scheduling"
       alt="Dashboard Job Listing"
-      src="/screenshots/Interview Scheduling.png"
+      src={`${screenshotsBucketURL}/Interview-Scheduling.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="company settings"
       alt="Dashboard Job Listing"
-      src="/screenshots/Company Settings.png"
+      src={`${screenshotsBucketURL}/Company-Settings.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="schedules"
       alt="Dashboard Job Listing"
-      src="/screenshots/Schedules.png"
+      src={`${screenshotsBucketURL}/Schedules.webp`}
     />,
     <Image
       layout="fill"
       objectFit="contain"
       key="calendars"
       alt="Dashboard Job Listing"
-      src="/screenshots/Calendars.png"
+      src={`${screenshotsBucketURL}/Calendars.webp`}
     />,
   ]
 
