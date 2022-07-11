@@ -19,7 +19,7 @@ export default function Privacy() {
   return (
     <LandingLayout title="hire-win | Privacy">
       <div className="w-full h-full flex justify-center">
-        <h1 className="font-bold text-5xl">This is the Privacy Section</h1>
+        <h1 className="font-bold text-5xl">Privacy Policy</h1>
       </div>
     </LandingLayout>
   )

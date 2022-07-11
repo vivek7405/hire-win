@@ -21,7 +21,7 @@ export const SignupForm = (props: SignupFormProps) => {
         <h1 className="text-gray-800 text-xl font-medium">Start Your Journey</h1>
         <p className="text-gray-500">
           Already have an account?{" "}
-          <Link href={Routes.LoginPage()} passHref>
+          <Link prefetch={true} href={Routes.LoginPage()} passHref>
             <a className="text-theme-600 hover:text-theme-900 font-medium">Login</a>
           </Link>
         </p>
@@ -89,6 +89,29 @@ export const SignupForm = (props: SignupFormProps) => {
           type="password"
           testid="signupPassword"
         />
+        <div>
+          <label className="text-xs text-neutral-500">
+            By signing up, you agree to the{" "}
+            <Link href={Routes.Terms()}>
+              <a target="_blank" className="text-indigo-600 underline">
+                Terms of Service
+              </a>
+            </Link>{" "}
+            and{" "}
+            <Link href={Routes.Privacy()}>
+              <a target="_blank" className="text-indigo-600 underline">
+                Privacy Policy
+              </a>
+            </Link>
+            , including{" "}
+            <Link href={Routes.Cookies()}>
+              <a target="_blank" className="text-indigo-600 underline">
+                Cookie Use
+              </a>
+            </Link>
+            .
+          </label>
+        </div>
       </AuthForm>
     </div>
   )
