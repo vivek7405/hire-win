@@ -97,13 +97,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                     </a>
                   </Link>
                 </li>
-                <li className="mr-3">
+                {/* <li className="mr-3">
                   <Link href={`${Routes.Home().pathname}/#reviews`}>
                     <a className="inline-block cursor-pointer hover:underline font-semibold py-2 px-4 text-black no-underline">
                       Reviews
                     </a>
                   </Link>
-                </li>
+                </li> */}
                 <li className="mr-3">
                   <Link href={`${Routes.Home().pathname}/#support`}>
                     <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">

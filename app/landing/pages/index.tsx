@@ -32,39 +32,107 @@ export async function getStaticProps(context: GetStaticPropsContext) {
 }
 
 export default function Home() {
-  // const [imageIndex, setImageIndex] = useState(0)
-  // const imageArray = [
-  //   <img key="jobs" alt="Dashboard Job Listing" src="/screenshots/Jobs.png" />,
-  //   <img key="kanban board" alt="Dashboard Job Listing" src="/screenshots/Kanban Board.png" />,
-  //   <img
-  //     key="candidates table"
-  //     alt="Dashboard Job Listing"
-  //     src="/screenshots/Candidates Table.png"
-  //   />,
-  //   <img key="job edit" alt="Dashboard Job Listing" src="/screenshots/Job Edit.png" />,
-  //   <img key="job members" alt="Dashboard Job Listing" src="/screenshots/Job Members.png" />,
-  //   <img
-  //     key="candidate detail"
-  //     alt="Dashboard Job Listing"
-  //     src="/screenshots/Candidate Detail.png"
-  //   />,
-  //   <img key="form" alt="Dashboard Job Listing" src="/screenshots/Form.png" />,
-  //   <img key="workflows" alt="Dashboard Job Listing" src="/screenshots/Workflows.png" />,
-  //   <img key="workflow" alt="Dashboard Job Listing" src="/screenshots/Workflow.png" />,
-  //   <img key="score card" alt="Dashboard Job Listing" src="/screenshots/Score Card.png" />,
-  //   <img
-  //     key="interview scheduling"
-  //     alt="Dashboard Job Listing"
-  //     src="/screenshots/Interview Scheduling.png"
-  //   />,
-  //   <img
-  //     key="company settings"
-  //     alt="Dashboard Job Listing"
-  //     src="/screenshots/Company Settings.png"
-  //   />,
-  //   <img key="schedules" alt="Dashboard Job Listing" src="/screenshots/Schedules.png" />,
-  //   <img key="calendars" alt="Dashboard Job Listing" src="/screenshots/Calendars.png" />,
-  // ]
+  const [imageIndex, setImageIndex] = useState(0)
+  const imageArray = [
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="jobs"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Jobs.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="kanban board"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Kanban Board.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="candidates table"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Candidates Table.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="job edit"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Job Edit.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="job members"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Job Members.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="candidate detail"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Candidate Detail.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="form"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Form.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="workflows"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Workflows.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="workflow"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Workflow.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="score card"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Score Card.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="interview scheduling"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Interview Scheduling.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="company settings"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Company Settings.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="schedules"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Schedules.png"
+    />,
+    <Image
+      layout="fill"
+      objectFit="contain"
+      key="calendars"
+      alt="Dashboard Job Listing"
+      src="/screenshots/Calendars.png"
+    />,
+  ]
 
   return (
     <LandingLayout>
@@ -139,132 +207,54 @@ export default function Home() {
           </div>
         </div>
 
-        <section id="screenshots" className="py-8">
-          <Suspense fallback="Loading...">
-            <h1 className="text-center pt-8 pb-4 lg:pb-8 font-bold text-3xl lg:text-5xl">
+        <section id="screenshots" className="py-8 bg-gray-100 mt-16">
+          <div className="container px-10">
+            <h1 className="text-center pb-4 lg:pb-8 font-bold text-3xl lg:text-5xl">
               Pictures speak louder than words!
             </h1>
 
-            {/* <div className="text-indigo-600 font-bold text-2xl lg:text-4xl text-center">
-            <button
-              className="hover:underline"
-              onClick={() => {
-                if (imageIndex === 0) {
-                  setImageIndex(imageArray.length - 1)
-                } else {
-                  setImageIndex(imageIndex - 1)
-                }
-              }}
-            >
-              Prev
-            </button>{" "}
-            |{" "}
-            <button
-              className="hover:underline"
-              onClick={() => {
-                if (imageIndex === imageArray.length - 1) {
-                  setImageIndex(0)
-                } else {
-                  setImageIndex(imageIndex + 1)
-                }
-              }}
-            >
-              Next
-            </button>
+            <div className="text-indigo-600 font-bold text-2xl lg:text-4xl text-center">
+              <button
+                className="hover:underline"
+                onClick={() => {
+                  if (imageIndex === 0) {
+                    setImageIndex(imageArray.length - 1)
+                  } else {
+                    setImageIndex(imageIndex - 1)
+                  }
+                }}
+              >
+                Prev
+              </button>{" "}
+              |{" "}
+              <button
+                className="hover:underline"
+                onClick={() => {
+                  if (imageIndex === imageArray.length - 1) {
+                    setImageIndex(0)
+                  } else {
+                    setImageIndex(imageIndex + 1)
+                  }
+                }}
+              >
+                Next
+              </button>
+            </div>
+            <div className="flex flex-col space-y-12 mt-3 border-2 border-indigo-500 p-2">
+              <div className="w-full h-screen relative">
+                {imageArray.map((image, index) => {
+                  return (
+                    <span hidden={index !== imageIndex} key={image.key}>
+                      {image}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col space-y-12 mt-3">
-            {imageArray.map((image, index) => {
-              return (
-                <span hidden={index !== imageIndex} key={image.key}>
-                  {image}
-                </span>
-              )
-            })}
-          </div> */}
-
-            <img key="jobs" alt="Dashboard Job Listing" src="/screenshots/Jobs.png" />
-            <img
-              className="mt-5"
-              key="kanban board"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Kanban Board.png"
-            />
-            <img
-              className="mt-5"
-              key="candidates table"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Candidates Table.png"
-            />
-            <img
-              className="mt-5"
-              key="job edit"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Job Edit.png"
-            />
-            <img
-              className="mt-5"
-              key="job members"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Job Members.png"
-            />
-            <img
-              className="mt-5"
-              key="candidate detail"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Candidate Detail.png"
-            />
-            <img
-              className="mt-5"
-              key="form"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Form.png"
-            />
-            <img
-              className="mt-5"
-              key="workflows"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Workflows.png"
-            />
-            <img
-              className="mt-5"
-              key="workflow"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Workflow.png"
-            />
-            <img
-              className="mt-5"
-              key="score card"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Score Card.png"
-            />
-            <img
-              className="mt-5"
-              key="interview scheduling"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Interview Scheduling.png"
-            />
-            <img
-              className="mt-5"
-              key="company settings"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Company Settings.png"
-            />
-            <img
-              className="mt-5"
-              key="schedules"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Schedules.png"
-            />
-            <img
-              className="mt-5"
-              key="calendars"
-              alt="Dashboard Job Listing"
-              src="/screenshots/Calendars.png"
-            />
-          </Suspense>
         </section>
 
-        <section id="pricing" className="bg-gray-100 py-8 mt-8">
+        <section id="pricing" className="bg-gray-100 py-8 mt-16">
           <div className="container mx-auto px-2 pb-6 text-neutral-800">
             <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
               Pricing?
@@ -352,7 +342,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="reviews" className="bg-gray-100 py-8 mt-16">
+        {/* <section id="reviews" className="bg-gray-100 py-8 mt-16">
           <div className="container mx-auto px-2 pb-6 text-neutral-800">
             <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
               <span>{`Don't believe us, believe them!`}</span>
@@ -393,7 +383,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section id="support" className="bg-gray-100 py-8 mt-16">
           <div className="container mx-auto px-2 pb-6 text-neutral-800">
