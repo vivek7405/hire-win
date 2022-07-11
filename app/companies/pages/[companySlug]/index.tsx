@@ -245,6 +245,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
             <div key={job.id}>
               <Card isFull={true}>
                 <Link
+                  prefetch={true}
                   href={Routes.JobDescriptionPage({
                     companySlug: company?.slug,
                     jobSlug: job.slug,

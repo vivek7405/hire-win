@@ -112,7 +112,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   </Link>
                 </li>
               </ul>
-              <Link href={Routes.LoginPage()}>
+              <Link prefetch={true} href={Routes.LoginPage()}>
                 <a>
                   <button
                     id="navAction"
@@ -140,13 +140,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
               </div>
 
               <div className="flex space-x-4 font-bold">
-                <Link href={Routes.Terms()}>
+                <Link prefetch={true} href={Routes.Terms()}>
                   <a className="hover:underline">TERMS</a>
                 </Link>
-                <Link href={Routes.Privacy()}>
+                <Link prefetch={true} href={Routes.Privacy()}>
                   <a className="hover:underline">PRIVACY</a>
                 </Link>
-                <Link href={Routes.Cookies()}>
+                <Link prefetch={true} href={Routes.Cookies()}>
                   <a className="hover:underline">COOKIES</a>
                 </Link>
               </div>

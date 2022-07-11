@@ -192,7 +192,11 @@ const CandidatePools = ({ user }) => {
                 <div className="space-y-2">
                   <div className="w-full relative">
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                      <Link href={Routes.SingleCandidatePoolPage({ slug: cp.slug })} passHref>
+                      <Link
+                        prefetch={true}
+                        href={Routes.SingleCandidatePoolPage({ slug: cp.slug })}
+                        passHref
+                      >
                         <a className="cursor-pointer text-theme-600 hover:text-theme-800">
                           {cp.name}
                         </a>

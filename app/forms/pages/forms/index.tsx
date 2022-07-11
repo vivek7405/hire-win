@@ -192,7 +192,7 @@ const Forms = () => {
                 <div className="space-y-2">
                   <div className="w-full relative">
                     <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                      <Link href={Routes.SingleFormPage({ slug: w.slug })} passHref>
+                      <Link prefetch={true} href={Routes.SingleFormPage({ slug: w.slug })} passHref>
                         <a
                           data-testid={`categorylink`}
                           className="text-theme-600 hover:text-theme-800"
@@ -340,7 +340,7 @@ const Forms = () => {
 //   //     accessor: "name",
 //   //     Cell: (props) => {
 //   //       return (
-//   //         <Link href={Routes.SingleFormPage({ slug: props.cell.row.original.slug })} passHref>
+//   //         <Link prefetch={true} href={Routes.SingleFormPage({ slug: props.cell.row.original.slug })} passHref>
 //   //           <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-900">
 //   //             {props.cell.row.original.name}
 //   //           </a>
@@ -361,7 +361,7 @@ const Forms = () => {
 //   //       return (
 //   //         <>
 //   //           {props.cell.row.original.canUpdate && (
-//   //             <Link href={Routes.FormSettingsPage({ slug: props.cell.row.original.slug })} passHref>
+//   //             <Link prefetch={true} href={Routes.FormSettingsPage({ slug: props.cell.row.original.slug })} passHref>
 //   //               <a className="text-theme-600 hover:text-theme-900">Settings</a>
 //   //             </Link>
 //   //           )}
@@ -399,7 +399,7 @@ const Forms = () => {
 //             <div className="space-y-2">
 //               <div className="w-full relative">
 //                 <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-//                   <Link href={Routes.SingleFormPage({ slug: f.slug })} passHref>
+//                   <Link prefetch={true} href={Routes.SingleFormPage({ slug: f.slug })} passHref>
 //                     <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-800">
 //                       {f.name}
 //                     </a>
@@ -407,7 +407,7 @@ const Forms = () => {
 //                 </div>
 //                 <div className="absolute top-0.5 right-0">
 //                   {f.canUpdate && (
-//                     <Link href={Routes.FormSettingsPage({ slug: f.slug })} passHref>
+//                     <Link prefetch={true} href={Routes.FormSettingsPage({ slug: f.slug })} passHref>
 //                       <a className="float-right text-theme-600 hover:text-theme-800">
 //                         <CogIcon className="h-6 w-6" />
 //                       </a>
@@ -446,7 +446,7 @@ const Forms = () => {
 //           //     <span>
 //           //       <div className="w-full relative">
 //           //         <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
-//           //           <Link href={Routes.SingleFormPage({ slug: f.slug })} passHref>
+//           //           <Link prefetch={true} href={Routes.SingleFormPage({ slug: f.slug })} passHref>
 //           //             <a data-testid={`formlink`} className="text-theme-600 hover:text-theme-800">
 //           //               {f.name}
 //           //             </a>
@@ -454,7 +454,7 @@ const Forms = () => {
 //           //         </div>
 //           //         <div className="absolute top-0.5 right-0">
 //           //           {f.canUpdate && (
-//           //             <Link href={Routes.FormSettingsPage({ slug: f.slug })} passHref>
+//           //             <Link prefetch={true} href={Routes.FormSettingsPage({ slug: f.slug })} passHref>
 //           //               <a className="float-right text-theme-600 hover:text-theme-800">
 //           //                 <CogIcon className="h-5 w-5" />
 //           //               </a>
@@ -495,13 +495,13 @@ const Forms = () => {
 const FormsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="FormsHome | hire-win" user={user}>
-      {/* <Link href={Routes.NewForm()} passHref>
+      {/* <Link prefetch={true} href={Routes.NewForm()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Form
         </a>
       </Link>
 
-      <Link href={Routes.QuestionsHome()} passHref>
+      <Link prefetch={true} href={Routes.QuestionsHome()} passHref>
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
           Question Pool
         </a>

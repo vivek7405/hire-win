@@ -287,7 +287,7 @@ const Questions = () => {
 const QuestionsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="QuestionsHome | hire-win" user={user}>
-      {/* <Link href={Routes.NewQuestion()} passHref>
+      {/* <Link prefetch={true} href={Routes.NewQuestion()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Question
         </a>

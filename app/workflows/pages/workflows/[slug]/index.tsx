@@ -159,7 +159,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
   //       return (
   //         <>
   //           {workflowStage.stage.allowEdit ? (
-  //             <Link href={Routes.SingleStagePage({ slug: workflowStage.stage.slug })} passHref>
+  //             <Link prefetch={true} href={Routes.SingleStagePage({ slug: workflowStage.stage.slug })} passHref>
   //               <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
   //                 {workflowStage.stage.name}
   //               </a>
@@ -391,7 +391,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
                       {ws.stage.name}
                     </a>
                   ) : (
-                    // <Link href={Routes.SingleStagePage({ slug: ws.stage.slug })} passHref>
+                    // <Link prefetch={true} href={Routes.SingleStagePage({ slug: ws.stage.slug })} passHref>
                     //   <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
                     //     {ws.stage.name}
                     //   </a>
@@ -401,7 +401,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
                 </div>
                 {ws.stage.allowEdit && (
                   <div className="absolute top-0.5 right-0">
-                    {/* <Link href={Routes.FormSettingsPage({ slug: fq.slug })} passHref>
+                    {/* <Link prefetch={true} href={Routes.FormSettingsPage({ slug: fq.slug })} passHref>
                       <a className="float-right text-red-600 hover:text-red-800">
                         <TrashIcon className="h-5 w-5" />
                       </a>
@@ -602,7 +602,7 @@ const SingleWorkflowPage = ({
       <br className="block md:hidden lg:hidden" />
       {/* {canUpdate && (
         <>
-          <Link href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })} passHref>
+          <Link prefetch={true} href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })} passHref>
             <a data-testid={`${workflow?.name && `${workflow?.name}-`}settingsLink`}>Settings</a>
           </Link>
           <br />
@@ -654,13 +654,17 @@ const SingleWorkflowPage = ({
         <div className="space-y-6">
           <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
             <div className="space-x-8 flex flex-row justify-between">
-              <Link href={Routes.StagesHome()} passHref>
+              <Link prefetch={true} href={Routes.StagesHome()} passHref>
                 <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
                   Stage Pool
                 </a>
               </Link>
 
-              <Link href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })} passHref>
+              <Link
+                prefetch={true}
+                href={Routes.WorkflowSettingsPage({ slug: workflow?.slug! })}
+                passHref
+              >
                 <a
                   className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
                   data-testid={`${workflow?.name && `${workflow?.name}-`}settingsLink`}

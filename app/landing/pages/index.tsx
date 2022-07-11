@@ -147,14 +147,14 @@ export default function Home() {
             Applicant Tracking, Collaborating, Interviewing & more!
           </p>
 
-          <Link href={Routes.SignupPage()}>
+          <Link prefetch={true} href={Routes.SignupPage()}>
             <a>
               <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
                 Sign Up
               </button>
             </a>
           </Link>
-          <Link href={Routes.LoginPage()}>
+          <Link prefetch={true} href={Routes.LoginPage()}>
             <a className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-neutral-600 font-extrabold py-2 lg:py-4 px-8">
               Login
             </a>
@@ -424,7 +424,7 @@ export default function Home() {
                 </span>
               </div>
               <div className="mt-6">
-                <Link href={Routes.SignupPage()}>
+                <Link prefetch={true} href={Routes.SignupPage()}>
                   <a>
                     <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
                       Sign Up

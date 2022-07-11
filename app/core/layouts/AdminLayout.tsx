@@ -16,7 +16,7 @@
 //     <div className="flex flex-col lg:flex-row mt-6 lg:space-x-4">
 //       <div className="w-full mb-6 lg:mb-0 lg:w-1/5">
 //         {subNavigation.map((item) => (
-//           <Link href={item.href} passHref key={item.name}>
+//           <Link prefetch={true} href={item.href} passHref key={item.name}>
 //             <a
 //               data-testid={`${item.name}-jobSettingsLink`}
 //               className={`${

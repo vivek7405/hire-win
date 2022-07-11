@@ -195,7 +195,11 @@ const Workflows = () => {
                 <div className="space-y-2">
                   <div className="w-full relative">
                     <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                      <Link href={Routes.SingleWorkflowPage({ slug: w.slug })} passHref>
+                      <Link
+                        prefetch={true}
+                        href={Routes.SingleWorkflowPage({ slug: w.slug })}
+                        passHref
+                      >
                         <a
                           data-testid={`categorylink`}
                           className="text-theme-600 hover:text-theme-800"
@@ -278,13 +282,13 @@ const Workflows = () => {
 const WorkflowsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="WorkflowsHome | hire-win" user={user}>
-      {/* <Link href={Routes.NewWorkflow()} passHref>
+      {/* <Link prefetch={true} href={Routes.NewWorkflow()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Workflow
         </a>
       </Link> */}
 
-      {/* <Link href={Routes.StagesHome()} passHref>
+      {/* <Link prefetch={true} href={Routes.StagesHome()} passHref>
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
           Stage Pool
         </a>

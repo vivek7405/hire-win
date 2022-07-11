@@ -203,7 +203,7 @@ const Categories = () => {
                       >
                         {c.name}
                       </a>
-                      {/* <Link href={Routes.SingleCategoryPage({ slug: c.slug })} passHref>
+                      {/* <Link prefetch={true} href={Routes.SingleCategoryPage({ slug: c.slug })} passHref>
                         <a className="cursor-pointer text-theme-600 hover:text-theme-800">
                           {c.name}
                         </a>
@@ -242,7 +242,7 @@ const Categories = () => {
 const CategoriesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="CategoriesHome | hire-win" user={user}>
-      {/* <Link href={Routes.NewCategory()} passHref>
+      {/* <Link prefetch={true} href={Routes.NewCategory()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Category
         </a>

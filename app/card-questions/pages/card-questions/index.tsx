@@ -272,7 +272,7 @@ const CardQuestions = () => {
 const CardQuestionsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="CardQuestionsHome | hire-win" user={user}>
-      {/* <Link href={Routes.NewCardQuestion()} passHref>
+      {/* <Link prefetch={true} href={Routes.NewCardQuestion()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Question
         </a>

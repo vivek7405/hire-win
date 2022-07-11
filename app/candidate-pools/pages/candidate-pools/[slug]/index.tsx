@@ -211,6 +211,7 @@ export const Candidates = ({ slug }) => {
                   <div className="w-full relative">
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
                       <Link
+                        prefetch={true}
                         href={Routes.SingleCandidatePage({
                           slug: candidate?.job?.slug,
                           candidateSlug: candidate?.slug,

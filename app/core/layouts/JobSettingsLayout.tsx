@@ -54,7 +54,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
         {subNavigation.map(
           (item) =>
             item.canView && (
-              <Link href={item.href} passHref key={item.name}>
+              <Link prefetch={true} href={item.href} passHref key={item.name}>
                 <a
                   data-testid={`${item.name}-jobSettingsLink`}
                   className={`${

@@ -197,6 +197,7 @@ const getBoard = (
                   <div>
                     <div className="font-bold flex items-center">
                       <Link
+                        prefetch={true}
                         href={Routes.SingleCandidatePage({
                           slug: c.job?.slug,
                           candidateSlug: c.slug,
@@ -449,6 +450,7 @@ const Candidates = (props: CandidateProps) => {
         return (
           <>
             <Link
+              prefetch={true}
               href={Routes.SingleCandidatePage({
                 slug: props.cell.row.original.job?.slug,
                 candidateSlug: props.cell.row.original.slug,
@@ -928,6 +930,7 @@ const SingleJobPage = ({
       </button>
 
       <Link
+        prefetch={true}
         href={
           canUpdate
             ? Routes.JobSettingsPage({ slug: job?.slug! })
@@ -944,6 +947,7 @@ const SingleJobPage = ({
       </Link>
 
       <Link
+        prefetch={true}
         href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
         passHref
       >
