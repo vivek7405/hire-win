@@ -44,7 +44,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Jobs.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="kanban board"
@@ -52,7 +51,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Kanban-Board.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="candidates table"
@@ -60,7 +58,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Candidates-Table.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="job edit"
@@ -68,7 +65,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Job-Edit.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="job members"
@@ -76,7 +72,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Job-Members.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="candidate detail"
@@ -84,7 +79,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Candidate-Detail.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="form"
@@ -92,7 +86,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Form.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="workflows"
@@ -100,7 +93,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Workflows.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="workflow"
@@ -108,7 +100,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Workflow.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="score card"
@@ -116,7 +107,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Score-Card.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="interview scheduling"
@@ -124,7 +114,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Interview-Scheduling.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="company settings"
@@ -132,7 +121,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Company-Settings.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="schedules"
@@ -140,7 +128,6 @@ export default function Home() {
       src={`${screenshotsBucketURL}/Schedules.webp`}
     />,
     <Image
-      priority={true}
       layout="fill"
       objectFit="contain"
       key="calendars"
@@ -189,8 +176,8 @@ export default function Home() {
               rel="noopener noreferrer"
               href={
                 process.env.NODE_ENV === "production"
-                  ? "https://hire.win/basecamp"
-                  : "http://localhost:3000/Padason"
+                  ? "https://hire.win/padason"
+                  : "http://localhost:3000/padason"
               }
             >
               <svg
@@ -213,8 +200,8 @@ export default function Home() {
             <iframe
               src={
                 process.env.NODE_ENV === "production"
-                  ? "https://hire.win/basecamp/Software-Engineer"
-                  : "http://localhost:3000/Padason"
+                  ? "https://hire.win/padason/software-engineer"
+                  : "http://localhost:3000/padason"
               }
               title="Job Board"
               className="w-full h-full rounded-b-lg"
