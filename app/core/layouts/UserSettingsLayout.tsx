@@ -84,7 +84,7 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
           if (!item) return <></>
 
           return (
-            <Link href={item.href} passHref key={item.name}>
+            <Link prefetch={true} href={item.href} passHref key={item.name}>
               <a
                 data-testid={`${item.name}-userSettingsLink`}
                 className={`${

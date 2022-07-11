@@ -196,7 +196,11 @@ const ScoreCards = () => {
                 <div className="space-y-2">
                   <div className="w-full relative">
                     <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                      <Link href={Routes.SingleScoreCardPage({ slug: w.slug })} passHref>
+                      <Link
+                        prefetch={true}
+                        href={Routes.SingleScoreCardPage({ slug: w.slug })}
+                        passHref
+                      >
                         <a
                           data-testid={`categorylink`}
                           className="text-theme-600 hover:text-theme-800"
@@ -283,13 +287,13 @@ const ScoreCards = () => {
 const ScoreCardsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="ScoreCardsHome | hire-win" user={user}>
-      {/* <Link href={Routes.NewScoreCard()} passHref>
+      {/* <Link prefetch={true} href={Routes.NewScoreCard()} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Score Card
         </a>
       </Link>
 
-      <Link href={Routes.CardQuestionsHome()} passHref>
+      <Link prefetch={true} href={Routes.CardQuestionsHome()} passHref>
         <a className="float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800">
           Question Pool
         </a>

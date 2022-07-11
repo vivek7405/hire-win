@@ -88,7 +88,7 @@
 //       <Breadcrumbs />
 //       <br />
 //       {canUpdate && (
-//         <Link href={Routes.StageSettingsPage({ slug: stage?.slug! })} passHref>
+//         <Link prefetch={true} href={Routes.StageSettingsPage({ slug: stage?.slug! })} passHref>
 //           <a data-testid={`${stage?.name && `${stage?.name}-`}settingsLink`}>Settings</a>
 //         </Link>
 //       )}

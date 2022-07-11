@@ -107,7 +107,7 @@ const JobApplicationLayout = ({
           <div className="flex justify-center items-center">
             <span className="self-center cursor-pointer">
               {company?.slug && (
-                <Link href={Routes.CareersPage({ companySlug: company?.slug })}>
+                <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug })}>
                   {logo?.Location ? (
                     <img src={logo?.Location} alt={`${company?.name} logo`} width={200} />
                   ) : (
@@ -159,7 +159,7 @@ const JobApplicationLayout = ({
               {!isCareersPage && (
                 <span className="hover:text-neutral-200">
                   {company?.slug && (
-                    <Link href={Routes.CareersPage({ companySlug: company?.slug })}>
+                    <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug })}>
                       View all jobs
                     </Link>
                   )}
@@ -177,7 +177,9 @@ const JobApplicationLayout = ({
             <div className="flex justify-center items-center">
               <span>Powered by&nbsp;</span>
               <span className="underline hover:text-neutral-200">
-                <Link href={Routes.JobsHome()}>hire.win</Link>
+                <Link prefetch={true} href={Routes.JobsHome()}>
+                  hire.win
+                </Link>
               </span>
             </div>
           </div>

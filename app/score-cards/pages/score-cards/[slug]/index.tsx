@@ -202,7 +202,7 @@ export const CardQuestions = ({
                         {sq.cardQuestion.name}
                       </a>
                     ) : (
-                      // <Link
+                      // <Link prefetch={true}
                       //   href={Routes.SingleCardQuestionPage({ slug: sq.cardQuestion.slug })}
                       //   passHref
                       // >
@@ -523,13 +523,17 @@ const SingleScoreCardPage = ({
                 Preview ScoreCard
               </button> */}
 
-              <Link href={Routes.CardQuestionsHome()} passHref>
+              <Link prefetch={true} href={Routes.CardQuestionsHome()} passHref>
                 <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
                   Question Pool
                 </a>
               </Link>
 
-              <Link href={Routes.ScoreCardSettingsPage({ slug: scoreCard?.slug! })} passHref>
+              <Link
+                prefetch={true}
+                href={Routes.ScoreCardSettingsPage({ slug: scoreCard?.slug! })}
+                passHref
+              >
                 <a
                   className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
                   data-testid={`${scoreCard?.name && `${scoreCard?.name}-`}settingsLink`}
