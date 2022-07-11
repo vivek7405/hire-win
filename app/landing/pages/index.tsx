@@ -35,6 +35,7 @@ export default function Home() {
   const [imageIndex, setImageIndex] = useState(0)
   const imageArray = [
     <Image
+      priority={true}
       layout="fill"
       objectFit="contain"
       key="jobs"

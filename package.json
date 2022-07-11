@@ -93,6 +93,7 @@
     "react-table": "7.7.0",
     "request": "2.88.2",
     "secure-e2ee": "0.4.0",
+    "sharp": "0.30.7",
     "slugify": "1.6.3",
     "stripe": "8.208.0",
     "tailwindcss": "3.0.18",
