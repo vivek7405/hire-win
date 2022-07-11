@@ -9,14 +9,14 @@ async function createFormWithFactoryFormQuestions(
   companyId: number,
   factoryForm: boolean
 ) {
-  const slugForm = slugify(formName, { strict: true })
+  const slugForm = slugify(formName, { strict: true, lower: true })
   const newSlugForm = await findFreeSlug(
     slugForm,
     async (e) => await db.form.findFirst({ where: { slug: e } })
   )
 
   const getQuestionSlug = async (fq) => {
-    const slugQuestion = slugify(fq.question.name, { strict: true })
+    const slugQuestion = slugify(fq.question.name, { strict: true, lower: true })
     const newSlugQuestion = await findFreeSlug(
       slugQuestion,
       async (e) => await db.question.findFirst({ where: { slug: e } })

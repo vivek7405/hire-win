@@ -5,7 +5,7 @@ import factoryCandidatePools from "../utils/factoryCandidatePools"
 
 async function createFactoryCandidatePools(companyId: number) {
   const getSlug = async (q) => {
-    const slug = slugify(q.name, { strict: true })
+    const slug = slugify(q.name, { strict: true, lower: true })
     const newSlug = await findFreeSlug(
       slug,
       async (e) => await db.candidatePool.findFirst({ where: { slug: e } })

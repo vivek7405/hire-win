@@ -13,7 +13,7 @@ export default Guard.authorize(
   resolver.pipe(
     resolver.zod(CompanyObj),
     async ({ name, logo, website, theme, info }, ctx: Ctx) => {
-      const slug = slugify(name, { strict: true })
+      const slug = slugify(name, { strict: true, lower: true })
       const newSlug = await findFreeSlug(
         slug,
         async (e) => await db.company.findFirst({ where: { slug: e } })

@@ -37,7 +37,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   if (!user) throw new AuthenticationError()
 
-  const slug = slugify(title, { strict: true })
+  const slug = slugify(title, { strict: true, lower: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.job.findFirst({ where: { slug: e } })

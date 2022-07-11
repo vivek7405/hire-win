@@ -15,7 +15,7 @@ async function updateCategory({ where, data, initial }: UpdateCategoryInput, ctx
 
   const { name } = CategoryObj.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug: string = await findFreeSlug(
     slug,
     async (e) => await db.category.findFirst({ where: { slug: e } })

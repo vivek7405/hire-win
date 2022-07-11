@@ -18,7 +18,7 @@ async function addNewCardQuestionToScoreCard(data: CardQuestionInputType, ctx: C
   // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   // if (!user) throw new AuthenticationError()
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug = await findFreeSlug(
     slug,
     async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })

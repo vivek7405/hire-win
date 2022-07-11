@@ -8,14 +8,14 @@ async function createWorkflowWithFactoryWorkflowStages(
   companyId: number,
   factoryWorkflow: boolean
 ) {
-  const slugWorkflow = slugify(workflowName, { strict: true })
+  const slugWorkflow = slugify(workflowName, { strict: true, lower: true })
   const newSlugWorkflow = await findFreeSlug(
     slugWorkflow,
     async (e) => await db.workflow.findFirst({ where: { slug: e } })
   )
 
   const getStageSlug = async (fq) => {
-    const slugStage = slugify(fq.stage.name, { strict: true })
+    const slugStage = slugify(fq.stage.name, { strict: true, lower: true })
     const newSlugStage = await findFreeSlug(
       slugStage,
       async (e) => await db.stage.findFirst({ where: { slug: e } })

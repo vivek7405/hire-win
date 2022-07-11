@@ -35,7 +35,7 @@ export default async function signup(
 
   const hashedPassword = await SecurePassword.hash(password.trim())
 
-  const slug = slugify(companyName || "NA", { strict: true })
+  const slug = slugify(companyName || "NA", { strict: true, lower: true })
   const newSlug = await findFreeSlug(
     slug,
     async (e) => await db.company.findFirst({ where: { slug: e } })

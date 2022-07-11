@@ -5,7 +5,7 @@ import factoryEmailTemplates from "../utils/factoryEmailTemplates"
 
 async function createFactoryEmailTemplates(companyId: number) {
   const getSlug = async (q) => {
-    const slug = slugify(q.name, { strict: true })
+    const slug = slugify(q.name, { strict: true, lower: true })
     const newSlug = await findFreeSlug(
       slug,
       async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })

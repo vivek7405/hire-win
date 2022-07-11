@@ -10,7 +10,7 @@ async function createCandidatePool(data: CandidatePoolInputType, ctx: Ctx) {
 
   const { name } = CandidatePoolObj.parse(data)
 
-  const slug = slugify(name, { strict: true })
+  const slug = slugify(name, { strict: true, lower: true })
   const newSlug = await findFreeSlug(
     slug,
     async (e) => await db.candidatePool.findFirst({ where: { slug: e } })
