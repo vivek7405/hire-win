@@ -19,7 +19,7 @@ export const LoginForm = (props: LoginFormProps) => {
         <h1 className="text-gray-800 text-2xl font-medium">Welcome!</h1>
         <p className="text-gray-500">
           Enter your login details to access your account. Or{" "}
-          <Link href={Routes.SignupPage()} passHref>
+          <Link prefetch={true} href={Routes.SignupPage()} passHref>
             <a
               className="text-theme-600 hover:text-theme-900 font-medium"
               data-testid={`signupLink`}

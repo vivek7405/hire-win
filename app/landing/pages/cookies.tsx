@@ -19,7 +19,7 @@ export default function Cookies() {
   return (
     <LandingLayout title="hire-win | Cookies">
       <div className="w-full h-full flex justify-center">
-        <h1 className="font-bold text-5xl">This is the Cookies Section</h1>
+        <h1 className="font-bold text-5xl">Cookie Use</h1>
       </div>
     </LandingLayout>
   )

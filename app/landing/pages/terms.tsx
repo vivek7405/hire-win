@@ -19,7 +19,7 @@ export default function Terms() {
   return (
     <LandingLayout title="hire-win | Terms">
       <div className="w-full h-full flex justify-center">
-        <h1 className="font-bold text-5xl">This is the Terms Section</h1>
+        <h1 className="font-bold text-5xl">Terms of Service</h1>
       </div>
     </LandingLayout>
   )
