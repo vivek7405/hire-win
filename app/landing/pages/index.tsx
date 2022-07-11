@@ -25,11 +25,11 @@ import LandingLayout from "app/core/layouts/LandingLayout"
 //   return { props: {} }
 // }
 
-export async function getStaticProps(context: GetStaticPropsContext) {
-  return {
-    props: {},
-  }
-}
+// export async function getStaticProps(context: GetStaticPropsContext) {
+//   return {
+//     props: {},
+//   }
+// }
 
 export default function Home() {
   const [imageIndex, setImageIndex] = useState(0)
