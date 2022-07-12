@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { FormStep } from "types"
 import Form from "./Form"
 
@@ -56,7 +56,9 @@ const MultiStepForm = (props: MultiStepFormProps) => {
       </div>
 
       {steps.map((stp, index) => {
-        return index + 1 === step && stp.renderComponent
+        return (
+          index + 1 === step && <Suspense fallback="Loading...">{stp.renderComponent}</Suspense>
+        )
       })}
     </Form>
   )
