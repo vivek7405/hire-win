@@ -16,7 +16,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import getForms from "app/forms/queries/getForms"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection } from "types"
 import { CogIcon, PencilIcon, TrashIcon } from "@heroicons/react/outline"
@@ -507,9 +507,7 @@ const FormsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSidePro
         </a>
       </Link> */}
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <Forms />
       </Suspense>
     </AuthLayout>

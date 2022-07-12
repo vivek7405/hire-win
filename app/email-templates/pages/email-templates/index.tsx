@@ -20,7 +20,7 @@ import {
 import path from "path"
 import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import Skeleton from "react-loading-skeleton"
+
 import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
 import { TrashIcon } from "@heroicons/react/outline"
 import { EmailTemplate } from "@prisma/client"
@@ -131,48 +131,50 @@ const EmailTemplates = ({ user }) => {
       </button>
 
       <Modal header="Add New Template" open={openModal} setOpen={setOpenModal}>
-        <EmailTemplateForm
-          header="New Email Template"
-          subHeader="HTML Template"
-          initialValues={
-            emailTemplateToEdit
-              ? {
-                  name: emailTemplateToEdit.name,
-                  subject: emailTemplateToEdit.subject,
-                  body: EditorState.createWithContent(
-                    convertFromRaw(emailTemplateToEdit?.body || {})
-                  ),
-                }
-              : { body: EditorState.createEmpty() }
-          }
-          onSubmit={async (values) => {
-            const isEdit = emailTemplateToEdit ? true : false
-
-            const toastId = toast.loading(isEdit ? "Updating template" : "Adding template")
-            try {
-              values.body = convertToRaw(values?.body?.getCurrentContent())
-              isEdit
-                ? await updateEmailTemplateMutation({
-                    where: { id: emailTemplateToEdit.id },
-                    data: { ...values },
-                    initial: emailTemplateToEdit,
-                  })
-                : await createEmailTemplateMutation({ ...values })
-              await invalidateQuery(getEmailTemplates)
-              toast.success(
-                isEdit ? "Template updated successfully" : "Template added successfully",
-                { id: toastId }
-              )
-              setEmailTemplateToEdit(null as any)
-              setOpenModal(false)
-            } catch (error) {
-              toast.error(
-                `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
-                { id: toastId }
-              )
+        <Suspense fallback="Loading...">
+          <EmailTemplateForm
+            header="New Email Template"
+            subHeader="HTML Template"
+            initialValues={
+              emailTemplateToEdit
+                ? {
+                    name: emailTemplateToEdit.name,
+                    subject: emailTemplateToEdit.subject,
+                    body: EditorState.createWithContent(
+                      convertFromRaw(emailTemplateToEdit?.body || {})
+                    ),
+                  }
+                : { body: EditorState.createEmpty() }
             }
-          }}
-        />
+            onSubmit={async (values) => {
+              const isEdit = emailTemplateToEdit ? true : false
+
+              const toastId = toast.loading(isEdit ? "Updating template" : "Adding template")
+              try {
+                values.body = convertToRaw(values?.body?.getCurrentContent())
+                isEdit
+                  ? await updateEmailTemplateMutation({
+                      where: { id: emailTemplateToEdit.id },
+                      data: { ...values },
+                      initial: emailTemplateToEdit,
+                    })
+                  : await createEmailTemplateMutation({ ...values })
+                await invalidateQuery(getEmailTemplates)
+                toast.success(
+                  isEdit ? "Template updated successfully" : "Template added successfully",
+                  { id: toastId }
+                )
+                setEmailTemplateToEdit(null as any)
+                setOpenModal(false)
+              } catch (error) {
+                toast.error(
+                  `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                  { id: toastId }
+                )
+              }
+            }}
+          />
+        </Suspense>
       </Modal>
       <div className="flex mb-2">
         <input
@@ -240,7 +242,7 @@ const EmailTemplates = ({ user }) => {
 const EmailTemplatesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="Email Templates | hire-win" user={user}>
-      <Suspense fallback={<Skeleton style={{ borderRadius: 0, marginBottom: "6px" }} />}>
+      <Suspense fallback="Loading...">
         <EmailTemplates user={user} />
       </Suspense>
     </AuthLayout>

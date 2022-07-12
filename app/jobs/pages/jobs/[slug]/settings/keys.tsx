@@ -28,7 +28,6 @@ import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
 import { XCircleIcon } from "@heroicons/react/outline"
 import toast from "react-hot-toast"
-import Skeleton from "react-loading-skeleton"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -294,7 +293,7 @@ const JobSettingsKeysPage = ({
                 </button>
               </div>
 
-              <Suspense fallback={<Skeleton height={100} style={{ borderRadius: 0 }} />}>
+              <Suspense fallback="Loading...">
                 <KeyTable job={job} canUpdate={canUpdate} />
               </Suspense>
             </div>

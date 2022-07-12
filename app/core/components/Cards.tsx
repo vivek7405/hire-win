@@ -221,10 +221,7 @@ const Cards = ({
                 </Draggable>
               ))
             ) : (
-              <div
-                // className='react-kanban-card-skeleton'
-                className={`box-border ${isFull ? "w-full" : "w-60"}`}
-              />
+              <div className={`box-border ${isFull ? "w-full" : "w-60"}`} />
             )}
           </DroppableColumn>
           {/* </div> */}

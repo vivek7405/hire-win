@@ -22,7 +22,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getWorkflow from "app/workflows/queries/getWorkflow"
-import Skeleton from "react-loading-skeleton"
+
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import toast from "react-hot-toast"
@@ -641,9 +641,7 @@ const SingleWorkflowPage = ({
             Add Stage
           </button>
           <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
+            fallback="Loading..."
           >
             <Stages workflow={workflow} user={user} />
           </Suspense>
@@ -680,30 +678,32 @@ const SingleWorkflowPage = ({
                 open={openAddExistingStage}
                 setOpen={setOpenAddExistingStage}
               >
-                <AddExistingStagesForm
-                  schema={WorkflowStages}
-                  companyId={session.companyId || 0}
-                  workflowId={workflow?.id!}
-                  onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Adding Stage(s)</span>)
-                    try {
-                      await addExistingWorkflowStagesMutation({
-                        workflowId: workflow?.id as string,
-                        stageIds: values.stageIds,
-                      })
-                      toast.success(() => <span>Stage(s) added</span>, {
-                        id: toastId,
-                      })
-                      router.reload()
-                    } catch (error) {
-                      toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " +
-                          error.toString(),
-                        { id: toastId }
-                      )
-                    }
-                  }}
-                />
+                <Suspense fallback="Loading...">
+                  <AddExistingStagesForm
+                    schema={WorkflowStages}
+                    companyId={session.companyId || 0}
+                    workflowId={workflow?.id!}
+                    onSubmit={async (values) => {
+                      const toastId = toast.loading(() => <span>Adding Stage(s)</span>)
+                      try {
+                        await addExistingWorkflowStagesMutation({
+                          workflowId: workflow?.id as string,
+                          stageIds: values.stageIds,
+                        })
+                        toast.success(() => <span>Stage(s) added</span>, {
+                          id: toastId,
+                        })
+                        router.reload()
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          { id: toastId }
+                        )
+                      }
+                    }}
+                  />
+                </Suspense>
               </Modal>
               <button
                 onClick={(e) => {
@@ -785,11 +785,7 @@ const SingleWorkflowPage = ({
             </div>
           </div>
 
-          <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
-          >
+          <Suspense fallback="Loading...">
             <Stages
               workflow={workflow}
               user={user}

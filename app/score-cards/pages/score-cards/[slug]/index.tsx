@@ -22,7 +22,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getScoreCard from "app/score-cards/queries/getScoreCard"
-import Skeleton from "react-loading-skeleton"
+
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import getScoreCardQuestions from "app/score-cards/queries/getScoreCardQuestions"
@@ -545,35 +545,37 @@ const SingleScoreCardPage = ({
 
             <div className="flex flex-row justify-between space-x-3">
               <Modal
-                header="Add CardQuestions from Pool"
+                header="Add Questions from Pool"
                 open={openAddExistingCardQuestions}
                 setOpen={setOpenAddExistingCardQuestions}
               >
-                <AddExistingCardQuestionsForm
-                  schema={ScoreCardQuestions}
-                  user={user}
-                  companyId={session.companyId || 0}
-                  scoreCardId={scoreCard?.id!}
-                  onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Adding CardQuestion(s)</span>)
-                    try {
-                      await addExistingScoreCardQuestionsMutation({
-                        scoreCardId: scoreCard?.id as string,
-                        cardQuestionIds: values.cardQuestionIds,
-                      })
-                      toast.success(() => <span>CardQuestion(s) added</span>, {
-                        id: toastId,
-                      })
-                      router.reload()
-                    } catch (error) {
-                      toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " +
-                          error.toString(),
-                        { id: toastId }
-                      )
-                    }
-                  }}
-                />
+                <Suspense fallback="Loading...">
+                  <AddExistingCardQuestionsForm
+                    schema={ScoreCardQuestions}
+                    user={user}
+                    companyId={session.companyId || 0}
+                    scoreCardId={scoreCard?.id!}
+                    onSubmit={async (values) => {
+                      const toastId = toast.loading(() => <span>Adding CardQuestion(s)</span>)
+                      try {
+                        await addExistingScoreCardQuestionsMutation({
+                          scoreCardId: scoreCard?.id as string,
+                          cardQuestionIds: values.cardQuestionIds,
+                        })
+                        toast.success(() => <span>CardQuestion(s) added</span>, {
+                          id: toastId,
+                        })
+                        router.reload()
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          { id: toastId }
+                        )
+                      }
+                    }}
+                  />
+                </Suspense>
               </Modal>
               <button
                 onClick={(e) => {
@@ -662,11 +664,7 @@ const SingleScoreCardPage = ({
             </div>
           </div>
 
-          <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
-          >
+          <Suspense fallback="Loading...">
             <CardQuestions
               companyId={session.companyId || 0}
               scoreCard={scoreCard}

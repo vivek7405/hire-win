@@ -15,7 +15,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import getUser from "app/users/queries/getUser"
 import SingleFileUploadField from "app/core/components/SingleFileUploadField"
 import { AttachmentObject, CardType, DragDirection, ExtendedJob, Plan } from "types"
@@ -343,9 +343,7 @@ const CareersPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <JobApplicationLayout company={company} isCareersPage={true}>
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <h3 className="text-2xl font-bold">Careers at {titleCase(company?.name)}</h3>
         <div
           className="mt-1 mb-8"

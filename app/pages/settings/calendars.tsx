@@ -20,7 +20,7 @@ import SubscribeButton from "app/users/components/SubscribeButton"
 import { Plan } from "types"
 import { CheckIcon } from "@heroicons/react/outline"
 import { Suspense } from "react"
-import Skeleton from "react-loading-skeleton"
+
 import Calendars from "app/scheduling/calendars/components/Calendars"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
@@ -56,9 +56,7 @@ const UserSettingsCalendarsPage = ({
     <AuthLayout title="Settings" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <UserSettingsLayout>
-        <Suspense
-          fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-        >
+        <Suspense fallback="Loading...">
           <Calendars user={user as any} />
         </Suspense>
       </UserSettingsLayout>

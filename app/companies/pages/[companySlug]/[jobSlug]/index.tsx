@@ -16,7 +16,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import getJobs from "app/jobs/queries/getJobs"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import getUser from "app/users/queries/getUser"
 import SingleFileUploadField from "app/core/components/SingleFileUploadField"
 import { AttachmentObject } from "types"
@@ -115,9 +115,7 @@ const JobDescriptionPage = ({
 
   return (
     <JobApplicationLayout company={company!} job={job!}>
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <button
           type="button"
           className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"

@@ -14,7 +14,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection } from "types"
 import deleteCardQuestion from "app/card-questions/mutations/deleteCardQuestion"
@@ -223,7 +223,7 @@ const CardQuestions = () => {
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
                       {!q.factory ? (
                         <a
-                          className="cursor-pointer text-theme-600 hover:text-theme-800"
+                          className="cursor-pointer text-theme-600 hover:text-theme-800 truncate"
                           onClick={(e) => {
                             e.preventDefault()
                             setCardQuestionToEdit(q)
@@ -233,7 +233,7 @@ const CardQuestions = () => {
                           {q.name}
                         </a>
                       ) : (
-                        <span>{q.name}</span>
+                        <span className="truncate">{q.name}</span>
                       )}
                     </div>
                     {!q.factory && (
@@ -272,15 +272,7 @@ const CardQuestions = () => {
 const CardQuestionsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="CardQuestionsHome | hire-win" user={user}>
-      {/* <Link prefetch={true} href={Routes.NewCardQuestion()} passHref>
-        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
-          New Question
-        </a>
-      </Link> */}
-
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <CardQuestions />
       </Suspense>
     </AuthLayout>

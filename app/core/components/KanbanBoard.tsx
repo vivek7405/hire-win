@@ -240,10 +240,7 @@ const KanbanBoard = ({
                                 </Draggable>
                               ))
                             ) : (
-                              <div
-                                // className='react-kanban-card-skeleton'
-                                className="box-border w-60"
-                              />
+                              <div className="box-border w-60" />
                             )}
                           </DroppableColumn>
                         </div>

@@ -48,7 +48,7 @@ import {
   QuestionType,
   User,
 } from "@prisma/client"
-import Skeleton from "react-loading-skeleton"
+
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
 import Form from "app/core/components/Form"
 import LabeledSelectField from "app/core/components/LabeledSelectField"
@@ -807,6 +807,34 @@ const SingleJobPage = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
+
+  return (
+    <AuthLayout user={user}>
+      <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
+      <br />
+      <Suspense fallback="Loading...">
+        <SingleJobPageContent
+          user={user!}
+          company={company!}
+          job={job!}
+          error={error!}
+          canUpdate={canUpdate!}
+        />
+      </Suspense>
+    </AuthLayout>
+  )
+}
+
+const SingleJobPageContent = ({
+  user,
+  company,
+  job,
+  error,
+  canUpdate,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [isKanban, setKanban] = useState(true)
   const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
   const [openConfirm, setOpenConfirm] = useState(false)
@@ -833,7 +861,7 @@ const SingleJobPage = ({
   }
 
   return (
-    <AuthLayout user={user}>
+    <>
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
@@ -906,8 +934,8 @@ const SingleJobPage = ({
         />
       </Modal>
 
-      <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
-      <br />
+      {/* <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
+      <br /> */}
 
       <button
         className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1034,9 +1062,7 @@ const SingleJobPage = ({
         </div>
       )}
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <Candidates
           job={job as any}
           user={user}
@@ -1047,9 +1073,10 @@ const SingleJobPage = ({
           setOpenModal={setOpenModal}
         />
       </Suspense>
-    </AuthLayout>
+    </>
   )
 }
 
 SingleJobPage.authenticate = true
+
 export default SingleJobPage

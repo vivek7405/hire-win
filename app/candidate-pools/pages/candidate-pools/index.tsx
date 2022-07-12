@@ -16,7 +16,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import { CandidatePool, Job } from "@prisma/client"
 import { CardType, DragDirection, ExtendedCandidatePool } from "types"
 import Debouncer from "app/core/utils/debouncer"
@@ -197,7 +197,7 @@ const CandidatePools = ({ user }) => {
                         href={Routes.SingleCandidatePoolPage({ slug: cp.slug })}
                         passHref
                       >
-                        <a className="cursor-pointer text-theme-600 hover:text-theme-800">
+                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 truncate">
                           {cp.name}
                         </a>
                       </Link>
@@ -250,9 +250,7 @@ const CandidatePools = ({ user }) => {
 const CandidatePoolsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="CandidatePoolsHome | hire-win" user={user}>
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <CandidatePools user={user} />
       </Suspense>
     </AuthLayout>

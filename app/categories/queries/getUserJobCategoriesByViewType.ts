@@ -43,6 +43,7 @@ const getUserJobCategoriesByViewType = resolver.pipe(
       include: { jobs: { select: { id: true, archived: true } } },
       orderBy: { name: "asc" },
     })
+
     return categories
   }
 )

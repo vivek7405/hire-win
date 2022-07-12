@@ -115,6 +115,7 @@ const JobSettingsPage = ({
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
+
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />

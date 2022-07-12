@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react"
+import React, { ReactNode, Suspense } from "react"
 import { useRouter, Link } from "blitz"
 import {
   CreditCardIcon,
@@ -74,7 +74,9 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
             )
         )}
       </div>
-      <div className="space-y-6 w-full">{children}</div>
+      <div className="space-y-6 w-full">
+        <Suspense fallback="Loading">{children}</Suspense>
+      </div>
     </div>
   )
 }

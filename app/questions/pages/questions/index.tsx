@@ -15,7 +15,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import getQuestions from "app/questions/queries/getQuestions"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection } from "types"
 import { Question, QuestionOption } from "@prisma/client"
@@ -233,7 +233,7 @@ const Questions = () => {
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
                       {!q.factory ? (
                         <a
-                          className="cursor-pointer text-theme-600 hover:text-theme-800"
+                          className="cursor-pointer text-theme-600 hover:text-theme-800 truncate"
                           onClick={(e) => {
                             e.preventDefault()
                             setQuestionToEdit(q)
@@ -243,7 +243,7 @@ const Questions = () => {
                           {q.name}
                         </a>
                       ) : (
-                        <span>{q.name}</span>
+                        <span className="truncate">{q.name}</span>
                       )}
                     </div>
                     {!q.factory && (
@@ -287,15 +287,7 @@ const Questions = () => {
 const QuestionsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="QuestionsHome | hire-win" user={user}>
-      {/* <Link prefetch={true} href={Routes.NewQuestion()} passHref>
-        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
-          New Question
-        </a>
-      </Link> */}
-
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <Questions />
       </Suspense>
     </AuthLayout>

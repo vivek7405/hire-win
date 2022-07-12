@@ -48,7 +48,6 @@ import {
   User,
 } from "@prisma/client"
 import Cards from "app/core/components/Cards"
-import Skeleton from "react-loading-skeleton"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
 import { titleCase } from "app/core/utils/titleCase"
@@ -287,7 +286,38 @@ const getCards = (candidate: ExtendedCandidate) => {
 //   )
 // }
 
-const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const SingleCandidatePage = ({
+  user,
+  error,
+  canUpdate,
+  candidateSlug,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
+
+  return (
+    <AuthLayout user={user}>
+      <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
+      <br />
+      <Suspense fallback="Loading...">
+        <SingleCandidatePageContent
+          user={user!}
+          error={error!}
+          canUpdate={canUpdate!}
+          candidateSlug={candidateSlug!}
+        />
+      </Suspense>
+    </AuthLayout>
+  )
+}
+
+const SingleCandidatePageContent = ({
+  user,
+  error,
+  canUpdate,
+  candidateSlug,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   enum CandidateToggleView {
     Scores = "Scores",
     Interviews = "Interviews",
@@ -295,9 +325,9 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
     Emails = "Emails",
   }
 
-  const { user, error, canUpdate } = props
+  // const { user, error, canUpdate } = props
   // const [candidate, setCandidate] = useState(props.candidate)
-  const [candidate] = useQuery(getCandidate, { where: { slug: props.candidateSlug as string } })
+  const [candidate] = useQuery(getCandidate, { where: { slug: candidateSlug as string } })
   const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
   // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
@@ -443,7 +473,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
   }
 
   return (
-    <AuthLayout user={user}>
+    <>
       <Modal header="Update Candidate" open={openEditModal} setOpen={setOpenEditModal}>
         <Suspense fallback="Loading...">
           <ApplicationForm
@@ -579,9 +609,8 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
         {moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"} stage?
       </Confirm>
 
-      <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
-
-      <br />
+      {/* <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
+      <br /> */}
 
       <DropdownMenu.Root
         modal={false}
@@ -865,9 +894,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
 
       <br />
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
           <div className="w-full md:w-1/2 lg:w-2/3 flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg">
             <div className="px-2 md:px-0 lg:px-0">
@@ -954,11 +981,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
                     />
                   </Form>
                 </div>
-                <Suspense
-                  fallback={
-                    <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-                  }
-                >
+                <Suspense fallback="Loading...">
                   {candidateToggleView === CandidateToggleView.Scores && (
                     <ScoreCard
                       // submitDisabled={
@@ -1077,7 +1100,7 @@ const SingleCandidatePage = (props: InferGetServerSidePropsType<typeof getServer
           </div>
         </div>
       </Suspense>
-    </AuthLayout>
+    </>
   )
 }
 

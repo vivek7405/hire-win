@@ -21,7 +21,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getForm from "app/forms/queries/getForm"
-import Skeleton from "react-loading-skeleton"
+
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import getFormQuestions from "app/forms/queries/getFormQuestions"
@@ -513,30 +513,32 @@ const SingleFormPage = ({
                 open={openAddExistingQuestions}
                 setOpen={setOpenAddExistingQuestions}
               >
-                <AddExistingQuestionsForm
-                  schema={FormQuestions}
-                  user={user}
-                  formId={form?.id!}
-                  onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Adding Question(s)</span>)
-                    try {
-                      await addExistingFormQuestionsMutation({
-                        formId: form?.id as string,
-                        questionIds: values.questionIds,
-                      })
-                      toast.success(() => <span>Question(s) added</span>, {
-                        id: toastId,
-                      })
-                      router.reload()
-                    } catch (error) {
-                      toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " +
-                          error.toString(),
-                        { id: toastId }
-                      )
-                    }
-                  }}
-                />
+                <Suspense fallback="Loading...">
+                  <AddExistingQuestionsForm
+                    schema={FormQuestions}
+                    user={user}
+                    formId={form?.id!}
+                    onSubmit={async (values) => {
+                      const toastId = toast.loading(() => <span>Adding Question(s)</span>)
+                      try {
+                        await addExistingFormQuestionsMutation({
+                          formId: form?.id as string,
+                          questionIds: values.questionIds,
+                        })
+                        toast.success(() => <span>Question(s) added</span>, {
+                          id: toastId,
+                        })
+                        router.reload()
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          { id: toastId }
+                        )
+                      }
+                    }}
+                  />
+                </Suspense>
               </Modal>
               <button
                 onClick={(e) => {
@@ -634,11 +636,7 @@ const SingleFormPage = ({
             </div>
           </div>
 
-          <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
-          >
+          <Suspense fallback="Loading...">
             <Questions
               form={form}
               user={user}

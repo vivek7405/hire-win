@@ -16,7 +16,7 @@ import { enUS } from "date-fns/locale"
 import moment from "moment"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import Skeleton from "react-loading-skeleton"
+
 import { DatePickerCalendar } from "react-nice-dates"
 import { InterviewDetailType } from "types"
 import scheduleInterview from "../mutations/scheduleInterview"
@@ -131,7 +131,7 @@ export default function ScheduleInterview({
   }
 
   if (!selectedDay) {
-    return <Skeleton count={10} />
+    return <></>
   }
 
   const onDateChange = (selectedDay: Date | null) => {
