@@ -791,7 +791,7 @@ const JobsHome = ({
         </Form>
       </div> */}
 
-      <Suspense fallback="Loading...">
+      <Suspense fallback={<p className="pt-7">Loading...</p>}>
         <Jobs
           viewType={viewType}
           user={user}

@@ -817,11 +817,11 @@ const SingleJobPage = ({
       <br />
       <Suspense fallback="Loading...">
         <SingleJobPageContent
-          user={user!}
-          company={company!}
-          job={job!}
-          error={error!}
-          canUpdate={canUpdate!}
+          user={user as any}
+          company={company as any}
+          job={job as any}
+          error={error as any}
+          canUpdate={canUpdate as any}
         />
       </Suspense>
     </AuthLayout>

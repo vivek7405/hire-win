@@ -131,50 +131,48 @@ const EmailTemplates = ({ user }) => {
       </button>
 
       <Modal header="Add New Template" open={openModal} setOpen={setOpenModal}>
-        <Suspense fallback="Loading...">
-          <EmailTemplateForm
-            header="New Email Template"
-            subHeader="HTML Template"
-            initialValues={
-              emailTemplateToEdit
-                ? {
-                    name: emailTemplateToEdit.name,
-                    subject: emailTemplateToEdit.subject,
-                    body: EditorState.createWithContent(
-                      convertFromRaw(emailTemplateToEdit?.body || {})
-                    ),
-                  }
-                : { body: EditorState.createEmpty() }
-            }
-            onSubmit={async (values) => {
-              const isEdit = emailTemplateToEdit ? true : false
+        <EmailTemplateForm
+          header="New Email Template"
+          subHeader="HTML Template"
+          initialValues={
+            emailTemplateToEdit
+              ? {
+                  name: emailTemplateToEdit.name,
+                  subject: emailTemplateToEdit.subject,
+                  body: EditorState.createWithContent(
+                    convertFromRaw(emailTemplateToEdit?.body || {})
+                  ),
+                }
+              : { body: EditorState.createEmpty() }
+          }
+          onSubmit={async (values) => {
+            const isEdit = emailTemplateToEdit ? true : false
 
-              const toastId = toast.loading(isEdit ? "Updating template" : "Adding template")
-              try {
-                values.body = convertToRaw(values?.body?.getCurrentContent())
-                isEdit
-                  ? await updateEmailTemplateMutation({
-                      where: { id: emailTemplateToEdit.id },
-                      data: { ...values },
-                      initial: emailTemplateToEdit,
-                    })
-                  : await createEmailTemplateMutation({ ...values })
-                await invalidateQuery(getEmailTemplates)
-                toast.success(
-                  isEdit ? "Template updated successfully" : "Template added successfully",
-                  { id: toastId }
-                )
-                setEmailTemplateToEdit(null as any)
-                setOpenModal(false)
-              } catch (error) {
-                toast.error(
-                  `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
-                  { id: toastId }
-                )
-              }
-            }}
-          />
-        </Suspense>
+            const toastId = toast.loading(isEdit ? "Updating template" : "Adding template")
+            try {
+              values.body = convertToRaw(values?.body?.getCurrentContent())
+              isEdit
+                ? await updateEmailTemplateMutation({
+                    where: { id: emailTemplateToEdit.id },
+                    data: { ...values },
+                    initial: emailTemplateToEdit,
+                  })
+                : await createEmailTemplateMutation({ ...values })
+              await invalidateQuery(getEmailTemplates)
+              toast.success(
+                isEdit ? "Template updated successfully" : "Template added successfully",
+                { id: toastId }
+              )
+              setEmailTemplateToEdit(null as any)
+              setOpenModal(false)
+            } catch (error) {
+              toast.error(
+                `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                { id: toastId }
+              )
+            }
+          }}
+        />
       </Modal>
       <div className="flex mb-2">
         <input

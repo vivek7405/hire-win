@@ -678,32 +678,30 @@ const SingleWorkflowPage = ({
                 open={openAddExistingStage}
                 setOpen={setOpenAddExistingStage}
               >
-                <Suspense fallback="Loading...">
-                  <AddExistingStagesForm
-                    schema={WorkflowStages}
-                    companyId={session.companyId || 0}
-                    workflowId={workflow?.id!}
-                    onSubmit={async (values) => {
-                      const toastId = toast.loading(() => <span>Adding Stage(s)</span>)
-                      try {
-                        await addExistingWorkflowStagesMutation({
-                          workflowId: workflow?.id as string,
-                          stageIds: values.stageIds,
-                        })
-                        toast.success(() => <span>Stage(s) added</span>, {
-                          id: toastId,
-                        })
-                        router.reload()
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          { id: toastId }
-                        )
-                      }
-                    }}
-                  />
-                </Suspense>
+                <AddExistingStagesForm
+                  schema={WorkflowStages}
+                  companyId={session.companyId || 0}
+                  workflowId={workflow?.id!}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Adding Stage(s)</span>)
+                    try {
+                      await addExistingWorkflowStagesMutation({
+                        workflowId: workflow?.id as string,
+                        stageIds: values.stageIds,
+                      })
+                      toast.success(() => <span>Stage(s) added</span>, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
+                      )
+                    }
+                  }}
+                />
               </Modal>
               <button
                 onClick={(e) => {
@@ -785,7 +783,7 @@ const SingleWorkflowPage = ({
             </div>
           </div>
 
-          <Suspense fallback="Loading...">
+          <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <Stages
               workflow={workflow}
               user={user}

@@ -513,32 +513,30 @@ const SingleFormPage = ({
                 open={openAddExistingQuestions}
                 setOpen={setOpenAddExistingQuestions}
               >
-                <Suspense fallback="Loading...">
-                  <AddExistingQuestionsForm
-                    schema={FormQuestions}
-                    user={user}
-                    formId={form?.id!}
-                    onSubmit={async (values) => {
-                      const toastId = toast.loading(() => <span>Adding Question(s)</span>)
-                      try {
-                        await addExistingFormQuestionsMutation({
-                          formId: form?.id as string,
-                          questionIds: values.questionIds,
-                        })
-                        toast.success(() => <span>Question(s) added</span>, {
-                          id: toastId,
-                        })
-                        router.reload()
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          { id: toastId }
-                        )
-                      }
-                    }}
-                  />
-                </Suspense>
+                <AddExistingQuestionsForm
+                  schema={FormQuestions}
+                  user={user}
+                  formId={form?.id!}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Adding Question(s)</span>)
+                    try {
+                      await addExistingFormQuestionsMutation({
+                        formId: form?.id as string,
+                        questionIds: values.questionIds,
+                      })
+                      toast.success(() => <span>Question(s) added</span>, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
+                      )
+                    }
+                  }}
+                />
               </Modal>
               <button
                 onClick={(e) => {
@@ -636,7 +634,7 @@ const SingleFormPage = ({
             </div>
           </div>
 
-          <Suspense fallback="Loading...">
+          <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <Questions
               form={form}
               user={user}

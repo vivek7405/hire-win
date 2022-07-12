@@ -302,10 +302,10 @@ const SingleCandidatePage = ({
       <br />
       <Suspense fallback="Loading...">
         <SingleCandidatePageContent
-          user={user!}
-          error={error!}
-          canUpdate={canUpdate!}
-          candidateSlug={candidateSlug!}
+          user={user as any}
+          error={error as any}
+          canUpdate={canUpdate as any}
+          candidateSlug={candidateSlug as any}
         />
       </Suspense>
     </AuthLayout>
@@ -475,56 +475,54 @@ const SingleCandidatePageContent = ({
   return (
     <>
       <Modal header="Update Candidate" open={openEditModal} setOpen={setOpenEditModal}>
-        <Suspense fallback="Loading...">
-          <ApplicationForm
-            header="Update Candidate"
-            subHeader=""
-            formId={candidate?.job?.formId || ""}
-            preview={false}
-            initialValues={getCandidateInitialValues(candidate)}
-            onSubmit={async (values) => {
-              const toastId = toast.loading(`Updating Candidate`)
-              try {
-                const updatedCandidate = await updateCandidateMutation({
-                  where: { id: candidate?.id },
-                  initial: candidate as any,
-                  data: {
-                    id: candidate?.id,
-                    jobId: candidate?.job?.id,
-                    name: values.Name,
-                    email: values.Email,
-                    resume: values.Resume,
-                    source: candidate?.source,
-                    answers:
-                      (candidate?.job?.form?.questions?.map((fq) => {
-                        const val = values[fq.question?.name] || ""
-                        return {
-                          questionId: fq.questionId,
-                          value: typeof val === "string" ? val : JSON.stringify(val),
-                        }
-                      }) as any) || ([] as any),
-                  },
-                })
-                toast.success(`Candidate updated`, { id: toastId })
-                if (updatedCandidate?.slug === candidate?.slug) {
-                  await invalidateQuery(getCandidate)
-                  setOpenEditModal(false)
-                } else {
-                  setOpenEditModal(false)
-                  router.replace(
-                    Routes.SingleCandidatePage({
-                      slug: candidate?.job?.slug,
-                      candidateSlug: updatedCandidate?.slug,
-                    })
-                  )
-                }
-              } catch (error) {
-                toast.error("Something went wrong - " + error.toString(), { id: toastId })
+        <ApplicationForm
+          header="Update Candidate"
+          subHeader=""
+          formId={candidate?.job?.formId || ""}
+          preview={false}
+          initialValues={getCandidateInitialValues(candidate)}
+          onSubmit={async (values) => {
+            const toastId = toast.loading(`Updating Candidate`)
+            try {
+              const updatedCandidate = await updateCandidateMutation({
+                where: { id: candidate?.id },
+                initial: candidate as any,
+                data: {
+                  id: candidate?.id,
+                  jobId: candidate?.job?.id,
+                  name: values.Name,
+                  email: values.Email,
+                  resume: values.Resume,
+                  source: candidate?.source,
+                  answers:
+                    (candidate?.job?.form?.questions?.map((fq) => {
+                      const val = values[fq.question?.name] || ""
+                      return {
+                        questionId: fq.questionId,
+                        value: typeof val === "string" ? val : JSON.stringify(val),
+                      }
+                    }) as any) || ([] as any),
+                },
+              })
+              toast.success(`Candidate updated`, { id: toastId })
+              if (updatedCandidate?.slug === candidate?.slug) {
+                await invalidateQuery(getCandidate)
                 setOpenEditModal(false)
+              } else {
+                setOpenEditModal(false)
+                router.replace(
+                  Routes.SingleCandidatePage({
+                    slug: candidate?.job?.slug,
+                    candidateSlug: updatedCandidate?.slug,
+                  })
+                )
               }
-            }}
-          />
-        </Suspense>
+            } catch (error) {
+              toast.error("Something went wrong - " + error.toString(), { id: toastId })
+              setOpenEditModal(false)
+            }
+          }}
+        />
       </Modal>
 
       <Confirm
@@ -981,7 +979,7 @@ const SingleCandidatePageContent = ({
                     />
                   </Form>
                 </div>
-                <Suspense fallback="Loading...">
+                <Suspense fallback={<p className="p-7">Loading...</p>}>
                   {candidateToggleView === CandidateToggleView.Scores && (
                     <ScoreCard
                       // submitDisabled={

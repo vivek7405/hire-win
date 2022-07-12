@@ -549,33 +549,31 @@ const SingleScoreCardPage = ({
                 open={openAddExistingCardQuestions}
                 setOpen={setOpenAddExistingCardQuestions}
               >
-                <Suspense fallback="Loading...">
-                  <AddExistingCardQuestionsForm
-                    schema={ScoreCardQuestions}
-                    user={user}
-                    companyId={session.companyId || 0}
-                    scoreCardId={scoreCard?.id!}
-                    onSubmit={async (values) => {
-                      const toastId = toast.loading(() => <span>Adding CardQuestion(s)</span>)
-                      try {
-                        await addExistingScoreCardQuestionsMutation({
-                          scoreCardId: scoreCard?.id as string,
-                          cardQuestionIds: values.cardQuestionIds,
-                        })
-                        toast.success(() => <span>CardQuestion(s) added</span>, {
-                          id: toastId,
-                        })
-                        router.reload()
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          { id: toastId }
-                        )
-                      }
-                    }}
-                  />
-                </Suspense>
+                <AddExistingCardQuestionsForm
+                  schema={ScoreCardQuestions}
+                  user={user}
+                  companyId={session.companyId || 0}
+                  scoreCardId={scoreCard?.id!}
+                  onSubmit={async (values) => {
+                    const toastId = toast.loading(() => <span>Adding CardQuestion(s)</span>)
+                    try {
+                      await addExistingScoreCardQuestionsMutation({
+                        scoreCardId: scoreCard?.id as string,
+                        cardQuestionIds: values.cardQuestionIds,
+                      })
+                      toast.success(() => <span>CardQuestion(s) added</span>, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
+                      )
+                    }
+                  }}
+                />
               </Modal>
               <button
                 onClick={(e) => {
@@ -664,7 +662,7 @@ const SingleScoreCardPage = ({
             </div>
           </div>
 
-          <Suspense fallback="Loading...">
+          <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <CardQuestions
               companyId={session.companyId || 0}
               scoreCard={scoreCard}
