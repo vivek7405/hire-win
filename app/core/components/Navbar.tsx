@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useRouter, useMutation, Link, Routes, Image, useSession, useQuery } from "blitz"
 import { CheckIcon, MenuIcon, XIcon } from "@heroicons/react/outline"
 import { ExtendedUser } from "types"
@@ -21,7 +21,7 @@ type NavbarProps = {
   user?: ExtendedUser | null
 }
 
-const Navbar = ({ user }: NavbarProps) => {
+const NavbarContent = ({ user }: NavbarProps) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [companyOpen, setCompanyOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -374,4 +374,27 @@ const Navbar = ({ user }: NavbarProps) => {
     </>
   )
 }
+
+const Navbar = ({ user }) => {
+  return (
+    <>
+      <Suspense
+        fallback={
+          <nav className="bg-theme-600 py-2">
+            <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
+              <Link prefetch={true} href={Routes.JobsHome()}>
+                <a className="w-12 h-12">
+                  <Logo fill="white" strokeWidth={0.1} />
+                </a>
+              </Link>
+            </div>
+          </nav>
+        }
+      >
+        <NavbarContent user={user} />
+      </Suspense>
+    </>
+  )
+}
+
 export default Navbar
