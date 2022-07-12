@@ -23,6 +23,7 @@ import { Suspense } from "react"
 import Skeleton from "react-loading-skeleton"
 import AddScheduleModal from "app/scheduling/schedules/components/AddScheduleModal"
 import Schedules from "app/scheduling/schedules/components/Schedules"
+import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -54,6 +55,7 @@ const UserSettingsSchedulesPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="Settings" user={user}>
+      <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <UserSettingsLayout>
         <Suspense
           fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
