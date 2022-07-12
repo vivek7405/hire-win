@@ -16,7 +16,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import Guard from "app/guard/ability"
 import Confirm from "app/core/components/Confirm"
 import { checkPlan } from "app/users/utils/checkPlan"
@@ -791,9 +791,7 @@ const JobsHome = ({
         </Form>
       </div> */}
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback={<p className="pt-7">Loading...</p>}>
         <Jobs
           viewType={viewType}
           user={user}

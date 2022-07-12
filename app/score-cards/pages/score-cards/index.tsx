@@ -16,7 +16,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import getScoreCards from "app/score-cards/queries/getScoreCards"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection, ExtendedScoreCard } from "types"
 import { CogIcon, PencilIcon, TrashIcon } from "@heroicons/react/outline"
@@ -299,9 +299,7 @@ const ScoreCardsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSi
         </a>
       </Link> */}
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <ScoreCards />
       </Suspense>
     </AuthLayout>

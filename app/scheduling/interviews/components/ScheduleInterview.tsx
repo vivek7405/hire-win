@@ -14,9 +14,9 @@ import getUser from "app/users/queries/getUser"
 import { invalidateQuery, useMutation, useQuery, useRouter, useSession } from "blitz"
 import { enUS } from "date-fns/locale"
 import moment from "moment"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import Skeleton from "react-loading-skeleton"
+
 import { DatePickerCalendar } from "react-nice-dates"
 import { InterviewDetailType } from "types"
 import scheduleInterview from "../mutations/scheduleInterview"
@@ -131,7 +131,7 @@ export default function ScheduleInterview({
   }
 
   if (!selectedDay) {
-    return <Skeleton count={10} />
+    return <></>
   }
 
   const onDateChange = (selectedDay: Date | null) => {
@@ -257,94 +257,7 @@ export default function ScheduleInterview({
             Schedule
           </button>
         )}
-        {/* <div>
-          {selectedTimeSlot && (
-            <Form
-              noFormatting={true}
-              onSubmit={async () => {
-                return
-              }}
-            >
-              <LabeledTextField
-                placeholder="Email"
-                name="email"
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                }}
-              />
-              <button
-                className="mt-5 bg-theme-600 hover:bg-theme-700 p-2 rounded-lg text-white"
-                onClick={() => onSubmit()}
-              >
-                Schedule
-              </button>
-            </Form>
-          )}
-        </div> */}
       </div>
-      {/* <Modal
-        show={modalVisible}
-        onHide={() => {
-          setError({ error: false, message: "" })
-          setMessage("")
-          setSuccess(false)
-          setModalVisible(false)
-        }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Finish your interview.</Modal.Title>
-        </Modal.Header>
-        {!error.error && !success && (
-          <Modal.Body>
-            {selectedTimeSlot && (
-              <p>
-                You are interview the slot {formatAs24HourClockString(selectedTimeSlot.start)}-
-                {formatAs24HourClockString(selectedTimeSlot.end)}.
-              </p>
-            )}
-            You will receive a confirmation mail to this adress
-            <Form>
-              <Form.Group controlId="formBasicEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Enter email"
-                  onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
-                    setEmail(e.currentTarget.value)
-                  }
-                />
-              </Form.Group>
-              <Form.Group controlId="formNotificationTime">
-                <Form.Label>
-                  Select how many minutes before the appointment you want to be notified:
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  placeholder="30min"
-                  onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
-                    setNotificationTime(Number(e.currentTarget.value))
-                  }
-                />
-              </Form.Group>
-              <Form.Text className="text-danger mb-4">{message}</Form.Text>
-            </Form>
-            <Button variant="primary" onClick={() => onSubmit()} id="submit">
-              Submit!
-            </Button>
-          </Modal.Body>
-        )}
-        {error.error && (
-          <Alert variant="danger">
-            Something went wrong: {error.message} Please edit your data and try again.
-          </Alert>
-        )}
-        {success && (
-          <Alert variant="success">
-            The slot has been booked! You will receive a confirmation e-mail with all details. You
-            can close this website now.
-          </Alert>
-        )}
-      </Modal> */}
     </>
   )
 }

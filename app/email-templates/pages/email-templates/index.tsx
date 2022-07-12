@@ -20,7 +20,7 @@ import {
 import path from "path"
 import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import Skeleton from "react-loading-skeleton"
+
 import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
 import { TrashIcon } from "@heroicons/react/outline"
 import { EmailTemplate } from "@prisma/client"
@@ -240,7 +240,7 @@ const EmailTemplates = ({ user }) => {
 const EmailTemplatesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="Email Templates | hire-win" user={user}>
-      <Suspense fallback={<Skeleton style={{ borderRadius: 0, marginBottom: "6px" }} />}>
+      <Suspense fallback="Loading...">
         <EmailTemplates user={user} />
       </Suspense>
     </AuthLayout>

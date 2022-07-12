@@ -15,7 +15,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import { Category, Job } from "@prisma/client"
 import { CardType, DragDirection, ExtendedCategory } from "types"
 import Debouncer from "app/core/utils/debouncer"
@@ -194,7 +194,7 @@ const Categories = () => {
                   <div className="w-full relative">
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
                       <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800"
+                        className="cursor-pointer text-theme-600 hover:text-theme-800 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setCategoryToEdit(c)
@@ -203,11 +203,6 @@ const Categories = () => {
                       >
                         {c.name}
                       </a>
-                      {/* <Link prefetch={true} href={Routes.SingleCategoryPage({ slug: c.slug })} passHref>
-                        <a className="cursor-pointer text-theme-600 hover:text-theme-800">
-                          {c.name}
-                        </a>
-                      </Link> */}
                     </div>
                     <div className="absolute top-0.5 right-0">
                       <button
@@ -248,9 +243,7 @@ const CategoriesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSi
         </a>
       </Link> */}
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <Categories />
       </Suspense>
     </AuthLayout>

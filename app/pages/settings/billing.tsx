@@ -30,6 +30,7 @@ import { plans } from "app/core/utils/plans"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import { CompanyUserRole } from "db"
+import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -81,6 +82,7 @@ const UserSettingsBillingPage = ({
     <>
       {companyUser?.role === CompanyUserRole.OWNER ? (
         <AuthLayout title="Settings" user={user}>
+          <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
           <UserSettingsLayout>
             <div className="bg-white mt-5 md:mt-0 md:col-span-2">
               <div className="sm:overflow-hidden">

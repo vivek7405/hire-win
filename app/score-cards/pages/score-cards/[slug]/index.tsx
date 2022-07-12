@@ -22,7 +22,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getScoreCard from "app/score-cards/queries/getScoreCard"
-import Skeleton from "react-loading-skeleton"
+
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import getScoreCardQuestions from "app/score-cards/queries/getScoreCardQuestions"
@@ -545,7 +545,7 @@ const SingleScoreCardPage = ({
 
             <div className="flex flex-row justify-between space-x-3">
               <Modal
-                header="Add CardQuestions from Pool"
+                header="Add Questions from Pool"
                 open={openAddExistingCardQuestions}
                 setOpen={setOpenAddExistingCardQuestions}
               >
@@ -662,11 +662,7 @@ const SingleScoreCardPage = ({
             </div>
           </div>
 
-          <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
-          >
+          <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <CardQuestions
               companyId={session.companyId || 0}
               scoreCard={scoreCard}

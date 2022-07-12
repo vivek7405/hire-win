@@ -16,6 +16,7 @@ import changePassword from "app/auth/mutations/changePassword"
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/themeHelpers"
 import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
+import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -47,6 +48,7 @@ const UserSettingsSecurityPage = ({
 
   return (
     <AuthLayout title="Settings" user={user}>
+      <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <UserSettingsLayout>
         <SecurityForm
           header="Security"

@@ -27,7 +27,7 @@ import {
   ExtendedJob,
   ExtendedWorkflowStage,
 } from "types"
-import Skeleton from "react-loading-skeleton"
+
 import { QuestionType, WorkflowStage } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {

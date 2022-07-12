@@ -22,7 +22,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getWorkflow from "app/workflows/queries/getWorkflow"
-import Skeleton from "react-loading-skeleton"
+
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import toast from "react-hot-toast"
@@ -641,9 +641,7 @@ const SingleWorkflowPage = ({
             Add Stage
           </button>
           <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
+            fallback="Loading..."
           >
             <Stages workflow={workflow} user={user} />
           </Suspense>
@@ -785,11 +783,7 @@ const SingleWorkflowPage = ({
             </div>
           </div>
 
-          <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
-          >
+          <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <Stages
               workflow={workflow}
               user={user}

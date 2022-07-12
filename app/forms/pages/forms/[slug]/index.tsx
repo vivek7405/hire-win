@@ -21,7 +21,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 import getForm from "app/forms/queries/getForm"
-import Skeleton from "react-loading-skeleton"
+
 import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import getFormQuestions from "app/forms/queries/getFormQuestions"
@@ -634,11 +634,7 @@ const SingleFormPage = ({
             </div>
           </div>
 
-          <Suspense
-            fallback={
-              <Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />
-            }
-          >
+          <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <Questions
               form={form}
               user={user}

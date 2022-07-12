@@ -32,6 +32,7 @@ import updateCompany from "app/companies/mutations/updateCompany"
 import CompanyForm from "app/companies/components/CompanyForm"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import { CompanyUserRole } from "@prisma/client"
+import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -85,6 +86,7 @@ const UserSettingsCompanyPage = ({
     <>
       {companyUser?.role === CompanyUserRole.OWNER ? (
         <AuthLayout title="Settings | Company" user={user}>
+          <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
           <UserSettingsLayout>
             <CompanyForm
               header="Company"

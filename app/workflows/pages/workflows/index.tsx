@@ -16,7 +16,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import getWorkflows from "app/workflows/queries/getWorkflows"
 import Table from "app/core/components/Table"
-import Skeleton from "react-loading-skeleton"
+
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import Cards from "app/core/components/Cards"
 import { CardType, DragDirection } from "types"
@@ -294,9 +294,7 @@ const WorkflowsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSid
         </a>
       </Link> */}
 
-      <Suspense
-        fallback={<Skeleton height={"120px"} style={{ borderRadius: 0, marginBottom: "6px" }} />}
-      >
+      <Suspense fallback="Loading...">
         <Workflows />
       </Suspense>
     </AuthLayout>

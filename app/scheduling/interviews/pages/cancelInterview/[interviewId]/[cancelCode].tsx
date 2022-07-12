@@ -2,7 +2,6 @@ import cancelInterview from "app/scheduling/interviews/mutations/cancelInterview
 import verifyCancelCode from "app/scheduling/interviews/queries/verifyCancelCode"
 import { BlitzPage, useMutation, useParam, useQuery } from "blitz"
 import React, { Suspense, useState } from "react"
-import Skeleton from "react-loading-skeleton"
 
 const CancelInterview = ({ interviewId, cancelCode }) => {
   const [isCodeValid] = useQuery(verifyCancelCode, { interviewId, cancelCode })
@@ -46,10 +45,10 @@ const CancelBooking: BlitzPage = () => {
   const cancelCode = useParam("cancelCode", "string")
 
   if (!interviewId || !cancelCode) {
-    return <Skeleton count={10} />
+    return <></>
   }
   return (
-    <Suspense fallback={<Skeleton count={10} />}>
+    <Suspense fallback="Loading...">
       <CancelInterview interviewId={interviewId} cancelCode={cancelCode} />
     </Suspense>
   )

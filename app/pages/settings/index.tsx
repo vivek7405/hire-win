@@ -21,6 +21,7 @@ import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
 import getCompany from "app/companies/queries/getCompany"
 import CompanyForm from "app/companies/components/CompanyForm"
 import updateCompany from "app/companies/mutations/updateCompany"
+import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -63,6 +64,7 @@ const UserSettingsPage = ({
 
   return (
     <AuthLayout title="Settings" user={user}>
+      <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <UserSettingsLayout>
         <UserForm
           header="Profile"
