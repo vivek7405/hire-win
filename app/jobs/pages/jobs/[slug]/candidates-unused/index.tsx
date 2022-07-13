@@ -302,7 +302,7 @@ const Candidates = (props: CandidateProps) => {
   )
 }
 
-const CandidatesHome = ({
+const CandidatesUnusedHome = ({
   user,
   job,
   error,
@@ -316,7 +316,7 @@ const CandidatesHome = ({
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
-      <Link prefetch={true} href={Routes.NewCandidate({ slug: job?.slug! })} passHref>
+      <Link prefetch={true} href={Routes.NewCandidateUnused({ slug: job?.slug! })} passHref>
         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
           New Candidate
         </a>
@@ -339,4 +339,4 @@ const CandidatesHome = ({
   )
 }
 
-export default CandidatesHome
+export default CandidatesUnusedHome
