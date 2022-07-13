@@ -132,7 +132,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
+const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStagesMsg }) => {
   const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
   const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
   const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
@@ -288,7 +288,7 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header }) => {
         ) : (
           <div>
             <br />
-            There are no stages assigned to you for interview
+            {noStagesMsg}
           </div>
         )}
       </div>
@@ -340,7 +340,8 @@ const JobSettingsSchedulingPage = ({
                       (int) => int.jobId === job?.id && int.interviewerId === user?.id
                     )
                   )}
-                  header={"Stages assigned to you"}
+                  header="Stages assigned to you"
+                  noStagesMsg="There are no stages assigned to you for interview"
                 />
                 <br />
                 <ScheduleCalendarAssignment
@@ -352,7 +353,8 @@ const JobSettingsSchedulingPage = ({
                         (int) => int.jobId === job?.id && int.interviewerId === user?.id
                       )
                   )}
-                  header={"Other Stages"}
+                  header="Other Stages"
+                  noStagesMsg="No other stages available"
                 />
               </Suspense>
             </div>
