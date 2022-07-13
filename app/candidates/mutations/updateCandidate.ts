@@ -10,6 +10,14 @@ type UpdateCandidateInput = Pick<Prisma.CandidateUpdateArgs, "where" | "data"> &
   initial: ExtendedCandidate
 }
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "2mb",
+    },
+  },
+}
+
 async function updateCandidate({ where, data, initial }: UpdateCandidateInput, ctx: Ctx) {
   ctx.session.$authorize()
 
