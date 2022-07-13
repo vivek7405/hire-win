@@ -53,4 +53,4 @@ async function assignInterviewerToJobStage(
   }
 }
 
-export default Guard.authorize("update", "job", assignInterviewerToJobStage)
+export default assignInterviewerToJobStage
