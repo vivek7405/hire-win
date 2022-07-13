@@ -111,7 +111,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const NewCandidate = ({
+const NewCandidateUnused = ({
   user,
   job,
   isOwner,
@@ -166,4 +166,4 @@ const NewCandidate = ({
   )
 }
 
-export default NewCandidate
+export default NewCandidateUnused
