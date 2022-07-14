@@ -692,8 +692,18 @@ const SingleCandidatePageContent = ({
           }
           onClick={async (e) => {
             e.preventDefault()
-            setCandidateToMove(candidate)
-            setOpenCandidateMoveConfirm(true)
+
+            if (
+              (selectedWorkflowStage?.order || 0) ===
+              (candidate?.job?.workflow?.stages?.length || 0)
+            ) {
+              toast.error("The candidate is already in the last stage")
+              return
+            } else {
+              setCandidateToMove(candidate)
+              setMoveToWorkflowStage(null)
+              setOpenCandidateMoveConfirm(true)
+            }
           }}
         >
           Move to Next Stage
@@ -741,9 +751,14 @@ const SingleCandidatePageContent = ({
                   key={ws.id}
                   onSelect={async (e) => {
                     e.preventDefault()
-                    setCandidateToMove(candidate)
-                    setMoveToWorkflowStage(ws)
-                    setOpenCandidateMoveConfirm(true)
+
+                    if (selectedWorkflowStage?.id === ws?.id) {
+                      toast.error(`The candidate is already in the ${ws?.stage?.name} stage`)
+                    } else {
+                      setCandidateToMove(candidate)
+                      setMoveToWorkflowStage(ws)
+                      setOpenCandidateMoveConfirm(true)
+                    }
                   }}
                   className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
                 >
