@@ -50,7 +50,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
 
   return (
     <div className="flex flex-col lg:flex-row mt-6 lg:space-x-4">
-      <div className="w-full mb-6 lg:mb-0 lg:w-1/5">
+      <div className="mb-6 lg:mb-0 w-full lg:w-1/5">
         {subNavigation.map(
           (item) =>
             item.canView && (
@@ -74,7 +74,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
             )
         )}
       </div>
-      <div className="space-y-6 w-full">
+      <div className="space-y-6 w-full lg:w-4/5">
         <Suspense fallback="Loading">{children}</Suspense>
       </div>
     </div>

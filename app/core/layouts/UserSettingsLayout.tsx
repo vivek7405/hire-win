@@ -79,7 +79,7 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
 
   return (
     <div className="flex flex-col mt-6 md:flex-row md:space-x-4 lg:flex-row lg:space-x-4">
-      <div className="w-full mb-6 md:mb-0 md:w-1/5 lg:mb-0 lg:w-1/5">
+      <div className="w-full mb-6 md:mb-0 lg:mb-0 md:w-1/5 lg:w-1/5">
         {subNavigation.map((item) => {
           if (!item) return <></>
 
@@ -104,7 +104,7 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
           )
         })}
       </div>
-      <div className="space-y-6 w-full">{children}</div>
+      <div className="space-y-6 w-full md:w-4/5 lg:w-4/5">{children}</div>
     </div>
   )
 }
