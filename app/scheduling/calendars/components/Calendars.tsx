@@ -124,7 +124,26 @@ const Calendars = ({ user }: CalendarProps) => {
         </Form>
       </Modal>
 
-      <div className="flex justify-between">
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={`Delete Calendar - ${calendarToDelete?.name}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Deleting Calendar - ${calendarToDelete?.name}`)
+          try {
+            await deleteCalendarMutation(calendarToDelete?.id)
+            toast.success("Calendar Deleted", { id: toastId })
+            await invalidateQuery(getCalendars)
+          } catch (error) {
+            toast.error(`Deleting calendar failed - ${error.toString()}`, { id: toastId })
+          }
+          setOpenConfirm(false)
+        }}
+      >
+        Are you sure you want to delete the calendar?
+      </Confirm>
+
+      <div className="hidden md:flex lg:flex items-center justify-between">
         <input
           placeholder="Search"
           type="text"
@@ -135,38 +154,11 @@ const Calendars = ({ user }: CalendarProps) => {
           }}
         />
 
-        <div>
-          <button
-            className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-            onClick={() => {
-              setShowAddCalendarModal(true)
-            }}
-          >
-            New Calendar
-          </button>
-
-          <Confirm
-            open={openConfirm}
-            setOpen={setOpenConfirm}
-            header={`Delete Calendar - ${calendarToDelete?.name}`}
-            onSuccess={async () => {
-              const toastId = toast.loading(`Deleting Calendar - ${calendarToDelete?.name}`)
-              try {
-                await deleteCalendarMutation(calendarToDelete?.id)
-                toast.success("Calendar Deleted", { id: toastId })
-                await invalidateQuery(getCalendars)
-              } catch (error) {
-                toast.error(`Deleting calendar failed - ${error.toString()}`, { id: toastId })
-              }
-              setOpenConfirm(false)
-            }}
-          >
-            Are you sure you want to delete the calendar?
-          </Confirm>
+        <div className="flex items-center flex-nowrap">
           {filteredCalendarEntries?.length > 0 && (
-            <div className="float-right flex items-center">
-              <span>Default Calendar</span>
-              <div className="w-40 ml-2 mr-10">
+            <div className="float-right flex items-center flex-nowrap">
+              <span className="text-lg text-neutral-600">Default</span>
+              <div className="w-40 ml-2 mr-5">
                 <Form
                   noFormatting={true}
                   onSubmit={async () => {
@@ -226,6 +218,15 @@ const Calendars = ({ user }: CalendarProps) => {
               </div>
             </div>
           )}
+
+          <button
+            className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+            onClick={() => {
+              setShowAddCalendarModal(true)
+            }}
+          >
+            New Calendar
+          </button>
         </div>
       </div>
       <br />
@@ -248,6 +249,7 @@ const Calendars = ({ user }: CalendarProps) => {
                           setCalendarToUpdateName(cal as any)
                           setOpenNameUpdateModal(true)
                         }}
+                        className="truncate"
                       >
                         <span className="cursor-pointer text-theme-600 font-bold hover:text-theme-800">
                           {cal.name}

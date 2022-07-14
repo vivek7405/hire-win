@@ -128,17 +128,6 @@ const Workflows = () => {
         Are you sure you want to delete the workflow?
       </Confirm>
 
-      <button
-        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-        onClick={(e) => {
-          e.preventDefault()
-          setWorkflowToEdit(null as any)
-          setOpenModal(true)
-        }}
-      >
-        New Workflow
-      </button>
-
       <Modal header="Workflow" open={openModal} setOpen={setOpenModal}>
         <WorkflowForm
           header={`${workflowToEdit ? "Update" : "New"} Workflow`}
@@ -175,20 +164,34 @@ const Workflows = () => {
         />
       </Modal>
 
-      <input
-        placeholder="Search"
-        type="text"
-        defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-        className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
-        onChange={(e) => {
-          execDebouncer(e)
-        }}
-      />
+      <div>
+        <button
+          className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+          onClick={(e) => {
+            e.preventDefault()
+            setWorkflowToEdit(null as any)
+            setOpenModal(true)
+          }}
+        >
+          New Workflow
+        </button>
+      </div>
+      <div className="flex mb-2">
+        <input
+          placeholder="Search"
+          type="text"
+          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+          className={`border border-gray-300 mr-2 md:w-1/4 lg:w-1/4 px-2 py-2 w-full rounded`}
+          onChange={(e) => {
+            execDebouncer(e)
+          }}
+        />
+      </div>
 
       {workflows?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No Workflows found</div>
       ) : (
-        <div className="flex flex-wrap justify-center mt-2">
+        <div className="flex flex-wrap justify-center">
           {workflows.map((w) => {
             return (
               <Card isFull={true} key={w.id}>
@@ -262,7 +265,7 @@ const Workflows = () => {
                             key={ws.id}
                             className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
                           >
-                            <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                            <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
                               {ws.stage?.name}
                             </div>
                           </div>

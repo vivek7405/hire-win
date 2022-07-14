@@ -78,8 +78,8 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
   ]
 
   return (
-    <div className="flex flex-col lg:flex-row mt-6 lg:space-x-4">
-      <div className="w-full mb-6 lg:mb-0 lg:w-1/5">
+    <div className="flex flex-col mt-6 md:flex-row md:space-x-4 lg:flex-row lg:space-x-4">
+      <div className="w-full mb-6 md:mb-0 md:w-1/5 lg:mb-0 lg:w-1/5">
         {subNavigation.map((item) => {
           if (!item) return <></>
 

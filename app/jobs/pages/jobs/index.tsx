@@ -549,7 +549,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                               key={ws.id}
                               className="overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
                             >
-                              <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                              <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
                                 {ws.stage?.name}
                               </div>
                               <div className="text-neutral-500">
@@ -690,7 +690,73 @@ const JobsHome = ({
         {confirmMessage}
       </Confirm>
 
-      <div className="flex items-center w-full justify-between">
+      {/* Mobile Menu */}
+      <div className="flex flex-col space-y-4 md:hidden lg:hidden">
+        <div className="flex w-full justify-between">
+          <input
+            placeholder="Search"
+            type="text"
+            defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+            className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+            onChange={(e) => {
+              execDebouncer(e)
+            }}
+          />
+          <div className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+            <button
+              className="whitespace-nowrap"
+              onClick={(e) => {
+                e.preventDefault()
+                if (canCreate) {
+                  return router.push(Routes.NewJob())
+                } else {
+                  setConfirmMessage(
+                    "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+                  )
+                  setOpenConfirm(true)
+                }
+              }}
+            >
+              New Job
+            </button>
+          </div>
+        </div>
+
+        <div className="text-theme-600">
+          <Form
+            noFormatting={true}
+            onSubmit={(value) => {
+              return value
+            }}
+          >
+            <RadioGroupField
+              name="View"
+              isBorder={true}
+              options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
+              initialValue={JobViewType.Active}
+              onChange={(value) => {
+                setViewType(value)
+              }}
+            />
+          </Form>
+        </div>
+
+        <div className="flex justify-center">
+          <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center underline text-theme-600 mx-6 py-2 hover:text-theme-800 whitespace-nowrap"
+            >
+              <span>View Careers Page</span>
+              <ExternalLinkIcon className="w-4 h-4 ml-1" />
+            </a>
+          </Link>
+        </div>
+      </div>
+
+      {/* Tablet and Desktop Menu */}
+      <div className="hidden md:flex lg:flex items-center w-full justify-between">
         <div className="flex items-center">
           <input
             placeholder="Search"
@@ -725,7 +791,7 @@ const JobsHome = ({
             <a
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
+              className="flex items-center float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800 whitespace-nowrap"
             >
               <span>View Careers Page</span>
               <ExternalLinkIcon className="w-4 h-4 ml-1" />
@@ -733,8 +799,8 @@ const JobsHome = ({
           </Link>
 
           {/* <Link href={Routes.NewJob()} passHref> */}
-          <a
-            className="cursor-pointer text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+          <button
+            className="cursor-pointer text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
             onClick={(e) => {
               e.preventDefault()
               if (canCreate) {
@@ -748,7 +814,7 @@ const JobsHome = ({
             }}
           >
             New Job
-          </a>
+          </button>
           {/* </Link> */}
         </div>
       </div>
