@@ -42,20 +42,61 @@ export default function ScheduleInterview({
 }: ScheduleInterviewProps) {
   //   const [meeting] = useQuery(getMeeting, { username: username, slug: meetingSlug })
   // const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
-  const [selectedDay, setSelectedDay] = useState<Date>(new Date())
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot>()
-  const [scheduleInterviewMutation] = useMutation(scheduleInterview)
-  // const [email, setEmail] = useState("")
-  const [notificationTime, setNotificationTime] = useState(30)
-  const [modalVisible, setModalVisible] = useState(false)
-  //   const user = useCurrentUser()
-  const [hideOccupied, setHideOccupied] = useState(false)
-  const [error, setError] = useState({ error: false, message: "" })
-  const [success, setSuccess] = useState(false)
-  const [message, setMessage] = useState("")
   const session = useSession()
   const [organizer] = useQuery(getUser, { where: { id: session?.userId! } })
   const [candidate] = useQuery(getCandidate, { where: { id: candidateId } })
+
+  return (
+    <>
+      <div className="bg-white text-center p-10 w-full md:w-96 lg:w-96 space-y-5">
+        <h3 className="font-semibold text-xl">Schedule Interview</h3>
+        <div>
+          {organizer?.id === interviewDetail?.interviewer?.id ? (
+            <>
+              <h5>
+                Organizer & Interviewer:{" "}
+                {organizer?.id === session?.userId ? "You" : organizer?.name}
+              </h5>
+            </>
+          ) : (
+            <>
+              <h5>Organizer: {organizer?.id === session?.userId ? "You" : organizer?.name}</h5>
+              <h5>
+                Interviewer:{" "}
+                {interviewDetail?.interviewer?.id === session?.userId
+                  ? "You"
+                  : interviewDetail?.interviewer?.name}
+              </h5>
+            </>
+          )}
+          <h5>Candidate: {candidate?.name}</h5>
+        </div>
+        <Suspense fallback={<p className="mt-8 font-semibold">Loading Schedule...</p>}>
+          <PickAndSchedule
+            interviewDetail={interviewDetail}
+            candidate={candidate}
+            organizer={organizer}
+            workflowStageId={workflowStageId}
+            candidateId={candidateId}
+            setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
+          />
+        </Suspense>
+      </div>
+    </>
+  )
+}
+
+const PickAndSchedule = ({
+  interviewDetail,
+  candidate,
+  organizer,
+  workflowStageId,
+  candidateId,
+  setOpenScheduleInterviewModal,
+}) => {
+  const [selectedDay, setSelectedDay] = useState<Date>(new Date())
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot>()
+  const [scheduleInterviewMutation] = useMutation(scheduleInterview)
   const [job] = useQuery(getJob, { where: { id: candidate?.jobId } })
   const [otherAttendees, setOtherAttendees] = useState([] as string[])
 
@@ -64,8 +105,8 @@ export default function ScheduleInterview({
     scheduleId: interviewDetail?.schedule?.id,
     duration: interviewDetail?.duration,
     otherAttendees,
-    startDateUTC: new Date(moment()?.startOf("month")?.format("YYYY-MM-DD")),
-    endDateUTC: new Date(moment()?.endOf("month")?.format("YYYY-MM-DD")),
+    startDateUTC: new Date(moment(selectedDay)?.startOf("month")?.format("YYYY-MM-DD")),
+    endDateUTC: new Date(moment(selectedDay)?.endOf("month")?.format("YYYY-MM-DD")),
   })
 
   useEffect(() => {
@@ -84,10 +125,6 @@ export default function ScheduleInterview({
 
     setSelectedDay(firstSlot.start)
   }, [slots, selectedDay])
-
-  // useEffect(() => {
-  //   invalidateQuery(getTimeSlots)
-  // }, [hideOccupied])
 
   useEffect(() => {
     invalidateQuery(getTimeSlots)
@@ -120,8 +157,8 @@ export default function ScheduleInterview({
     )
   }
 
-  let currentDate = new Date()
-  let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  // let currentDate = new Date()
+  // let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   //   if (meeting.endDateUTC < zonedTimeToUtc(currentDate, timezone)) {
   //     return <h2 className="text-center m-5">This meeting is in the past.</h2>
   //   }
@@ -143,18 +180,9 @@ export default function ScheduleInterview({
 
   const onSubmit = async () => {
     if (!selectedTimeSlot || selectedTimeSlot.start < new Date()) {
-      setMessage("Please select a time slot. The time slot must be in the future.")
+      toast.error("Please select a time slot. The time slot must be in the future.")
       return
     }
-    // const parseResult = InterviewInput.safeParse({
-    //   email,
-    //   notificationTime,
-    // })
-
-    // if (!parseResult.success) {
-    //   setMessage(parseResult?.error?.errors[0]!.message)
-    //   return
-    // }
 
     try {
       await scheduleInterviewMutation({
@@ -164,100 +192,72 @@ export default function ScheduleInterview({
         startDate: selectedTimeSlot.start,
         otherAttendees,
       })
-      setSuccess(true)
       setOpenScheduleInterviewModal(false)
       toast.success("Interview scheduled successfully")
       invalidateQuery(getCandidateInterviewsByStage)
-    } catch (e) {
-      setError({ error: true, message: e.message })
-      toast.error("Something went wrong while scheduling interview")
+    } catch (error) {
+      toast.error(`Something went wrong: ${error.message}`)
     }
   }
 
   return (
     <>
-      <div className="bg-white text-center p-10 w-full md:w-96 lg:w-96 space-y-5">
-        <h3 className="font-semibold text-xl">Schedule Interview</h3>
-        <div>
-          {organizer?.id === interviewDetail?.interviewer?.id ? (
-            <>
-              <h5>
-                Organizer & Interviewer:{" "}
-                {organizer?.id === session?.userId ? "You" : organizer?.name}
-              </h5>
-            </>
-          ) : (
-            <>
-              <h5>Organizer: {organizer?.id === session?.userId ? "You" : organizer?.name}</h5>
-              <h5>
-                Interviewer:{" "}
-                {interviewDetail?.interviewer?.id === session?.userId
-                  ? "You"
-                  : interviewDetail?.interviewer?.name}
-              </h5>
-            </>
-          )}
-          <h5>Candidate: {candidate?.name}</h5>
-        </div>
-        <Form
-          noFormatting={true}
-          onSubmit={async () => {
-            return
+      <Form
+        noFormatting={true}
+        onSubmit={async () => {
+          return
+        }}
+      >
+        <label>Add more attendees:</label>
+        <LabeledReactSelectField
+          name="attendees"
+          placeholder="Select members to invite"
+          isMulti={true}
+          options={job?.users
+            ?.filter(
+              (m) => m.userId !== organizer?.id && m.userId !== interviewDetail?.interviewer?.id
+            )
+            ?.map((m) => {
+              return { label: m.user.name, value: m.userId.toString() }
+            })}
+          onChange={(val) => {
+            setOtherAttendees(val as any as string[])
           }}
+        />
+      </Form>
+      <DatePickerCalendar
+        date={selectedDay}
+        month={selectedDay}
+        onDateChange={onDateChange}
+        onMonthChange={async (selectedDay) => {
+          onDateChange(selectedDay)
+          await invalidateQuery(getTimeSlots)
+        }}
+        locale={enUS}
+        modifiers={{
+          disabled: (date) => {
+            const isDateAvailable = slots.some(
+              (slot) => areDatesOnSameDay(slot.start, date) && slot.start > new Date()
+            )
+            return !isDateAvailable
+          },
+        }}
+        modifiersClassNames={{ selected: "-selected" }}
+      />
+      <AvailableTimeSlotsSelection
+        slots={slots}
+        selectedDay={selectedDay}
+        selectedTimeSlot={selectedTimeSlot}
+        setSelectedTimeSlot={setSelectedTimeSlot}
+      />
+      {selectedTimeSlot && (
+        <button
+          className="bg-theme-600 hover:bg-theme-700 p-2 rounded-lg text-white"
+          onClick={() => onSubmit()}
         >
-          <label>Add more attendees:</label>
-          {/* <LabeledTextField
-            placeholder="Enter comma seperated email addresses"
-            name="email"
-            onChange={(e) => {
-              // setEmail(e.target.value)
-            }}
-          /> */}
-          <LabeledReactSelectField
-            name="attendees"
-            placeholder="Select members to invite"
-            isMulti={true}
-            options={job?.users
-              ?.filter(
-                (m) => m.userId !== organizer?.id && m.userId !== interviewDetail?.interviewer?.id
-              )
-              ?.map((m) => {
-                return { label: m.user.name, value: m.userId.toString() }
-              })}
-            onChange={(val) => {
-              setOtherAttendees(val as any as string[])
-            }}
-          />
-        </Form>
-        <DatePickerCalendar
-          date={selectedDay}
-          onDateChange={onDateChange}
-          locale={enUS}
-          modifiers={{
-            disabled: (date) => {
-              const isDateAvailable = slots.some(
-                (slot) => areDatesOnSameDay(slot.start, date) && slot.start > new Date()
-              )
-              return !isDateAvailable
-            },
-          }}
-          modifiersClassNames={{ selected: "-selected" }}
-        />
-        <AvailableTimeSlotsSelection
-          slots={slots}
-          selectedDay={selectedDay}
-          selectedTimeSlot={selectedTimeSlot}
-          setSelectedTimeSlot={setSelectedTimeSlot}
-        />
-        {selectedTimeSlot && (
-          <button
-            className="bg-theme-600 hover:bg-theme-700 p-2 rounded-lg text-white"
-            onClick={() => onSubmit()}
-          >
-            Schedule
-          </button>
-        )}
-      </div>
+          Schedule
+        </button>
+      )}
     </>
   )
 }
