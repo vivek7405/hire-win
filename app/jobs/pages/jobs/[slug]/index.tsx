@@ -177,129 +177,128 @@ const getBoard = (
   setOpenModal
 ) => {
   return {
-    columns: job?.workflow?.stages
-      ?.sort((a, b) => {
-        return a.order - b.order
-      })
-      .map((ws) => {
-        return {
-          id: ws.id,
-          title: ws.stage?.name,
-          cards: candidates
-            ?.filter((c) => c.workflowStageId === ws.id)
-            .map((c) => {
-              return {
-                id: c.id,
-                title: c.name,
-                description: c.email,
-                isDragDisabled: !enableDrag,
-                renderContent: (
-                  <div>
-                    <div className="font-bold flex items-center">
-                      <Link
-                        prefetch={true}
-                        href={Routes.SingleCandidatePage({
-                          slug: c.job?.slug,
-                          candidateSlug: c.slug,
-                        })}
-                        passHref
+    columns: job?.workflow?.stages?.map((ws) => {
+      return {
+        id: ws.id,
+        title: ws.stage?.name,
+        cards: candidates
+          ?.filter((c) => c.workflowStageId === ws.id)
+          .map((c) => {
+            return {
+              id: c.id,
+              title: c.name,
+              description: c.email,
+              isDragDisabled: !enableDrag,
+              renderContent: (
+                <div>
+                  <div className="font-bold flex items-center">
+                    <Link
+                      prefetch={true}
+                      href={Routes.SingleCandidatePage({
+                        slug: c.job?.slug,
+                        candidateSlug: c.slug,
+                      })}
+                      passHref
+                    >
+                      <a
+                        className={`${
+                          c.rejected
+                            ? "text-red-600 hover:text-red-900"
+                            : "text-theme-600 hover:text-theme-900"
+                        } truncate`}
                       >
-                        <a
-                          className={`${
-                            c.rejected
-                              ? "text-red-600 hover:text-red-900"
-                              : "text-theme-600 hover:text-theme-900"
-                          }`}
-                        >
-                          {c.name}
-                        </a>
-                      </Link>
-                    </div>
-
-                    <div className="border-b-2 my-2 border-gray-100 w-full"></div>
-                    <div className="flex items-center">{c.email}</div>
-
-                    <div className="border-b-2 my-2 border-gray-100 w-full"></div>
-                    <div className="flex items-center justify-between">
-                      <Form
-                        noFormatting={true}
-                        onSubmit={async () => {
-                          return
-                        }}
-                      >
-                        <LabeledRatingField
-                          name="candidateAverageRating"
-                          ratingClass="!flex items-center"
-                          height={5}
-                          color={c.rejected ? "red" : "theme"}
-                          value={Math.round(
-                            getScoreAverage(c?.scores?.map((score) => score.rating) || [])
-                          )}
-                          disabled={true}
-                        />
-                      </Form>
-                      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                        JobUserRole.OWNER ||
-                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                          JobUserRole.ADMIN) && (
-                        <div className="flex items-center space-x-2">
-                          <span>
-                            <button
-                              className="float-right text-theme-600 hover:text-theme-800"
-                              title={"Edit Candidate"}
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                setCandidateToEdit(c)
-                                setOpenModal(true)
-                              }}
-                            >
-                              <PencilIcon className="w-5 h-5" />
-                            </button>
-                          </span>
-                          <span>
-                            <button
-                              className="float-right text-red-600 hover:text-red-800"
-                              title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                setCandidateToReject(c)
-                                setOpenCandidateRejectConfirm(true)
-                              }}
-                            >
-                              {viewRejected ? (
-                                <RefreshIcon className="w-5 h-5" />
-                              ) : (
-                                <BanIcon className="w-5 h-5" />
-                              )}
-                            </button>
-                          </span>
-                          {!viewRejected && (
-                            <span>
-                              <button
-                                className="float-right text-theme-600 hover:text-theme-800"
-                                title="Move to next stage"
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  setCandidateToMove(c)
-                                  setOpenCandidateMoveConfirm(true)
-                                }}
-                              >
-                                <ArrowRightIcon className="w-5 h-5" />
-                              </button>
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                        {c.name}
+                      </a>
+                    </Link>
                   </div>
-                ),
-              }
-            }) as CardType[],
-        }
-      }) as KanbanColumnType[],
+
+                  <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                  <div className="flex items-center">
+                    <p className="truncate">{c.email}</p>
+                  </div>
+
+                  <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                  <div className="flex items-center justify-between">
+                    <Form
+                      noFormatting={true}
+                      onSubmit={async () => {
+                        return
+                      }}
+                    >
+                      <LabeledRatingField
+                        name="candidateAverageRating"
+                        ratingClass="!flex items-center"
+                        height={5}
+                        color={c.rejected ? "red" : "theme"}
+                        value={Math.round(
+                          getScoreAverage(c?.scores?.map((score) => score.rating) || [])
+                        )}
+                        disabled={true}
+                      />
+                    </Form>
+                    {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
+                      JobUserRole.OWNER ||
+                      user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
+                        JobUserRole.ADMIN) && (
+                      <div className="flex items-center space-x-2">
+                        <span>
+                          <button
+                            className="float-right text-theme-600 hover:text-theme-800"
+                            title={"Edit Candidate"}
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setCandidateToEdit(c)
+                              setOpenModal(true)
+                            }}
+                          >
+                            <PencilIcon className="w-5 h-5" />
+                          </button>
+                        </span>
+                        <span>
+                          <button
+                            className="float-right text-red-600 hover:text-red-800"
+                            title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setCandidateToReject(c)
+                              setOpenCandidateRejectConfirm(true)
+                            }}
+                          >
+                            {viewRejected ? (
+                              <RefreshIcon className="w-5 h-5" />
+                            ) : (
+                              <BanIcon className="w-5 h-5" />
+                            )}
+                          </button>
+                        </span>
+                        {!viewRejected && (
+                          <span>
+                            <button
+                              className="float-right text-theme-600 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Move to next stage"
+                              type="button"
+                              disabled={c.workflowStage?.order === job?.workflow?.stages?.length}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setCandidateToMove(c)
+                                setOpenCandidateMoveConfirm(true)
+                              }}
+                            >
+                              <ArrowRightIcon className="w-5 h-5" />
+                            </button>
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ),
+            }
+          }) as CardType[],
+      }
+    }) as KanbanColumnType[],
   } as KanbanBoardType
 }
 
@@ -730,9 +729,7 @@ const Candidates = (props: CandidateProps) => {
             //   rejected: !candidateToMove?.rejected,
             // })
 
-            const workflowStages = props.job?.workflow?.stages?.sort((a, b) => {
-              return a.order - b.order
-            })
+            const workflowStages = props.job?.workflow?.stages
             const currentStageOrder =
               workflowStages?.find((ws) => ws.id === candidateToMove.workflowStageId)?.order || 0
             const moveToWorkflowStageId = workflowStages?.find(
