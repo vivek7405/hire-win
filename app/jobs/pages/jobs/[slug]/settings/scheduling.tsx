@@ -422,16 +422,18 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
                         </div>
                       </div>
 
-                      <ArrowSmRightIcon className="invisible h-6 w-auto text-neutral-500" />
-
                       {calendars?.length > 0 && (
-                        <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
-                          <div className="overflow-auto p-2 rounded-lg w-32 flex flex-col items-center justify-center">
-                            <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate">
-                              Calendars
+                        <>
+                          <ArrowSmRightIcon className="invisible h-6 w-auto text-neutral-500" />
+
+                          <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
+                            <div className="overflow-auto p-2 rounded-lg w-32 flex flex-col items-center justify-center">
+                              <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate">
+                                Calendars
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        </>
                       )}
                     </div>
                   )}
@@ -491,52 +493,53 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
                       </select>
                     </div>
 
-                    <ArrowSmRightIcon className="hidden md:block lg:block h-6 w-auto text-neutral-500" />
-                    <ArrowSmDownIcon className="block md:hidden lg:hidden h-6 w-auto text-neutral-500" />
-
                     {calendars?.length > 0 && (
-                      <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
-                        <p className="block md:hidden lg:hidden text-xs text-neutral-500">
-                          Calendar
-                        </p>
-                        <select
-                          className="border border-gray-300 px-2 py-2 block w-32 text-sm rounded truncate pr-6"
-                          name={`calendars.${index}.id`}
-                          placeholder={`Select Calendar`}
-                          defaultValue={
-                            existingScheduleCalendar?.calendarId || defaultCalendar?.calendarId
-                          }
-                          onChange={async (e) => {
-                            const selectedCalendarId = e.target.value
-                            const toastId = toast.loading(() => <span>Updating Calendar</span>)
-                            try {
-                              await assignCalendarToJobStageMutation({
-                                jobId: job?.id,
-                                workflowStageId: ws.id,
-                                calendarId: parseInt(selectedCalendarId || "0"),
-                              })
-                              await invalidateQuery(getJob)
-
-                              toast.success(() => <span>Calendar assigned to stage</span>, {
-                                id: toastId,
-                              })
-                            } catch (error) {
-                              toast.error(
-                                `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
-                                { id: toastId }
-                              )
+                      <>
+                        <ArrowSmRightIcon className="hidden md:block lg:block h-6 w-auto text-neutral-500" />
+                        <ArrowSmDownIcon className="block md:hidden lg:hidden h-6 w-auto text-neutral-500" />
+                        <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
+                          <p className="block md:hidden lg:hidden text-xs text-neutral-500">
+                            Calendar
+                          </p>
+                          <select
+                            className="border border-gray-300 px-2 py-2 block w-32 text-sm rounded truncate pr-6"
+                            name={`calendars.${index}.id`}
+                            placeholder={`Select Calendar`}
+                            defaultValue={
+                              existingScheduleCalendar?.calendarId || defaultCalendar?.calendarId
                             }
-                          }}
-                        >
-                          {calendars?.map((cal) => {
-                            return (
-                              <option key={cal.id} value={cal.id}>
-                                {cal.name}
-                              </option>
-                            )
-                          })}
-                        </select>
-                      </div>
+                            onChange={async (e) => {
+                              const selectedCalendarId = e.target.value
+                              const toastId = toast.loading(() => <span>Updating Calendar</span>)
+                              try {
+                                await assignCalendarToJobStageMutation({
+                                  jobId: job?.id,
+                                  workflowStageId: ws.id,
+                                  calendarId: parseInt(selectedCalendarId || "0"),
+                                })
+                                await invalidateQuery(getJob)
+
+                                toast.success(() => <span>Calendar assigned to stage</span>, {
+                                  id: toastId,
+                                })
+                              } catch (error) {
+                                toast.error(
+                                  `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
+                                  { id: toastId }
+                                )
+                              }
+                            }}
+                          >
+                            {calendars?.map((cal) => {
+                              return (
+                                <option key={cal.id} value={cal.id}>
+                                  {cal.name}
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
