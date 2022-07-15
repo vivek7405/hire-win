@@ -46,7 +46,7 @@ export const LabeledToggleSwitch = forwardRef<HTMLInputElement, LabeledToggleSwi
         {label && (
           <label
             data-testid={`${props.testid && `${props.testid}-`}label`}
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 whitespace-nowrap"
           >
             {label}
           </label>

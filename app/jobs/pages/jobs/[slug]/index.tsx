@@ -314,7 +314,7 @@ type CandidateProps = {
         })[]
       })
     | undefined
-  isKanban: boolean
+  isTable: boolean
   viewRejected: boolean
   enableDrag: boolean
   setCandidateToEdit: any
@@ -325,7 +325,6 @@ const Candidates = (props: CandidateProps) => {
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   // const [data, setData] = useState<ExtendedCandidate[]>([])
-  const [query, setQuery] = useState({})
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
   const [candidateToReject, setCandidateToReject] = useState(null as any)
   const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)
@@ -333,6 +332,7 @@ const Candidates = (props: CandidateProps) => {
   const [candidateToMove, setCandidateToMove] = useState(null as any)
   const [openCandidateMoveConfirm, setOpenCandidateMoveConfirm] = useState(false)
 
+  const [query, setQuery] = useState({})
   useEffect(() => {
     const search = router.query.search
       ? {
@@ -751,20 +751,24 @@ const Candidates = (props: CandidateProps) => {
       >
         Are you sure you want to move the candidate to next stage?
       </Confirm>
-      {!props.isKanban ? (
-        <Table
-          columns={columns}
-          data={candidates}
-          pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
-          pageIndex={tablePage}
-          pageSize={ITEMS_PER_PAGE}
-          hasNext={hasMore}
-          hasPrevious={tablePage !== 0}
-          totalCount={count}
-          startPage={startPage}
-          endPage={endPage}
-          resultName="candidate"
-        />
+      {props.isTable ? (
+        <>
+          <br />
+          <Table
+            columns={columns}
+            data={candidates}
+            pageCount={Math.ceil(count / ITEMS_PER_PAGE)}
+            pageIndex={tablePage}
+            pageSize={ITEMS_PER_PAGE}
+            hasNext={hasMore}
+            hasPrevious={tablePage !== 0}
+            totalCount={count}
+            startPage={startPage}
+            endPage={endPage}
+            noSearch={true}
+            resultName="candidate"
+          />
+        </>
       ) : (
         <KanbanBoard
           board={board}
@@ -776,6 +780,7 @@ const Candidates = (props: CandidateProps) => {
           totalCount={count}
           startPage={startPage}
           endPage={endPage}
+          noSearch={true}
           resultName="candidate"
         />
       )}
@@ -832,7 +837,7 @@ const SingleJobPageContent = ({
   error,
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [isKanban, setKanban] = useState(true)
+  const [isTable, setTable] = useState(false)
   const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
   const [openConfirm, setOpenConfirm] = useState(false)
   const router = useRouter()
@@ -853,9 +858,177 @@ const SingleJobPageContent = ({
   const [createCandidateMutation] = useMutation(createCandidate)
   const [updateCandidateMutation] = useMutation(updateCandidate)
 
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.replace({
+      query: {
+        ...router.query,
+        page: 0,
+        ...searchQuery,
+      },
+    })
+  }
+
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
+
+  const searchInput = (
+    <input
+      placeholder="Search"
+      type="text"
+      defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+      className={`border border-gray-300 px-2 py-2 rounded w-full mr-2`}
+      onChange={(e) => {
+        execDebouncer(e)
+      }}
+    />
+  )
+
+  const enableDragToggle = (
+    <>
+      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.OWNER ||
+        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.ADMIN) && (
+        <div className="text-theme-600 py-2">
+          <Form
+            noFormatting={true}
+            onSubmit={(value) => {
+              return value
+            }}
+          >
+            <LabeledToggleSwitch
+              name="toggleEnableDrag"
+              label="Enable Drag"
+              flex={true}
+              value={enableDrag}
+              onChange={(switchState) => {
+                setEnableDrag(!enableDrag)
+              }}
+            />
+          </Form>
+        </div>
+      )}
+    </>
+  )
+
+  const viewRejectedToggle = (
+    <div className="text-theme-600 py-2">
+      <Form
+        noFormatting={true}
+        onSubmit={(value) => {
+          return value
+        }}
+      >
+        <LabeledToggleSwitch
+          name="toggleViewRejected"
+          label="View Rejected"
+          flex={true}
+          value={viewRejected}
+          onChange={(switchState) => {
+            setViewRejected(!viewRejected)
+          }}
+        />
+      </Form>
+    </div>
+  )
+
+  const tableViewToggle = (
+    <div className="text-theme-600 py-2">
+      <Form
+        noFormatting={true}
+        onSubmit={(value) => {
+          return value
+        }}
+      >
+        <LabeledToggleSwitch
+          name="toggleTableView"
+          label="Table View"
+          flex={true}
+          value={isTable}
+          onChange={(switchState) => {
+            setTable(!isTable)
+          }}
+        />
+      </Form>
+    </div>
+  )
+
+  const viewJobListingLink = (
+    <Link
+      prefetch={true}
+      href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
+      passHref
+    >
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex whitespace-nowrap items-center underline text-theme-600 py-2 hover:text-theme-800"
+      >
+        <span className="mr-1">View Job Listing</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          />
+        </svg>
+      </a>
+    </Link>
+  )
+
+  const jobSettingsLink = (
+    <Link
+      prefetch={true}
+      href={
+        canUpdate
+          ? Routes.JobSettingsPage({ slug: job?.slug! })
+          : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
+      }
+      passHref
+    >
+      <a
+        className="underline whitespace-nowrap text-theme-600 py-2 hover:text-theme-800"
+        data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
+      >
+        Job Settings
+      </a>
+    </Link>
+  )
+
+  const newCandidateButton = (
+    <button
+      className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+      disabled={
+        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.OWNER &&
+        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
+      }
+      onClick={(e) => {
+        if (canCreateCandidate) {
+          // router.push(Routes.NewCandidate({ slug: job?.slug! }))
+          e.preventDefault()
+          setCandidateToEdit(null as any)
+          setOpenModal(true)
+        } else {
+          setOpenConfirm(true)
+        }
+      }}
+    >
+      New Candidate
+    </button>
+  )
 
   return (
     <>
@@ -931,139 +1104,62 @@ const SingleJobPageContent = ({
         />
       </Modal>
 
-      {/* <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
-      <br /> */}
-
-      <button
-        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 ml-3 disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={
-          user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.OWNER &&
-          user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
-        }
-        onClick={(e) => {
-          if (canCreateCandidate) {
-            // router.push(Routes.NewCandidate({ slug: job?.slug! }))
-            e.preventDefault()
-            setCandidateToEdit(null as any)
-            setOpenModal(true)
-          } else {
-            setOpenConfirm(true)
-          }
-        }}
-      >
-        New Candidate
-      </button>
-
-      <Link
-        prefetch={true}
-        href={
-          canUpdate
-            ? Routes.JobSettingsPage({ slug: job?.slug! })
-            : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
-        }
-        passHref
-      >
-        <a
-          className="float-right underline text-theme-600 ml-3 py-2 hover:text-theme-800"
-          data-testid={`${job?.title && `${job?.title}-`}settingsLink`}
-        >
-          Job Settings
-        </a>
-      </Link>
-
-      <Link
-        prefetch={true}
-        href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
-        passHref
-      >
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center float-right underline text-theme-600 ml-3 py-2 hover:text-theme-800"
-        >
-          <span className="mr-1">View Job Listing</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
-        </a>
-      </Link>
-
-      <div className="float-right text-theme-600 py-2 ml-3">
-        <Form
-          noFormatting={true}
-          onSubmit={(value) => {
-            return value
-          }}
-        >
-          <LabeledToggleSwitch
-            name="toggleKanbanLayout"
-            label="Kanban Board"
-            flex={true}
-            value={isKanban}
-            onChange={(switchState) => {
-              setKanban(!isKanban)
-            }}
-          />
-        </Form>
-      </div>
-
-      <div className="float-right text-theme-600 py-2 ml-3">
-        <Form
-          noFormatting={true}
-          onSubmit={(value) => {
-            return value
-          }}
-        >
-          <LabeledToggleSwitch
-            name="toggleViewRejected"
-            label="View Rejected"
-            flex={true}
-            value={viewRejected}
-            onChange={(switchState) => {
-              setViewRejected(!viewRejected)
-            }}
-          />
-        </Form>
-      </div>
-
-      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.OWNER ||
-        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.ADMIN) && (
-        <div className="float-right text-theme-600 py-2 ml-3">
-          <Form
-            noFormatting={true}
-            onSubmit={(value) => {
-              return value
-            }}
-          >
-            <LabeledToggleSwitch
-              name="toggleEnableDrag"
-              label="Enable Drag"
-              flex={true}
-              value={enableDrag}
-              onChange={(switchState) => {
-                setEnableDrag(!enableDrag)
-              }}
-            />
-          </Form>
+      {/* Mobile Menu */}
+      <div className="flex flex-col space-y-4 md:hidden lg:hidden">
+        <div className="flex w-full justify-between">
+          {searchInput}
+          {newCandidateButton}
         </div>
-      )}
+
+        <div className="flex w-full justify-between">
+          {viewJobListingLink}
+          {jobSettingsLink}
+        </div>
+
+        <div className="flex w-full justify-between">
+          {viewRejectedToggle}
+          {tableViewToggle}
+        </div>
+      </div>
+
+      {/* Tablet Menu */}
+      <div className="hidden lg:hidden md:flex md:flex-col space-y-4">
+        <div className="w-full flex flex-nowrap">
+          <div className="w-1/6">{searchInput}</div>
+
+          <div className="flex w-5/6 space-x-3 flex-nowrap justify-end">
+            {viewJobListingLink}
+            {jobSettingsLink}
+            {newCandidateButton}
+          </div>
+        </div>
+
+        <div className="flex space-x-4 w-full justify-end">
+          {enableDragToggle}
+          {viewRejectedToggle}
+          {tableViewToggle}
+        </div>
+      </div>
+
+      {/* Desktop Menu */}
+      <div className="hidden md:hidden w-full lg:flex lg:flex-nowrap">
+        <div className="w-1/6">{searchInput}</div>
+
+        <div className="flex w-5/6 space-x-3 flex-nowrap justify-end">
+          {enableDragToggle}
+          {viewRejectedToggle}
+          {tableViewToggle}
+          {viewJobListingLink}
+          {jobSettingsLink}
+          {newCandidateButton}
+        </div>
+      </div>
 
       <Suspense fallback="Loading...">
         <Candidates
           job={job as any}
           user={user}
-          isKanban={isKanban}
+          isTable={isTable}
           viewRejected={viewRejected}
           enableDrag={enableDrag}
           setCandidateToEdit={setCandidateToEdit}
