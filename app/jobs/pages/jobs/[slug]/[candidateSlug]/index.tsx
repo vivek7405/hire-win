@@ -359,9 +359,13 @@ const SingleCandidatePageContent = ({
   const [candidatePools] = useQuery(getCandidatePools, {
     where: { companyId: session.companyId || 0, candidates: { none: { id: candidate?.id } } },
   })
-  const [candidatePoolsOpen, setCandidatePoolsOpen] = useState(false)
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
-  const [stagesOpen, setStagesOpen] = useState(false)
+
+  const [candidatePoolsOpenDesktop, setCandidatePoolsOpenDesktop] = useState(false)
+  const [candidatePoolsOpenMobileAndTablet, setCandidatePoolsOpenMobileAndTablet] = useState(false)
+
+  const [stagesOpenMobileAndTablet, setStagesOpenMobileAndTablet] = useState(false)
+  const [stagesOpenDesktop, setStagesOpenDesktop] = useState(false)
 
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
@@ -470,6 +474,249 @@ const SingleCandidatePageContent = ({
         id: toastId,
       })
     }
+  }
+
+  const candidateNameHeader = (
+    <h3 className={`font-bold text-5xl ${candidate?.rejected ? "text-red-600" : "text-theme-600"}`}>
+      {candidate?.name}
+    </h3>
+  )
+
+  const candidateRatingDiv = (
+    <Form
+      noFormatting={true}
+      onSubmit={async () => {
+        return
+      }}
+    >
+      <LabeledRatingField
+        name="candidateAverageRating"
+        ratingClass={`!flex items-center`}
+        height={8}
+        color={candidate?.rejected ? "red" : "theme"}
+        value={Math.round(getScoreAverage(candidate?.scores?.map((score) => score.rating) || []))}
+        disabled={true}
+      />
+    </Form>
+  )
+
+  const candidateStageAndInterviewerDiv = (
+    <div className="px-3 py-1 rounded-lg border-2 border-theme-600 text-theme-700 font-semibold flex items-center justify-center space-x-2">
+      <span>{candidate?.workflowStage?.stage?.name}</span>
+      <ArrowRightIcon className="w-4 h-4" />
+      <span>{interviewDetail?.interviewer?.name}</span>
+    </div>
+  )
+
+  const rejectCandidateButton = (
+    <button
+      title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
+      className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+      disabled={
+        // interviewDetail?.interviewer?.id !== user?.id &&
+        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+          JobUserRole.OWNER &&
+        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+          JobUserRole.ADMIN
+      }
+      onClick={(e) => {
+        e.preventDefault()
+        setCandidateToReject(candidate)
+        setOpenCandidateRejectConfirm(true)
+      }}
+    >
+      {candidate?.rejected ? <RefreshIcon className="w-6 h-6" /> : <BanIcon className="w-6 h-6" />}
+    </button>
+  )
+
+  const updateCandidateDetailsButton = (
+    <button
+      title="Update Candidate Details"
+      className="float-right underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+      disabled={
+        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+          JobUserRole.OWNER &&
+        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+          JobUserRole.ADMIN
+      }
+      data-testid={`${candidate?.id}-settingsLink`}
+      onClick={(e) => {
+        e.preventDefault()
+        setOpenEditModal(true)
+      }}
+    >
+      <PencilAltIcon className="h-6 w-6" />
+    </button>
+  )
+
+  const MoveToNextStageButton = ({ stagesOpen, setStagesOpen }) => {
+    return (
+      <div className="cursor-pointer flex justify-center">
+        <button
+          className="text-white bg-theme-600 px-3 py-2 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          disabled={
+            // interviewDetail?.interviewer?.id !== user?.id &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.OWNER &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.ADMIN
+          }
+          onClick={async (e) => {
+            e.preventDefault()
+
+            if (
+              (selectedWorkflowStage?.order || 0) ===
+              (candidate?.job?.workflow?.stages?.length || 0)
+            ) {
+              toast.error("The candidate is already in the last stage")
+              return
+            } else {
+              setCandidateToMove(candidate)
+              setMoveToWorkflowStage(null)
+              setOpenCandidateMoveConfirm(true)
+            }
+          }}
+        >
+          Move to Next Stage
+        </button>
+        <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
+          <DropdownMenu.Trigger
+            className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
+            disabled={
+              // interviewDetail?.interviewer?.id !== user?.id &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.OWNER &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.ADMIN
+            }
+          >
+            <button
+              className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={
+                // interviewDetail?.interviewer?.id !== user?.id &&
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                  JobUserRole.OWNER &&
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                  JobUserRole.ADMIN
+              }
+            >
+              <ChevronDownIcon className="w-5 h-5" />
+            </button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
+            <DropdownMenu.Arrow className="fill-current" offset={10} />
+            {candidate?.job?.workflow?.stages?.length === 0 && (
+              <DropdownMenu.Item
+                disabled={true}
+                onSelect={(e) => {
+                  e.preventDefault()
+                }}
+                className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
+              >
+                No stages
+              </DropdownMenu.Item>
+            )}
+            {candidate?.job?.workflow?.stages.map((ws) => {
+              return (
+                <DropdownMenu.Item
+                  key={ws.id}
+                  onSelect={async (e) => {
+                    e.preventDefault()
+
+                    if (selectedWorkflowStage?.id === ws?.id) {
+                      toast.error(`The candidate is already in the ${ws?.stage?.name} stage`)
+                    } else {
+                      setCandidateToMove(candidate)
+                      setMoveToWorkflowStage(ws)
+                      setOpenCandidateMoveConfirm(true)
+                    }
+                  }}
+                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                >
+                  {ws.stage?.name?.length > 30
+                    ? `${ws.stage?.name?.substring(0, 30)}...`
+                    : ws.stage?.name}
+                </DropdownMenu.Item>
+              )
+            })}
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      </div>
+    )
+  }
+
+  const AddToPoolButton = ({ candidatePoolsOpen, setCandidatePoolsOpen }) => {
+    return (
+      <DropdownMenu.Root
+        modal={false}
+        open={candidatePoolsOpen}
+        onOpenChange={setCandidatePoolsOpen}
+      >
+        <DropdownMenu.Trigger
+          className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
+          disabled={
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.OWNER &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.ADMIN
+          }
+        >
+          <button
+            className="flex px-2 py-1 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            disabled={
+              // selectedWorkflowStage?.interviewDetails?.find(
+              //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+              // )?.interviewerId !== user?.id &&
+              // interviewDetail?.interviewer?.id !== user?.id &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.OWNER &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.ADMIN
+            }
+          >
+            Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
+          <DropdownMenu.Arrow className="fill-current" offset={10} />
+          {candidatePools?.length === 0 && (
+            <DropdownMenu.Item
+              disabled={true}
+              onSelect={(e) => {
+                e.preventDefault()
+              }}
+              className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
+            >
+              No more pools to add
+            </DropdownMenu.Item>
+          )}
+          {candidatePools.map((cp) => {
+            return (
+              <DropdownMenu.Item
+                key={cp.id}
+                onSelect={async (e) => {
+                  e.preventDefault()
+                  const toastId = toast.loading(`Adding candidate to pool - ${cp.name}`)
+                  try {
+                    await addCandidateToPoolMutation({ candidateId: candidate?.id, poolId: cp.id })
+                    await invalidateQuery(getCandidatePools)
+                    toast.success(`Candidate added to pool - ${cp.name}`, { id: toastId })
+                  } catch (error) {
+                    toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
+                      id: toastId,
+                    })
+                  }
+                  setCandidatePoolsOpen(false)
+                }}
+                className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+              >
+                {cp.name?.length > 30 ? `${cp.name?.substring(0, 30)}...` : cp.name}
+              </DropdownMenu.Item>
+            )
+          })}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    )
   }
 
   return (
@@ -607,349 +854,93 @@ const SingleCandidatePageContent = ({
         {moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"} stage?
       </Confirm>
 
-      {/* <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
-      <br /> */}
+      {/* Mobile and Tablet Menu */}
+      <div className="flex flex-col lg:hidden">
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {candidateNameHeader}
+          {candidateRatingDiv}
+        </div>
 
-      <DropdownMenu.Root
-        modal={false}
-        open={candidatePoolsOpen}
-        onOpenChange={setCandidatePoolsOpen}
-      >
-        <DropdownMenu.Trigger
-          className="float-right ml-6 disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
-          disabled={
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.OWNER &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.ADMIN
-          }
-        >
-          <button
-            className="flex px-2 py-1 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={
-              // selectedWorkflowStage?.interviewDetails?.find(
-              //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-              // )?.interviewerId !== user?.id &&
-              // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.OWNER &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.ADMIN
-            }
-          >
-            Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
-          </button>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-          <DropdownMenu.Arrow className="fill-current" offset={10} />
-          {candidatePools?.length === 0 && (
-            <DropdownMenu.Item
-              disabled={true}
-              onSelect={(e) => {
-                e.preventDefault()
-              }}
-              className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
-            >
-              No more pools to add
-            </DropdownMenu.Item>
-          )}
-          {candidatePools.map((cp) => {
-            return (
-              <DropdownMenu.Item
-                key={cp.id}
-                onSelect={async (e) => {
-                  e.preventDefault()
-                  const toastId = toast.loading(`Adding candidate to pool - ${cp.name}`)
-                  try {
-                    await addCandidateToPoolMutation({ candidateId: candidate?.id, poolId: cp.id })
-                    await invalidateQuery(getCandidatePools)
-                    toast.success(`Candidate added to pool - ${cp.name}`, { id: toastId })
-                  } catch (error) {
-                    toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
-                      id: toastId,
-                    })
-                  }
-                  setCandidatePoolsOpen(false)
-                }}
-                className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
-              >
-                {cp.name}
-              </DropdownMenu.Item>
-            )
-          })}
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
+        <div className="flex flex-nowrap items-center justify-center space-x-4 my-4">
+          {candidateStageAndInterviewerDiv}
+        </div>
 
-      <div className="float-right cursor-pointer flex justify-center">
-        <button
-          className="text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={
-            // interviewDetail?.interviewer?.id !== user?.id &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.OWNER &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.ADMIN
-          }
-          onClick={async (e) => {
-            e.preventDefault()
-
-            if (
-              (selectedWorkflowStage?.order || 0) ===
-              (candidate?.job?.workflow?.stages?.length || 0)
-            ) {
-              toast.error("The candidate is already in the last stage")
-              return
-            } else {
-              setCandidateToMove(candidate)
-              setMoveToWorkflowStage(null)
-              setOpenCandidateMoveConfirm(true)
-            }
-          }}
-        >
-          Move to Next Stage
-        </button>
-        <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
-          <DropdownMenu.Trigger
-            className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
-            disabled={
-              // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.OWNER &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.ADMIN
-            }
-          >
-            <button
-              className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={
-                // interviewDetail?.interviewer?.id !== user?.id &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  JobUserRole.OWNER &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  JobUserRole.ADMIN
-              }
-            >
-              <ChevronDownIcon className="w-5 h-5" />
-            </button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-            <DropdownMenu.Arrow className="fill-current" offset={10} />
-            {candidate?.job?.workflow?.stages?.length === 0 && (
-              <DropdownMenu.Item
-                disabled={true}
-                onSelect={(e) => {
-                  e.preventDefault()
-                }}
-                className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
-              >
-                No stages
-              </DropdownMenu.Item>
-            )}
-            {candidate?.job?.workflow?.stages.map((ws) => {
-              return (
-                <DropdownMenu.Item
-                  key={ws.id}
-                  onSelect={async (e) => {
-                    e.preventDefault()
-
-                    if (selectedWorkflowStage?.id === ws?.id) {
-                      toast.error(`The candidate is already in the ${ws?.stage?.name} stage`)
-                    } else {
-                      setCandidateToMove(candidate)
-                      setMoveToWorkflowStage(ws)
-                      setOpenCandidateMoveConfirm(true)
-                    }
-                  }}
-                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
-                >
-                  {ws.stage?.name}
-                </DropdownMenu.Item>
-              )
-            })}
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
+        <div className="flex flex-nowrap items-center justify-center space-x-4 my-4">
+          {rejectCandidateButton}
+          {updateCandidateDetailsButton}
+          <MoveToNextStageButton
+            stagesOpen={stagesOpenMobileAndTablet}
+            setStagesOpen={setStagesOpenMobileAndTablet}
+          />
+          <AddToPoolButton
+            candidatePoolsOpen={candidatePoolsOpenMobileAndTablet}
+            setCandidatePoolsOpen={setCandidatePoolsOpenMobileAndTablet}
+          />
+        </div>
       </div>
 
-      <button
-        title="Edit Details"
-        className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={
-          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-            JobUserRole.OWNER &&
-          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-            JobUserRole.ADMIN
-        }
-        data-testid={`${candidate?.id}-settingsLink`}
-        onClick={(e) => {
-          e.preventDefault()
-          setOpenEditModal(true)
-        }}
-      >
-        <PencilAltIcon className="h-6 w-6" />
-      </button>
+      {/* Desktop Menu */}
+      <div className="hidden lg:flex justify-between items-center space-x-4">
+        <div className="flex flex-nowrap items-center space-x-4">
+          {candidateNameHeader}
+          {candidateRatingDiv}
+          {candidateStageAndInterviewerDiv}
+        </div>
 
-      {/* <Link
-        href={Routes.CandidateSettingsPage({
-          slug: candidate?.job?.slug!,
-          candidateSlug: candidate?.slug!,
-        })}
-        passHref
-      >
-        <button
-          title="Edit Details"
-          className="float-right ml-4 underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
-          }
-          data-testid={`${candidate?.id}-settingsLink`}
-        >
-          <PencilAltIcon className="h-6 w-6" />
-        </button>
-      </Link> */}
-
-      <button
-        title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
-        className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={
-          // interviewDetail?.interviewer?.id !== user?.id &&
-          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-            JobUserRole.OWNER &&
-          user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-            JobUserRole.ADMIN
-        }
-        onClick={(e) => {
-          e.preventDefault()
-          setCandidateToReject(candidate)
-          setOpenCandidateRejectConfirm(true)
-        }}
-      >
-        {candidate?.rejected ? (
-          <RefreshIcon className="w-6 h-6" />
-        ) : (
-          <BanIcon className="w-6 h-6" />
-        )}
-      </button>
-
-      <div className="flex items-center space-x-4">
-        <h3
-          className={`font-bold text-5xl ${
-            candidate?.rejected ? "text-red-600" : "text-theme-600"
-          }`}
-        >
-          {candidate?.name}
-        </h3>
-
-        <Form
-          noFormatting={true}
-          onSubmit={async () => {
-            return
-          }}
-        >
-          <LabeledRatingField
-            name="candidateAverageRating"
-            ratingClass={`!flex items-center`}
-            height={8}
-            color={candidate?.rejected ? "red" : "theme"}
-            value={Math.round(
-              getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])
-            )}
-            disabled={true}
+        <div className="flex flex-nowrap items-center justify-end space-x-4">
+          {rejectCandidateButton}
+          {updateCandidateDetailsButton}
+          <MoveToNextStageButton
+            stagesOpen={stagesOpenDesktop}
+            setStagesOpen={setStagesOpenDesktop}
           />
-        </Form>
-
-        {/* <label className="text-neutral-500">assigned to <span className="text-theme-600 font-semibold">{interviewDetail?.interviewer?.name}</span> for </label> */}
-        {/* <select
-          className="border border-gray-300 px-2 py-2 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
-          name="interviewerId"
-          placeholder={`Interviewer for ${selectedWorkflowStage?.stage?.name}`}
-          disabled={
-            jobData?.users?.find((usr) => usr.id === session.userId)?.role === JobUserRole.USER
-          }
-          value={interviewDetail?.interviewer?.id?.toString()}
-          onChange={async (e) => {
-            const selectedInterviewerId = e.target.value
-            const toastId = toast.loading(() => <span>Updating Interviewer</span>)
-            try {
-              await setCandidateInterviewerMutation({
-                candidateId: candidate?.id,
-                workflowStageId: selectedWorkflowStage?.id || "0",
-                interviewerId: parseInt(selectedInterviewerId || "0"),
-              })
-
-              await invalidateQuery(getCandidateInterviewDetail)
-
-              toast.success(() => <span>Interviewer assigned to candidate stage</span>, {
-                id: toastId,
-              })
-            } catch (error) {
-              toast.error(
-                "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-              )
-            }
-          }}
-        >
-          {jobData?.users.map((jobUser) => {
-            return (
-              <option key={jobUser?.userId?.toString()!} value={jobUser?.userId?.toString()!}>
-                {jobUser?.user?.name!}
-              </option>
-            )
-          })}
-        </select> */}
-
-        <div className="px-3 py-1 rounded-lg border-2 border-theme-600 text-theme-700 font-semibold flex items-center justify-center space-x-2">
-          <span>{candidate?.workflowStage?.stage?.name}</span>
-          <ArrowRightIcon className="w-4 h-4" />
-          <span>{interviewDetail?.interviewer?.name}</span>
+          <AddToPoolButton
+            candidatePoolsOpen={candidatePoolsOpenDesktop}
+            setCandidatePoolsOpen={setCandidatePoolsOpenDesktop}
+          />
         </div>
       </div>
 
       <br />
 
       <Suspense fallback="Loading...">
-        <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
-          <div className="w-full md:w-1/2 lg:w-2/3 flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg">
-            <div className="px-2 md:px-0 lg:px-0">
-              {file && <PDFViewer file={file} scale={1.29} />}
-            </div>
-            <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
-              {candidate?.job?.form?.questions?.map((fq) => {
-                const answer = getAnswer(fq, candidate)
-                if (fq?.question?.name === "Resume") {
-                  console.log("RESUME RESUME RESUME")
-                  console.log(answer)
-                }
+        <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-0 lg:space-x-0">
+          {/* PDF Viewer and Candidate Answers */}
+          <div className="w-full md:w-3/5 lg:w-2/3">
+            <div className="flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg md:mr-8 lg:mr-8">
+              <div className="px-2 md:px-0 lg:px-0">
+                {file && <PDFViewer file={file} scale={1.29} />}
+              </div>
+              <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
+                {candidate?.job?.form?.questions?.map((fq) => {
+                  const answer = getAnswer(fq, candidate)
+                  if (fq?.question?.name === "Resume") {
+                    console.log("RESUME RESUME RESUME")
+                    console.log(answer)
+                  }
 
-                return (
-                  <Card key={fq.id}>
-                    <div className="space-y-2">
-                      <div className="w-full relative">
-                        <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                          <span className="truncate">{fq.question.name}</span>
+                  return (
+                    <Card key={fq.id}>
+                      <div className="space-y-2">
+                        <div className="w-full relative">
+                          <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                            <span className="truncate">{fq.question.name}</span>
+                          </div>
+                        </div>
+                        <div className="border-b-2 border-gray-50 w-full"></div>
+                        <div className="flex md:justify-center lg:justify-center">
+                          <span className="truncate">{answer || "NA"}</span>
                         </div>
                       </div>
-                      <div className="border-b-2 border-gray-50 w-full"></div>
-                      <div className="flex md:justify-center lg:justify-center">
-                        <span className="truncate">{answer || "NA"}</span>
-                      </div>
-                    </div>
-                  </Card>
-                )
-              })}
+                    </Card>
+                  )
+                })}
+              </div>
             </div>
-            {/* <Cards
-              cards={cards}
-              setCards={setCards}
-              noPagination={true}
-              mutateCardDropDB={(source, destination, draggableId) => {}}
-              droppableName="answers"
-              isDragDisabled={true}
-              direction={DragDirection.HORIZONTAL}
-              noSearch={true}
-            /> */}
           </div>
-          <div className="w-full md:w-1/2 lg:w-1/3">
+
+          {/* Interviewing Info */}
+          <div className="w-full md:w-2/5 lg:w-1/3">
             <div
               className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
             >
@@ -965,14 +956,16 @@ const SingleCandidatePageContent = ({
                             : ""
                         } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
                           selectedWorkflowStage?.id === ws.id ? "!bg-theme-500 !text-white" : ""
-                        }`}
+                        } whitespace-nowrap`}
                         onClick={() => {
                           setSelectedWorkflowStage(ws)
                           invalidateQuery(getCandidateInterviewsByStage)
                           // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
                         }}
                       >
-                        {ws.stage?.name}
+                        {ws.stage?.name?.length > 20
+                          ? `${ws.stage?.name?.substring(0, 20)}...`
+                          : ws?.stage?.name}
                       </div>
                     )
                   })}
