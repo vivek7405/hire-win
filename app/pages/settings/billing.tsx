@@ -84,7 +84,7 @@ const UserSettingsBillingPage = ({
         <AuthLayout title="Settings" user={user}>
           <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
           <UserSettingsLayout>
-            <div className="bg-white mt-5 md:mt-0 md:col-span-2">
+            <div className="bg-white md:col-span-2">
               <div className="sm:overflow-hidden">
                 <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
                   {/* <div className="mb-6">
@@ -136,10 +136,7 @@ const UserSettingsBillingPage = ({
                     <div className="md:grid md:gap-6 md:grid-flow-row md:grid-cols-3">
                       {plans?.map((plan, i) => {
                         return (
-                          <div
-                            key={i}
-                            className="mt-12 md:mt-0 space-y-12 lg:space-y-0 flex flex-col"
-                          >
+                          <div key={i} className="md:mt-0 space-y-4 lg:space-y-0 flex flex-col">
                             <div className="flex-1 pb-6">
                               <h3 className="text-xl font-semibold text-gray-900">{plan.title}</h3>
                               <p className="mt-4 flex items-baseline text-gray-900">
@@ -149,7 +146,7 @@ const UserSettingsBillingPage = ({
                                 <span className="ml-1 text-sm text-gray-400">{plan.frequency}</span>
                               </p>
                               {/* <p className="mt-6 text-gray-800">{plan.description}</p> */}
-                              <ul className="mt-6 space-y-6">
+                              <ul className="mt-6 space-y-4">
                                 {plan.features.map((feature, j) => (
                                   <li key={j} className="flex">
                                     <span className="text-gray-500">- {feature}</span>

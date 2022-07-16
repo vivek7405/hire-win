@@ -143,12 +143,12 @@ const Calendars = ({ user }: CalendarProps) => {
         Are you sure you want to delete the calendar?
       </Confirm>
 
-      <div className="hidden md:flex lg:flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 flex-wrap items-center justify-between">
         <input
           placeholder="Search"
           type="text"
           defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 rounded`}
+          className={`border border-gray-300 w-full lg:mr-2 lg:w-1/4 px-2 py-2 rounded`}
           onChange={(e) => {
             execDebouncer(e)
           }}
@@ -229,11 +229,10 @@ const Calendars = ({ user }: CalendarProps) => {
           </button>
         </div>
       </div>
-      <br />
       {/* <br /> */}
       {/* <Table columns={columns} data={calendarEntries} noPagination={true} resultName="calendar" /> */}
       {filteredCalendarEntries?.length > 0 ? (
-        <div className="flex flex-wrap justify-center mt-2">
+        <div className="flex flex-wrap justify-center">
           {filteredCalendarEntries?.map((cal) => {
             let calType = cal.type.includes("Caldav") ? "Caldav" : cal.type
             calType = calType.includes("Google") ? "Google" : calType
