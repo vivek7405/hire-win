@@ -689,27 +689,6 @@ const JobsHome = ({
     />
   )
 
-  const JobViewTypeRadio = ({ isBorder }) => {
-    return (
-      <Form
-        noFormatting={true}
-        onSubmit={(value) => {
-          return value
-        }}
-      >
-        <RadioGroupField
-          name="View"
-          isBorder={isBorder}
-          options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
-          initialValue={JobViewType.Active}
-          onChange={(value) => {
-            setViewType(value)
-          }}
-        />
-      </Form>
-    )
-  }
-
   const viewCareersPageLink = (
     <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
       <a
@@ -762,7 +741,22 @@ const JobsHome = ({
           {newJobButton}
         </div>
 
-        <JobViewTypeRadio isBorder={true} />
+        <Form
+          noFormatting={true}
+          onSubmit={(value) => {
+            return value
+          }}
+        >
+          <RadioGroupField
+            name="View"
+            isBorder={true}
+            options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
+            initialValue={JobViewType.Active}
+            onChange={(value) => {
+              setViewType(value)
+            }}
+          />
+        </Form>
 
         <div className="flex justify-center">{viewCareersPageLink}</div>
       </div>
@@ -771,7 +765,22 @@ const JobsHome = ({
       <div className="hidden md:flex lg:flex items-center w-full justify-between">
         <div className="flex items-center">
           {searchInput}
-          <JobViewTypeRadio isBorder={false} />
+          <Form
+            noFormatting={true}
+            onSubmit={(value) => {
+              return value
+            }}
+          >
+            <RadioGroupField
+              name="View"
+              isBorder={false}
+              options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
+              initialValue={JobViewType.Active}
+              onChange={(value) => {
+                setViewType(value)
+              }}
+            />
+          </Form>
         </div>
 
         <div className="flex items-center">
