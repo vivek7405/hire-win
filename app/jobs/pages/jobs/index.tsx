@@ -549,7 +549,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                               key={ws.id}
                               className="overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
                             >
-                              <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                              <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
                                 {ws.stage?.name}
                               </div>
                               <div className="text-neutral-500">
@@ -677,6 +677,71 @@ const JobsHome = ({
   //   return <></>
   // }
 
+  const searchInput = (
+    <input
+      placeholder="Search"
+      type="text"
+      defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+      className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+      onChange={(e) => {
+        execDebouncer(e)
+      }}
+    />
+  )
+
+  const JobViewTypeRadio = ({ isBorder }) => {
+    return (
+      <Form
+        noFormatting={true}
+        onSubmit={(value) => {
+          return value
+        }}
+      >
+        <RadioGroupField
+          name="View"
+          isBorder={isBorder}
+          options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
+          initialValue={JobViewType.Active}
+          onChange={(value) => {
+            setViewType(value)
+          }}
+        />
+      </Form>
+    )
+  }
+
+  const viewCareersPageLink = (
+    <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center underline text-theme-600 mx-6 py-2 hover:text-theme-800 whitespace-nowrap"
+      >
+        <span>View Careers Page</span>
+        <ExternalLinkIcon className="w-4 h-4 ml-1" />
+      </a>
+    </Link>
+  )
+
+  const newJobButton = (
+    <button
+      className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+      onClick={(e) => {
+        e.preventDefault()
+        if (canCreate) {
+          return router.push(Routes.NewJob())
+        } else {
+          setConfirmMessage(
+            "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+          )
+          setOpenConfirm(true)
+        }
+      }}
+    >
+      New Job
+    </button>
+  )
+
   return (
     <AuthLayout title="Jobs | hire-win" user={user}>
       <Confirm
@@ -690,106 +755,30 @@ const JobsHome = ({
         {confirmMessage}
       </Confirm>
 
-      <div className="flex items-center w-full justify-between">
+      {/* Mobile Menu */}
+      <div className="flex flex-col space-y-4 md:hidden lg:hidden">
+        <div className="flex w-full justify-between">
+          {searchInput}
+          {newJobButton}
+        </div>
+
+        <JobViewTypeRadio isBorder={true} />
+
+        <div className="flex justify-center">{viewCareersPageLink}</div>
+      </div>
+
+      {/* Tablet and Desktop Menu */}
+      <div className="hidden md:flex lg:flex items-center w-full justify-between">
         <div className="flex items-center">
-          <input
-            placeholder="Search"
-            type="text"
-            defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-            className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
-            onChange={(e) => {
-              execDebouncer(e)
-            }}
-          />
-          <div className="text-theme-600">
-            <Form
-              noFormatting={true}
-              onSubmit={(value) => {
-                return value
-              }}
-            >
-              <RadioGroupField
-                name="View"
-                options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
-                initialValue={JobViewType.Active}
-                onChange={(value) => {
-                  setViewType(value)
-                }}
-              />
-            </Form>
-          </div>
+          {searchInput}
+          <JobViewTypeRadio isBorder={false} />
         </div>
 
         <div className="flex items-center">
-          <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center float-right underline text-theme-600 mx-6 py-2 hover:text-theme-800"
-            >
-              <span>View Careers Page</span>
-              <ExternalLinkIcon className="w-4 h-4 ml-1" />
-            </a>
-          </Link>
-
-          {/* <Link href={Routes.NewJob()} passHref> */}
-          <a
-            className="cursor-pointer text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-            onClick={(e) => {
-              e.preventDefault()
-              if (canCreate) {
-                return router.push(Routes.NewJob())
-              } else {
-                setConfirmMessage(
-                  "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
-                )
-                setOpenConfirm(true)
-              }
-            }}
-          >
-            New Job
-          </a>
-          {/* </Link> */}
+          {viewCareersPageLink}
+          {newJobButton}
         </div>
       </div>
-
-      {/* <div className="float-right text-theme-600 py-2 ml-3">
-        <Form
-          noFormatting={true}
-          onSubmit={(value) => {
-            return value
-          }}
-        >
-          <LabeledToggleSwitch
-            name="toggleViewArchived"
-            label="View Archived"
-            flex={true}
-            value={viewArchived}
-            onChange={(switchState) => {
-              setViewArchived(switchState)
-            }}
-          />
-        </Form>
-      </div>
-
-      <div className="float-right text-theme-600 py-2 ml-3">
-        <Form
-          noFormatting={true}
-          onSubmit={(value) => {
-            return value
-          }}
-        >
-          <LabeledToggleSwitch
-            name="toggleViewExpired"
-            label="View Expired"
-            flex={true}
-            value={viewExpired}
-            onChange={(switchState) => {
-              setViewExpired(switchState)
-            }}
-          />
-        </Form>
-      </div> */}
 
       <Suspense fallback={<p className="pt-7">Loading...</p>}>
         <Jobs

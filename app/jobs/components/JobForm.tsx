@@ -362,7 +362,7 @@ const Step5Workflow = (props: Step5WorkflowProps) => {
           />
         </div>
         <label className="font-medium text-xl text-neutral-600">Score Cards</label>
-        <div className="w-full flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-2 lg:space-y-0 lg:space-x-2">
+        <div className="w-full flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-20 md:space-y-0 lg:space-y-0 md:space-x-2 lg:space-x-2">
           {workflows
             .find((w) => w.id === selectedWorkflowId)
             ?.stages?.sort((a, b) => {
@@ -388,7 +388,7 @@ const Step5Workflow = (props: Step5WorkflowProps) => {
                     <ArrowSmDownIcon className="h-6 w-auto text-neutral-500" />
                   </div>
 
-                  <div className="w-32 flex flex-col items-center justify-center">
+                  <div className="w-32">
                     <LabeledReactSelectField
                       name={`scoreCards.${index}.scoreCardId`}
                       // {...register(`scoreCards.${index}.scoreCardId`)}

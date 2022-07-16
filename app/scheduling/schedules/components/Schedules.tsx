@@ -226,14 +226,13 @@ const Schedules = ({ user }) => {
           }}
         />
         <div className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
-          {/* <AddScheduleModal /> */}
           <button
+            className="whitespace-nowrap"
             onClick={(e) => {
               e.preventDefault()
               setScheduleToEdit(null)
               setOpenAddSchedule(true)
             }}
-            className="whitespace-nowrap"
           >
             New Schedule
           </button>
@@ -278,7 +277,7 @@ const Schedules = ({ user }) => {
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
                 Timezone: {s.timezone}
               </div>
-              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+              <div className="hidden lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {s.dailySchedules?.map((ds) => {
                   return (
                     <div

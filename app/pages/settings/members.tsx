@@ -47,6 +47,7 @@ import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
 import inviteToCompany from "app/companies/mutations/inviteToCompany"
 import updateCompanyUserRole from "app/companies/mutations/updateCompanyUserRole"
 import removeFromCompany from "app/companies/mutations/removeFromCompany"
+import { titleCase } from "app/core/utils/titleCase"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -161,7 +162,7 @@ const UserSettingsMembersPage = ({
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <UserSettingsLayout>
-        <div className="bg-white mt-5 md:mt-0 md:col-span-2">
+        <div className="bg-white md:col-span-2">
           <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
             <div className="flex justify-between items-center mb-6">
               <h2
@@ -259,7 +260,7 @@ const UserSettingsMembersPage = ({
                           ) : (
                             <select
                               value={m.role}
-                              className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
+                              className="border border-gray-300 px-2 py-2 block w-32 sm:text-sm rounded truncate pr-6"
                               onChange={async (e) => {
                                 const toastId = toast.loading(() => (
                                   <span>Updating member permission</span>
@@ -286,7 +287,7 @@ const UserSettingsMembersPage = ({
                               {Object.values(JobUserRole)
                                 .filter((m) => m !== "OWNER")
                                 .map((m, i) => {
-                                  return <option key={i}>{m}</option>
+                                  return <option key={i}>{titleCase(m)}</option>
                                 })}
                             </select>
                           )}

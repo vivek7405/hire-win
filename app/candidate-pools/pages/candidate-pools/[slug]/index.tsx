@@ -199,11 +199,11 @@ export const Candidates = ({ slug }) => {
         totalCount={count}
         resultName="candidate"
       />
-      <br />
+
       {candidates?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No candidates found</div>
       ) : (
-        <div className="flex flex-wrap justify-center mt-2">
+        <div className="flex flex-wrap justify-center">
           {candidates.map((candidate) => {
             return (
               <Card key={candidate.id}>

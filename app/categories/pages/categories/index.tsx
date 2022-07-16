@@ -127,16 +127,6 @@ const Categories = () => {
       >
         Are you sure you want to delete the category?
       </Confirm>
-      <button
-        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-        onClick={(e) => {
-          e.preventDefault()
-          setCategoryToEdit(null as any)
-          setOpenModal(true)
-        }}
-      >
-        New Category
-      </button>
 
       <Modal header="Category" open={openModal} setOpen={setOpenModal}>
         <CategoryForm
@@ -171,22 +161,35 @@ const Categories = () => {
           }}
         />
       </Modal>
+
+      <div>
+        <button
+          className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+          onClick={(e) => {
+            e.preventDefault()
+            setCategoryToEdit(null as any)
+            setOpenModal(true)
+          }}
+        >
+          New Category
+        </button>
+      </div>
       <div className="flex mb-2">
         <input
           placeholder="Search"
           type="text"
           defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+          className={`border border-gray-300 mr-2 md:w-1/4 lg:w-1/4 px-2 py-2 w-full rounded`}
           onChange={(e) => {
             execDebouncer(e)
           }}
         />
       </div>
-      <br />
+
       {categories?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No Categories found</div>
       ) : (
-        <div className="flex flex-wrap justify-center mt-2">
+        <div className="flex flex-wrap justify-center">
           {categories.map((c) => {
             return (
               <Card key={c.id}>

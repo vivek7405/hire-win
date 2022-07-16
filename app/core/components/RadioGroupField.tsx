@@ -66,7 +66,7 @@ export const RadioGroupField = forwardRef<HTMLInputElement, RadioGroupFieldProps
                       key={i}
                       className={`w-full p-2 ${
                         isBorder ? "border" : ""
-                      } flex flex-row items-center`}
+                      } flex flex-row items-center text-theme-600`}
                     >
                       <RadioGroup.Item className="relative w-full" value={option}>
                         <RadioGroup.Indicator
