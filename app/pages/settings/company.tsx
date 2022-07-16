@@ -101,7 +101,10 @@ const UserSettingsCompanyPage = ({
                 theme: company?.theme || "indigo",
               }}
               onSubmit={async (values) => {
-                values.info = convertToRaw(values?.info?.getCurrentContent())
+                if (values?.info) {
+                  values.info = convertToRaw(values?.info?.getCurrentContent())
+                }
+
                 const toastId = toast.loading(() => <span>Updating Company details</span>)
                 try {
                   await updateCompanyMutation({

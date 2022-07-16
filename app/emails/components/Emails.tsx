@@ -121,8 +121,12 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
           onSubmit={async (values) => {
             const toastId = toast.loading("Sending email")
             try {
-              values.body = convertToRaw(values?.body?.getCurrentContent())
+              if (values?.body) {
+                values.body = convertToRaw(values?.body?.getCurrentContent())
+              }
+
               // values.body = draftToHtml(values.body || {})
+
               await sendEmailMutation({
                 ...values,
                 templateId: selectedEmailTemplate?.id,

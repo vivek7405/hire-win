@@ -80,7 +80,6 @@ const UserSettingsPage = ({
             // theme: company?.theme || "indigo",
           }}
           onSubmit={async (values) => {
-            // values.companyInfo = convertToRaw(values?.companyInfo?.getCurrentContent())
             const toastId = toast.loading(() => <span>Updating User</span>)
             try {
               await updateUserMutation({
@@ -89,7 +88,6 @@ const UserSettingsPage = ({
                 initial: user!,
               })
               toast.success(() => <span>User Updated</span>, { id: toastId })
-              // router.push(Routes.JobsHome())
             } catch (error) {
               toast.error(
                 "Sorry, we had an unexpected error. Please try again. - " + error.toString()

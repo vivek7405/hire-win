@@ -152,7 +152,9 @@ const JobSettingsPage = ({
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating Job</span>)
             try {
-              values.description = convertToRaw(values?.description?.getCurrentContent() || {})
+              if (values?.description) {
+                values.description = convertToRaw(values?.description?.getCurrentContent() || {})
+              }
 
               await updateJobMutation({
                 where: { id: job?.id },

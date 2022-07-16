@@ -53,7 +53,10 @@ const NewEmailTemplate = ({ user }: InferGetServerSidePropsType<typeof getServer
           onSubmit={async (values) => {
             const toastId = toast.loading("Adding template")
             try {
-              values.body = convertToRaw(values?.body?.getCurrentContent())
+              if (values?.body) {
+                values.body = convertToRaw(values?.body?.getCurrentContent())
+              }
+
               await createEmailTemplateMutation({ ...values })
               await invalidateQuery(getEmailTemplates)
               toast.success("Template added successfully", { id: toastId })

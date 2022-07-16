@@ -67,7 +67,10 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
               theme: "indigo",
             }}
             onSubmit={async (values) => {
-              values.info = convertToRaw(values?.info?.getCurrentContent())
+              if (values?.info) {
+                values.info = convertToRaw(values?.info?.getCurrentContent())
+              }
+
               const toastId = toast.loading(() => <span>Creating Company</span>)
               try {
                 await createCompanyMutation(values)
