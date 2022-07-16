@@ -106,7 +106,10 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
         onSubmit={async (values) => {
           const toastId = toast.loading("Updating template")
           try {
-            values.body = convertToRaw(values?.body?.getCurrentContent())
+            if (values?.body) {
+              values.body = convertToRaw(values?.body?.getCurrentContent())
+            }
+
             await updateEmailTemplateMutation({
               where: { id: emailTemplate?.id },
               data: { ...values },

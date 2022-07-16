@@ -60,7 +60,9 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Creating Job</span>)
             try {
-              values.description = convertToRaw(values?.description?.getCurrentContent())
+              if (values?.description) {
+                values.description = convertToRaw(values?.description?.getCurrentContent())
+              }
 
               const createdJob = await createJobMutation(values)
               toast.success(() => <span>Job Created</span>, { id: toastId })

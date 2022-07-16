@@ -140,7 +140,10 @@ const EmailTemplates = ({ user }) => {
 
             const toastId = toast.loading(isEdit ? "Updating template" : "Adding template")
             try {
-              values.body = convertToRaw(values?.body?.getCurrentContent())
+              if (values?.body) {
+                values.body = convertToRaw(values?.body?.getCurrentContent())
+              }
+
               isEdit
                 ? await updateEmailTemplateMutation({
                     where: { id: emailTemplateToEdit.id },
