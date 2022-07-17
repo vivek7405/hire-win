@@ -2,7 +2,7 @@ import db from "db"
 import { Ctx } from "blitz"
 
 type UpdateCalendarNameInputProps = {
-  calendarId: number
+  calendarId: string
   calendarName: string
 }
 export default async function updateCalendarName(

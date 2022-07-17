@@ -71,7 +71,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const scoreCard = await invokeWithMiddleware(
         getScoreCard,
-        { where: { slug: context?.params?.slug!, companyId: session?.companyId || 0 } },
+        { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
         { ...context }
       )
 
@@ -461,7 +461,7 @@ export const CardQuestions = ({
                 }}
                 scoreCardQuestions={data}
                 userId={user?.id || 0}
-                companyId={companyId || 0}
+                companyId={companyId || "0"}
               />
             </div>
           </div>
@@ -552,7 +552,7 @@ const SingleScoreCardPage = ({
                 <AddExistingCardQuestionsForm
                   schema={ScoreCardQuestions}
                   user={user}
-                  companyId={session.companyId || 0}
+                  companyId={session.companyId || "0"}
                   scoreCardId={scoreCard?.id!}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Adding CardQuestion(s)</span>)
@@ -664,7 +664,7 @@ const SingleScoreCardPage = ({
 
           <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <CardQuestions
-              companyId={session.companyId || 0}
+              companyId={session.companyId || "0"}
               scoreCard={scoreCard}
               user={user}
               setCardQuestionToEdit={setCardQuestionToEdit}

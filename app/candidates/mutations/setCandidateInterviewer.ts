@@ -9,7 +9,7 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 type UpdateCandidateWorkflowStageInterviewerInput = {
   candidateId: string
   workflowStageId: string
-  interviewerId: number
+  interviewerId: string
 }
 
 async function setCandidateInterviewer(

@@ -45,7 +45,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const company = await invokeWithMiddleware(
     getCompany,
-    { where: { id: session.companyId || 0 } },
+    { where: { id: session.companyId || "0" } },
     { ...context }
   )
 
@@ -79,7 +79,7 @@ const UserSettingsCompanyPage = ({
   const [updateCompanyMutation] = useMutation(updateCompany)
   const session = useSession()
   const [companyUser] = useQuery(getCompanyUser, {
-    where: { userId: session.userId || 0, companyId: session.companyId || 0 },
+    where: { userId: session.userId || "0", companyId: session.companyId || "0" },
   })
 
   return (

@@ -36,20 +36,20 @@ export default Guard.authorize(
           ...data,
           users: {
             create: {
-              userId: ctx?.session?.userId || 0,
+              userId: ctx?.session?.userId || "0",
               role: CompanyUserRole.OWNER,
             },
           },
         },
       })
 
-      const companyId = company?.id || 0
+      const companyId = company?.id || "0"
 
       await createFactoryItems(companyId)
 
-      await ctx.session.$setPublicData({ companyId: company.id || 0 })
+      await ctx.session.$setPublicData({ companyId: company.id || "0" })
 
-      // await provideTrail(ctx?.session?.userId || 0, company.id || 0)
+      // await provideTrail(ctx?.session?.userId || "0", company.id || "0")
 
       return company
     }

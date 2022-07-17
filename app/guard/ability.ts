@@ -109,7 +109,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // Check user plan and don't allow to create a new job
         // if the user is running on the Free Plan and already has 1 (or more) job
         const company = await db.company.findFirst({
-          where: { id: ctx.session.companyId || 0 },
+          where: { id: ctx.session.companyId || "0" },
           include: {
             jobs: true,
           },
@@ -136,7 +136,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // Check user plan and don't allow to read the job
         // if the user is running on the Free Plan and has more than 1 job
         const company = await db.company.findFirst({
-          where: { id: ctx.session.companyId || 0 },
+          where: { id: ctx.session.companyId || "0" },
           include: {
             jobs: true,
           },
@@ -172,7 +172,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // Check user plan and don't allow to read the job
         // if the user is running on the Free Plan and has more than 1 job
         const company = await db.company.findFirst({
-          where: { id: ctx.session.companyId || 0 },
+          where: { id: ctx.session.companyId || "0" },
           include: {
             jobs: true,
           },
@@ -203,7 +203,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // Check user plan and don't allow to invite to job
         // if the user is running on the Free Plan
         const company = await db.company.findFirst({
-          where: { id: ctx.session.companyId || 0 },
+          where: { id: ctx.session.companyId || "0" },
           include: {
             jobs: true,
           },
@@ -290,7 +290,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("create", "company", async (args) => {
         const companyUsers = await db.companyUser.findMany({
-          where: { userId: ctx.session.userId || 0 },
+          where: { userId: ctx.session.userId || "0" },
           include: { company: true },
         })
 
@@ -314,7 +314,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // Check user plan and don't allow to invite to job
         // if the user is running on the Free Plan
         const company = await db.company.findFirst({
-          where: { id: ctx.session.companyId || 0 },
+          where: { id: ctx.session.companyId || "0" },
           include: {
             // jobs: true,
             users: true,
@@ -336,8 +336,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -391,8 +391,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -410,8 +410,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -496,8 +496,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -515,8 +515,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -601,8 +601,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -624,14 +624,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           where: args.where,
         })
 
-        return schedule?.ownerId === ctx.session.userId
+        return schedule?.userId === ctx.session.userId
       })
       can("readAll", "schedule", async (args) => {
         const schedules = await db.schedule.findMany({
           where: args.where,
         })
 
-        return schedules.every((p) => p.ownerId === ctx.session.userId) === true
+        return schedules.every((p) => p.userId === ctx.session.userId) === true
       })
 
       can("create", "calendar")
@@ -641,14 +641,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           where: args.where,
         })
 
-        return calendar?.ownerId === ctx.session.userId
+        return calendar?.userId === ctx.session.userId
       })
       can("readAll", "calendar", async (args) => {
         const calendars = await db.calendar.findMany({
           where: args.where,
         })
 
-        return calendars.every((p) => p.ownerId === ctx.session.userId) === true
+        return calendars.every((p) => p.userId === ctx.session.userId) === true
       })
 
       can("create", "question")
@@ -712,8 +712,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -731,8 +731,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const companyUser = await db.companyUser.findUnique({
           where: {
             userId_companyId: {
-              userId: ctx.session.userId || 0,
-              companyId: ctx.session.companyId || 0,
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
             },
           },
         })
@@ -827,14 +827,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("update", "comment", async (args) => {
         const comment = await db.comment.findFirst({
-          where: { id: args.commentId, creatorId: ctx.session.userId || 0 },
+          where: { id: args.commentId, creatorId: ctx.session.userId || "0" },
         })
 
         return comment ? true : false
       })
       can("delete", "comment", async (args) => {
         const comment = await db.comment.findFirst({
-          where: { id: args.commentId, creatorId: ctx.session.userId || 0 },
+          where: { id: args.commentId, creatorId: ctx.session.userId || "0" },
         })
 
         return comment ? true : false

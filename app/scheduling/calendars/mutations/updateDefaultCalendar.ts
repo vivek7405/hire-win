@@ -1,7 +1,7 @@
 import db from "db"
 import { Ctx } from "blitz"
 
-export default async function updateDefaultCalendar(calendarId: number, ctx: Ctx) {
+export default async function updateDefaultCalendar(calendarId: string, ctx: Ctx) {
   ctx.session.$authorize()
 
   const owner = await db.user.findFirst({

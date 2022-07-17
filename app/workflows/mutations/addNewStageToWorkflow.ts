@@ -17,13 +17,13 @@ async function addNewStageToWorkflow(data: StageInputType, ctx: Ctx) {
   // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug = await findFreeSlug(
-    slug,
-    async (e) => await db.stage.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.stage.findFirst({ where: { slug: e } })
+  // )
 
   const existingStage = await db.stage.findFirst({
-    where: { name, companyId: ctx.session.companyId || 0 },
+    where: { name, companyId: ctx.session.companyId || "0" },
   })
   const order = (await db.workflowStage.count({ where: { workflowId: workflowId } })) + 1
 
@@ -42,10 +42,10 @@ async function addNewStageToWorkflow(data: StageInputType, ctx: Ctx) {
                 where: { id: existingStage?.id || "" },
                 create: {
                   name,
-                  slug: newSlug,
+                  slug,
                   company: {
                     connect: {
-                      id: ctx.session.companyId || 0,
+                      id: ctx.session.companyId || "0",
                     },
                   },
                 },

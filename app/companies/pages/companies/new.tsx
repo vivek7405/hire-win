@@ -46,8 +46,8 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
   const [createCompanyMutation] = useMutation(createCompany)
   const [companyUser] = useQuery(getCompanyUser, {
     where: {
-      companyId: session.companyId || 0,
-      userId: session.userId || 0,
+      companyId: session.companyId || "0",
+      userId: session.userId || "0",
     },
   })
 

@@ -24,7 +24,7 @@ async function linkScoreCardWithJobWorkflowStage(
   // if (!user) throw new AuthenticationError()
 
   const defaultScoreCard: ExtendedScoreCard | null = await db.scoreCard.findFirst({
-    where: { companyId: ctx.session.companyId || 0, name: "Default" },
+    where: { companyId: ctx.session.companyId || "0", name: "Default" },
     include: {
       cardQuestions: {
         include: {
@@ -37,7 +37,7 @@ async function linkScoreCardWithJobWorkflowStage(
   })
 
   const scoreCard: ExtendedScoreCard | null = await db.scoreCard.findFirst({
-    where: { companyId: ctx.session.companyId || 0, id: scoreCardId || "0" },
+    where: { companyId: ctx.session.companyId || "0", id: scoreCardId || "0" },
     include: {
       cardQuestions: {
         include: {

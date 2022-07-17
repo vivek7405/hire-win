@@ -8,7 +8,7 @@ async function addComment(data: CommentsInputType, ctx: Ctx) {
   const comment = await db.comment.create({
     data: {
       text,
-      creatorId: ctx.session.userId || 0,
+      creatorId: ctx.session.userId || "0",
       parentCommentId,
       candidateId,
       workflowStageId,

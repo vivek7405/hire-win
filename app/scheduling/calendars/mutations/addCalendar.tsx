@@ -3,6 +3,7 @@ import { resolver } from "blitz"
 import passwordEncryptor from "app/core/utils/password-encryptor"
 import { verifyConnectionDetails } from "app/scheduling/calendars/caldav"
 import * as z from "zod"
+import slugify from "slugify"
 
 export default resolver.pipe(
   resolver.zod(
@@ -29,9 +30,12 @@ export default resolver.pipe(
 
     const encryptedPassword = await passwordEncryptor.encrypt(calendarCreate.password)
 
+    const slug = slugify(calendarCreate.name, { strict: true, lower: true })
+
     const calendar = await db.calendar.create({
       data: {
         name: calendarCreate.name,
+        slug,
         caldavAddress: calendarCreate.url,
         type:
           calendarCreate.type === "CaldavDigest" || calendarCreate.type === "CaldavBasic"
@@ -41,7 +45,7 @@ export default resolver.pipe(
             : calendarCreate.type,
         username: calendarCreate.username,
         encryptedPassword,
-        owner: {
+        user: {
           connect: { id: ctx.session.userId },
         },
       },

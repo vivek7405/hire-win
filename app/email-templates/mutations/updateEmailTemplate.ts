@@ -16,10 +16,10 @@ export default async function updateEmailTemplate(
 
   const { name, subject, body } = EmailTemplateObj.parse(data)
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug: string = await findFreeSlug(
-    slug,
-    async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })
+  // )
 
   const emailTemplate = await db.emailTemplate.update({
     where,
@@ -27,7 +27,7 @@ export default async function updateEmailTemplate(
       name,
       subject,
       body,
-      slug: initial.name !== name ? newSlug : initial.slug,
+      slug,
     },
   })
 

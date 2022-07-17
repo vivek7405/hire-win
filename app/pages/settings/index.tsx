@@ -36,7 +36,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     getCompany,
     {
       where: {
-        id: session.companyId || 0,
+        id: session.companyId || "0",
       },
     },
     { ...context }

@@ -20,7 +20,7 @@ async function createUsers() {
       const hashedPassword = await SecurePassword.hash(user.password.trim())
 
       // const slug = slugify(`${user.companyName}`, { strict: true, lower: true })
-      // const newSlug: string = await findFreeSlug(
+      // const newSlug = await findFreeSlug(
       //   slug,
       //   async (e) => await db.company.findFirst({ where: { slug: e } })
       // )
@@ -92,7 +92,7 @@ async function createJobs() {
               },
             },
           },
-          companyId: 0,
+          companyId: "0",
         },
       })
 

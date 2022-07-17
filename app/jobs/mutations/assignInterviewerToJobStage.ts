@@ -5,7 +5,7 @@ import Guard from "app/guard/ability"
 type InterviewDetailInputProps = {
   jobId: string
   workflowStageId: string
-  interviewerId: number
+  interviewerId: string
 }
 
 async function assignInterviewerToJobStage(

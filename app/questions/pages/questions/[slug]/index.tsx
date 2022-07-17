@@ -10,6 +10,7 @@ import {
   getSession,
   useRouter,
   useMutation,
+  useSession,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -85,6 +86,7 @@ const SingleQuestionPage = ({
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [updateQuestionMutation] = useMutation(updateQuestion)
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -111,7 +113,12 @@ const SingleQuestionPage = ({
           const toastId = toast.loading(() => <span>Updating Question</span>)
           try {
             await updateQuestionMutation({
-              where: { slug: question?.slug },
+              where: {
+                companyId_slug: {
+                  companyId: session.companyId || "0",
+                  slug: question?.slug!,
+                },
+              },
               data: { ...values },
               initial: question!,
             })

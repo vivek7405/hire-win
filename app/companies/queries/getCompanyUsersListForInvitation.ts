@@ -12,7 +12,7 @@ async function getCompanyUsersListForInvitation({ jobId }, ctx: Ctx) {
     where: {
       companyId: ctx.session?.companyId,
       userId: {
-        not: ctx.session.userId || 0,
+        not: ctx.session.userId || "0",
         notIn: jobUsers?.map((ju) => ju.userId),
       },
     },

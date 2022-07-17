@@ -55,7 +55,7 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
           const toastId = toast.loading("Cancelling interview")
           try {
             await cancelInterviewMutation({
-              interviewId: interviewToDelete?.id || 0,
+              interviewId: interviewToDelete?.id || "0",
               cancelCode: interviewToDelete?.cancelCode,
               skipCancelCodeVerification: true,
             })
@@ -90,7 +90,7 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
                 await setCandidateInterviewerMutation({
                   candidateId: candidate?.id,
                   workflowStageId: selectedWorkflowStage?.id || "0",
-                  interviewerId: parseInt(selectedInterviewerId || "0"),
+                  interviewerId: selectedInterviewerId || "0",
                 })
 
                 await invalidateQuery(getCandidateInterviewDetail)

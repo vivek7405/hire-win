@@ -16,16 +16,16 @@ async function updateWorkflow({ where, data, initial }: UpdateWorkflowInput, ctx
   const { name } = WorkflowObj.parse(data)
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug: string = await findFreeSlug(
-    slug,
-    async (e) => await db.workflow.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.workflow.findFirst({ where: { slug: e } })
+  // )
 
   const workflow = await db.workflow.update({
     where,
     data: {
       name,
-      slug: initial.name !== name ? newSlug : initial.slug,
+      slug,
     },
   })
 

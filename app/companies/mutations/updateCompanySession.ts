@@ -4,6 +4,6 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { CompanyObj } from "../validations"
 
-export default async function updateCompanySession(companyId: number, ctx: Ctx) {
-  await ctx.session.$setPublicData({ companyId: companyId || 0 })
+export default async function updateCompanySession(companyId: string, ctx: Ctx) {
+  await ctx.session.$setPublicData({ companyId: companyId || "0" })
 }

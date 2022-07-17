@@ -37,7 +37,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
   const [sendEmailMutation] = useMutation(sendEmail)
   const [emailTemplatesOpen, setEmailTemplatesOpen] = useState(false)
   const [emailTemplates] = useQuery(getEmailTemplates, {
-    where: { companyId: session.companyId || 0 },
+    where: { companyId: session.companyId || "0" },
   })
   const [selectedEmailTemplate, setSelectedEmailTemplate] = useState(null as any as EmailTemplate)
   // const interviewDetailId =

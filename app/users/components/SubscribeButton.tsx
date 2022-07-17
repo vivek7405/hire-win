@@ -12,7 +12,7 @@ export default function SubscribeButton({
   type,
   testid,
 }: {
-  userId: number
+  userId: string
   priceId: string
   quantity: number
   type: "new" | "update"
@@ -27,7 +27,7 @@ export default function SubscribeButton({
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
     const sessionId = await createStripeSessionMutation({
       priceId,
-      companyId: session?.companyId || 0,
+      companyId: session?.companyId || "0",
       quantity,
     })
 
@@ -40,7 +40,7 @@ export default function SubscribeButton({
   const updateSubscription = async () => {
     const toastId = toast.loading(() => <span>Upgrading Subscription</span>)
     try {
-      await updateStripeSubscriptionMutation({ priceId, companyId: session.companyId || 0 })
+      await updateStripeSubscriptionMutation({ priceId, companyId: session.companyId || "0" })
       toast.success(() => <span>Subscription Updated</span>, { id: toastId })
       router.reload()
     } catch (error) {

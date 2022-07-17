@@ -6,7 +6,7 @@ export default async function getCurrentPlan(_ = null, ctx: Ctx) {
   ctx.session.$authorize()
 
   const companyUser = await db.companyUser.findFirst({
-    where: { companyId: ctx.session.companyId || 0, userId: ctx.session.userId || 0 },
+    where: { companyId: ctx.session.companyId || "0", userId: ctx.session.userId || "0" },
     include: { company: true },
   })
 

@@ -134,7 +134,7 @@ export const Candidates = ({ slug }) => {
       candidatePools: {
         some: {
           slug,
-          companyId: session?.companyId || 0,
+          companyId: session?.companyId || "0",
         },
       },
       ...query,
@@ -214,7 +214,7 @@ export const Candidates = ({ slug }) => {
                         prefetch={true}
                         href={Routes.SingleCandidatePage({
                           slug: candidate?.job?.slug,
-                          candidateSlug: candidate?.slug,
+                          candidateEmail: candidate?.email,
                         })}
                         passHref
                       >

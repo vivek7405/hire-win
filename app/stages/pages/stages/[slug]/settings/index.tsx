@@ -9,6 +9,7 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useSession,
 } from "blitz"
 import path from "path"
 
@@ -95,6 +96,7 @@ const StageSettingsPage = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [updateStageMutation] = useMutation(updateStage)
 
   if (error) {
@@ -114,7 +116,12 @@ const StageSettingsPage = ({
           const toastId = toast.loading(() => <span>Updating Stage</span>)
           try {
             await updateStageMutation({
-              where: { slug: stage?.slug },
+              where: {
+                companyId_slug: {
+                  companyId: session.companyId || "0",
+                  slug: stage?.slug!,
+                },
+              },
               data: { ...values },
               initial: stage!,
             })

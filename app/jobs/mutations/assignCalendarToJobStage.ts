@@ -10,7 +10,7 @@ import { customTsParser } from "@blitzjs/installer"
 type InterviewDetailInputProps = {
   jobId: string
   workflowStageId: string
-  calendarId: number
+  calendarId: string
 }
 
 async function assignCalendarToJobStage(
@@ -29,7 +29,7 @@ async function assignCalendarToJobStage(
       jobId_workflowStageId_userId: {
         jobId,
         workflowStageId,
-        userId: user?.id || 0,
+        userId: user?.id || "0",
       },
     },
   })
@@ -43,9 +43,9 @@ async function assignCalendarToJobStage(
 
     return updatedScheduleCalendar
   } else {
-    const defaultScheduleId = user?.schedules.find((sch) => sch.name === "Default")?.id || 0
+    const defaultScheduleId = user?.schedules.find((sch) => sch.name === "Default")?.id || "0"
     const calId =
-      user?.calendars?.find((cal) => cal.ownerId === user.id && cal.id === calendarId)?.id || null
+      user?.calendars?.find((cal) => cal.userId === user.id && cal.id === calendarId)?.id || null
     const defaultCalendarId =
       user?.defaultCalendars?.find((cal) => cal.userId === user.id)?.calendarId || null
 

@@ -11,18 +11,18 @@ async function createCandidatePool(data: CandidatePoolInputType, ctx: Ctx) {
   const { name } = CandidatePoolObj.parse(data)
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug = await findFreeSlug(
-    slug,
-    async (e) => await db.candidatePool.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.candidatePool.findFirst({ where: { slug: e } })
+  // )
 
   const candidatePool = await db.candidatePool.create({
     data: {
       name: name,
-      slug: newSlug,
+      slug,
       company: {
         connect: {
-          id: ctx.session.companyId || 0,
+          id: ctx.session.companyId || "0",
         },
       },
     },

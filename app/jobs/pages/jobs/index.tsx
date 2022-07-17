@@ -11,6 +11,7 @@ import {
   useQuery,
   invalidateQuery,
   invokeWithMiddleware,
+  useSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -71,7 +72,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     getCompanyUser,
     {
       where: {
-        companyId: session.companyId || 0,
+        companyId: session.companyId || "0",
         userId: session.userId || 0,
       },
     },
@@ -156,6 +157,7 @@ const CategoryFilterButtons = ({
 const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, viewType }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const session = useSession()
   const tablePage = Number(router.query.page) || 0
   const [data, setData] = useState<{}[]>([])
   const [searchString, setSearchString] = useState((router.query.search as string) || '""')
@@ -405,7 +407,12 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
                               try {
                                 await setJobHiddenMutation({
-                                  where: { slug: job?.slug! },
+                                  where: {
+                                    companyId_slug: {
+                                      companyId: session.companyId || "0",
+                                      slug: job?.slug!,
+                                    },
+                                  },
                                   hidden: switchState,
                                 })
 
@@ -467,7 +474,12 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
                               try {
                                 await setJobSalaryVisibilityMutation({
-                                  where: { slug: job?.slug! },
+                                  where: {
+                                    companyId_slug: {
+                                      companyId: session.companyId || "0",
+                                      slug: job?.slug!,
+                                    },
+                                  },
                                   showSalary: switchState,
                                 })
 
@@ -642,7 +654,7 @@ const JobsHome = ({
   // const manageBilling = useCallback(async () => {
   //   try {
   //     const url = await createStripeBillingPortalMutation({
-  //       companyId: company?.id || 0,
+  //       companyId: company?.id || "0",
   //     })
 
   //     if (url) window.location.href = url
@@ -656,7 +668,7 @@ const JobsHome = ({
   //     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
   //     const sessionId = await createStripeSessionMutation({
   //       priceId,
-  //       companyId: company?.id || 0,
+  //       companyId: company?.id || "0",
   //       quantity: 1,
   //     })
 

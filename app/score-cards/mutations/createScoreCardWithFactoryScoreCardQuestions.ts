@@ -5,22 +5,22 @@ import factoryScoreCardQuestions from "../../card-questions/utils/factoryScoreCa
 
 async function createScoreCardWithFactoryScoreCardQuestions(
   scoreCardName: string,
-  companyId: number,
+  companyId: string,
   factoryScoreCard: boolean
 ) {
   const slugScoreCard = slugify(scoreCardName, { strict: true, lower: true })
-  const newSlugScoreCard = await findFreeSlug(
-    slugScoreCard,
-    async (e) => await db.scoreCard.findFirst({ where: { slug: e } })
-  )
+  // const newSlugScoreCard = await findFreeSlug(
+  //   slugScoreCard,
+  //   async (e) => await db.scoreCard.findFirst({ where: { slug: e } })
+  // )
 
   const getCardQuestionSlug = async (fq) => {
     const slugCardQuestion = slugify(fq.cardQuestion.name, { strict: true, lower: true })
-    const newSlugCardQuestion = await findFreeSlug(
-      slugCardQuestion,
-      async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
-    )
-    fq.cardQuestion.slug = newSlugCardQuestion
+    // const newSlugCardQuestion = await findFreeSlug(
+    //   slugCardQuestion,
+    //   async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
+    // )
+    fq.cardQuestion.slug = slugCardQuestion
   }
   const promises = [] as any
   factoryScoreCardQuestions.forEach(async (fq) => {
@@ -44,7 +44,7 @@ async function createScoreCardWithFactoryScoreCardQuestions(
       createdAt: new Date(),
       updatedAt: new Date(),
       name: scoreCardName,
-      slug: newSlugScoreCard,
+      slug: slugScoreCard,
       factory: factoryScoreCard,
       company: {
         connect: {

@@ -11,8 +11,8 @@ async function createScoreCard(data: ScoreCardInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { name } = ScoreCardObj.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  const company = await db.user.findFirst({ where: { id: ctx.session.companyId! } })
+  if (!company) throw new AuthenticationError()
 
   // const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
@@ -28,7 +28,7 @@ async function createScoreCard(data: ScoreCardInputType, ctx: Ctx) {
   //   },
   // })
 
-  const scoreCard = await createScoreCardWithFactoryScoreCardQuestions(name, user.id, false)
+  const scoreCard = await createScoreCardWithFactoryScoreCardQuestions(name, company.id, false)
 
   return scoreCard
 }

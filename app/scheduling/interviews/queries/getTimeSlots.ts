@@ -57,8 +57,8 @@ async function getTakenSlots(
 export default resolver.pipe(
   resolver.zod(
     z.object({
-      interviewerId: z.number()?.optional(),
-      scheduleId: z.number()?.optional(),
+      interviewerId: z.string()?.optional(),
+      scheduleId: z.string()?.optional(),
       duration: z.number()?.optional(),
       otherAttendees: z.array(z.string()), // user ids - numbers as strings
       startDateUTC: z.date(),
@@ -140,7 +140,7 @@ export default resolver.pipe(
       await Promise.all(
         otherAttendees?.map(async (userId) => {
           const attendee = await db.user.findFirst({
-            where: { id: parseInt(userId) },
+            where: { id: userId },
             include: { calendars: true },
           })
           if (!attendee) {

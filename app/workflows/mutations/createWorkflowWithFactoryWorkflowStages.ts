@@ -5,28 +5,32 @@ import factoryWorkflowStages from "../../stages/utils/factoryWorkflowStages"
 
 async function createWorkflowWithFactoryWorkflowStages(
   workflowName: string,
-  companyId: number,
+  companyId: string,
   factoryWorkflow: boolean
 ) {
   const slugWorkflow = slugify(workflowName, { strict: true, lower: true })
-  const newSlugWorkflow = await findFreeSlug(
-    slugWorkflow,
-    async (e) => await db.workflow.findFirst({ where: { slug: e } })
-  )
+  // const newSlugWorkflow = await findFreeSlug(
+  //   slugWorkflow,
+  //   async (e) => await db.workflow.findFirst({ where: { slug: e } })
+  // )
 
-  const getStageSlug = async (fq) => {
-    const slugStage = slugify(fq.stage.name, { strict: true, lower: true })
-    const newSlugStage = await findFreeSlug(
-      slugStage,
-      async (e) => await db.stage.findFirst({ where: { slug: e } })
-    )
-    fq.stage.slug = newSlugStage
-  }
-  const promises = [] as any
-  factoryWorkflowStages.forEach(async (fq) => {
-    promises.push(getStageSlug(fq))
+  // const getStageSlug = async (fq) => {
+  //   const slugStage = slugify(fq.stage.name, { strict: true, lower: true })
+  //   const newSlugStage = await findFreeSlug(
+  //     slugStage,
+  //     async (e) => await db.stage.findFirst({ where: { slug: e } })
+  //   )
+  //   fq.stage.slug = slugStage
+  // }
+  // const promises = [] as any
+  // factoryWorkflowStages.forEach(async (fq) => {
+  //   promises.push(getStageSlug(fq))
+  // })
+  // await Promise.all(promises)
+
+  factoryWorkflowStages.forEach((fq) => {
+    fq.stage.slug = slugify(fq.stage.name, { strict: true, lower: true })
   })
-  await Promise.all(promises)
 
   const existingStages = await db.stage.findMany({
     where: {
@@ -44,7 +48,7 @@ async function createWorkflowWithFactoryWorkflowStages(
       createdAt: new Date(),
       updatedAt: new Date(),
       name: workflowName,
-      slug: newSlugWorkflow,
+      slug: slugWorkflow,
       factory: factoryWorkflow,
       company: {
         connect: {

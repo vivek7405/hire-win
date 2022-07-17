@@ -85,7 +85,7 @@ const Forms = () => {
 
   const [forms] = useQuery(getFormsWOPagination, {
     where: {
-      companyId: session.companyId || 0,
+      companyId: session.companyId || "0",
       ...query,
     },
   })
@@ -316,7 +316,7 @@ const Forms = () => {
 
 //   const [forms] = useQuery(getFormsWOPagination, {
 //     where: {
-//       companyId: session.companyId || 0,
+//       companyId: session.companyId || "0",
 //       ...query,
 //     },
 //   })

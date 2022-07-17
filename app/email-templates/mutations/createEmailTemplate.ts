@@ -9,18 +9,18 @@ export default resolver.pipe(
   resolver.authorize(),
   async ({ name, subject, body }, ctx: Ctx) => {
     const slug = slugify(name, { strict: true, lower: true })
-    const newSlug = await findFreeSlug(
-      slug,
-      async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })
-    )
+    // const newSlug = await findFreeSlug(
+    //   slug,
+    //   async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })
+    // )
 
     const emailTemplate = await db.emailTemplate.create({
       data: {
         name,
         subject,
-        slug: newSlug,
+        slug,
         body,
-        companyId: ctx.session.companyId || 0,
+        companyId: ctx.session.companyId || "0",
       },
     })
 

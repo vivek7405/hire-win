@@ -14,18 +14,12 @@ export default resolver.pipe(
       throw new Error("Email body can't be empty")
     }
 
-    const slug = slugify(subject, { strict: true, lower: true })
-    const newSlug = await findFreeSlug(
-      slug,
-      async (e) => await db.email.findFirst({ where: { slug: e } })
-    )
-
     const candidate = await db.candidate.findUnique({ where: { id: candidateId } })
     if (!candidate) {
       throw new Error("No candidate found for the provided id")
     }
 
-    const sender = await db.user.findUnique({ where: { id: ctx.session.userId || 0 } })
+    const sender = await db.user.findUnique({ where: { id: ctx.session.userId || "0" } })
 
     const buildEmail = await sendCandidateEmailMailer({
       candidateEmail: candidate?.email,
@@ -40,11 +34,10 @@ export default resolver.pipe(
       data: {
         subject,
         cc,
-        slug: newSlug,
         body,
         candidateId: candidateId || "0",
         workflowStageId: workflowStageId || "0",
-        senderId: ctx.session.userId || 0,
+        senderId: ctx.session.userId || "0",
         templateId,
       },
     })

@@ -63,21 +63,21 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "company",
     { session },
-    { where: { id: session?.companyId || 0 } }
+    { where: { id: session?.companyId || "0" } }
   )
 
   const { can: isOwner } = await Guard.can(
     "isOwner",
     "company",
     { session },
-    { where: { id: session?.companyId || 0 } }
+    { where: { id: session?.companyId || "0" } }
   )
 
   const { can: isAdmin } = await Guard.can(
     "isAdmin",
     "company",
     { session },
-    { where: { id: session?.companyId || 0 } }
+    { where: { id: session?.companyId || "0" } }
   )
 
   if (user) {
@@ -86,7 +86,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         const company = await invokeWithMiddleware(
           getCompany,
           {
-            where: { id: session.companyId || 0 },
+            where: { id: session.companyId || "0" },
           },
           { ...context }
         )
@@ -179,7 +179,7 @@ const UserSettingsMembersPage = ({
                     const toastId = toast.loading(() => <span>Inviting {values.email}</span>)
                     try {
                       await inviteToCompanyMutation({
-                        companyId: company?.id as number,
+                        companyId: company?.id || "0",
                         email: values.email,
                       })
                       setOpenInvite(false)
@@ -305,7 +305,7 @@ const UserSettingsMembersPage = ({
                                   ))
                                   try {
                                     await removeFromCompanyMutation({
-                                      companyId: company?.id || 0,
+                                      companyId: company?.id || "0",
                                       userId: memberToDelete?.user?.id,
                                     })
                                     toast.success(

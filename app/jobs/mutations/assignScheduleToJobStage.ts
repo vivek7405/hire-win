@@ -10,7 +10,7 @@ import { customTsParser } from "@blitzjs/installer"
 type ScheduleCalendarInputProps = {
   jobId: string
   workflowStageId: string
-  scheduleId: number
+  scheduleId: string
 }
 
 async function assignScheduleToJobStage(
@@ -29,7 +29,7 @@ async function assignScheduleToJobStage(
       jobId_workflowStageId_userId: {
         jobId,
         workflowStageId,
-        userId: user?.id || 0,
+        userId: user?.id || "0",
       },
     },
   })
@@ -44,9 +44,9 @@ async function assignScheduleToJobStage(
     return updatedScheduleCalendar
   } else {
     const schId =
-      user?.schedules?.find((sch) => sch.ownerId === user?.id && sch.id === scheduleId)?.id || null
+      user?.schedules?.find((sch) => sch.userId === user?.id && sch.id === scheduleId)?.id || null
     const defaultScheduleId =
-      user?.schedules?.find((sch) => sch.factory && sch.name === "Default")?.id || 0
+      user?.schedules?.find((sch) => sch.factory && sch.name === "Default")?.id || "0"
     const defaultCalendarId =
       user?.defaultCalendars.find((cal) => cal.userId === user.id)?.calendarId || null
 
@@ -56,8 +56,8 @@ async function assignScheduleToJobStage(
         data: {
           jobId,
           workflowStageId,
-          userId: user?.id || 0,
-          scheduleId: schId || defaultScheduleId,
+          userId: user?.id || "0",
+          scheduleId: schId || defaultScheduleId || "0",
           calendarId: defaultCalendarId,
         },
       })

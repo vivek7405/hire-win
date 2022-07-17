@@ -220,7 +220,7 @@ const Candidates = (props: CandidateProps) => {
               prefetch={true}
               href={Routes.SingleCandidatePage({
                 slug: props.cell.row.original.job?.slug,
-                candidateSlug: props.cell.row.original.slug,
+                candidateEmail: props.cell.row.original.email,
               })}
               passHref
             >
@@ -275,7 +275,7 @@ const Candidates = (props: CandidateProps) => {
             prefetch={true}
             href={Routes.CandidateSettingsPage({
               slug: props.cell.row.original.job?.slug,
-              candidateSlug: props.cell.row.original.slug,
+              candidateEmail: props.cell.row.original.email,
             })}
             passHref
           >

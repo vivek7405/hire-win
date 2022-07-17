@@ -6,22 +6,22 @@ import { QuestionType } from "@prisma/client"
 
 async function createFormWithFactoryFormQuestions(
   formName: string,
-  companyId: number,
+  companyId: string,
   factoryForm: boolean
 ) {
   const slugForm = slugify(formName, { strict: true, lower: true })
-  const newSlugForm = await findFreeSlug(
-    slugForm,
-    async (e) => await db.form.findFirst({ where: { slug: e } })
-  )
+  // const newSlugForm = await findFreeSlug(
+  //   slugForm,
+  //   async (e) => await db.form.findFirst({ where: { slug: e } })
+  // )
 
   const getQuestionSlug = async (fq) => {
     const slugQuestion = slugify(fq.question.name, { strict: true, lower: true })
-    const newSlugQuestion = await findFreeSlug(
-      slugQuestion,
-      async (e) => await db.question.findFirst({ where: { slug: e } })
-    )
-    fq.question.slug = newSlugQuestion
+    // const newSlugQuestion = await findFreeSlug(
+    //   slugQuestion,
+    //   async (e) => await db.question.findFirst({ where: { slug: e } })
+    // )
+    fq.question.slug = slugQuestion
   }
   const promises = [] as any
   factoryFormQuestions.forEach(async (fq) => {
@@ -45,7 +45,7 @@ async function createFormWithFactoryFormQuestions(
       createdAt: new Date(),
       updatedAt: new Date(),
       name: formName,
-      slug: newSlugForm,
+      slug: slugForm,
       factory: factoryForm,
       company: {
         connect: {

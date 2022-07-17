@@ -9,11 +9,11 @@ import Guard from "app/guard/ability"
 async function createCandidate(data: CandidateInputType, ctx: Ctx) {
   const { name, email, resume, answers, jobId, source } = Candidate.parse(data)
 
-  const slug = slugify(name, { strict: true, lower: true })
-  const newSlug = await findFreeSlug(
-    slug,
-    async (e) => await db.candidate.findFirst({ where: { slug: e } })
-  )
+  // const slug = slugify(name, { strict: true, lower: true })
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.candidate.findFirst({ where: { slug: e, jobId } })
+  // )
 
   const jobUser = await db.jobUser.findFirst({
     where: { jobId },
@@ -28,7 +28,7 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
   let candidateData = {
     name,
     email,
-    slug: newSlug,
+    // slug: newSlug,
     answers: {
       create: answers?.map((answer) => {
         return {

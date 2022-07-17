@@ -84,7 +84,7 @@ const Categories = () => {
 
   const [categories] = useQuery(getCategoriesWOPagination, {
     where: {
-      companyId: session.companyId || 0,
+      companyId: session.companyId || "0",
       ...query,
     },
   })

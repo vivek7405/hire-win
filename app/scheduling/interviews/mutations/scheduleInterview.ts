@@ -106,7 +106,7 @@ export default resolver.pipe(
       select: { id: true },
     })
     const organizer = await db.user.findUnique({
-      where: { id: ctx.session.userId || 0 },
+      where: { id: ctx.session.userId || "0" },
       select: {
         id: true,
         email: true,
@@ -116,7 +116,7 @@ export default resolver.pipe(
       },
     })
     const otherAttendees = await db.user.findMany({
-      where: { id: { in: interviewInfo.otherAttendees?.map((userId) => parseInt(userId)) } },
+      where: { id: { in: interviewInfo.otherAttendees?.map((userId) => userId) } },
       select: { id: true, email: true, name: true },
     })
 

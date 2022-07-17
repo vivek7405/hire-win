@@ -6,7 +6,12 @@ export default async function removeCandidateFromPool(
   ctx: Ctx
 ) {
   const updatedCandidatePool = await db.candidatePool.update({
-    where: { slug: candidatePoolSlug },
+    where: {
+      companyId_slug: {
+        companyId: ctx.session.companyId || "0",
+        slug: candidatePoolSlug,
+      },
+    },
     data: {
       candidates: {
         disconnect: {

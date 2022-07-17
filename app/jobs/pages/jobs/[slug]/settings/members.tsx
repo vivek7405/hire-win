@@ -57,7 +57,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const company = await invokeWithMiddleware(
     getCompany,
     {
-      where: { id: session.companyId || 0 },
+      where: { id: session.companyId || "0" },
     },
     { ...context }
   )
@@ -411,7 +411,7 @@ const JobSettingsMembersPage = ({
                                 {
                                   jobId: jobData?.id,
                                   workflowStageId: ws.id,
-                                  interviewerId: parseInt(selectedInterviewerId || "0"),
+                                  interviewerId: selectedInterviewerId || "0",
                                 }
                               )
                               if (existingInterviewDetail && assignedInterviewer) {

@@ -29,10 +29,10 @@ const NavbarContent = ({ user }: NavbarProps) => {
   const session = useSession()
   const [openConfirm, setOpenConfirm] = useState(false)
   const [companyUser] = useQuery(getCompanyUser, {
-    where: { userId: session?.userId || 0, companyId: session?.companyId || 0 },
+    where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
   })
   const [companyUsers] = useQuery(getCompanyUsers, {
-    where: { userId: session?.userId || 0 },
+    where: { userId: session?.userId || "0" },
   })
   const [canCreateCompany] = useQuery(canCreateNewCompany, null)
 
@@ -204,13 +204,13 @@ const NavbarContent = ({ user }: NavbarProps) => {
                     <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
                       <DropdownMenu.Arrow className="fill-current" offset={10} />
                       <DropdownMenu.RadioGroup
-                        value={((selectedCompanyUser || companyUser)?.companyId || 0)?.toString()}
+                        value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
                         onValueChange={async (companyId) => {
                           const cu = companyUsers?.find(
-                            (cu) => cu.userId === user?.id && cu.companyId === parseInt(companyId)
+                            (cu) => cu.userId === user?.id && cu.companyId === companyId
                           )
                           setSelectedCompanyUser(cu!)
-                          await updateCompanySessionMutation(parseInt(companyId || "0"))
+                          await updateCompanySessionMutation(companyId || "0")
                           router.pathname === Routes.JobsHome().pathname
                             ? router.reload()
                             : router.push(Routes.JobsHome())

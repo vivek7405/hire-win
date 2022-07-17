@@ -5,7 +5,7 @@ import createFormWithFactoryFormQuestions from "app/forms/mutations/createFormWi
 import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
 import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
 
-const createFactoryItems = async (companyId: number) => {
+const createFactoryItems = async (companyId: string) => {
   await createFactoryCategories(companyId)
   await createWorkflowWithFactoryWorkflowStages("Default", companyId, true)
   await createFormWithFactoryFormQuestions("Default", companyId, true)

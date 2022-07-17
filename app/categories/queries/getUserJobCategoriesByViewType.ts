@@ -23,7 +23,7 @@ const getUserJobCategoriesByViewType = resolver.pipe(
 
     const categories = await db.category.findMany({
       where: {
-        companyId: ctx.session.companyId || 0,
+        companyId: ctx.session.companyId || "0",
         jobs: {
           some: {
             archived: viewType === JobViewType.Archived,
@@ -34,7 +34,7 @@ const getUserJobCategoriesByViewType = resolver.pipe(
             },
             users: {
               some: {
-                userId: ctx.session.userId || 0,
+                userId: ctx.session.userId || "0",
               },
             },
           },

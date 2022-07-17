@@ -61,7 +61,7 @@ declare module "blitz" {
     PublicData: {
       userId: User["id"]
       role: UserRole
-      companyId: number
+      companyId: string
     }
   }
 }

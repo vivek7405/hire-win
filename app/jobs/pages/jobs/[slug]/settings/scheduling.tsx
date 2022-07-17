@@ -56,7 +56,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const company = await invokeWithMiddleware(
     getCompany,
     {
-      where: { id: session.companyId || 0 },
+      where: { id: session.companyId || "0" },
     },
     { ...context }
   )
@@ -135,8 +135,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStagesMsg }) => {
   const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
   const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
-  const [schedules] = useQuery(getSchedulesWOPagination, { where: { ownerId: user?.id } })
-  const [calendars] = useQuery(getCalendars, { where: { ownerId: user?.id } })
+  const [schedules] = useQuery(getSchedulesWOPagination, { where: { userId: user?.id } })
+  const [calendars] = useQuery(getCalendars, { where: { userId: user?.id } })
   const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
 
   return (
@@ -468,7 +468,7 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
                             await assignScheduleToJobStageMutation({
                               jobId: job?.id,
                               workflowStageId: ws.id,
-                              scheduleId: parseInt(selectedScheduleId || "0"),
+                              scheduleId: selectedScheduleId || "0",
                             })
                             await invalidateQuery(getJob)
 
@@ -515,7 +515,7 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
                                 await assignCalendarToJobStageMutation({
                                   jobId: job?.id,
                                   workflowStageId: ws.id,
-                                  calendarId: parseInt(selectedCalendarId || "0"),
+                                  calendarId: selectedCalendarId || "0",
                                 })
                                 await invalidateQuery(getJob)
 

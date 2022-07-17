@@ -49,7 +49,7 @@ const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <div className="mt-6">
         <JobForm
-          companyId={session.companyId || 0}
+          companyId={session.companyId || "0"}
           user={user}
           header="Create A New Job"
           subHeader="Enter job details"

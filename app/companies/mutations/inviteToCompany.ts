@@ -4,7 +4,7 @@ import db from "db"
 import { inviteToCompanyMailer } from "mailers/inviteToCompanyMailer"
 
 interface InviteToCompanyInput {
-  companyId: number
+  companyId: string
   email: string
 }
 
@@ -41,7 +41,7 @@ async function inviteToCompany({ companyId, email }: InviteToCompanyInput, ctx: 
       expiresAt,
       hashedToken,
       sentTo: email,
-      companyId: companyId || 0,
+      companyId: companyId || "0",
     },
   })
 

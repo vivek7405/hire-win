@@ -62,7 +62,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const workflow = await invokeWithMiddleware(
         getWorkflow,
-        { where: { slug: context?.params?.slug!, companyId: session?.companyId || 0 } },
+        { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
         { ...context }
       )
 
@@ -680,7 +680,7 @@ const SingleWorkflowPage = ({
               >
                 <AddExistingStagesForm
                   schema={WorkflowStages}
-                  companyId={session.companyId || 0}
+                  companyId={session.companyId || "0"}
                   workflowId={workflow?.id!}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Adding Stage(s)</span>)
