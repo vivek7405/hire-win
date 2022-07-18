@@ -25,6 +25,11 @@ async function createCandidatePool(data: CandidatePoolInputType, ctx: Ctx) {
           id: ctx.session.companyId || "0",
         },
       },
+      createdBy: {
+        connect: {
+          id: ctx.session.userId || "0",
+        },
+      },
     },
   })
 

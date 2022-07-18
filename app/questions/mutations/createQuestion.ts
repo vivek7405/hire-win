@@ -30,6 +30,7 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
       },
       slug,
       companyId: ctx.session.companyId || "0",
+      createdById: ctx.session.userId || "0",
       acceptedFiles: acceptedFiles,
     },
   })

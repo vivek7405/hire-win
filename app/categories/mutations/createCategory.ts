@@ -22,11 +22,8 @@ async function createCategory(data: CategoryInputType, ctx: Ctx) {
     data: {
       name: name,
       slug,
-      company: {
-        connect: {
-          id: ctx.session.companyId || "0",
-        },
-      },
+      companyId: ctx.session.companyId || "0",
+      createdById: ctx.session.userId || "0",
     },
   })
 

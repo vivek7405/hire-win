@@ -27,7 +27,10 @@ async function createWorkflow(data: WorkflowInputType, ctx: Ctx) {
   //   },
   // })
 
-  const workflow = await createWorkflowWithFactoryWorkflowStages(name, company.id, false)
+  const workflow = await createWorkflowWithFactoryWorkflowStages(
+    { workflowName: name, companyId: company.id, factoryWorkflow: false },
+    ctx
+  )
 
   return workflow
 }

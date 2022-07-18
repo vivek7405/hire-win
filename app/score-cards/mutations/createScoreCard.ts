@@ -28,7 +28,10 @@ async function createScoreCard(data: ScoreCardInputType, ctx: Ctx) {
   //   },
   // })
 
-  const scoreCard = await createScoreCardWithFactoryScoreCardQuestions(name, company.id, false)
+  const scoreCard = await createScoreCardWithFactoryScoreCardQuestions(
+    { scoreCardName: name, companyId: company.id, factoryScoreCard: false },
+    ctx
+  )
 
   return scoreCard
 }

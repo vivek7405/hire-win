@@ -2,8 +2,13 @@ import db from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryCandidatePools from "../utils/factoryCandidatePools"
+import { closestIndexTo } from "date-fns"
+import { Ctx } from "blitz"
 
-async function createFactoryCandidatePools(companyId: string) {
+type InputType = {
+  companyId: string
+}
+async function createFactoryCandidatePools({ companyId }: InputType, ctx: Ctx) {
   // const getSlug = async (q) => {
   //   const slug = slugify(q.name, { strict: true, lower: true })
   //   const newSlug = await findFreeSlug(
@@ -30,6 +35,7 @@ async function createFactoryCandidatePools(companyId: string) {
         name: cp.name,
         slug: cp.slug,
         companyId,
+        createdById: ctx.session.userId || "0",
       }
     }),
   })

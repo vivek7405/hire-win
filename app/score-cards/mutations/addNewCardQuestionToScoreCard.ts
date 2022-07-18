@@ -50,6 +50,11 @@ async function addNewCardQuestionToScoreCard(data: CardQuestionInputType, ctx: C
                       id: ctx.session.companyId || "0",
                     },
                   },
+                  createdBy: {
+                    connect: {
+                      id: ctx.session.userId || "0",
+                    },
+                  },
                 },
               },
             },

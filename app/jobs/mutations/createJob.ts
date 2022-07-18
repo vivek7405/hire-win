@@ -39,7 +39,8 @@ async function createJob(data: JobInputType, ctx: Ctx) {
   const newSlug = await findFreeSlug(
     slug,
     async (e) =>
-      await db.job.findFirst({ where: { slug: e, companyId: ctx.session.companyId || "0" } })
+      await db.job.findFirst({ where: { slug: e, companyId: ctx.session.companyId || "0" } }),
+    500
   )
 
   // const defaultScoreCard = await db.scoreCard.findFirst({
@@ -120,6 +121,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         },
       },
       companyId: ctx.session.companyId || "0",
+      createdById: ctx.session.userId || "0",
     },
   })
 

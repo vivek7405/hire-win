@@ -364,7 +364,8 @@ const SingleCandidatePageContent = ({
   const [candidatePoolsOpenDesktop, setCandidatePoolsOpenDesktop] = useState(false)
   const [candidatePoolsOpenMobileAndTablet, setCandidatePoolsOpenMobileAndTablet] = useState(false)
 
-  const [stagesOpenMobileAndTablet, setStagesOpenMobileAndTablet] = useState(false)
+  const [stagesOpenMobile, setStagesOpenMobile] = useState(false)
+  const [stagesOpenTablet, setStagesOpenTablet] = useState(false)
   const [stagesOpenDesktop, setStagesOpenDesktop] = useState(false)
 
   const resume = candidate?.resume as AttachmentObject
@@ -854,8 +855,36 @@ const SingleCandidatePageContent = ({
         {moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"} stage?
       </Confirm>
 
-      {/* Mobile and Tablet Menu */}
-      <div className="flex flex-col lg:hidden">
+      {/* Mobile Menu */}
+      <div className="flex flex-col space-y-4 mb-2 md:hidden lg:hidden">
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {candidateNameHeader}
+          {candidateRatingDiv}
+        </div>
+
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {candidateStageAndInterviewerDiv}
+        </div>
+
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {rejectCandidateButton}
+          {updateCandidateDetailsButton}
+        </div>
+
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          <MoveToNextStageButton
+            stagesOpen={stagesOpenMobile}
+            setStagesOpen={setStagesOpenMobile}
+          />
+          <AddToPoolButton
+            candidatePoolsOpen={candidatePoolsOpenMobileAndTablet}
+            setCandidatePoolsOpen={setCandidatePoolsOpenMobileAndTablet}
+          />
+        </div>
+      </div>
+
+      {/* Tablet Menu */}
+      <div className="hidden md:flex md:flex-col lg:hidden">
         <div className="flex flex-nowrap items-center justify-center space-x-4">
           {candidateNameHeader}
           {candidateRatingDiv}
@@ -869,8 +898,8 @@ const SingleCandidatePageContent = ({
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
           <MoveToNextStageButton
-            stagesOpen={stagesOpenMobileAndTablet}
-            setStagesOpen={setStagesOpenMobileAndTablet}
+            stagesOpen={stagesOpenTablet}
+            setStagesOpen={setStagesOpenTablet}
           />
           <AddToPoolButton
             candidatePoolsOpen={candidatePoolsOpenMobileAndTablet}

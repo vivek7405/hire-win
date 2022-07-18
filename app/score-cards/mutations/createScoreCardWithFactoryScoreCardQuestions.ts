@@ -2,11 +2,16 @@ import db from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryScoreCardQuestions from "../../card-questions/utils/factoryScoreCardQuestions"
+import { Ctx } from "blitz"
 
-async function createScoreCardWithFactoryScoreCardQuestions(
-  scoreCardName: string,
-  companyId: string,
+type InputType = {
+  scoreCardName: string
+  companyId: string
   factoryScoreCard: boolean
+}
+async function createScoreCardWithFactoryScoreCardQuestions(
+  { scoreCardName, companyId, factoryScoreCard }: InputType,
+  ctx: Ctx
 ) {
   const slugScoreCard = slugify(scoreCardName, { strict: true, lower: true })
   // const newSlugScoreCard = await findFreeSlug(
@@ -51,6 +56,11 @@ async function createScoreCardWithFactoryScoreCardQuestions(
           id: companyId,
         },
       },
+      createdBy: {
+        connect: {
+          id: ctx.session.userId || "0",
+        },
+      },
       cardQuestions: {
         create: factoryScoreCardQuestions.map((fq) => {
           return {
@@ -69,6 +79,11 @@ async function createScoreCardWithFactoryScoreCardQuestions(
                   company: {
                     connect: {
                       id: companyId,
+                    },
+                  },
+                  createdBy: {
+                    connect: {
+                      id: ctx.session.userId || "0",
                     },
                   },
                 },

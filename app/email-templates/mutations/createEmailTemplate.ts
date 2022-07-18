@@ -21,6 +21,7 @@ export default resolver.pipe(
         slug,
         body,
         companyId: ctx.session.companyId || "0",
+        createdById: ctx.session.userId || "0",
       },
     })
 

@@ -28,7 +28,10 @@ async function createForm(data: FormInputType, ctx: Ctx) {
   //   },
   // })
 
-  const form = await createFormWithFactoryFormQuestions(name, ctx.session.companyId || "0", false)
+  const form = await createFormWithFactoryFormQuestions(
+    { formName: name, companyId: ctx.session.companyId || "0", factoryForm: false },
+    ctx
+  )
 
   return form
 }

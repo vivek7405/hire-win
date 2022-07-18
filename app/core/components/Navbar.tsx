@@ -259,7 +259,7 @@ const NavbarContent = ({ user }: NavbarProps) => {
                   <DropdownMenu.Root modal={false} open={profileOpen} onOpenChange={setProfileOpen}>
                     <DropdownMenu.Trigger className="bg-theme-700 flex text-sm rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
                       <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100">
-                        {user?.email.charAt(0).toUpperCase()}
+                        {user?.name.charAt(0).toUpperCase()}
                       </div>
                     </DropdownMenu.Trigger>
 

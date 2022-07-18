@@ -2,8 +2,10 @@ import db from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryCategories from "../utils/factoryCategories"
+import { closestIndexTo } from "date-fns"
+import { Ctx } from "blitz"
 
-async function createFactoryCategories(companyId: string) {
+async function createFactoryCategories(companyId: string, ctx: Ctx) {
   // const getSlug = async (q) => {
   //   const slug = slugify(q.name, { strict: true, lower: true })
   //   const newSlug = await findFreeSlug(
@@ -30,6 +32,7 @@ async function createFactoryCategories(companyId: string) {
         name: c.name,
         slug: c.slug,
         companyId,
+        createdById: ctx.session.userId || "0",
       }
     }),
   })

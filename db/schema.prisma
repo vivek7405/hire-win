@@ -43,6 +43,18 @@ model User {
   emails   Email[]
 
   jobUserScheduleCalendars JobUserScheduleCalendar[]
+
+  createdJobs           Job[]
+  createdCategories     Category[]
+  createdWorkflows      Workflow[]
+  createdStages         Stage[]
+  createdForms          Form[]
+  createdQuestions      Question[]
+  createdScoreCards     ScoreCard[]
+  createdCardQuestions  CardQuestion[]
+  createdCandidates     Candidate[]
+  createdEmailTemplates EmailTemplate[]
+  createdCandidatePools CandidatePool[]
 }
 
 enum UserRole {
@@ -177,9 +189,11 @@ model Company {
 }
 
 model Job {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   title String
   slug  String
@@ -293,15 +307,14 @@ model JobUser {
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String
-
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
 
   company   Company @relation(fields: [companyId], references: [id])
   companyId String
@@ -312,9 +325,11 @@ model Category {
 }
 
 model Workflow {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String
@@ -331,9 +346,11 @@ model Workflow {
 }
 
 model Stage {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String
@@ -381,9 +398,11 @@ model WorkflowStage {
 }
 
 model Form {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String
@@ -400,9 +419,11 @@ model Form {
 }
 
 model Question {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String
@@ -425,9 +446,11 @@ model Question {
 }
 
 model ScoreCard {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String
@@ -445,9 +468,11 @@ model ScoreCard {
 }
 
 model CardQuestion {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name    String
   slug    String
@@ -611,9 +636,11 @@ model CandidateWorkflowStageInterviewer {
 }
 
 model Candidate {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name   String
   email  String
@@ -766,9 +793,11 @@ model Comment {
 }
 
 model EmailTemplate {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String
@@ -807,9 +836,11 @@ model Email {
 }
 
 model CandidatePool {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
   slug String

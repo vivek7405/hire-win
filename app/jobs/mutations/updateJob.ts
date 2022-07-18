@@ -41,7 +41,8 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   const newSlug = await findFreeSlug(
     slug,
     async (e) =>
-      await db.job.findFirst({ where: { slug: e, companyId: ctx.session.companyId || "0" } })
+      await db.job.findFirst({ where: { slug: e, companyId: ctx.session.companyId || "0" } }),
+    500
   )
 
   const job = await db.job.update({

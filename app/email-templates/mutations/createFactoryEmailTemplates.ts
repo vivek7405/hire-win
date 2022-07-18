@@ -2,8 +2,12 @@ import db from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryEmailTemplates from "../utils/factoryEmailTemplates"
+import { Ctx } from "blitz"
 
-async function createFactoryEmailTemplates(companyId: string) {
+type InputType = {
+  companyId: string
+}
+async function createFactoryEmailTemplates({ companyId }: InputType, ctx: Ctx) {
   // const getSlug = async (q) => {
   //   const slug = slugify(q.name, { strict: true, lower: true })
   //   const newSlug = await findFreeSlug(
@@ -32,6 +36,7 @@ async function createFactoryEmailTemplates(companyId: string) {
         subject: et.subject,
         body: et.body!,
         companyId,
+        createdById: ctx.session.userId || "0",
       }
     }),
   })

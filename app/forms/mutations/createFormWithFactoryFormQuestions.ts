@@ -3,11 +3,16 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryFormQuestions from "../../questions/utils/factoryFormQuestions"
 import { QuestionType } from "@prisma/client"
+import { Ctx } from "blitz"
 
-async function createFormWithFactoryFormQuestions(
-  formName: string,
-  companyId: string,
+type InputType = {
+  formName: string
+  companyId: string
   factoryForm: boolean
+}
+async function createFormWithFactoryFormQuestions(
+  { formName, companyId, factoryForm }: InputType,
+  ctx: Ctx
 ) {
   const slugForm = slugify(formName, { strict: true, lower: true })
   // const newSlugForm = await findFreeSlug(
@@ -77,11 +82,21 @@ async function createFormWithFactoryFormQuestions(
                       id: companyId,
                     },
                   },
+                  createdBy: {
+                    connect: {
+                      id: ctx.session.userId || "0",
+                    },
+                  },
                 },
               },
             },
           }
         }),
+      },
+      createdBy: {
+        connect: {
+          id: ctx.session.userId || "0",
+        },
       },
     },
   })
