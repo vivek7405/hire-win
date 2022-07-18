@@ -36,7 +36,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "form",
     { session },
-    { where: { slug: context?.params?.slug! } }
+    {
+      where: {
+        companyId_slug: {
+          companyId: session.companyId || "0",
+          slug: context?.params?.slug!,
+        },
+      },
+    }
   )
 
   if (user) {
@@ -44,7 +51,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       if (canUpdate) {
         const form = await invokeWithMiddleware(
           getForm,
-          { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
+          {
+            where: {
+              slug: context?.params?.slug!,
+              companyId: session?.companyId || "0",
+            },
+          },
           { ...context }
         )
 

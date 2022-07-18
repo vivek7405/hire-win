@@ -42,13 +42,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { where: { email: context?.params?.candidateEmail as string } }
   )
 
-  const { can: isOwner } = await Guard.can(
-    "isOwner",
-    "candidate",
-    { session },
-    { where: { email: context?.params?.candidateEmail as string } }
-  )
-
   if (user) {
     try {
       if (canUpdate) {
@@ -65,7 +58,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             candidate: candidate,
             canUpdate,
-            isOwner,
           },
         }
       } else {
@@ -106,7 +98,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const CandidateSettingsPage = ({
   user,
   candidate,
-  isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()

@@ -73,7 +73,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     {
       where: {
         companyId: session.companyId || "0",
-        userId: session.userId || 0,
+        userId: session.userId || "0",
       },
     },
     { ...context }

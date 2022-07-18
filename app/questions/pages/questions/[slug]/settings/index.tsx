@@ -36,7 +36,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "question",
     { session },
-    { where: { slug: context?.params?.slug! } }
+    { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } }
   )
 
   if (user) {
@@ -44,7 +44,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       if (canUpdate) {
         const question = await invokeWithMiddleware(
           getQuestion,
-          { where: { slug: context?.params?.slug!, userId: user?.id } },
+          { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
           { ...context }
         )
 

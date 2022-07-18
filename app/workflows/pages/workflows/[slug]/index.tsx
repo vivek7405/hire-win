@@ -55,14 +55,24 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "workflow",
     { session },
-    { where: { slug: context?.params?.slug! } }
+    {
+      where: {
+        slug: context?.params?.slug!,
+        companyId: session?.companyId || "0",
+      },
+    }
   )
 
   if (user) {
     try {
       const workflow = await invokeWithMiddleware(
         getWorkflow,
-        { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
+        {
+          where: {
+            slug: context?.params?.slug!,
+            companyId: session?.companyId || "0",
+          },
+        },
         { ...context }
       )
 

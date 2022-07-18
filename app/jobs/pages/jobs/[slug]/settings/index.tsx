@@ -40,7 +40,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "job",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    { where: { slug: context?.params?.slug as string, companyId: session.companyId || "0" } }
   )
 
   // const { can: isOwner } = await Guard.can(

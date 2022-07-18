@@ -68,14 +68,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "job",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    { where: { slug: context?.params?.slug as string, companyId: session.companyId || "0" } }
   )
 
   const { can: isOwner } = await Guard.can(
     "isOwner",
     "job",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    { where: { slug: context?.params?.slug as string, companyId: session.companyId || "0" } }
   )
 
   if (user) {
@@ -84,7 +84,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         const job = await invokeWithMiddleware(
           getJob,
           {
-            where: { slug: context?.params?.slug as string },
+            where: { slug: context?.params?.slug as string, companyId: session.companyId || "0" },
           },
           { ...context }
         )

@@ -60,7 +60,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     const job = await invokeWithMiddleware(
       getJob,
       {
-        where: { slug: context?.params?.jobSlug as string },
+        where: { slug: context?.params?.jobSlug as string, companyId: company?.id || "0" },
       },
       { ...context }
     )
