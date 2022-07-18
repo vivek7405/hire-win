@@ -1134,7 +1134,7 @@ const SingleJobPageContent = ({
           </div>
         </div>
 
-        <div className="flex space-x-4 w-full justify-end">
+        <div className="flex space-x-4 w-full justify-center">
           {enableDragToggle}
           {viewRejectedToggle}
           {tableViewToggle}
