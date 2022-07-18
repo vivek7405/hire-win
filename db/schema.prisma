@@ -13,7 +13,7 @@ generator client {
 // --------------------------------------
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -24,24 +24,8 @@ model User {
   tokens         Token[]
   sessions       Session[]
 
-  // stripeCustomerId       String?   @unique
-  // stripeSubscriptionId   String?   @unique
-  // stripePriceId          String?
-  // stripeCurrentPeriodEnd DateTime?
-
   companies CompanyUser[]
   jobs      JobUser[]
-
-  // categories     Category[]
-
-  // workflows Workflow[]
-  // stages    Stage[]
-
-  // forms     Form[]
-  // questions Question[]
-
-  // scoreCards    ScoreCard[]
-  // cardQuestions CardQuestion[]
 
   calendars        Calendar[]
   defaultCalendars DefaultCalendar[]
@@ -51,7 +35,7 @@ model User {
   organizerInterviews      Interview[]       @relation(name: "organizerInterviews")
   interviewerInterviews    Interview[]       @relation(name: "interviewerInterviews")
   otherAttendeeInterview   Interview?        @relation(fields: [otherAttendeeInterviewId], references: [id])
-  otherAttendeeInterviewId Int?
+  otherAttendeeInterviewId String?
 
   interviewCandidates CandidateWorkflowStageInterviewer[]
 
@@ -60,8 +44,17 @@ model User {
 
   jobUserScheduleCalendars JobUserScheduleCalendar[]
 
-  // emailTemplates EmailTemplate[]
-  // candidatePools CandidatePool[]
+  createdJobs           Job[]
+  createdCategories     Category[]
+  createdWorkflows      Workflow[]
+  createdStages         Stage[]
+  createdForms          Form[]
+  createdQuestions      Question[]
+  createdScoreCards     ScoreCard[]
+  createdCardQuestions  CardQuestion[]
+  createdCandidates     Candidate[]
+  createdEmailTemplates EmailTemplate[]
+  createdCandidatePools CandidatePool[]
 }
 
 enum UserRole {
@@ -70,9 +63,10 @@ enum UserRole {
 }
 
 model Session {
-  id                 Int       @id @default(autoincrement())
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   expiresAt          DateTime?
   handle             String    @unique
   hashedSessionToken String?
@@ -80,28 +74,29 @@ model Session {
   publicData         String?
   privateData        String?
 
-  user   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 model Token {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   hashedToken String
   lastFour    String?
   type        TokenType
   expiresAt   DateTime
   sentTo      String?
 
-  user   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
 
   job   Job?    @relation(fields: [jobId], references: [id])
   jobId String?
 
   company   Company? @relation(fields: [companyId], references: [id])
-  companyId Int?
+  companyId String?
 
   @@unique([hashedToken, type])
 }
@@ -147,17 +142,17 @@ model CompanyUser {
 
   role CompanyUserRole
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   @@unique([userId, companyId])
 }
 
 model Company {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -194,12 +189,14 @@ model Company {
 }
 
 model Job {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   title String
-  slug  String @unique
+  slug  String
 
   country String
   state   String
@@ -240,7 +237,9 @@ model Job {
   archived Boolean @default(false)
 
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
+
+  @@unique([companyId, slug])
 }
 
 model InterviewDetail {
@@ -248,8 +247,8 @@ model InterviewDetail {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  interviewer   User @relation(fields: [interviewerId], references: [id])
-  interviewerId Int
+  interviewer   User   @relation(fields: [interviewerId], references: [id])
+  interviewerId String
 
   duration Int
 
@@ -268,13 +267,13 @@ model JobUserScheduleCalendar {
   updatedAt DateTime @updatedAt
 
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  scheduleId Int
+  scheduleId String
 
   calendar   Calendar? @relation(fields: [calendarId], references: [id])
-  calendarId Int?
+  calendarId String?
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
@@ -292,7 +291,7 @@ enum JobUserRole {
 }
 
 model JobUser {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -301,60 +300,60 @@ model JobUser {
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   @@unique([userId, jobId])
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
-  slug String @unique
-
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
+  slug String
 
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   jobs Job[]
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }
 
 model Workflow {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
-  slug String @unique
+  slug String
 
   stages WorkflowStage[]
   jobs   Job[]
 
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
-
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   factory Boolean @default(false)
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }
 
 model Stage {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
-  slug String @unique
+  slug String
 
   allowEdit Boolean @default(true)
 
@@ -364,9 +363,9 @@ model Stage {
   // userId Int
 
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }
 
 model WorkflowStage {
@@ -399,33 +398,36 @@ model WorkflowStage {
 }
 
 model Form {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
-  slug String @unique
+  slug String
 
   questions FormQuestion[]
   jobs      Job[]
 
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
-
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   factory Boolean @default(false)
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }
 
 model Question {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
-  name          String
+  name String
+  slug String
+
   placeholder   String           @default("")
   type          QuestionType     @default(Single_line_text)
   options       QuestionOption[]
@@ -433,62 +435,55 @@ model Question {
 
   factory Boolean @default(false)
 
-  slug String @unique
-
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
 
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   forms   FormQuestion[]
   answers Answer[]
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }
 
 model ScoreCard {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
-  slug String @unique
+  slug String
 
   cardQuestions ScoreCardQuestion[]
 
   jobWorkflowStages ScoreCardJobWorkflowStage[]
 
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
-
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   factory Boolean @default(false)
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }
 
 model CardQuestion {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name    String
+  slug    String
   factory Boolean @default(false)
 
-  slug String @unique
-
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
-
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   scoreCards ScoreCardQuestion[]
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }
 
 model ScoreCardQuestion {
@@ -556,7 +551,7 @@ model Score {
 }
 
 model QuestionOption {
-  id        String   @id @default(cuid()) // value
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -634,16 +629,18 @@ model CandidateWorkflowStageInterviewer {
   workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
   workflowStageId String
 
-  interviewer   User @relation(fields: [interviewerId], references: [id])
-  interviewerId Int
+  interviewer   User   @relation(fields: [interviewerId], references: [id])
+  interviewerId String
 
   @@unique([candidateId, workflowStageId])
 }
 
 model Candidate {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name   String
   email  String
@@ -651,8 +648,6 @@ model Candidate {
 
   workflowStage   WorkflowStage? @relation(fields: [workflowStageId], references: [id])
   workflowStageId String?
-
-  slug String @unique
 
   answers Answer[]
   scores  Score[]
@@ -681,11 +676,15 @@ enum CandidateSource {
 }
 
 model DefaultCalendar {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @unique
-  user       User     @relation(fields: [userId], references: [id])
-  calendarId Int
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
   calendar   Calendar @relation(fields: [calendarId], references: [id])
+  calendarId String
 }
 
 enum CalendarType {
@@ -696,85 +695,80 @@ enum CalendarType {
 }
 
 model Calendar {
-  id                       Int                       @id @default(autoincrement())
-  name                     String
-  caldavAddress            String?
-  username                 String?
-  encryptedPassword        String?
-  refreshToken             String?
-  owner                    User                      @relation(fields: [ownerId], references: [id])
-  ownerId                  Int
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  slug String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  caldavAddress     String?
+  username          String?
+  encryptedPassword String?
+  refreshToken      String?
+
   type                     CalendarType
   defaultCalendars         DefaultCalendar[]
-  // meetings          Meeting[]
   jobUserScheduleCalendars JobUserScheduleCalendar[]
 
-  @@unique([ownerId, name])
+  @@unique([userId, slug])
 }
 
-// model Meeting {
-//   id                         Int               @id @default(autoincrement())
-//   name                       String
-//   link                       String
-//   owner                      User              @relation(fields: [ownerName], references: [slug])
-//   ownerName                  String
-//   description                String
-//   duration                   Int
-//   startDateUTC               DateTime
-//   endDateUTC                 DateTime
-//   schedule                   Schedule          @relation(fields: [scheduleId], references: [id])
-//   scheduleId                 Int
-//   location                   String
-//   bookings                   Booking[]
-//   defaultCalendar   Calendar @relation(fields: [defaultCalendarId], references: [id])
-//   defaultCalendarId Int
-// }
-
 model DailySchedule {
-  id         Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   day        String
   startTime  String
   endTime    String
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
-  scheduleId Int
+  scheduleId String
 
   @@unique([scheduleId, day])
 }
 
 model Schedule {
-  id                       Int                       @id @default(autoincrement())
-  name                     String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  slug String
+
   timezone                 String
   dailySchedules           DailySchedule[]
-  owner                    User                      @relation(fields: [ownerId], references: [id])
-  ownerId                  Int
+  user                     User                      @relation(fields: [userId], references: [id])
+  userId                   String
   jobUserScheduleCalendars JobUserScheduleCalendar[]
   factory                  Boolean                   @default(false)
 
-  @@unique([ownerId, name])
+  @@unique([userId, slug])
 }
 
 model Interview {
-  id              Int           @id @default(autoincrement())
-  // meeting      Meeting  @relation(fields: [meetingId], references: [id])
-  // meetingId    Int
-  // interviewDetail   InterviewDetail @relation(fields: [interviewDetailId], references: [id])
-  // interviewDetailId String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   candidate       Candidate     @relation(fields: [candidateId], references: [id])
   candidateId     String
   job             Job           @relation(fields: [jobId], references: [id])
   jobId           String
   workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
   workflowStageId String
-  // inviteeEmail      String
-  organizer       User          @relation(fields: [organizerId], references: [id], name: "organizerInterviews")
-  organizerId     Int
-  interviewer     User          @relation(fields: [interviewerId], references: [id], name: "interviewerInterviews")
-  interviewerId   Int
-  otherAttendees  User[]
-  startDateUTC    DateTime
-  duration        Int
-  cancelCode      String
+
+  organizer      User     @relation(fields: [organizerId], references: [id], name: "organizerInterviews")
+  organizerId    String
+  interviewer    User     @relation(fields: [interviewerId], references: [id], name: "interviewerInterviews")
+  interviewerId  String
+  otherAttendees User[]
+  startDateUTC   DateTime
+  duration       Int
+  cancelCode     String
 }
 
 model Comment {
@@ -784,8 +778,8 @@ model Comment {
 
   text String
 
-  creator   User @relation(fields: [creatorId], references: [id])
-  creatorId Int
+  creator   User   @relation(fields: [creatorId], references: [id])
+  creatorId String
 
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
@@ -799,24 +793,24 @@ model Comment {
 }
 
 model EmailTemplate {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
-  name    String
+  name String
+  slug String
+
   subject String
-  slug    String @unique
   body    Json
 
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
-
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   emails Email[]
 
-  @@unique([companyId, subject])
+  @@unique([companyId, slug])
 }
 
 model Email {
@@ -826,7 +820,6 @@ model Email {
 
   subject String
   cc      String?
-  slug    String  @unique
   body    Json
 
   templateUsed EmailTemplate? @relation(fields: [templateId], references: [id])
@@ -838,25 +831,24 @@ model Email {
   workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
   workflowStageId String
 
-  sender   User @relation(fields: [senderId], references: [id])
-  senderId Int
+  sender   User   @relation(fields: [senderId], references: [id])
+  senderId String
 }
 
 model CandidatePool {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
 
   name String
-  slug String @unique
-
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
+  slug String
 
   company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  companyId String
 
   candidates Candidate[]
 
-  @@unique([companyId, name])
+  @@unique([companyId, slug])
 }

@@ -22,7 +22,7 @@ export const AddExistingQuestionsForm = (props: AddQuestionFormProps) => {
   })
   const [questions] = useQuery(getQuestionsWOPagination, {
     where: {
-      companyId: session.companyId || 0,
+      companyId: session.companyId || "0",
       slug: {
         notIn: formQuestions.map((ws) => {
           return ws.question.slug

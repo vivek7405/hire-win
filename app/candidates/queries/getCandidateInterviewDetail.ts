@@ -183,7 +183,7 @@ const getJobOwnerInterviewDetails = async ({
         jobId_workflowStageId_userId: {
           jobId,
           workflowStageId,
-          userId: interviewer?.id || 0,
+          userId: interviewer?.id || "0",
         },
       },
       include: {

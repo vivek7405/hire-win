@@ -39,14 +39,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "candidate",
     { session },
-    { where: { slug: context?.params?.candidateSlug as string } }
+    { where: { email: context?.params?.candidateEmail as string } }
   )
 
   const { can: isOwner } = await Guard.can(
     "isOwner",
     "candidate",
     { session },
-    { where: { slug: context?.params?.candidateSlug as string } }
+    { where: { email: context?.params?.candidateEmail as string } }
   )
 
   if (user) {
@@ -55,7 +55,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         const candidate = await invokeWithMiddleware(
           getCandidate,
           {
-            where: { slug: context?.params?.candidateSlug as string },
+            where: { email: context?.params?.candidateEmail as string },
           },
           { ...context }
         )

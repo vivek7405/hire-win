@@ -87,7 +87,7 @@ const Stages = () => {
 
   const [{ stages, hasMore, count }] = usePaginatedQuery(getStages, {
     where: {
-      companyId: session.companyId || 0,
+      companyId: session.companyId || "0",
       ...query,
     },
     orderBy: { allowEdit: "asc" },

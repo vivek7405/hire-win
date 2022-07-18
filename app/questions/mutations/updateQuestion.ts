@@ -16,10 +16,10 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
   const { name, placeholder, options, acceptedFiles } = QuestionObj.parse(data)
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug: string = await findFreeSlug(
-    slug,
-    async (e) => await db.question.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.question.findFirst({ where: { slug: e } })
+  // )
 
   const currentQuestion = await db.question.findFirst({
     where,
@@ -40,7 +40,7 @@ async function updateQuestion({ where, data, initial }: UpdateQuestionInput, ctx
     data: {
       name,
       placeholder,
-      slug: initial.name !== name ? newSlug : initial.slug,
+      slug,
       acceptedFiles,
       options: {
         delete: optionsToDelete?.map((op) => {

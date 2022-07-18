@@ -9,6 +9,7 @@ import {
   getSession,
   useRouter,
   useMutation,
+  useSession,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -84,6 +85,7 @@ const SingleCardQuestionPage = ({
   canUpdate,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [updateCardQuestionMutation] = useMutation(updateCardQuestion)
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -104,7 +106,12 @@ const SingleCardQuestionPage = ({
           const toastId = toast.loading(() => <span>Updating Question</span>)
           try {
             await updateCardQuestionMutation({
-              where: { slug: cardQuestion?.slug },
+              where: {
+                companyId_slug: {
+                  companyId: session?.companyId || "0",
+                  slug: cardQuestion?.slug || "0",
+                },
+              },
               data: { ...values },
               initial: cardQuestion!,
             })

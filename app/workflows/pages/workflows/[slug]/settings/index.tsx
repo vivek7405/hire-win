@@ -9,6 +9,7 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useSession,
 } from "blitz"
 import path from "path"
 
@@ -95,6 +96,7 @@ const WorkflowSettingsPage = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [updateWorkflowMutation] = useMutation(updateWorkflow)
 
   if (error) {
@@ -114,7 +116,12 @@ const WorkflowSettingsPage = ({
           const toastId = toast.loading(() => <span>Updating Workflow</span>)
           try {
             await updateWorkflowMutation({
-              where: { slug: workflow?.slug },
+              where: {
+                companyId_slug: {
+                  companyId: session.companyId || "0",
+                  slug: workflow?.slug!,
+                },
+              },
               data: { ...values },
               initial: workflow!,
             })

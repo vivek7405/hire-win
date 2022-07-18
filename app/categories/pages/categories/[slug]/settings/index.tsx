@@ -9,6 +9,7 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useSession,
 } from "blitz"
 import path from "path"
 
@@ -95,6 +96,7 @@ const CategorySettingsPage = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [updateCategoryMutation] = useMutation(updateCategory)
 
   if (error) {
@@ -114,7 +116,12 @@ const CategorySettingsPage = ({
           const toastId = toast.loading(() => <span>Updating Category</span>)
           try {
             await updateCategoryMutation({
-              where: { slug: category?.slug },
+              where: {
+                companyId_slug: {
+                  companyId: session.companyId || "0",
+                  slug: category?.slug!,
+                },
+              },
               data: { ...values },
               initial: category!,
             })

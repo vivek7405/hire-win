@@ -3,7 +3,7 @@ import db from "db"
 import stripe from "app/core/utils/stripe"
 
 interface CreateStripeCheckoutSessionInput {
-  companyId: number
+  companyId: string
   priceId: string
 }
 
@@ -15,7 +15,7 @@ async function updateStripeSubscription(
 
   const company = await db.company.findFirst({
     where: {
-      id: companyId || 0,
+      id: companyId || "0",
     },
   })
 

@@ -49,7 +49,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
   } else {
     // 6. If there is a user and companyUser does not exist, create a new membership associated with the company and user
     const companyUser = await db.companyUser.findFirst({
-      where: { companyId: possibleToken.companyId || 0, userId: existingUser.id },
+      where: { companyId: possibleToken.companyId || "0", userId: existingUser.id },
     })
     if (!companyUser) {
       await db.companyUser.create({
@@ -57,7 +57,7 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
           role: CompanyUserRole.USER,
           company: {
             connect: {
-              id: possibleToken.companyId || 0,
+              id: possibleToken.companyId || "0",
             },
           },
           user: {

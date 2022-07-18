@@ -17,7 +17,7 @@ export const SchedulesObj = z.object({
 })
 
 export const ScheduleInput = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   name: z.string().nonempty({ message: "Required" }),
   timezone: z.string().optional(),
   schedule: SchedulesObj,

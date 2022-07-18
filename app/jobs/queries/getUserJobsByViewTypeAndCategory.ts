@@ -36,7 +36,7 @@ async function getUserJobsByViewTypeAndCategory(
     job: {
       archived: viewType === JobViewType.Archived,
       validThrough: viewType === JobViewType.Archived ? {} : validThrough,
-      companyId: ctx.session.companyId || 0,
+      companyId: ctx.session.companyId || "0",
       categoryId: categoryId || {},
       title: {
         contains: JSON.parse(searchString),

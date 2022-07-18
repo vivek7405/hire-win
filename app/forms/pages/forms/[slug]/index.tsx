@@ -70,7 +70,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const form = await invokeWithMiddleware(
         getForm,
-        { where: { slug: context?.params?.slug!, companyId: session?.companyId || 0 } },
+        { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
         { ...context }
       )
 

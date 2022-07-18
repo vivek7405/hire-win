@@ -13,7 +13,7 @@ type AddExistingCardQuestionsFormProps = {
   user: any
   schema: any
   scoreCardId: string
-  companyId: number
+  companyId: string
 }
 
 export const AddExistingCardQuestionsForm = (props: AddExistingCardQuestionsFormProps) => {

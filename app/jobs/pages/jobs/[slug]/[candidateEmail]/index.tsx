@@ -100,7 +100,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "candidate",
     { session },
-    { where: { slug: context?.params?.candidateSlug as string } }
+    { where: { email: context?.params?.email } }
   )
 
   if (user) {
@@ -108,7 +108,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       // const candidate = await invokeWithMiddleware(
       //   getCandidate,
       //   {
-      //     where: { slug: context?.params?.candidateSlug as string },
+      //     where: { email: context?.params?.candidateEmail as string },
       //   },
       //   { ...context }
       // )
@@ -117,7 +117,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         props: {
           user: user,
           canUpdate: canUpdate,
-          candidateSlug: context?.params?.candidateSlug as string,
+          candidateEmail: context?.params?.email as string,
           // candidate: candidate,
         },
       }
@@ -138,7 +138,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   } else {
     return {
       redirect: {
-        destination: `/login?next=jobs/${context?.params?.slug}/candidates/${context?.params?.candidateSlug}`,
+        destination: `/login?next=jobs/${context?.params?.slug}/candidates/${context?.params?.candidateEmail}`,
         permanent: false,
       },
       props: {},
@@ -290,7 +290,7 @@ const SingleCandidatePage = ({
   user,
   error,
   canUpdate,
-  candidateSlug,
+  candidateEmail,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -305,7 +305,7 @@ const SingleCandidatePage = ({
           user={user as any}
           error={error as any}
           canUpdate={canUpdate as any}
-          candidateSlug={candidateSlug as any}
+          candidateEmail={candidateEmail as any}
         />
       </Suspense>
     </AuthLayout>
@@ -316,7 +316,7 @@ const SingleCandidatePageContent = ({
   user,
   error,
   canUpdate,
-  candidateSlug,
+  candidateEmail,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   enum CandidateToggleView {
     Scores = "Scores",
@@ -327,7 +327,7 @@ const SingleCandidatePageContent = ({
 
   // const { user, error, canUpdate } = props
   // const [candidate, setCandidate] = useState(props.candidate)
-  const [candidate] = useQuery(getCandidate, { where: { slug: candidateSlug as string } })
+  const [candidate] = useQuery(getCandidate, { where: { email: candidateEmail as string } })
   const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
   // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
@@ -357,14 +357,15 @@ const SingleCandidatePageContent = ({
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
   const [candidatePools] = useQuery(getCandidatePools, {
-    where: { companyId: session.companyId || 0, candidates: { none: { id: candidate?.id } } },
+    where: { companyId: session.companyId || "0", candidates: { none: { id: candidate?.id } } },
   })
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
 
   const [candidatePoolsOpenDesktop, setCandidatePoolsOpenDesktop] = useState(false)
   const [candidatePoolsOpenMobileAndTablet, setCandidatePoolsOpenMobileAndTablet] = useState(false)
 
-  const [stagesOpenMobileAndTablet, setStagesOpenMobileAndTablet] = useState(false)
+  const [stagesOpenMobile, setStagesOpenMobile] = useState(false)
+  const [stagesOpenTablet, setStagesOpenTablet] = useState(false)
   const [stagesOpenDesktop, setStagesOpenDesktop] = useState(false)
 
   const resume = candidate?.resume as AttachmentObject
@@ -752,7 +753,7 @@ const SingleCandidatePageContent = ({
                 },
               })
               toast.success(`Candidate updated`, { id: toastId })
-              if (updatedCandidate?.slug === candidate?.slug) {
+              if (updatedCandidate?.email === candidate?.email) {
                 await invalidateQuery(getCandidate)
                 setOpenEditModal(false)
               } else {
@@ -760,7 +761,7 @@ const SingleCandidatePageContent = ({
                 router.replace(
                   Routes.SingleCandidatePage({
                     slug: candidate?.job?.slug,
-                    candidateSlug: updatedCandidate?.slug,
+                    candidateEmail: updatedCandidate?.email,
                   })
                 )
               }
@@ -854,8 +855,36 @@ const SingleCandidatePageContent = ({
         {moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"} stage?
       </Confirm>
 
-      {/* Mobile and Tablet Menu */}
-      <div className="flex flex-col lg:hidden">
+      {/* Mobile Menu */}
+      <div className="flex flex-col space-y-4 mb-2 md:hidden lg:hidden">
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {candidateNameHeader}
+          {candidateRatingDiv}
+        </div>
+
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {candidateStageAndInterviewerDiv}
+        </div>
+
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {rejectCandidateButton}
+          {updateCandidateDetailsButton}
+        </div>
+
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
+          <MoveToNextStageButton
+            stagesOpen={stagesOpenMobile}
+            setStagesOpen={setStagesOpenMobile}
+          />
+          <AddToPoolButton
+            candidatePoolsOpen={candidatePoolsOpenMobileAndTablet}
+            setCandidatePoolsOpen={setCandidatePoolsOpenMobileAndTablet}
+          />
+        </div>
+      </div>
+
+      {/* Tablet Menu */}
+      <div className="hidden md:flex md:flex-col lg:hidden">
         <div className="flex flex-nowrap items-center justify-center space-x-4">
           {candidateNameHeader}
           {candidateRatingDiv}
@@ -869,8 +898,8 @@ const SingleCandidatePageContent = ({
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
           <MoveToNextStageButton
-            stagesOpen={stagesOpenMobileAndTablet}
-            setStagesOpen={setStagesOpenMobileAndTablet}
+            stagesOpen={stagesOpenTablet}
+            setStagesOpen={setStagesOpenTablet}
           />
           <AddToPoolButton
             candidatePoolsOpen={candidatePoolsOpenMobileAndTablet}
@@ -1005,9 +1034,9 @@ const SingleCandidatePageContent = ({
                       //   )?.stage?.name
                       // } Stage`}
                       scoreCardId={scoreCardId}
-                      companyId={session.companyId || 0}
+                      companyId={session.companyId || "0"}
                       preview={false}
-                      userId={user?.id || 0}
+                      userId={user?.id || "0"}
                       workflowStage={selectedWorkflowStage as any}
                       onSubmit={async (values) => {
                         const toastId = toast.loading(() => <span>Updating Candidate</span>)

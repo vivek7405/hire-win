@@ -13,20 +13,17 @@ async function createCategory(data: CategoryInputType, ctx: Ctx) {
   // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug = await findFreeSlug(
-    slug,
-    async (e) => await db.category.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.category.findFirst({ where: { slug: e } })
+  // )
 
   const category = await db.category.create({
     data: {
       name: name,
-      slug: newSlug,
-      company: {
-        connect: {
-          id: ctx.session.companyId || 0,
-        },
-      },
+      slug,
+      companyId: ctx.session.companyId || "0",
+      createdById: ctx.session.userId || "0",
     },
   })
 

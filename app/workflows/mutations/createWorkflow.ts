@@ -10,8 +10,8 @@ async function createWorkflow(data: WorkflowInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { name } = WorkflowObj.parse(data)
-  const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  if (!user) throw new AuthenticationError()
+  const company = await db.company.findFirst({ where: { id: ctx.session.companyId! } })
+  if (!company) throw new AuthenticationError()
 
   // const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
@@ -27,7 +27,10 @@ async function createWorkflow(data: WorkflowInputType, ctx: Ctx) {
   //   },
   // })
 
-  const workflow = await createWorkflowWithFactoryWorkflowStages(name, user.id, false)
+  const workflow = await createWorkflowWithFactoryWorkflowStages(
+    { workflowName: name, companyId: company.id, factoryWorkflow: false },
+    ctx
+  )
 
   return workflow
 }

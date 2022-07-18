@@ -8,7 +8,7 @@ import { JobViewType } from "types"
 
 type GetCategoriesInput = {
   searchString: string
-  companyId: number | null
+  companyId: string | null
 }
 const getCompanyJobCategoriesForFilter = async (
   { searchString, companyId }: GetCategoriesInput,
@@ -18,7 +18,7 @@ const getCompanyJobCategoriesForFilter = async (
 
   const categories = await db.category.findMany({
     where: {
-      companyId: companyId || 0,
+      companyId: companyId || "0",
       jobs: {
         some: {
           archived: false,

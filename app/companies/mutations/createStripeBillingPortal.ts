@@ -3,7 +3,7 @@ import db from "db"
 import stripe from "app/core/utils/stripe"
 
 interface CreateStripeBillingPortalInput {
-  companyId: number
+  companyId: string
 }
 
 async function createStripeBillingPortal({ companyId }: CreateStripeBillingPortalInput, ctx: Ctx) {

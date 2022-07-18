@@ -7,13 +7,13 @@ export default resolver.pipe(
   resolver.zod(ScheduleInput),
   resolver.authorize(),
   async (scheduleUpdate, ctx) => {
-    const dailySchedules = Object.entries(scheduleUpdate.schedule).map(
-      ([day, { blocked, startTime, endTime }]) => ({
-        day,
-        startTime: blocked ? "00:00" : startTime,
-        endTime: blocked ? "00:00" : endTime,
-      })
-    )
+    // const dailySchedules = Object.entries(scheduleUpdate.schedule).map(
+    //   ([day, { blocked, startTime, endTime }]) => ({
+    //     day,
+    //     startTime: blocked ? "00:00" : startTime,
+    //     endTime: blocked ? "00:00" : endTime,
+    //   })
+    // )
     const schedule = await db.schedule.update({
       where: { id: scheduleUpdate.id },
       data: {

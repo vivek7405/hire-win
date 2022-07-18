@@ -64,7 +64,11 @@ export const Breadcrumbs = ({ ignore }: BreadcrumbsProps) => {
                 </svg>
 
                 <span className="text-sm font-medium text-gray-800">
-                  {breadcrumb.breadcrumb.charAt(0).toUpperCase() + breadcrumb.breadcrumb.slice(1)}
+                  {decodeURIComponent(breadcrumb.breadcrumb)?.includes("@") ? (
+                    decodeURIComponent(breadcrumb.breadcrumb)
+                  ) : (
+                    <span className="capitalize">{decodeURIComponent(breadcrumb.breadcrumb)}</span>
+                  )}
                 </span>
               </div>
             ) : (
@@ -77,7 +81,13 @@ export const Breadcrumbs = ({ ignore }: BreadcrumbsProps) => {
                 </svg>
                 <Link href={breadcrumb.href} passHref>
                   <a className="text-sm font-medium text-gray-500 hover:text-gray-700">
-                    {breadcrumb.breadcrumb.charAt(0).toUpperCase() + breadcrumb.breadcrumb.slice(1)}
+                    {decodeURIComponent(breadcrumb.breadcrumb)?.includes("@") ? (
+                      decodeURIComponent(breadcrumb.breadcrumb)
+                    ) : (
+                      <span className="capitalize">
+                        {decodeURIComponent(breadcrumb.breadcrumb)}
+                      </span>
+                    )}
                   </a>
                 </Link>
               </div>

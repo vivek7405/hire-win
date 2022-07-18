@@ -3,7 +3,7 @@ import Guard from "app/guard/ability"
 import db from "db"
 
 interface GenerateTokenInput {
-  companyId: number
+  companyId: string
 }
 
 const INVITE_TOKEN_EXPIRE_IN_HOURS = 9999

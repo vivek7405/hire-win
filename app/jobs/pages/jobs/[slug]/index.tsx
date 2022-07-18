@@ -88,8 +88,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     getCompanyUser,
     {
       where: {
-        companyId: session.companyId || 0,
-        userId: session.userId || 0,
+        companyId: session.companyId || "0",
+        userId: session.userId || "0",
       },
     },
     { ...context }
@@ -115,7 +115,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // const company = await invokeWithMiddleware(
   //   getCompany,
   //   {
-  //     where: { id: session.companyId || 0 },
+  //     where: { id: session.companyId || "0" },
   //   },
   //   { ...context }
   // )
@@ -196,7 +196,7 @@ const getBoard = (
                       prefetch={true}
                       href={Routes.SingleCandidatePage({
                         slug: c.job?.slug,
-                        candidateSlug: c.slug,
+                        candidateEmail: c.email,
                       })}
                       passHref
                     >
@@ -452,7 +452,7 @@ const Candidates = (props: CandidateProps) => {
               prefetch={true}
               href={Routes.SingleCandidatePage({
                 slug: props.cell.row.original.job?.slug,
-                candidateSlug: props.cell.row.original.slug,
+                candidateEmail: props.cell.row.original.email,
               })}
               passHref
             >

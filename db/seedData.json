@@ -53,32 +53,32 @@
     {
       "title": "Test Job",
       "slug": "Test-Job",
-      "owner": 1,
-      "members": [2, 3]
+      "owner": "1",
+      "members": ["2", "3"]
     },
     {
       "title": "Test Job 2",
       "slug": "Test-Job-2",
-      "owner": 2,
-      "members": [4, 5]
+      "owner": "2",
+      "members": ["4", "5"]
     },
     {
       "title": "Test Job 3",
       "slug": "Test-Job-3",
-      "owner": 3,
-      "members": [6, 7]
+      "owner": "3",
+      "members": ["6", "7"]
     },
     {
       "title": "Test Job 4",
       "slug": "Test-Job-4",
-      "owner": 4,
-      "members": [1, 8]
+      "owner": "4",
+      "members": ["1", "8"]
     },
     {
       "title": "Test Job 5",
       "slug": "Test-Job-5",
-      "owner": 1,
-      "members": [2]
+      "owner": "1",
+      "members": ["2"]
     }
   ]
 }

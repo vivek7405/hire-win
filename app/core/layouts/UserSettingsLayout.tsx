@@ -23,7 +23,7 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
   const router = useRouter()
   const session = useSession()
   const [companyUser] = useQuery(getCompanyUser, {
-    where: { userId: session.userId || 0, companyId: session.companyId || 0 },
+    where: { userId: session.userId || "0", companyId: session.companyId || "0" },
   })
 
   const subNavigation = [

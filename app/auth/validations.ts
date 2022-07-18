@@ -7,7 +7,7 @@ export const Signup = z.object({
   email: z.string().email(),
   companyName: z.string().nonempty({ message: "Required" }),
   slug: z.string().optional(),
-  companyId: z.number().optional(),
+  companyId: z.string().optional(),
   password: z.string().nonempty({ message: "Required" }),
 })
 

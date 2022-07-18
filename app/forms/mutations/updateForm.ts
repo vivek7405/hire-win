@@ -15,16 +15,16 @@ async function updateForm({ where, data, initial }: UpdateFormInput, ctx: Ctx) {
   const { name } = FormObj.parse(data)
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug: string = await findFreeSlug(
-    slug,
-    async (e) => await db.form.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.form.findFirst({ where: { slug: e } })
+  // )
 
   const form = await db.form.update({
     where,
     data: {
       name,
-      slug: initial.name !== name ? newSlug : initial.slug,
+      slug,
     },
   })
 

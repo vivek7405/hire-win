@@ -63,7 +63,7 @@ const CandidatePools = ({ user }) => {
   const [createCandidatePoolMutation] = useMutation(createCandidatePool)
   const [updateCandidatePoolMutation] = useMutation(updateCandidatePool)
   const [candidatePools] = useQuery(getCandidatePools, {
-    where: { companyId: session.companyId || 0, ...query },
+    where: { companyId: session.companyId || "0", ...query },
   })
   const [deleteCandidatePoolMutation] = useMutation(deleteCandidatePool)
   const [candidatePoolToEdit, setCandidatePoolToEdit] = useState(null as any as CandidatePool)

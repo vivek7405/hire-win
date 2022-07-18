@@ -35,8 +35,8 @@ type ScoreCardProps = {
   preview: boolean
   scoreCardQuestions?: ExtendedScoreCardQuestion[]
   onChange?: any
-  userId: number
-  companyId: number
+  userId: string
+  companyId: string
   candidate?: ExtendedCandidate
   workflowStage?: ExtendedWorkflowStage
 }

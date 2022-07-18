@@ -17,7 +17,7 @@ async function getCompanyJobsForCareersPage(
   }: GetJobsInput & {
     searchString: string
     categoryId: string | null
-    companyId: number | null
+    companyId: string | null
   },
   ctx: Ctx
 ) {
@@ -28,7 +28,7 @@ async function getCompanyJobsForCareersPage(
   const where = {
     archived: false,
     validThrough,
-    companyId: companyId || 0,
+    companyId: companyId || "0",
     categoryId: categoryId || {},
     title: {
       contains: JSON.parse(searchString),

@@ -34,7 +34,7 @@ import verifyCancelCode from "../queries/verifyCancelCode"
 // }
 
 type CancelInterviewInput = {
-  interviewId: number
+  interviewId: string
   cancelCode: string
   skipCancelCodeVerification?: boolean
 }

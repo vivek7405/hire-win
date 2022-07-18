@@ -19,13 +19,13 @@ async function addNewCardQuestionToScoreCard(data: CardQuestionInputType, ctx: C
   // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug = await findFreeSlug(
-    slug,
-    async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
+  // )
 
   const existingCardQuestion = await db.cardQuestion.findFirst({
-    where: { name, companyId: ctx.session.companyId || 0 },
+    where: { name, companyId: ctx.session.companyId || "0" },
   })
   const order = (await db.scoreCardQuestion.count({ where: { scoreCardId: scoreCardId } })) + 1
 
@@ -44,10 +44,15 @@ async function addNewCardQuestionToScoreCard(data: CardQuestionInputType, ctx: C
                 where: { id: existingCardQuestion?.id || "" },
                 create: {
                   name,
-                  slug: newSlug,
+                  slug,
                   company: {
                     connect: {
-                      id: ctx.session.companyId || 0,
+                      id: ctx.session.companyId || "0",
+                    },
+                  },
+                  createdBy: {
+                    connect: {
+                      id: ctx.session.userId || "0",
                     },
                   },
                 },

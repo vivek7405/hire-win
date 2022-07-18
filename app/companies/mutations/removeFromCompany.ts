@@ -3,8 +3,8 @@ import Guard from "app/guard/ability"
 import db from "db"
 
 interface RemoveFromCompanyInput {
-  companyId: number
-  userId: number
+  companyId: string
+  userId: string
 }
 
 async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, ctx: Ctx) {

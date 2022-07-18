@@ -11,16 +11,16 @@ async function createCardQuestion(data: CardQuestionInputType, ctx: Ctx) {
   // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug = await findFreeSlug(
-    slug,
-    async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
+  // )
 
   const cardQuestion = await db.cardQuestion.create({
     data: {
       name,
-      slug: newSlug,
-      companyId: ctx.session.companyId || 0,
+      slug,
+      companyId: ctx.session.companyId || "0",
     },
   })
 

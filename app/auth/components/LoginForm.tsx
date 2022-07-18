@@ -37,7 +37,7 @@ export const LoginForm = (props: LoginFormProps) => {
         onSubmit={async (values) => {
           try {
             const companyId = await loginMutation(values)
-            if (companyId === 0) {
+            if (companyId === "0") {
               router.push(Routes.NewCompany())
             }
             props.onSuccess?.()

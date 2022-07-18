@@ -11,10 +11,10 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
   // if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true, lower: true })
-  const newSlug = await findFreeSlug(
-    slug,
-    async (e) => await db.question.findFirst({ where: { slug: e } })
-  )
+  // const newSlug = await findFreeSlug(
+  //   slug,
+  //   async (e) => await db.question.findFirst({ where: { slug: e } })
+  // )
 
   const question = await db.question.create({
     data: {
@@ -28,8 +28,9 @@ async function createQuestion(data: QuestionInputType, ctx: Ctx) {
           }
         }),
       },
-      slug: newSlug,
-      companyId: ctx.session.companyId || 0,
+      slug,
+      companyId: ctx.session.companyId || "0",
+      createdById: ctx.session.userId || "0",
       acceptedFiles: acceptedFiles,
     },
   })

@@ -2,7 +2,7 @@ import db from "db"
 import { resolver } from "blitz"
 import * as z from "zod"
 
-export default resolver.pipe(resolver.zod(z.number()), resolver.authorize(), async (scheduleId) => {
+export default resolver.pipe(resolver.zod(z.string()), resolver.authorize(), async (scheduleId) => {
   const scheduleCalendar = await db.jobUserScheduleCalendar.count({
     where: { scheduleId },
   })

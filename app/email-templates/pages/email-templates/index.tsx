@@ -61,7 +61,7 @@ const EmailTemplates = ({ user }) => {
   const [createEmailTemplateMutation] = useMutation(createEmailTemplate)
   const [updateEmailTemplateMutation] = useMutation(updateEmailTemplate)
   const [emailTemplates] = useQuery(getEmailTemplates, {
-    where: { ...query, companyId: session.companyId || 0 },
+    where: { ...query, companyId: session.companyId || "0" },
   })
   const [deleteEmailTemplateMutation] = useMutation(deleteEmailTemplate)
   const [emailTemplateToEdit, setEmailTemplateToEdit] = useState(null as any as EmailTemplate)

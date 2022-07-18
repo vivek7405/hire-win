@@ -44,14 +44,14 @@ const Calendars = ({ user }: CalendarProps) => {
 
   const [filteredCalendarEntries] = useQuery(getCalendars, {
     where: {
-      ownerId: user?.id,
+      userId: user?.id,
       ...query,
     },
   })
 
   const [allCalendarEntries] = useQuery(getCalendars, {
     where: {
-      ownerId: user?.id,
+      userId: user?.id,
     },
   })
 
@@ -109,7 +109,7 @@ const Calendars = ({ user }: CalendarProps) => {
             const toastId = toast.loading(`Updating Calendar Name to ${calendarToUpdateName?.name}`)
             try {
               await updateCalendarNameMutation({
-                calendarId: calendarToUpdateName?.id || 0,
+                calendarId: calendarToUpdateName?.id || "0",
                 calendarName: values.name || "",
               })
               toast.success("Calendar Name Updated", { id: toastId })
@@ -172,7 +172,7 @@ const Calendars = ({ user }: CalendarProps) => {
                     })}
                     defaultValue={defaultCalendar?.calendarId?.toString()}
                     onChange={async (value) => {
-                      const selectedCalendarId: number = parseInt(value as any as string)
+                      const selectedCalendarId: string = value as any
                       const selectedCalendarName = allCalendarEntries?.find(
                         (cal) => cal.id === selectedCalendarId
                       )?.name

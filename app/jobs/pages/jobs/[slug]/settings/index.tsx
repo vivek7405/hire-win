@@ -121,7 +121,7 @@ const JobSettingsPage = ({
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <JobSettingsLayout job={job!}>
         <JobForm
-          companyId={session.companyId || 0}
+          companyId={session.companyId || "0"}
           user={user}
           category={job?.category!}
           workflow={job?.workflow!}

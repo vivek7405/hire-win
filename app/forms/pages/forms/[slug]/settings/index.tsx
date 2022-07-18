@@ -9,6 +9,7 @@ import {
   AuthorizationError,
   ErrorComponent,
   getSession,
+  useSession,
 } from "blitz"
 import path from "path"
 
@@ -43,7 +44,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       if (canUpdate) {
         const form = await invokeWithMiddleware(
           getForm,
-          { where: { slug: context?.params?.slug!, companyId: session?.companyId } },
+          { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
           { ...context }
         )
 
@@ -95,6 +96,7 @@ const FormSettingsPage = ({
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
+  const session = useSession()
   const [updateFormMutation] = useMutation(updateForm)
 
   if (error) {
@@ -114,7 +116,12 @@ const FormSettingsPage = ({
           const toastId = toast.loading(() => <span>Updating Form</span>)
           try {
             await updateFormMutation({
-              where: { slug: form?.slug },
+              where: {
+                companyId_slug: {
+                  companyId: session.companyId || "0",
+                  slug: form?.slug!,
+                },
+              },
               data: { ...values },
               initial: form!,
             })

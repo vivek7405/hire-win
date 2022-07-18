@@ -2,25 +2,30 @@ import db from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryScoreCardQuestions from "../../card-questions/utils/factoryScoreCardQuestions"
+import { Ctx } from "blitz"
 
-async function createScoreCardWithFactoryScoreCardQuestions(
-  scoreCardName: string,
-  companyId: number,
+type InputType = {
+  scoreCardName: string
+  companyId: string
   factoryScoreCard: boolean
+}
+async function createScoreCardWithFactoryScoreCardQuestions(
+  { scoreCardName, companyId, factoryScoreCard }: InputType,
+  ctx: Ctx
 ) {
   const slugScoreCard = slugify(scoreCardName, { strict: true, lower: true })
-  const newSlugScoreCard = await findFreeSlug(
-    slugScoreCard,
-    async (e) => await db.scoreCard.findFirst({ where: { slug: e } })
-  )
+  // const newSlugScoreCard = await findFreeSlug(
+  //   slugScoreCard,
+  //   async (e) => await db.scoreCard.findFirst({ where: { slug: e } })
+  // )
 
   const getCardQuestionSlug = async (fq) => {
     const slugCardQuestion = slugify(fq.cardQuestion.name, { strict: true, lower: true })
-    const newSlugCardQuestion = await findFreeSlug(
-      slugCardQuestion,
-      async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
-    )
-    fq.cardQuestion.slug = newSlugCardQuestion
+    // const newSlugCardQuestion = await findFreeSlug(
+    //   slugCardQuestion,
+    //   async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
+    // )
+    fq.cardQuestion.slug = slugCardQuestion
   }
   const promises = [] as any
   factoryScoreCardQuestions.forEach(async (fq) => {
@@ -44,11 +49,16 @@ async function createScoreCardWithFactoryScoreCardQuestions(
       createdAt: new Date(),
       updatedAt: new Date(),
       name: scoreCardName,
-      slug: newSlugScoreCard,
+      slug: slugScoreCard,
       factory: factoryScoreCard,
       company: {
         connect: {
           id: companyId,
+        },
+      },
+      createdBy: {
+        connect: {
+          id: ctx.session.userId || "0",
         },
       },
       cardQuestions: {
@@ -69,6 +79,11 @@ async function createScoreCardWithFactoryScoreCardQuestions(
                   company: {
                     connect: {
                       id: companyId,
+                    },
+                  },
+                  createdBy: {
+                    connect: {
+                      id: ctx.session.userId || "0",
                     },
                   },
                 },

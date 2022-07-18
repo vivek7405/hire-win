@@ -5,7 +5,7 @@ import stripe from "app/core/utils/stripe"
 
 interface InviteToJobInput {
   jobId: string
-  userId: number
+  userId: string
 }
 
 async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {

@@ -88,7 +88,7 @@ const Questions = () => {
 
   const [{ questions, hasMore, count }] = usePaginatedQuery(getQuestions, {
     where: {
-      companyId: session.companyId || 0,
+      companyId: session.companyId || "0",
       ...query,
     },
     orderBy: [{ factory: "desc" }, { name: "asc" }],

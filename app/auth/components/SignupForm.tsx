@@ -8,7 +8,7 @@ import { z } from "zod"
 
 type SignupFormProps = {
   onSuccess?: () => void
-  companyId?: number | null | undefined
+  companyId?: string | null | undefined
   email?: string | null | undefined
 }
 
@@ -36,16 +36,16 @@ export const SignupForm = (props: SignupFormProps) => {
               ? z.string().email().nonempty({ message: "Required" })
               : z.string().optional(),
           companyName:
-            !props.companyId || props.companyId === 0
+            !props.companyId || props.companyId === "0"
               ? z.string().nonempty({ message: "Required" })
               : z.string().optional(),
-          companyId: z.number().optional(),
+          companyId: z.string().optional(),
           password: z.string().nonempty({ message: "Required" }),
         })}
         initialValues={{ email: "", password: "" }}
         onSubmit={async (values) => {
           try {
-            values["companyId"] = props.companyId || 0
+            values["companyId"] = props.companyId || "0"
             values["email"] = props.email || ""
             await signupMutation(values)
             props.onSuccess?.()
@@ -74,7 +74,7 @@ export const SignupForm = (props: SignupFormProps) => {
             testid="signupEmail"
           />
         )}
-        {(!props.companyId || props.companyId === 0) && (
+        {(!props.companyId || props.companyId === "0") && (
           <LabeledTextField
             name="companyName"
             label="Company Name"

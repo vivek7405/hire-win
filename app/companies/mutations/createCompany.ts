@@ -5,7 +5,7 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { CompanyObj } from "../validations"
 import provideTrail from "app/core/utils/provideTrial"
 import Guard from "app/guard/ability"
-import createFactoryItems from "app/core/utils/createFactoryItems"
+import createFactoryItems from "app/auth/mutations/createFactoryItems"
 
 export default Guard.authorize(
   "create",
@@ -36,20 +36,20 @@ export default Guard.authorize(
           ...data,
           users: {
             create: {
-              userId: ctx?.session?.userId || 0,
+              userId: ctx?.session?.userId || "0",
               role: CompanyUserRole.OWNER,
             },
           },
         },
       })
 
-      const companyId = company?.id || 0
+      const companyId = company?.id || "0"
 
-      await createFactoryItems(companyId)
+      await ctx.session.$setPublicData({ companyId: company.id || "0" })
 
-      await ctx.session.$setPublicData({ companyId: company.id || 0 })
+      await createFactoryItems({ companyId }, ctx)
 
-      // await provideTrail(ctx?.session?.userId || 0, company.id || 0)
+      // await provideTrail(ctx?.session?.userId || "0", company.id || "0")
 
       return company
     }

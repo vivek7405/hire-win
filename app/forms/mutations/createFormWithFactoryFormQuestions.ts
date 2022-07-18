@@ -3,25 +3,30 @@ import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryFormQuestions from "../../questions/utils/factoryFormQuestions"
 import { QuestionType } from "@prisma/client"
+import { Ctx } from "blitz"
 
-async function createFormWithFactoryFormQuestions(
-  formName: string,
-  companyId: number,
+type InputType = {
+  formName: string
+  companyId: string
   factoryForm: boolean
+}
+async function createFormWithFactoryFormQuestions(
+  { formName, companyId, factoryForm }: InputType,
+  ctx: Ctx
 ) {
   const slugForm = slugify(formName, { strict: true, lower: true })
-  const newSlugForm = await findFreeSlug(
-    slugForm,
-    async (e) => await db.form.findFirst({ where: { slug: e } })
-  )
+  // const newSlugForm = await findFreeSlug(
+  //   slugForm,
+  //   async (e) => await db.form.findFirst({ where: { slug: e } })
+  // )
 
   const getQuestionSlug = async (fq) => {
     const slugQuestion = slugify(fq.question.name, { strict: true, lower: true })
-    const newSlugQuestion = await findFreeSlug(
-      slugQuestion,
-      async (e) => await db.question.findFirst({ where: { slug: e } })
-    )
-    fq.question.slug = newSlugQuestion
+    // const newSlugQuestion = await findFreeSlug(
+    //   slugQuestion,
+    //   async (e) => await db.question.findFirst({ where: { slug: e } })
+    // )
+    fq.question.slug = slugQuestion
   }
   const promises = [] as any
   factoryFormQuestions.forEach(async (fq) => {
@@ -45,7 +50,7 @@ async function createFormWithFactoryFormQuestions(
       createdAt: new Date(),
       updatedAt: new Date(),
       name: formName,
-      slug: newSlugForm,
+      slug: slugForm,
       factory: factoryForm,
       company: {
         connect: {
@@ -77,11 +82,21 @@ async function createFormWithFactoryFormQuestions(
                       id: companyId,
                     },
                   },
+                  createdBy: {
+                    connect: {
+                      id: ctx.session.userId || "0",
+                    },
+                  },
                 },
               },
             },
           }
         }),
+      },
+      createdBy: {
+        connect: {
+          id: ctx.session.userId || "0",
+        },
       },
     },
   })

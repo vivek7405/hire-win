@@ -2,7 +2,7 @@ import db from "db"
 import bcrypt from "bcrypt"
 
 type VerifyCancelCodeInput = {
-  interviewId: number
+  interviewId: string
   cancelCode: string
 }
 export default async function verifyCancelCode({ interviewId, cancelCode }: VerifyCancelCodeInput) {

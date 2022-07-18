@@ -1,6 +1,7 @@
 import db from "db"
 import { resolver } from "blitz"
 import * as z from "zod"
+import slugify from "slugify"
 
 export default resolver.pipe(
   resolver.zod(
@@ -11,10 +12,12 @@ export default resolver.pipe(
   ),
   resolver.authorize(),
   async ({ name, refreshToken }, ctx) => {
+    const slug = slugify(name, { strict: true, lower: true })
     await db.calendar.create({
       data: {
         name: name,
-        owner: {
+        slug,
+        user: {
           connect: { id: ctx.session.userId },
         },
         type: "OutlookCalendar",

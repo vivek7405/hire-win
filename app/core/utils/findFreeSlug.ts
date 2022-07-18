@@ -1,4 +1,4 @@
-export async function findFreeSlug(prefix, fetchResults, maxAttempts = 15) {
+export async function findFreeSlug(prefix, fetchResults, maxAttempts = 10) {
   for (let i = 1; i < maxAttempts; i++) {
     const slug = i > 1 ? `${prefix}-${i}` : prefix
     const result = await fetchResults(slug)

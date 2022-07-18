@@ -86,7 +86,7 @@ const ScoreCards = () => {
 
   const [scoreCards] = useQuery(getScoreCardsWOPagination, {
     where: {
-      companyId: session.companyId || 0,
+      companyId: session.companyId || "0",
       ...query,
     },
   })

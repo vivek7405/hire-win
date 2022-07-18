@@ -12,13 +12,13 @@ import stripe from "app/core/utils/stripe"
 import { plans } from "app/core/utils/plans"
 import { PlanName } from "types"
 import provideTrail from "app/core/utils/provideTrial"
-import createFactoryItems from "app/core/utils/createFactoryItems"
+import createFactoryItems from "./createFactoryItems"
 
 type signupProps = {
   name: string
   email?: string
   companyName?: string
-  companyId?: number
+  companyId?: string
   password: string
 }
 export default async function signup(
@@ -42,7 +42,7 @@ export default async function signup(
   )
 
   const existingCompany = await db.company.findFirst({
-    where: { id: companyId || 0 },
+    where: { id: companyId || "0" },
   })
 
   const user = await db.user.create({
@@ -65,7 +65,7 @@ export default async function signup(
                 slug: newSlug,
               },
               where: {
-                id: existingCompany?.id || 0,
+                id: existingCompany?.id || "0",
               },
             },
           },
@@ -75,13 +75,14 @@ export default async function signup(
     select: { id: true, email: true, role: true, companies: true },
   })
 
-  const compId = existingCompany?.id || (user.companies && (user.companies[0]?.companyId || 0)) || 0
-
-  if (!existingCompany) {
-    await createFactoryItems(compId)
-  }
+  const compId =
+    existingCompany?.id || (user.companies && (user.companies[0]?.companyId || "0")) || "0"
 
   await ctx.session.$create({ userId: user.id, role: user.role as UserRole, companyId: compId })
+
+  if (!existingCompany) {
+    await createFactoryItems({ companyId: compId }, ctx)
+  }
 
   await addSchedule(
     {

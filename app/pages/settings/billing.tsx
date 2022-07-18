@@ -43,7 +43,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const session = await getSession(context.req, context.res)
   const company = await invokeWithMiddleware(
     getCompany,
-    { where: { id: session.companyId || 0 } },
+    { where: { id: session.companyId || "0" } },
     { ...context }
   )
 
@@ -75,7 +75,7 @@ const UserSettingsBillingPage = ({
   const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
   const session = useSession()
   const [companyUser] = useQuery(getCompanyUser, {
-    where: { userId: session.userId || 0, companyId: session.companyId || 0 },
+    where: { userId: session.userId || "0", companyId: session.companyId || "0" },
   })
 
   return (
@@ -118,7 +118,7 @@ const UserSettingsBillingPage = ({
                               e.preventDefault()
                               try {
                                 const url = await createStripeBillingPortalMutation({
-                                  companyId: session.companyId || 0,
+                                  companyId: session.companyId || "0",
                                 })
 
                                 if (url) window.location.href = url
@@ -156,7 +156,7 @@ const UserSettingsBillingPage = ({
                             </div>
                             <SubscribeButton
                               priceId={plan.priceId}
-                              userId={user?.id as number}
+                              userId={user?.id!}
                               quantity={1}
                               type="new"
                             />
@@ -203,7 +203,7 @@ const UserSettingsBillingPage = ({
                               </div>
                               <SubscribeButton
                                 priceId={plan.priceId}
-                                userId={user?.id as number}
+                                userId={user?.id!}
                                 quantity={1}
                                 type="update"
                               />

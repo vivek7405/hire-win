@@ -47,7 +47,7 @@ export default async (req, res) => {
 
     await db.company.update({
       where: {
-        id: parseInt(session.metadata.companyId || "0"),
+        id: session.metadata.companyId || "0",
       },
       data: {
         stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),

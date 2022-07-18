@@ -11,7 +11,7 @@ import db from "db"
 type InviteToCompanyInput = {
   to: string
   token: string
-  companyId: number
+  companyId: string
 }
 
 export async function inviteToCompanyMailer({ to, token, companyId }: InviteToCompanyInput) {

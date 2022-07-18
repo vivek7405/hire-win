@@ -2,21 +2,29 @@ import db from "db"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import factoryEmailTemplates from "../utils/factoryEmailTemplates"
+import { Ctx } from "blitz"
 
-async function createFactoryEmailTemplates(companyId: number) {
-  const getSlug = async (q) => {
-    const slug = slugify(q.name, { strict: true, lower: true })
-    const newSlug = await findFreeSlug(
-      slug,
-      async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })
-    )
-    q.slug = newSlug
-  }
-  const promises = [] as any
-  factoryEmailTemplates.forEach(async (c) => {
-    promises.push(getSlug(c))
+type InputType = {
+  companyId: string
+}
+async function createFactoryEmailTemplates({ companyId }: InputType, ctx: Ctx) {
+  // const getSlug = async (q) => {
+  //   const slug = slugify(q.name, { strict: true, lower: true })
+  //   const newSlug = await findFreeSlug(
+  //     slug,
+  //     async (e) => await db.emailTemplate.findFirst({ where: { slug: e } })
+  //   )
+  //   q.slug = newSlug
+  // }
+  // const promises = [] as any
+  // factoryEmailTemplates.forEach(async (c) => {
+  //   promises.push(getSlug(c))
+  // })
+  // await Promise.all(promises)
+
+  factoryEmailTemplates.forEach(async (et) => {
+    et.slug = slugify(et.name, { strict: true, lower: true })
   })
-  await Promise.all(promises)
 
   const createEmailTemplates = await db.emailTemplate.createMany({
     data: factoryEmailTemplates.map((et) => {
@@ -28,6 +36,7 @@ async function createFactoryEmailTemplates(companyId: number) {
         subject: et.subject,
         body: et.body!,
         companyId,
+        createdById: ctx.session.userId || "0",
       }
     }),
   })

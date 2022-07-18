@@ -4,7 +4,7 @@ import stripe from "app/core/utils/stripe"
 import { Plan } from "types"
 
 interface CreateStripeCheckoutSessionInput {
-  companyId: number
+  companyId: string
   priceId: string
   quantity: number
 }

@@ -70,7 +70,7 @@ const Schedules = ({ user }) => {
 
   const [schedules] = useQuery(getSchedulesWOPagination, {
     where: {
-      ownerId: user?.id,
+      userId: user?.id,
       ...query,
     },
   })

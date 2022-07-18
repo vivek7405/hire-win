@@ -10,7 +10,7 @@ export default resolver.pipe(resolver.authorize(), async ({ where }: GetCalendar
       caldavAddress: true,
       id: true,
       name: true,
-      ownerId: true,
+      userId: true,
       type: true,
       username: true,
       encryptedPassword: false,

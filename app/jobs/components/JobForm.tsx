@@ -61,7 +61,7 @@ const Step1Basic = () => {
 
 type Step2ExtraProps = {
   category?: Category // Need to be provided while editing the form
-  companyId: number
+  companyId: string
   // user: any
 }
 const Step2Extra = (props: Step2ExtraProps) => {
@@ -278,7 +278,7 @@ const Step4Salary = () => {
 type Step5WorkflowProps = {
   workflow?: ExtendedWorkflow // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
-  companyId: number
+  companyId: string
   // user: any
 }
 const Step5Workflow = (props: Step5WorkflowProps) => {
@@ -430,7 +430,7 @@ type Step6FormProps = {
   workflow?: ExtendedWorkflow // Need to be provided while editing the form
   form?: Form // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
-  companyId: number
+  companyId: string
 }
 const Step6Form = (props: Step6FormProps) => {
   const [forms] = useQuery(getFormsWOPagination, { where: { companyId: props.companyId } })
@@ -511,7 +511,7 @@ type JobFormProps = {
   workflow?: ExtendedWorkflow // Need to be provided while editing the form
   form?: Form // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
-  companyId: number
+  companyId: string
 }
 export const JobForm = (props: JobFormProps) => {
   const stp1: FormStep = {
