@@ -51,7 +51,7 @@ async function linkScoreCardWithJobWorkflowStage(
 
   // const workflowStage = await db.workflowStage.findFirst({ where: { id: workflowStageId } })
 
-  const job = await db.job.update({
+  await db.job.update({
     where: { id: jobId },
     data: {
       scoreCards: {
@@ -66,4 +66,5 @@ async function linkScoreCardWithJobWorkflowStage(
   return scoreCard || defaultScoreCard
 }
 
-export default Guard.authorize("update", "job", linkScoreCardWithJobWorkflowStage)
+export default linkScoreCardWithJobWorkflowStage
+// export default Guard.authorize("update", "job", linkScoreCardWithJobWorkflowStage)

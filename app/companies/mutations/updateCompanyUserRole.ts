@@ -16,4 +16,5 @@ async function updateCompanyUserRole({ where, data }: UpdateCompanyUserInput, ct
   return companyUser
 }
 
-export default Guard.authorize("update", "companyUser", updateCompanyUserRole)
+export default updateCompanyUserRole
+// export default Guard.authorize("update", "companyUser", updateCompanyUserRole)

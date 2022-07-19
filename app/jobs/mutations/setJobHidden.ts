@@ -26,4 +26,5 @@ async function setJobHidden({ where, hidden }: UpdateJobInput, ctx: Ctx) {
   return job
 }
 
+// export default setJobHidden
 export default Guard.authorize("update", "job", setJobHidden)

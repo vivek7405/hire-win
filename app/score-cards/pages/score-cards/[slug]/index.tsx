@@ -64,14 +64,24 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "scoreCard",
     { session },
-    { where: { slug: context?.params?.slug! } }
+    {
+      where: {
+        slug: context?.params?.slug!,
+        companyId: session?.companyId || "0",
+      },
+    }
   )
 
   if (user) {
     try {
       const scoreCard = await invokeWithMiddleware(
         getScoreCard,
-        { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
+        {
+          where: {
+            slug: context?.params?.slug!,
+            companyId: session?.companyId || "0",
+          },
+        },
         { ...context }
       )
 

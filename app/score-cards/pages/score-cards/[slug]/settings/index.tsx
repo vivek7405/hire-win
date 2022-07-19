@@ -36,7 +36,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "scoreCard",
     { session },
-    { where: { slug: context?.params?.slug! } }
+    {
+      where: {
+        slug: context?.params?.slug!,
+        companyId: session?.companyId || "0",
+      },
+    }
   )
 
   if (user) {
@@ -44,7 +49,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       if (canUpdate) {
         const scoreCard = await invokeWithMiddleware(
           getScoreCard,
-          { where: { slug: context?.params?.slug!, companyId: session?.companyId } },
+          {
+            where: {
+              slug: context?.params?.slug!,
+              companyId: session?.companyId || "0",
+            },
+          },
           { ...context }
         )
 
@@ -117,10 +127,7 @@ const ScoreCardSettingsPage = ({
           try {
             await updateScoreCardMutation({
               where: {
-                companyId_slug: {
-                  companyId: session.companyId || "0",
-                  slug: scoreCard?.slug!,
-                },
+                id: scoreCard?.id,
               },
               data: { ...values },
               initial: scoreCard!,

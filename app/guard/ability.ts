@@ -27,6 +27,7 @@ type ExtendedResourceTypes =
   | "company"
   | "companyUser"
   | "jobListing"
+  | "freeCandidate"
 
 type ExtendedAbilityTypes =
   | "access"
@@ -35,6 +36,7 @@ type ExtendedAbilityTypes =
   | "isAdmin"
   | "inviteUser"
   | "cancelInterview"
+  | "isLimitAvailable"
 
 const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
   async (ctx, { can, cannot }) => {
@@ -63,6 +65,10 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       return true
     }
+
+    can("isLimitAvailable", "freeCandidate", async (args) => {
+      return isFreePlanCandidateLimitAvailable(args)
+    })
 
     can("create", "candidate", async (args) => {
       const jobId = args?.jobId
@@ -119,6 +125,20 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           const currentPlan = checkPlan(company)
           if (!currentPlan) return false
         }
+
+        // Only company owner and admins can create jobs, company users can't
+        const companyUser = await db.companyUser.findUnique({
+          where: {
+            userId_companyId: {
+              userId: ctx.session.userId || "0",
+              companyId: ctx.session.companyId || "0",
+            },
+          },
+        })
+        if (companyUser?.role === CompanyUserRole.USER) {
+          return false
+        }
+
         return true
       })
       can("read", "job", async (args) => {
@@ -157,7 +177,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return jobUsers.every((p) => p.userId === ctx.session.userId) === true
       })
       can("update", "job", async (args) => {
-        const job = await db.job.findFirst({
+        const job = await db.job.findUnique({
           where: args.where,
           include: {
             // company: {
@@ -540,7 +560,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return cardQuestion?.companyId === ctx.session.companyId
       })
       can("update", "cardQuestion", async (args) => {
-        const cardQuestion = await db.cardQuestion.findFirst({
+        const cardQuestion = await db.cardQuestion.findUnique({
           where: args.where,
         })
 
@@ -578,7 +598,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         )
       })
       can("update", "scoreCardQuestion", async (args) => {
-        const scoreCardQuestion = await db.scoreCardQuestion.findFirst({
+        const scoreCardQuestion = await db.scoreCardQuestion.findUnique({
           where: args.where,
           include: {
             scoreCard: true,
@@ -660,7 +680,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return question?.companyId === ctx.session.companyId
       })
       can("update", "question", async (args) => {
-        const question = await db.question.findFirst({
+        const question = await db.question.findUnique({
           where: args.where,
         })
 
@@ -696,7 +716,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return formQuestions.every((p) => p.form.companyId === ctx.session.companyId) === true
       })
       can("update", "formQuestion", async (args) => {
-        const formQuestion = await db.formQuestion.findFirst({
+        const formQuestion = await db.formQuestion.findUnique({
           where: args.where,
           include: {
             form: true,
@@ -748,7 +768,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       })
 
       can("update", "candidate", async (args) => {
-        const candidate = await db.candidate.findFirst({
+        const candidate = await db.candidate.findUnique({
           where: args.where,
           include: {
             job: {

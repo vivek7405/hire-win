@@ -44,7 +44,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     try {
       const emailTemplate = await invokeWithMiddleware(
         getEmailTemplate,
-        { where: { slug: context?.params?.slug! } },
+        {
+          where: {
+            slug: context?.params?.slug!,
+            companyId: session?.companyId || "0",
+          },
+        },
         { ...context }
       )
 

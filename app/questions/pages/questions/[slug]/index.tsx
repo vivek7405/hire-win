@@ -36,14 +36,21 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "question",
     { session },
-    { where: { slug: context?.params?.slug! } }
+    {
+      where: {
+        companyId_slug: {
+          companyId: session?.companyId || "0",
+          slug: context?.params?.slug!,
+        },
+      },
+    }
   )
 
   if (user) {
     try {
       const question = await invokeWithMiddleware(
         getQuestion,
-        { where: { slug: context?.params?.slug!, companyId: session?.companyId } },
+        { where: { slug: context?.params?.slug!, companyId: session?.companyId || "0" } },
         { ...context }
       )
 
@@ -114,10 +121,7 @@ const SingleQuestionPage = ({
           try {
             await updateQuestionMutation({
               where: {
-                companyId_slug: {
-                  companyId: session.companyId || "0",
-                  slug: question?.slug!,
-                },
+                id: question?.id,
               },
               data: { ...values },
               initial: question!,

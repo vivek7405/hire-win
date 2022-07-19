@@ -11,7 +11,7 @@ const INVITE_TOKEN_EXPIRE_IN_HOURS = 9999
 async function generateInviteToJobToken({ jobId }: GenerateTokenInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const job = await db.job.findFirst({
+  const job = await db.job.findUnique({
     where: {
       id: jobId,
     },
@@ -80,4 +80,5 @@ async function generateInviteToJobToken({ jobId }: GenerateTokenInput, ctx: Ctx)
   return generatePrivateToken
 }
 
-export default Guard.authorize("update", "job", generateInviteToJobToken)
+export default generateInviteToJobToken
+// export default Guard.authorize("update", "job", generateInviteToJobToken)

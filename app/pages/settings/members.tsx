@@ -29,7 +29,7 @@ import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
 import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon } from "@heroicons/react/outline"
 
-import { CompanyUser, CompanyUserRole, JobUserRole, User } from "db"
+import { CompanyUser, CompanyUserRole, User } from "db"
 // import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
@@ -259,7 +259,7 @@ const UserSettingsMembersPage = ({
                             m.role
                           ) : (
                             <select
-                              value={m.role}
+                              defaultValue={m.role}
                               className="border border-gray-300 px-2 py-2 block w-32 sm:text-sm rounded truncate pr-6"
                               onChange={async (e) => {
                                 const toastId = toast.loading(() => (
@@ -278,16 +278,20 @@ const UserSettingsMembersPage = ({
                                   router.reload()
                                 } catch (e) {
                                   toast.error(
-                                    "Sorry, we had an unexpected error. Please try again. - " +
-                                      e.toString()
+                                    `Sorry, we had an unexpected error. Please try again. - ${e.toString()}`,
+                                    { id: toastId }
                                   )
                                 }
                               }}
                             >
-                              {Object.values(JobUserRole)
+                              {Object.values(CompanyUserRole)
                                 .filter((m) => m !== "OWNER")
                                 .map((m, i) => {
-                                  return <option key={i}>{titleCase(m)}</option>
+                                  return (
+                                    <option key={i} value={m}>
+                                      {titleCase(m)}
+                                    </option>
+                                  )
                                 })}
                             </select>
                           )}
@@ -308,16 +312,12 @@ const UserSettingsMembersPage = ({
                                       companyId: company?.id || "0",
                                       userId: memberToDelete?.user?.id,
                                     })
-                                    toast.success(
-                                      () => <span>{memberToDelete?.user?.name} removed</span>,
-                                      {
-                                        id: toastId,
-                                      }
-                                    )
+                                    toast.success(`${memberToDelete?.user?.name} removed`, {
+                                      id: toastId,
+                                    })
                                   } catch (error) {
                                     toast.error(
-                                      "Sorry, we had an unexpected error. Please try again. - " +
-                                        error.toString(),
+                                      `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
                                       { id: toastId }
                                     )
                                   }

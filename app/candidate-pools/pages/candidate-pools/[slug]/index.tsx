@@ -51,13 +51,19 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
 
   const user = await getCurrentUserServer({ ...context })
+  const session = await getSession(context.req, context.res)
   // const session = await getSession(context.req, context.res)
 
   if (user) {
     try {
       await invokeWithMiddleware(
         getCandidatePool,
-        { where: { slug: context?.params?.slug } },
+        {
+          where: {
+            slug: context?.params?.slug!,
+            companyId: session?.companyId || "0",
+          },
+        },
         { ...context }
       )
       return { props: { user: user, slug: context?.params?.slug } }

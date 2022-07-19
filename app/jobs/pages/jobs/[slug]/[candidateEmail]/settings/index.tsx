@@ -25,6 +25,7 @@ import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, ExtendedAnswer } from "types"
 import { QuestionType } from "@prisma/client"
 import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
+import getJob from "app/jobs/queries/getJob"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -35,18 +36,29 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
+
+  const job = await invokeWithMiddleware(
+    getJob,
+    {
+      where: {
+        companyId: session.companyId || "0",
+        slug: context?.params?.slug as string,
+      },
+    },
+    { ...context }
+  )
   const { can: canUpdate } = await Guard.can(
     "update",
     "candidate",
     { session },
-    { where: { email: context?.params?.candidateEmail as string } }
-  )
-
-  const { can: isOwner } = await Guard.can(
-    "isOwner",
-    "candidate",
-    { session },
-    { where: { email: context?.params?.candidateEmail as string } }
+    {
+      where: {
+        jobId_email: {
+          jobId: job?.id,
+          email: context?.params?.candidateEmail as string,
+        },
+      },
+    }
   )
 
   if (user) {
@@ -65,7 +77,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             candidate: candidate,
             canUpdate,
-            isOwner,
           },
         }
       } else {
@@ -106,7 +117,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const CandidateSettingsPage = ({
   user,
   candidate,
-  isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()

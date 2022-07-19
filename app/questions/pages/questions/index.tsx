@@ -177,7 +177,7 @@ const Questions = () => {
             try {
               isEdit
                 ? await updateQuestionMutation({
-                    where: { id: questionToEdit.id },
+                    where: { id: questionToEdit?.id },
                     data: { ...values },
                     initial: questionToEdit,
                   })

@@ -112,4 +112,5 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
   return candidate
 }
 
-export default Guard.authorize("update", "candidate", updateCandidateScores)
+export default updateCandidateScores
+// export default Guard.authorize("update", "candidate", updateCandidateScores)

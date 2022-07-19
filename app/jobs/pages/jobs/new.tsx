@@ -5,6 +5,8 @@ import {
   GetServerSidePropsContext,
   useMutation,
   useSession,
+  getSession,
+  ErrorComponent,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import JobForm from "app/jobs/components/JobForm"
@@ -16,6 +18,7 @@ import path from "path"
 import { convertToRaw } from "draft-js"
 import { Category } from "@prisma/client"
 import moment from "moment"
+import Guard from "app/guard/ability"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -25,9 +28,22 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   path.resolve(".next/__db.js")
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
+  const session = await getSession(context.req, context.res)
 
   if (user) {
-    return { props: { user: user } }
+    const { can: canCreate } = await Guard.can("create", "job", { session }, {})
+    if (canCreate) {
+      return { props: { user: user } }
+    } else {
+      return {
+        props: {
+          error: {
+            statusCode: 401,
+            message: "You don't have permission",
+          },
+        },
+      }
+    }
   } else {
     return {
       redirect: {
@@ -39,10 +55,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const NewJob = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const NewJob = ({ user, error }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const session = useSession()
   const [createJobMutation] = useMutation(createJob)
+
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
 
   return (
     <AuthLayout title="New Job" user={user}>
