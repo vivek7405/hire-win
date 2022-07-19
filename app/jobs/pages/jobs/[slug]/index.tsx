@@ -137,12 +137,22 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         { ...context }
       )
 
+      const { can: isFreeCandidateLimitAvailable } = await Guard.can(
+        "isLimitAvailable",
+        "freeCandidate",
+        { session },
+        {
+          jobId: job?.id,
+        }
+      )
+
       return {
         props: {
           user,
           company: companyUser.company,
           canUpdate: canUpdate,
           job,
+          isFreeCandidateLimitAvailable,
         },
       }
     } catch (error) {
@@ -815,6 +825,7 @@ const SingleJobPage = ({
   job,
   error,
   canUpdate,
+  isFreeCandidateLimitAvailable,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -831,6 +842,7 @@ const SingleJobPage = ({
           job={job as any}
           error={error as any}
           canUpdate={canUpdate as any}
+          isFreeCandidateLimitAvailable={isFreeCandidateLimitAvailable}
         />
       </Suspense>
     </AuthLayout>
@@ -843,6 +855,7 @@ const SingleJobPageContent = ({
   job,
   error,
   canUpdate,
+  isFreeCandidateLimitAvailable,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [isTable, setTable] = useState(false)
   const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
@@ -1023,7 +1036,7 @@ const SingleJobPageContent = ({
         user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
       }
       onClick={(e) => {
-        if (canCreateCandidate) {
+        if (isFreeCandidateLimitAvailable) {
           // router.push(Routes.NewCandidate({ slug: job?.slug! }))
           e.preventDefault()
           setCandidateToEdit(null as any)
@@ -1110,6 +1123,15 @@ const SingleJobPageContent = ({
           }}
         />
       </Modal>
+
+      {!isFreeCandidateLimitAvailable && (
+        <div className="flex flex-col items-center text-red-600">
+          <h1 className="font-semibold">{`Free Candidate Limit Reached`}</h1>
+          <h1 className="text-sm text-justify">{`Your job listing page has been taken down. Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1>
+          {/* <h1 className="text-sm">{`Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1> */}
+          <br />
+        </div>
+      )}
 
       {/* Mobile Menu */}
       <div className="flex flex-col space-y-4 md:hidden lg:hidden">

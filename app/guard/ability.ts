@@ -27,6 +27,7 @@ type ExtendedResourceTypes =
   | "company"
   | "companyUser"
   | "jobListing"
+  | "freeCandidate"
 
 type ExtendedAbilityTypes =
   | "access"
@@ -35,6 +36,7 @@ type ExtendedAbilityTypes =
   | "isAdmin"
   | "inviteUser"
   | "cancelInterview"
+  | "isLimitAvailable"
 
 const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
   async (ctx, { can, cannot }) => {
@@ -63,6 +65,10 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       return true
     }
+
+    can("isLimitAvailable", "freeCandidate", async (args) => {
+      return isFreePlanCandidateLimitAvailable(args)
+    })
 
     can("create", "candidate", async (args) => {
       const jobId = args?.jobId
