@@ -68,7 +68,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "job",
     { session },
-    { where: { slug: context?.params?.slug as string, companyId: session.companyId || "0" } }
+    {
+      where: {
+        companyId_slug: {
+          companyId: session.companyId || "0",
+          slug: context?.params?.slug as string,
+        },
+      },
+    }
   )
 
   const { can: isOwner } = await Guard.can(
@@ -264,12 +271,10 @@ const JobSettingsMembersPage = ({
                             titleCase(m.role)
                           ) : (
                             <select
-                              value={m.role}
+                              defaultValue={m.role}
                               className="border border-gray-300 px-2 py-2 block sm:text-sm rounded w-24 truncate pr-6"
                               onChange={async (e) => {
-                                const toastId = toast.loading(() => (
-                                  <span>Updating member permission</span>
-                                ))
+                                const toastId = toast.loading("Updating member permission")
                                 try {
                                   await changePermissionMutation({
                                     where: {
@@ -279,12 +284,11 @@ const JobSettingsMembersPage = ({
                                       role: JobUserRole[e.target.value],
                                     },
                                   })
-                                  toast.success(() => <span>Member updated</span>, { id: toastId })
+                                  toast.success("Member updated", { id: toastId })
                                   router.reload()
                                 } catch (e) {
                                   toast.error(
-                                    "Sorry, we had an unexpected error. Please try again. - " +
-                                      e.toString()
+                                    `Sorry, we had an unexpected error. Please try again. - ${e.toString()}`
                                   )
                                 }
                               }}
@@ -292,7 +296,11 @@ const JobSettingsMembersPage = ({
                               {Object.values(JobUserRole)
                                 .filter((m) => m !== "OWNER")
                                 .map((m, i) => {
-                                  return <option key={i}>{titleCase(m)}</option>
+                                  return (
+                                    <option key={i} value={m}>
+                                      {titleCase(m)}
+                                    </option>
+                                  )
                                 })}
                             </select>
                           )}
@@ -305,21 +313,18 @@ const JobSettingsMembersPage = ({
                                 setOpen={setOpenConfirmDelete}
                                 header={"Delete Member?"}
                                 onSuccess={async () => {
-                                  const toastId = toast.loading(() => (
-                                    <span>Removing {m.user.email}</span>
-                                  ))
+                                  const toastId = toast.loading(`Removing ${m.user.email}`)
                                   try {
                                     await removeFromJobMutation({
                                       jobId: jobData?.id as string,
                                       userId: m.user.id,
                                     })
-                                    toast.success(() => <span>{m.user.email} removed</span>, {
+                                    toast.success(`${m.user.email} removed`, {
                                       id: toastId,
                                     })
                                   } catch (error) {
                                     toast.error(
-                                      "Sorry, we had an unexpected error. Please try again. - " +
-                                        error.toString(),
+                                      `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
                                       { id: toastId }
                                     )
                                   }

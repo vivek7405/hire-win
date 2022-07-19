@@ -30,7 +30,7 @@ import {
   Plan,
   PlanName,
 } from "types"
-import { Candidate, Category, Stage, WorkflowStage } from "@prisma/client"
+import { Candidate, Category, CompanyUserRole, Stage, WorkflowStage } from "@prisma/client"
 import moment from "moment"
 import { Country, State } from "country-state-city"
 import { titleCase } from "app/core/utils/titleCase"
@@ -95,7 +95,16 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     const currentPlan = checkPlan(companyUser.company)
     const priceId = plans?.find((plan) => plan.name === PlanName.PRO)?.priceId || "0"
 
-    return { props: { user, company: companyUser.company, canCreate, currentPlan, priceId } }
+    return {
+      props: {
+        user,
+        companyUserRole: companyUser.role,
+        company: companyUser.company,
+        canCreate,
+        currentPlan,
+        priceId,
+      },
+    }
   } else {
     return {
       redirect: {
@@ -244,8 +253,6 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
             toast.success(`Job ${viewType === JobViewType.Archived ? "Restored" : "Archived"}`, {
               id: toastId,
             })
-            setOpenJobArchiveConfirm(false)
-            setJobToArchive(null as any)
             setSelectedCategoryId(null)
             invalidateQuery(getUserJobsByViewTypeAndCategory)
             invalidateQuery(getUserJobCategoriesByViewType)
@@ -257,6 +264,8 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
               { id: toastId }
             )
           }
+          setJobToArchive(null as any)
+          setOpenJobArchiveConfirm(false)
         }}
       >
         Are you sure you want to {viewType === JobViewType.Archived ? "Restore" : "Archive"} the
@@ -360,7 +369,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                             .fromNow()}
                         </p>
                       </div>
-                      <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-center lg:justify-center space-x-4 mt-6 md:mt-0 lg:mt-0">
+                      <div className="w-full md:w-1/3 lg:w-1/5 flex items-center md:justify-end lg:justify-end space-x-4 mt-6 md:mt-0 lg:mt-0">
                         <a
                           title="Job Settings"
                           className="cursor-pointer text-theme-600 hover:text-theme-800"
@@ -381,156 +390,156 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                           <CogIcon className="h-6 w-6" />
                         </a>
 
-                        <Form
-                          noFormatting={true}
-                          onSubmit={(value) => {
-                            return value
-                          }}
-                        >
-                          <LabeledToggleSwitch
-                            name="toggleJobHidden"
-                            label="Hidden"
-                            flex={true}
-                            height={4}
-                            width={3}
-                            value={job?.hidden}
-                            defaultChecked={job?.hidden}
-                            onChange={async (switchState: boolean) => {
-                              const toastId = toast.loading(() => (
-                                <span>
-                                  <b>
-                                    {switchState ? "Hiding" : "Unhiding"} job - {job?.title} from
-                                    Job Board
-                                  </b>
-                                </span>
-                              ))
-
-                              try {
-                                await setJobHiddenMutation({
-                                  where: {
-                                    companyId_slug: {
-                                      companyId: session.companyId || "0",
-                                      slug: job?.slug!,
-                                    },
-                                  },
-                                  hidden: switchState,
-                                })
-
-                                let newArr = [...data] as any
-                                const updateIndex = newArr.findIndex((j) => j.id === job?.id)
-                                if (updateIndex >= 0 && newArr[updateIndex]) {
-                                  newArr[updateIndex].hidden = switchState
-                                  setData(newArr)
-                                }
-
-                                toast.success(
-                                  () => (
+                        {job.canUpdate && (
+                          <>
+                            <Form
+                              noFormatting={true}
+                              onSubmit={(value) => {
+                                return value
+                              }}
+                            >
+                              <LabeledToggleSwitch
+                                name="toggleJobHidden"
+                                label="Hidden"
+                                flex={true}
+                                height={4}
+                                width={3}
+                                value={job?.hidden}
+                                defaultChecked={job?.hidden}
+                                onChange={async (switchState: boolean) => {
+                                  const toastId = toast.loading(() => (
                                     <span>
                                       <b>
-                                        {job?.title} job {switchState ? "hidden" : "unhidden"}{" "}
-                                        successfully
+                                        {switchState ? "Hiding" : "Unhiding"} job - {job?.title}{" "}
+                                        from Job Board
                                       </b>
                                     </span>
-                                  ),
-                                  { id: toastId }
-                                )
-                              } catch (error) {
-                                toast.error(
-                                  "Sorry, we had an unexpected error. Please try again. - " +
-                                    error.toString(),
-                                  {
-                                    id: toastId,
+                                  ))
+
+                                  try {
+                                    await setJobHiddenMutation({
+                                      where: {
+                                        id: job?.id,
+                                      },
+                                      hidden: switchState,
+                                    })
+
+                                    let newArr = [...data] as any
+                                    const updateIndex = newArr.findIndex((j) => j.id === job?.id)
+                                    if (updateIndex >= 0 && newArr[updateIndex]) {
+                                      newArr[updateIndex].hidden = switchState
+                                      setData(newArr)
+                                    }
+
+                                    toast.success(
+                                      () => (
+                                        <span>
+                                          <b>
+                                            {job?.title} job {switchState ? "hidden" : "unhidden"}{" "}
+                                            successfully
+                                          </b>
+                                        </span>
+                                      ),
+                                      { id: toastId }
+                                    )
+                                  } catch (error) {
+                                    toast.error(
+                                      "Sorry, we had an unexpected error. Please try again. - " +
+                                        error.toString(),
+                                      {
+                                        id: toastId,
+                                      }
+                                    )
                                   }
-                                )
-                              }
-                            }}
-                          />
-                        </Form>
+                                }}
+                              />
+                            </Form>
 
-                        <Form
-                          noFormatting={true}
-                          onSubmit={(value) => {
-                            return value
-                          }}
-                        >
-                          <LabeledToggleSwitch
-                            name="toggleJobSalaryVisibility"
-                            label="Salary"
-                            flex={true}
-                            height={4}
-                            width={3}
-                            value={job?.showSalary}
-                            defaultChecked={job?.showSalary}
-                            onChange={async (switchState: boolean) => {
-                              const toastId = toast.loading(() => (
-                                <span>
-                                  <b>
-                                    {switchState ? "Showing" : "Hiding"} salary - {job?.showSalary}{" "}
-                                    {switchState ? "on" : "from"}
-                                    Job Board
-                                  </b>
-                                </span>
-                              ))
-
-                              try {
-                                await setJobSalaryVisibilityMutation({
-                                  where: {
-                                    companyId_slug: {
-                                      companyId: session.companyId || "0",
-                                      slug: job?.slug!,
-                                    },
-                                  },
-                                  showSalary: switchState,
-                                })
-
-                                let newArr = [...data] as any
-                                const updateIndex = newArr.findIndex((j) => j.id === job?.id)
-                                if (updateIndex >= 0 && newArr[updateIndex]) {
-                                  newArr[updateIndex].showSalary = switchState
-                                  setData(newArr)
-                                }
-
-                                toast.success(
-                                  () => (
+                            <Form
+                              noFormatting={true}
+                              onSubmit={(value) => {
+                                return value
+                              }}
+                            >
+                              <LabeledToggleSwitch
+                                name="toggleJobSalaryVisibility"
+                                label="Salary"
+                                flex={true}
+                                height={4}
+                                width={3}
+                                value={job?.showSalary}
+                                defaultChecked={job?.showSalary}
+                                onChange={async (switchState: boolean) => {
+                                  const toastId = toast.loading(() => (
                                     <span>
                                       <b>
-                                        Salary for {job?.title} job{" "}
-                                        {switchState ? "shown" : "hidden"} successfully
+                                        {switchState ? "Showing" : "Hiding"} salary -{" "}
+                                        {job?.showSalary} {switchState ? "on" : "from"}
+                                        Job Board
                                       </b>
                                     </span>
-                                  ),
-                                  { id: toastId }
-                                )
-                              } catch (error) {
-                                toast.error(
-                                  "Sorry, we had an unexpected error. Please try again. - " +
-                                    error.toString(),
-                                  {
-                                    id: toastId,
-                                  }
-                                )
-                              }
-                            }}
-                          />
-                        </Form>
+                                  ))
 
-                        <button
-                          id={"archive-" + job?.id}
-                          className="float-right text-red-600 hover:text-red-800"
-                          title={viewType === JobViewType.Archived ? "Restore Job" : "Archive Job"}
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            setJobToArchive(job)
-                            setOpenJobArchiveConfirm(true)
-                          }}
-                        >
-                          {viewType === JobViewType.Archived ? (
-                            <RefreshIcon className="w-6 h-6" />
-                          ) : (
-                            <ArchiveIcon className="w-6 h-6" />
-                          )}
-                        </button>
+                                  try {
+                                    await setJobSalaryVisibilityMutation({
+                                      where: {
+                                        id: job?.id,
+                                      },
+                                      showSalary: switchState,
+                                    })
+
+                                    let newArr = [...data] as any
+                                    const updateIndex = newArr.findIndex((j) => j.id === job?.id)
+                                    if (updateIndex >= 0 && newArr[updateIndex]) {
+                                      newArr[updateIndex].showSalary = switchState
+                                      setData(newArr)
+                                    }
+
+                                    toast.success(
+                                      () => (
+                                        <span>
+                                          <b>
+                                            Salary for {job?.title} job{" "}
+                                            {switchState ? "shown" : "hidden"} successfully
+                                          </b>
+                                        </span>
+                                      ),
+                                      { id: toastId }
+                                    )
+                                  } catch (error) {
+                                    toast.error(
+                                      "Sorry, we had an unexpected error. Please try again. - " +
+                                        error.toString(),
+                                      {
+                                        id: toastId,
+                                      }
+                                    )
+                                  }
+                                }}
+                              />
+                            </Form>
+
+                            <button
+                              id={"archive-" + job?.id}
+                              className="float-right text-red-600 hover:text-red-800"
+                              title={
+                                viewType === JobViewType.Archived ? "Restore Job" : "Archive Job"
+                              }
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setJobToArchive(job)
+                                setOpenJobArchiveConfirm(true)
+                              }}
+                            >
+                              {viewType === JobViewType.Archived ? (
+                                <RefreshIcon className="w-6 h-6" />
+                              ) : (
+                                <ArchiveIcon className="w-6 h-6" />
+                              )}
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -619,6 +628,7 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
 const JobsHome = ({
   user,
+  companyUserRole,
   company,
   canCreate,
   currentPlan,
@@ -714,6 +724,10 @@ const JobsHome = ({
     </Link>
   )
 
+  const [hideConfirmButton, setHideConfirmButton] = useState(false)
+  const [cancelButtonText, setCancelButtonText] = useState("Cancel")
+  const [confirmHeader, setConfirmHeader] = useState("Upgrade to the Pro Plan?")
+
   const newJobButton = (
     <button
       className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
@@ -722,9 +736,26 @@ const JobsHome = ({
         if (canCreate) {
           return router.push(Routes.NewJob())
         } else {
-          setConfirmMessage(
-            "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
-          )
+          if (companyUserRole === CompanyUserRole.USER) {
+            setConfirmHeader("No Permission")
+            setConfirmMessage("You need admin rights for creating a job")
+            setCancelButtonText("Ok")
+            setHideConfirmButton(true)
+          } else {
+            if (!currentPlan) {
+              setConfirmHeader("Upgrade to the Pro Plan?")
+              setConfirmMessage(
+                "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+              )
+              setCancelButtonText("Cancel")
+              setHideConfirmButton(false)
+            } else {
+              setConfirmHeader("No Permission")
+              setConfirmMessage("You don't have the permission to create a job")
+              setCancelButtonText("Ok")
+              setHideConfirmButton(true)
+            }
+          }
           setOpenConfirm(true)
         }
       }}
@@ -738,10 +769,12 @@ const JobsHome = ({
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
-        header="Upgrade to the Pro Plan?"
+        header={confirmHeader}
         onSuccess={async () => {
           router.push(Routes.UserSettingsBillingPage())
         }}
+        hideConfirm={hideConfirmButton}
+        cancelText={cancelButtonText}
       >
         {confirmMessage}
       </Confirm>

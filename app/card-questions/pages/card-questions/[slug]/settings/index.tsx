@@ -36,7 +36,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "cardQuestion",
     { session },
-    { where: { slug: context?.params?.slug! } }
+    {
+      where: {
+        companyId_slug: {
+          companyId: session.companyId || "0",
+          slug: context?.params?.slug!,
+        },
+      },
+    }
   )
 
   if (user) {
@@ -118,10 +125,7 @@ const CardQuestionSettingsPage = ({
           try {
             await updateCardQuestionMutation({
               where: {
-                companyId_slug: {
-                  companyId: session.companyId || "0",
-                  slug: cardQuestion?.slug!,
-                },
+                id: cardQuestion?.id,
               },
               data: { ...values },
               initial: cardQuestion!,

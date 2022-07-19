@@ -127,10 +127,7 @@ const ScoreCardSettingsPage = ({
           try {
             await updateScoreCardMutation({
               where: {
-                companyId_slug: {
-                  companyId: session.companyId || "0",
-                  slug: scoreCard?.slug!,
-                },
+                id: scoreCard?.id,
               },
               data: { ...values },
               initial: scoreCard!,

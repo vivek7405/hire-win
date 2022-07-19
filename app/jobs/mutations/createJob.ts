@@ -4,7 +4,7 @@ import slugify from "slugify"
 import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { JobUserRole, ScoreCard } from "@prisma/client"
+import { CompanyUserRole, JobUserRole, ScoreCard } from "@prisma/client"
 import moment from "moment"
 
 async function createJob(data: JobInputType, ctx: Ctx) {
@@ -124,6 +124,32 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       createdById: ctx.session.userId || "0",
     },
   })
+
+  const jobCreatedByCompanyUser = await db.companyUser.findFirst({
+    where: {
+      companyId: ctx.session.companyId || "0",
+      userId: ctx.session.userId || "0",
+    },
+  })
+  // if job creator is not the company owner, assign the job to them as well
+  if (job && jobCreatedByCompanyUser && jobCreatedByCompanyUser.role !== CompanyUserRole.OWNER) {
+    // Assign the job to company owner as well
+    const companyUserOwner = await db.companyUser.findFirst({
+      where: {
+        companyId: jobCreatedByCompanyUser?.companyId,
+        role: CompanyUserRole.OWNER,
+      },
+    })
+    if (companyUserOwner) {
+      await db.jobUser.create({
+        data: {
+          jobId: job.id,
+          userId: companyUserOwner.userId,
+          role: JobUserRole.ADMIN,
+        },
+      })
+    }
+  }
 
   return job
 }

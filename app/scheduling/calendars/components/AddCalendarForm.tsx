@@ -25,19 +25,19 @@ const AddCalendarForm = (props: AddCalendarProps) => {
         header="New Calendar"
         subHeader="Connect & add a new calendar"
         submitText="Submit"
+        submitDisabled={calendarType !== "caldav"}
         onSubmit={async (e) => {
           e.preventDefault()
 
           const form = new FormData(e.currentTarget)
 
-          const type = form.get("type") as string
+          // const type = form.get("type") as string
           const name = form.get("name") as string
           const url = form.get("url") as string
           const username = form.get("username") as string
           const password = form.get("password") as string
 
           const parseResult = AddCalendarInput.safeParse({
-            type,
             url,
             name,
             password,
@@ -55,7 +55,7 @@ const AddCalendarForm = (props: AddCalendarProps) => {
             // CaldavDigest may be changed to CaldavBasic depending on
             // which auth worked while trying to connect
             // Refer to the mutation logic for more details
-            type: type === "google" ? "GoogleCalendar" : "CaldavDigest",
+            type: "CaldavDigest",
             url,
             username,
           })
@@ -92,7 +92,7 @@ const AddCalendarForm = (props: AddCalendarProps) => {
           options={[
             { label: "Google Calendar", value: "google" },
             { label: "Microsoft Outlook", value: "outlook" },
-            { label: "CalDav", value: "caldav" },
+            // { label: "CalDav", value: "caldav" },
           ]}
           onChange={(value) => {
             setCalendarType(value as any)

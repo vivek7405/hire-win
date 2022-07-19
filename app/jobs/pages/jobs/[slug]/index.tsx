@@ -109,7 +109,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "job",
     { session },
-    { where: { slug: context?.params?.slug as string, companyId: session.companyId || "0" } }
+    {
+      where: {
+        companyId_slug: {
+          companyId: session.companyId || "0",
+          slug: context?.params?.slug as string,
+        },
+      },
+    }
   )
 
   // const company = await invokeWithMiddleware(

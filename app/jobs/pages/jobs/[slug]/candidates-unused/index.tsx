@@ -43,7 +43,14 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     "update",
     "job",
     { session },
-    { where: { slug: context?.params?.slug as string } }
+    {
+      where: {
+        companyId_slug: {
+          companyId: session.companyId || "0",
+          slug: context?.params?.slug as string,
+        },
+      },
+    }
   )
 
   if (user) {
