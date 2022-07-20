@@ -87,6 +87,7 @@ import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialV
 import updateCandidate from "app/candidates/mutations/updateCandidate"
 import Card from "app/core/components/Card"
 import getJob from "app/jobs/queries/getJob"
+import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswerForDisplay"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -108,6 +109,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     },
     { ...context }
   )
+
   const { can: canUpdate } = await Guard.can(
     "update",
     "candidate",
@@ -124,21 +126,33 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   if (user) {
     try {
-      // const candidate = await invokeWithMiddleware(
-      //   getCandidate,
-      //   {
-      //     where: { email: context?.params?.candidateEmail as string },
-      //   },
-      //   { ...context }
-      // )
-
-      return {
-        props: {
-          user: user,
-          canUpdate: canUpdate,
-          candidateEmail: context?.params?.email as string,
-          // candidate: candidate,
+      const candidate = await invokeWithMiddleware(
+        getCandidate,
+        {
+          where: { email: context?.params?.candidateEmail as string, jobId: job?.id },
         },
+        { ...context }
+      )
+
+      if (candidate) {
+        return {
+          props: {
+            user: user,
+            canUpdate: canUpdate,
+            candidateEmail: candidate?.email as string,
+            jobId: candidate?.jobId,
+            // candidate: candidate,
+          },
+        }
+      } else {
+        return {
+          props: {
+            error: {
+              statusCode: 404,
+              message: "Candidate not found",
+            },
+          },
+        }
       }
     } catch (error) {
       if (error instanceof AuthorizationError) {
@@ -197,65 +211,12 @@ const getResume = async (resume) => {
   }
 }
 
-const getAnswer = (formQuestion: ExtendedFormQuestion, candidate: ExtendedCandidate) => {
-  const answer: ExtendedAnswer = candidate?.answers?.find(
-    (ans) => ans.question?.name === formQuestion?.question?.name
-  )!
-
-  if (answer) {
-    const val = answer.value
-    const type = answer?.question?.type
-
-    switch (type) {
-      case QuestionType.URL:
-        return (
-          <a
-            href={val}
-            className="text-theme-600 hover:text-theme-500"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {val}
-          </a>
-        )
-      case QuestionType.Multiple_select:
-        const answerSelectedOptionIds: String[] = JSON.parse(val)
-        const selectedOptions = answer?.question?.options
-          ?.filter((op) => answerSelectedOptionIds?.includes(op.id))
-          ?.map((op) => {
-            return op.text
-          })
-        return JSON.stringify(selectedOptions)
-      case QuestionType.Single_select:
-        return answer?.question?.options?.find((op) => val === op.id)?.text
-      case QuestionType.Attachment:
-        const attachmentObj: AttachmentObject = JSON.parse(val)
-        return attachmentObj && attachmentObj?.Key?.trim() !== "" ? (
-          <a
-            href={attachmentObj.Location}
-            className="text-theme-600 hover:text-theme-500"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {attachmentObj.Key}
-          </a>
-        ) : null
-      case QuestionType.Long_text:
-        return <p className="max-w-md overflow-auto">{val}</p>
-      default:
-        return val
-    }
-  }
-
-  return ""
-}
-
 const getCards = (candidate: ExtendedCandidate) => {
   return (
     candidate?.job?.form?.questions
       // ?.filter((q) => !q.question.factory)
       ?.map((fq) => {
-        const answer = getAnswer(fq, candidate)
+        const answer = getCandidateAnswerForDisplay(fq, candidate)
         return {
           id: fq.id,
           title: fq.question.name,
@@ -310,6 +271,7 @@ const SingleCandidatePage = ({
   error,
   canUpdate,
   candidateEmail,
+  jobId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -325,6 +287,7 @@ const SingleCandidatePage = ({
           error={error as any}
           canUpdate={canUpdate as any}
           candidateEmail={candidateEmail as any}
+          jobId={jobId}
         />
       </Suspense>
     </AuthLayout>
@@ -336,6 +299,7 @@ const SingleCandidatePageContent = ({
   error,
   canUpdate,
   candidateEmail,
+  jobId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   enum CandidateToggleView {
     Scores = "Scores",
@@ -346,7 +310,7 @@ const SingleCandidatePageContent = ({
 
   // const { user, error, canUpdate } = props
   // const [candidate, setCandidate] = useState(props.candidate)
-  const [candidate] = useQuery(getCandidate, { where: { email: candidateEmail as string } })
+  const [candidate] = useQuery(getCandidate, { where: { email: candidateEmail, jobId } })
   const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
   // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
@@ -366,10 +330,10 @@ const SingleCandidatePageContent = ({
   }, [candidate?.workflowStage])
 
   const [file, setFile] = useState(null as any)
-  const [cards, setCards] = useState(getCards(candidate!))
-  useEffect(() => {
-    setCards(getCards(candidate!))
-  }, [candidate])
+  // const [cards, setCards] = useState(getCards(candidate!))
+  // useEffect(() => {
+  //   setCards(getCards(candidate!))
+  // }, [candidate])
 
   const router = useRouter()
   const session = useSession()
@@ -961,11 +925,11 @@ const SingleCandidatePageContent = ({
               </div>
               <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
                 {candidate?.job?.form?.questions?.map((fq) => {
-                  const answer = getAnswer(fq, candidate)
-                  if (fq?.question?.name === "Resume") {
-                    console.log("RESUME RESUME RESUME")
-                    console.log(answer)
-                  }
+                  const answer = getCandidateAnswerForDisplay(fq, candidate)
+                  // if (fq?.question?.name === "Resume") {
+                  //   console.log("RESUME RESUME RESUME")
+                  //   console.log(answer)
+                  // }
 
                   return (
                     <Card key={fq.id}>

@@ -73,6 +73,7 @@ import Modal from "app/core/components/Modal"
 import ApplicationForm from "app/candidates/components/ApplicationForm"
 import createCandidate from "app/candidates/mutations/createCandidate"
 import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
+import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswerForDisplay"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -399,56 +400,7 @@ const Candidates = (props: CandidateProps) => {
     return {
       Header: formQuestion?.question?.name,
       Cell: (props) => {
-        const answer: ExtendedAnswer = props.cell.row.original?.answers?.find(
-          (ans) => ans.question?.name === formQuestion?.question?.name
-        )
-
-        if (answer) {
-          const val = answer.value
-          const type = answer?.question?.type
-
-          switch (type) {
-            case QuestionType.URL:
-              return (
-                <a
-                  href={val}
-                  className="text-theme-600 hover:text-theme-500"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {val}
-                </a>
-              )
-            case QuestionType.Multiple_select:
-              const answerSelectedOptionIds: String[] = JSON.parse(val)
-              const selectedOptions = answer?.question?.options
-                ?.filter((op) => answerSelectedOptionIds?.includes(op.id))
-                ?.map((op) => {
-                  return op.text
-                })
-              return JSON.stringify(selectedOptions)
-            case QuestionType.Single_select:
-              return answer?.question?.options?.find((op) => val === op.id)?.text
-            case QuestionType.Attachment:
-              const attachmentObj: AttachmentObject = JSON.parse(val)
-              return (
-                <a
-                  href={attachmentObj.Location}
-                  className="text-theme-600 hover:text-theme-500"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {attachmentObj.Key}
-                </a>
-              )
-            case QuestionType.Long_text:
-              return <p className="max-w-md overflow-auto">{val}</p>
-            default:
-              return val
-          }
-        }
-
-        return ""
+        return getCandidateAnswerForDisplay(formQuestion, props.cell.row.original)
       },
     }
   }
