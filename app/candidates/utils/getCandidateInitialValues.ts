@@ -13,7 +13,7 @@ function getCandidateInitialValues(
 
       switch (type) {
         case QuestionType.Multiple_select:
-          const selectedOptionIds: String[] = JSON.parse(val)
+          const selectedOptionIds: String[] = JSON.parse(val || "[]")
           initialValues[answer?.question?.name] = selectedOptionIds
           break
         case QuestionType.Attachment:
