@@ -201,7 +201,7 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
                       //   </a>
                       // </Link>
                       <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800"
+                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setQuestionToEdit(fq.question)

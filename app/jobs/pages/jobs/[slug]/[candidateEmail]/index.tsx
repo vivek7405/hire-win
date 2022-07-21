@@ -461,8 +461,15 @@ const SingleCandidatePageContent = ({
   }
 
   const candidateNameHeader = (
-    <h3 className={`font-bold text-5xl ${candidate?.rejected ? "text-red-600" : "text-theme-600"}`}>
-      {candidate?.name}
+    <h3
+      className={`font-bold text-5xl ${
+        candidate?.rejected ? "text-red-600" : "text-theme-600"
+      } capitalize`}
+    >
+      {/* Used regular expression for getting the first word */}
+      {candidate?.name?.replace(/ .*/, "")?.length > 10
+        ? `${candidate?.name?.replace(/ .*/, "")?.substring(0, 10)}...`
+        : candidate?.name?.replace(/ .*/, "")}
     </h3>
   )
 
@@ -842,6 +849,9 @@ const SingleCandidatePageContent = ({
       <div className="flex flex-col space-y-4 mb-2 md:hidden lg:hidden">
         <div className="flex flex-nowrap items-center justify-center space-x-4">
           {candidateNameHeader}
+        </div>
+
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
           {candidateRatingDiv}
         </div>
 
@@ -867,17 +877,17 @@ const SingleCandidatePageContent = ({
       </div>
 
       {/* Tablet Menu */}
-      <div className="hidden md:flex md:flex-col lg:hidden">
+      <div className="hidden md:flex md:flex-col lg:hidden space-y-6 mb-3">
         <div className="flex flex-nowrap items-center justify-center space-x-4">
           {candidateNameHeader}
           {candidateRatingDiv}
         </div>
 
-        <div className="flex flex-nowrap items-center justify-center space-x-4 my-4">
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
           {candidateStageAndInterviewerDiv}
         </div>
 
-        <div className="flex flex-nowrap items-center justify-center space-x-4 my-4">
+        <div className="flex flex-nowrap items-center justify-center space-x-4">
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
           <MoveToNextStageButton
