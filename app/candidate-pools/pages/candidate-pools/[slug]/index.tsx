@@ -41,6 +41,7 @@ import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import Pagination from "app/core/components/Pagination"
+import Breadcrumbs from "app/core/components/Breadcrumbs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -284,6 +285,8 @@ const SingleCandidatePoolPage = ({
   }
   return (
     <AuthLayout title="CandidatePoolsHome | hire-win" user={user}>
+      <Breadcrumbs />
+      <br />
       <Suspense fallback="Loading...">
         <Candidates slug={slug} />
       </Suspense>
