@@ -391,7 +391,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
                 <div className="font-bold flex justify-between">
                   {ws.stage.allowEdit ? (
                     <a
-                      className="cursor-pointer text-theme-600 hover:text-theme-800"
+                      className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                       onClick={(e) => {
                         e.preventDefault()
                         setStageToEdit(ws.stage)

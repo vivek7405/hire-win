@@ -248,7 +248,7 @@ const Calendars = ({ user }: CalendarProps) => {
                           setCalendarToUpdateName(cal as any)
                           setOpenNameUpdateModal(true)
                         }}
-                        className="truncate"
+                        className="pr-6 md:px-6 lg:px-6 truncate"
                       >
                         <span className="cursor-pointer text-theme-600 font-bold hover:text-theme-800">
                           {cal.name}

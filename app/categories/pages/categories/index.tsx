@@ -197,7 +197,7 @@ const Categories = () => {
                   <div className="w-full relative">
                     <div className="font-bold flex md:justify-center lg:justify:center items-center">
                       <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800 truncate"
+                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setCategoryToEdit(c)

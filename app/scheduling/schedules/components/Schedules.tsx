@@ -246,7 +246,7 @@ const Schedules = ({ user }) => {
               <div className="w-full relative">
                 <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
                   <a
-                    className="cursor-pointer text-theme-600 hover:text-theme-800"
+                    className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
                     onClick={() => {
                       setScheduleToEdit(s)
                       setOpenAddSchedule(true)

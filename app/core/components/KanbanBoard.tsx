@@ -155,10 +155,7 @@ const KanbanBoard = ({
 
       <div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <div
-            // className='react-kanban-board'
-            className="overflow-y-hidden flex items-start p-1"
-          >
+          <div className="overflow-y-hidden flex items-start p-1">
             <DroppableBoard droppableId="board-droppable" direction="horizontal" type="BOARD">
               {board?.columns?.map((column, index) => {
                 return (
@@ -182,15 +179,13 @@ const KanbanBoard = ({
                             minHeight: "28px",
                             ...columnProvided.draggableProps.style,
                           }}
-                          // className='react-kanban-column'
                           className="p-4 bg-neutral-100 border-2 border-gray-300 rounded m-2 focus:outline-none h-full inline-block align-top"
                         >
                           <div {...columnProvided.dragHandleProps}>
-                            <h1
-                              // className="react-kanban-column-header"
-                              className="pb-2.5 font-bold focus:outline-none"
-                            >
-                              {column.title}
+                            <h1 className="pb-2.5 font-bold focus:outline-none">
+                              {column.title?.length > 25
+                                ? `${column.title?.substring(0, 25)}...`
+                                : column.title}
                             </h1>
                           </div>
                           <DroppableColumn key={column.id} droppableId={column.id}>
@@ -211,7 +206,6 @@ const KanbanBoard = ({
                                       >
                                         <div className="inline-block whitespace-normal">
                                           <div
-                                            // className={`react-kanban-card ${isDragging ? 'react-kanban-card--dragging' : ''}`}
                                             className={`box-border w-60 rounded bg-white border-2 border-gray-200 p-2.5 mb-2 ${
                                               isDragging ? "shadow-md" : ""
                                             }`}
@@ -219,19 +213,11 @@ const KanbanBoard = ({
                                             {!card.renderContent ? (
                                               <div>
                                                 <span>
-                                                  <div
-                                                    // className='react-kanban-card__title'
-                                                    className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between"
-                                                  >
+                                                  <div className="border-b-2 border-gray-50 pb-1 font-bold flex justify-between">
                                                     <span>{card.title}</span>
                                                   </div>
                                                 </span>
-                                                <div
-                                                  // className='react-kanban-card__description'
-                                                  className="pt-2.5"
-                                                >
-                                                  {card.description}
-                                                </div>
+                                                <div className="pt-2.5">{card.description}</div>
                                               </div>
                                             ) : (
                                               <div>{card.renderContent}</div>
@@ -254,7 +240,6 @@ const KanbanBoard = ({
                 )
               })}
             </DroppableBoard>
-            {/* {renderColumnAdder()} */}
           </div>
         </DragDropContext>
       </div>

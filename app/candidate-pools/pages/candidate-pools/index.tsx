@@ -200,7 +200,7 @@ const CandidatePools = ({ user }) => {
                         href={Routes.SingleCandidatePoolPage({ slug: cp.slug })}
                         passHref
                       >
-                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 truncate">
+                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 pr-12 md:px-12 lg:px-12 truncate">
                           {cp.name}
                         </a>
                       </Link>
@@ -220,7 +220,7 @@ const CandidatePools = ({ user }) => {
                         <TrashIcon className="w-5 h-5" />
                       </button>
                     </div>
-                    <div className="absolute top-0.5 right-4">
+                    <div className="absolute top-0.5 right-5">
                       <button
                         id={"edit-" + cp.id}
                         className="float-right text-indigo-600 hover:text-indigo-800"

@@ -225,7 +225,7 @@ export const Candidates = ({ slug }) => {
                         })}
                         passHref
                       >
-                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 truncate">
+                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate">
                           {candidate.name}
                         </a>
                       </Link>

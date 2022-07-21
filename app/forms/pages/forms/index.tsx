@@ -198,7 +198,7 @@ const Forms = () => {
                       <Link prefetch={true} href={Routes.SingleFormPage({ slug: w.slug })} passHref>
                         <a
                           data-testid={`categorylink`}
-                          className="text-theme-600 hover:text-theme-800"
+                          className="text-theme-600 hover:text-theme-800 pr-12 md:px-12 lg:px-12 truncate"
                         >
                           {w.name}
                         </a>
