@@ -23,7 +23,8 @@ type NavbarProps = {
 
 const NavbarContent = ({ user }: NavbarProps) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [companyOpen, setCompanyOpen] = useState(false)
+  const [companyOpenDesktop, setCompanyOpenDesktop] = useState(false)
+  const [companyOpenMobileAndTablet, setCompanyOpenMobileAndTablet] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const router = useRouter()
   const session = useSession()
@@ -147,6 +148,54 @@ const NavbarContent = ({ user }: NavbarProps) => {
 
   const [updateCompanySessionMutation] = useMutation(updateCompanySession)
 
+  const CompanySelectDropdown = ({ companyOpen, setCompanyOpen }) => (
+    <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
+      <DropdownMenu.Trigger className="mr-6 bg-theme-700 flex items-center text-sm text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
+        <div
+          title={selectedCompanyUser?.company?.name}
+          className="w-24 p-1 text-white font-semibold truncate"
+        >
+          {selectedCompanyUser?.company?.name}
+        </div>
+      </DropdownMenu.Trigger>
+
+      <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
+        <DropdownMenu.Arrow className="fill-current" offset={10} />
+        <DropdownMenu.RadioGroup
+          value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
+          onValueChange={async (companyId) => {
+            const cu = companyUsers?.find(
+              (cu) => cu.userId === user?.id && cu.companyId === companyId
+            )
+            setSelectedCompanyUser(cu!)
+            await updateCompanySessionMutation(companyId || "0")
+            router.pathname === Routes.JobsHome().pathname
+              ? router.reload()
+              : router.push(Routes.JobsHome())
+          }}
+        >
+          {companyUsers?.map((cu) => {
+            return (
+              <div key={cu.companyId}>
+                <DropdownMenu.RadioItem
+                  value={cu.company?.id?.toString()}
+                  className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
+                >
+                  <DropdownMenu.ItemIndicator className="flex items-center">
+                    <CheckIcon className="w-4 h-4 absolute left-2" />
+                  </DropdownMenu.ItemIndicator>
+                  <p className="ml-2">
+                    {cu.company?.name} (<span className="lowercase">{cu.role}</span>)
+                  </p>
+                </DropdownMenu.RadioItem>
+              </div>
+            )
+          })}
+        </DropdownMenu.RadioGroup>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  )
+
   return (
     <>
       <Confirm
@@ -191,70 +240,10 @@ const NavbarContent = ({ user }: NavbarProps) => {
                 </div>
 
                 <div className="flex">
-                  <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
-                    <DropdownMenu.Trigger className="mr-6 bg-theme-700 flex items-center text-sm text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
-                      <div
-                        title={selectedCompanyUser?.company?.name}
-                        className="w-24 p-1 text-white font-semibold truncate"
-                      >
-                        {selectedCompanyUser?.company?.name}
-                      </div>
-                    </DropdownMenu.Trigger>
-
-                    <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-                      <DropdownMenu.Arrow className="fill-current" offset={10} />
-                      <DropdownMenu.RadioGroup
-                        value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
-                        onValueChange={async (companyId) => {
-                          const cu = companyUsers?.find(
-                            (cu) => cu.userId === user?.id && cu.companyId === companyId
-                          )
-                          setSelectedCompanyUser(cu!)
-                          await updateCompanySessionMutation(companyId || "0")
-                          router.pathname === Routes.JobsHome().pathname
-                            ? router.reload()
-                            : router.push(Routes.JobsHome())
-                        }}
-                      >
-                        {companyUsers?.map((cu) => {
-                          return (
-                            <div key={cu.companyId}>
-                              <DropdownMenu.RadioItem
-                                value={cu.company?.id?.toString()}
-                                className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
-                              >
-                                <DropdownMenu.ItemIndicator className="flex items-center">
-                                  <CheckIcon className="w-4 h-4 absolute left-2" />
-                                </DropdownMenu.ItemIndicator>
-                                <p className="ml-2">
-                                  {cu.company?.name} (<span className="lowercase">{cu.role}</span>)
-                                </p>
-                              </DropdownMenu.RadioItem>
-                            </div>
-                          )
-                        })}
-                      </DropdownMenu.RadioGroup>
-                    </DropdownMenu.Content>
-
-                    {/* <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-                <DropdownMenu.Arrow className="fill-current" offset={10} />
-                {companyUsers.map((companyUser, i) => {
-                  return (
-                    <DropdownMenu.Item
-                      key={i}
-                      data-testid={`${companyUser?.company?.name}-navLink`}
-                      onSelect={(e) => {
-                        e.preventDefault()
-                        // item.href.length ? router.push(item.href) : item.action!()
-                      }}
-                      className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
-                    >
-                      {companyUser?.company?.name}
-                    </DropdownMenu.Item>
-                  )
-                })}
-              </DropdownMenu.Content> */}
-                  </DropdownMenu.Root>
+                  <CompanySelectDropdown
+                    companyOpen={companyOpenDesktop}
+                    setCompanyOpen={setCompanyOpenDesktop}
+                  />
 
                   <DropdownMenu.Root modal={false} open={profileOpen} onOpenChange={setProfileOpen}>
                     <DropdownMenu.Trigger className="bg-theme-700 flex text-sm rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
@@ -298,6 +287,13 @@ const NavbarContent = ({ user }: NavbarProps) => {
                     </DropdownMenu.Content>
                   </DropdownMenu.Root>
                 </div>
+              </div>
+
+              <div className="flex lg:hidden items-center">
+                <CompanySelectDropdown
+                  companyOpen={companyOpenMobileAndTablet}
+                  setCompanyOpen={setCompanyOpenMobileAndTablet}
+                />
               </div>
 
               <div className="flex lg:hidden items-center">
