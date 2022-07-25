@@ -1,6 +1,7 @@
 import { Plan } from "types"
 import { Company, User } from "db"
-import { plans } from "app/core/utils/plans"
+import allPlans from "app/settings/plans/utils/allPlans"
+// import { plans } from "app/core/utils/plans"
 
 export const checkPlan = (company: Company | null): Plan | null => {
   if (
@@ -11,7 +12,7 @@ export const checkPlan = (company: Company | null): Plan | null => {
   ) {
     return null
   } else {
-    const plan = plans.find((plan) => plan.priceId === company.stripePriceId)
+    const plan = allPlans.find((plan) => plan.priceId === company.stripePriceId)
     return plan || null
   }
 }

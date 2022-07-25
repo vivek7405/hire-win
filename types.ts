@@ -2,6 +2,16 @@ import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
 import { Calendar, DailySchedule, Prisma, Schedule, UserRole } from "@prisma/client"
 
+export enum Currency {
+  INR = "INR",
+  USD = "USD",
+  CAD = "CAD",
+  AUD = "AUD",
+  GBP = "GBP",
+  EUR = "EUR",
+  AED = "AED",
+}
+
 export enum PlanName {
   PRO,
 }
@@ -20,14 +30,22 @@ export enum EmailTemplatePlaceholders {
   Interviewer_Name = "Interviewer_Name",
 }
 
+export enum PlanFrequency {
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY",
+}
+
 export type Plan = {
   name: PlanName
   priceId: string
   title: string
-  price: number
-  frequency: string
-  description: string
-  features: string[]
+  pricePerMonth: number
+  pricePerYear: number
+  // price: number
+  frequency: PlanFrequency
+  currencySymbol: string
+  // description: string
+  // features: string[]
 }
 
 export type FormStep = {

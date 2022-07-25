@@ -9,6 +9,7 @@ import {
   invokeWithMiddleware,
   useQuery,
   ErrorComponent,
+  invalidateQuery,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -22,15 +23,21 @@ import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/themeHelpers"
 import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
 import SubscribeButton from "app/users/components/SubscribeButton"
-import { Plan } from "types"
-import { CheckIcon } from "@heroicons/react/outline"
+import { Currency, Plan, PlanFrequency } from "types"
+import { CheckIcon, CurrencyEuroIcon } from "@heroicons/react/outline"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
 import { checkPlan } from "app/users/utils/checkPlan"
-import { plans } from "app/core/utils/plans"
+// import { plans } from "app/core/utils/plans"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import { CompanyUserRole } from "db"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
+import getPlans from "app/settings/plans/queries/getPlans"
+import LocaleCurrency from "locale-currency"
+import Form from "app/core/components/Form"
+import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
+import { useEffect, useState } from "react"
+import proPlanFeatures from "app/settings/plans/utils/proPlanFeatures"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -50,7 +57,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user && company) {
     return {
       props: {
-        plans,
+        // plans,
         user,
         company,
         currentPlan: checkPlan(company) as Plan | null,
@@ -68,7 +75,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const UserSettingsBillingPage = ({
-  plans,
+  // plans,
   user,
   currentPlan,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -77,6 +84,14 @@ const UserSettingsBillingPage = ({
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session.userId || "0", companyId: session.companyId || "0" },
   })
+
+  const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US")
+  const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
+
+  const [plans] = useQuery(getPlans, { currency: selectedCurrency })
+  useEffect(() => {
+    invalidateQuery(getPlans)
+  }, [selectedCurrency])
 
   return (
     <>
@@ -87,6 +102,27 @@ const UserSettingsBillingPage = ({
             <div className="bg-white md:col-span-2">
               <div className="sm:overflow-hidden">
                 <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
+                  {!currentPlan && (
+                    <>
+                      <Form noFormatting={true} onSubmit={async (values) => {}}>
+                        <LabeledToggleGroupField
+                          // name={`formQuestion-${fq.id}-behaviour`}
+                          name="currency"
+                          paddingX={3}
+                          paddingY={1}
+                          // defaultValue={}
+                          value={selectedCurrency}
+                          options={Object.keys(Currency).map((currency) => {
+                            return { label: currency, value: currency }
+                          })}
+                          onChange={async (value) => {
+                            setSelectedCurrency(value)
+                          }}
+                        />
+                      </Form>
+                      <br />
+                    </>
+                  )}
                   {/* <div className="mb-6">
                 <h2
                   id="billing-history-heading"
@@ -108,7 +144,7 @@ const UserSettingsBillingPage = ({
                       <div className="mt-2 md:flex md:items-start md:justify-between">
                         <div className="max-w-xl text-sm text-gray-500">
                           <p>
-                            View your past invoices, cancel your subscription , or update your card.
+                            View your past invoices, cancel your subscription, or update your card.
                           </p>
                         </div>
                         <div className="mt-5 md:mt-0 md:ml-6 md:shrink-0 md:flex md:items-center">
@@ -133,41 +169,63 @@ const UserSettingsBillingPage = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="md:grid md:gap-6 md:grid-flow-row md:grid-cols-3">
-                      {plans?.map((plan, i) => {
-                        return (
-                          <div key={i} className="md:mt-0 space-y-4 lg:space-y-0 flex flex-col">
-                            <div className="flex-1 pb-6">
-                              <h3 className="text-xl font-semibold text-gray-900">{plan.title}</h3>
-                              <p className="mt-4 flex items-baseline text-gray-900">
-                                <span className="text-5xl text-theme-500 font-extrabold tracking-tight">
-                                  ${plan.price}
-                                </span>
-                                <span className="ml-1 text-sm text-gray-400">{plan.frequency}</span>
-                              </p>
-                              {/* <p className="mt-6 text-gray-800">{plan.description}</p> */}
-                              <ul className="mt-6 space-y-4">
+                    <>
+                      <div className="md:grid md:gap-6 md:grid-flow-row md:grid-cols-3">
+                        {plans?.map((plan, i) => {
+                          return (
+                            <div key={i} className="md:mt-0 space-y-4 lg:space-y-0 flex flex-col">
+                              <div className="flex-1 pb-6">
+                                <h3 className="text-xl font-semibold text-gray-900">
+                                  {plan.title}
+                                </h3>
+                                <p className="mt-4 flex items-baseline text-gray-900">
+                                  <span className="text-5xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
+                                    {plan.currencySymbol}
+                                    {plan.pricePerMonth}
+                                  </span>
+                                  <span className="ml-1 text-lg text-gray-400">/month</span>
+                                </p>
+                                {plan.frequency === PlanFrequency.YEARLY && (
+                                  <p className="mt-4 flex items-baseline text-gray-900">
+                                    <span className="text-lg text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
+                                      {plan.currencySymbol}
+                                      {plan.pricePerYear}
+                                    </span>
+                                    <span className="ml-1 text-lg text-gray-400">/year</span>
+                                  </p>
+                                )}
+                                {/* <p className="mt-6 text-gray-800">{plan.description}</p> */}
+                                {/* <ul className="mt-6 space-y-4">
                                 {plan.features.map((feature, j) => (
                                   <li key={j} className="flex">
                                     <span className="text-gray-500">- {feature}</span>
                                   </li>
                                 ))}
-                              </ul>
+                              </ul> */}
+                              </div>
+                              <SubscribeButton
+                                priceId={plan.priceId}
+                                frequency={plan.frequency}
+                                userId={user?.id!}
+                                quantity={1}
+                                type="new"
+                              />
                             </div>
-                            <SubscribeButton
-                              priceId={plan.priceId}
-                              userId={user?.id!}
-                              quantity={1}
-                              type="new"
-                            />
-                          </div>
-                        )
-                      })}
-                    </div>
+                          )
+                        })}
+                      </div>
+                      <ul className="mt-6 space-y-6 text-2xl">
+                        {proPlanFeatures.map((feature, j) => (
+                          <li key={j} className="flex">
+                            <span className="text-gray-500">- {feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
                   )}
 
                   {/* If user is subscribed, show other plans to upgrade/downgrade */}
-                  {currentPlan && (
+                  {/* {currentPlan && (
                     <div className="md:grid md:gap-6 md:grid-flow-row md:grid-cols-3">
                       {plans?.map((plan, i) => {
                         if (plan !== currentPlan) {
@@ -181,14 +239,15 @@ const UserSettingsBillingPage = ({
                                   {plan.title}
                                 </h3>
                                 <p className="mt-4 flex items-baseline text-gray-900">
-                                  <span className="text-5xl font-extrabold tracking-tight">
-                                    ${plan.price}
+                                  <span className="text-5xl font-extrabold tracking-tight whitespace-nowrap">
+                                    {plan.currencySymbol}
+                                    {plan.price}
                                   </span>
                                   <span className="ml-1 text-xl font-semibold">
                                     {plan.frequency}
                                   </span>
                                 </p>
-                                {/* <p className="mt-6 text-gray-500">{plan.description}</p> */}
+                                <p className="mt-6 text-gray-500">{plan.description}</p>
                                 <ul className="mt-6 space-y-6">
                                   {plan.features.map((feature, j) => (
                                     <li key={j} className="flex">
@@ -214,7 +273,7 @@ const UserSettingsBillingPage = ({
                         }
                       })}
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
