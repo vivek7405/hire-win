@@ -1,16 +1,16 @@
 import { Currency } from "types"
-import aedPlans from "../utils/aedPlans"
-import audPlans from "../utils/audPlans"
-import cadPlans from "../utils/cadPlans"
-import eurPlans from "../utils/eurPlans"
-import gbpPlans from "../utils/gbpPlans"
-import inrPlans from "../utils/inrPlans"
-import usdPlans from "../utils/usdPlans"
+import aedPlans from "./aedPlans"
+import audPlans from "./audPlans"
+import cadPlans from "./cadPlans"
+import eurPlans from "./eurPlans"
+import gbpPlans from "./gbpPlans"
+import inrPlans from "./inrPlans"
+import usdPlans from "./usdPlans"
 
 type GetPlansInputType = {
   currency: Currency
 }
-const getPlans = async ({ currency }: GetPlansInputType) => {
+const getPlansByCurrency = ({ currency }: GetPlansInputType) => {
   switch (currency) {
     case Currency.INR:
       return inrPlans
@@ -31,4 +31,4 @@ const getPlans = async ({ currency }: GetPlansInputType) => {
   }
 }
 
-export default getPlans
+export default getPlansByCurrency

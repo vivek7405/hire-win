@@ -4,7 +4,7 @@ const cadPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_CAD_YEARLY || "",
-    title: "Pro Plan Yearly",
+    title: "Yearly",
     frequency: PlanFrequency.YEARLY,
     pricePerMonth: 34.99,
     pricePerYear: 419.88,
@@ -13,7 +13,7 @@ const cadPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_CAD_MONTHLY || "",
-    title: "Pro Plan Monthly",
+    title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
     pricePerMonth: 39.99,
     pricePerYear: 479.88,

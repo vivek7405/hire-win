@@ -32,12 +32,12 @@ import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import { CompanyUserRole } from "db"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import getPlans from "app/settings/plans/queries/getPlans"
 import LocaleCurrency from "locale-currency"
 import Form from "app/core/components/Form"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import { useEffect, useState } from "react"
-import proPlanFeatures from "app/settings/plans/utils/proPlanFeatures"
+import getPlansByCurrency from "app/core/utils/plans/getPlansByCurrency"
+import proPlanFeatures from "app/core/utils/plans/proPlanFeatures"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -85,12 +85,12 @@ const UserSettingsBillingPage = ({
     where: { userId: session.userId || "0", companyId: session.companyId || "0" },
   })
 
-  const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US")
+  const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
   const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
 
-  const [plans] = useQuery(getPlans, { currency: selectedCurrency })
+  const [plans, setPlans] = useState(getPlansByCurrency({ currency: selectedCurrency }))
   useEffect(() => {
-    invalidateQuery(getPlans)
+    setPlans(getPlansByCurrency({ currency: selectedCurrency }))
   }, [selectedCurrency])
 
   return (
@@ -187,7 +187,7 @@ const UserSettingsBillingPage = ({
                                 </p>
                                 {plan.frequency === PlanFrequency.YEARLY && (
                                   <p className="mt-4 flex items-baseline text-gray-900">
-                                    <span className="text-lg text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
+                                    <span className="text-xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
                                       {plan.currencySymbol}
                                       {plan.pricePerYear}
                                     </span>
@@ -214,7 +214,7 @@ const UserSettingsBillingPage = ({
                           )
                         })}
                       </div>
-                      <ul className="mt-6 space-y-6 text-2xl">
+                      <ul className="mt-6 space-y-6 text-xl">
                         {proPlanFeatures.map((feature, j) => (
                           <li key={j} className="flex">
                             <span className="text-gray-500">- {feature}</span>

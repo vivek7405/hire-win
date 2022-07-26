@@ -4,7 +4,7 @@ const inrPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_INR_YEARLY || "",
-    title: "Pro Plan Yearly",
+    title: "Yearly",
     frequency: PlanFrequency.YEARLY,
     pricePerMonth: 1999,
     pricePerYear: 23988,
@@ -13,7 +13,7 @@ const inrPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_INR_MONTHLY || "",
-    title: "Pro Plan Monthly",
+    title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
     pricePerMonth: 2299,
     pricePerYear: 27588,

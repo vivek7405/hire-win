@@ -1,7 +1,6 @@
 import { Plan } from "types"
 import { Company, User } from "db"
-import allPlans from "app/settings/plans/utils/allPlans"
-// import { plans } from "app/core/utils/plans"
+import allPlans from "app/core/utils/plans/allPlans"
 
 export const checkPlan = (company: Company | null): Plan | null => {
   if (

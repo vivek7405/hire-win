@@ -4,7 +4,7 @@ const aedPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_AED_YEARLY || "",
-    title: "Pro Plan Yearly",
+    title: "Yearly",
     frequency: PlanFrequency.YEARLY,
     pricePerMonth: 99.99,
     pricePerYear: 1199.88,
@@ -13,7 +13,7 @@ const aedPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_AED_MONTHLY || "",
-    title: "Pro Plan Monthly",
+    title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
     pricePerMonth: 119.99,
     pricePerYear: 1439.88,

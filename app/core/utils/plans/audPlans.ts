@@ -4,7 +4,7 @@ const audPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_AUD_YEARLY || "",
-    title: "Pro Plan Yearly",
+    title: "Yearly",
     frequency: PlanFrequency.YEARLY,
     pricePerMonth: 39.99,
     pricePerYear: 479.88,
@@ -13,7 +13,7 @@ const audPlans = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_AUD_MONTHLY || "",
-    title: "Pro Plan Monthly",
+    title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
     pricePerMonth: 44.99,
     pricePerYear: 539.88,
