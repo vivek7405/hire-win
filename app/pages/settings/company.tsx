@@ -26,7 +26,6 @@ import { Plan } from "types"
 import { CheckIcon } from "@heroicons/react/outline"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
 import { checkPlan } from "app/users/utils/checkPlan"
-import { plans } from "app/core/utils/plans"
 import getCompany from "app/companies/queries/getCompany"
 import updateCompany from "app/companies/mutations/updateCompany"
 import CompanyForm from "app/companies/components/CompanyForm"
@@ -52,7 +51,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user && company) {
     return {
       props: {
-        plans,
         user,
         company,
         currentPlan: checkPlan(company) as Plan | null,
@@ -70,7 +68,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const UserSettingsCompanyPage = ({
-  plans,
   user,
   company,
   currentPlan,

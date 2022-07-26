@@ -2,18 +2,20 @@ import { useMutation, useRouter, useSession } from "blitz"
 import { loadStripe } from "@stripe/stripe-js"
 import createStripeCheckoutSession from "app/companies/mutations/createStripeCheckoutSession"
 import updateStripeSubscription from "app/companies/mutations/updateStripeSubscription"
-import { Plan } from "types"
+import { Plan, PlanFrequency } from "types"
 import { toast } from "react-hot-toast"
 
 export default function SubscribeButton({
   userId,
   priceId,
+  frequency,
   quantity,
   type,
   testid,
 }: {
   userId: string
   priceId: string
+  frequency: PlanFrequency
   quantity: number
   type: "new" | "update"
   testid?: string
@@ -50,14 +52,14 @@ export default function SubscribeButton({
 
   return (
     <button
-      className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
+      className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 capitalize whitespace-nowrap"
       data-testid={`${testid && `${testid}-`}upgradeButton`}
       onClick={(e) => {
         e.preventDefault()
         return type === "new" ? createSubscription() : updateSubscription()
       }}
     >
-      {type === "new" ? "Subscribe" : "Upgrade"}
+      {type === "new" ? `Subscribe ${frequency?.toLowerCase()}` : "Upgrade"}
     </button>
   )
 }

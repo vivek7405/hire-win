@@ -49,7 +49,6 @@ import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import { loadStripe } from "@stripe/stripe-js"
 import createStripeCheckoutSession from "app/companies/mutations/createStripeCheckoutSession"
-import { plans } from "app/core/utils/plans"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
 import updateJob from "app/jobs/mutations/updateJob"
 import setJobArchived from "app/jobs/mutations/setJobArchived"
@@ -93,7 +92,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     const { can: canCreate } = await Guard.can("create", "job", { session }, {})
 
     const currentPlan = checkPlan(companyUser.company)
-    const priceId = plans?.find((plan) => plan.name === PlanName.PRO)?.priceId || "0"
 
     return {
       props: {
@@ -102,7 +100,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         company: companyUser.company,
         canCreate,
         currentPlan,
-        priceId,
       },
     }
   } else {
@@ -632,7 +629,6 @@ const JobsHome = ({
   company,
   canCreate,
   currentPlan,
-  priceId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [openConfirm, setOpenConfirm] = useState(false)
