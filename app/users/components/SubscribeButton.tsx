@@ -26,6 +26,7 @@ export default function SubscribeButton({
   const session = useSession()
 
   const createSubscription = async () => {
+    debugger
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
     const sessionId = await createStripeSessionMutation({
       priceId,

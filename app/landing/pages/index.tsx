@@ -1,4 +1,13 @@
-import { GetServerSidePropsContext, GetStaticPropsContext, Head, Image, Link, Routes } from "blitz"
+import {
+  GetServerSidePropsContext,
+  GetStaticPropsContext,
+  Head,
+  Image,
+  invalidateQuery,
+  Link,
+  Routes,
+  useQuery,
+} from "blitz"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import LogoBrand from "app/assets/LogoBrand"
@@ -8,7 +17,7 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import Form from "app/core/components/Form"
 import { Currency, PlanFrequency } from "types"
 import LocaleCurrency from "locale-currency"
-import getPlansByCurrency from "app/core/utils/plans/getPlansByCurrency"
+import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
@@ -44,9 +53,9 @@ export default function Home() {
 
   const [selectedFrequency, setSelectedFrequency] = useState(PlanFrequency.YEARLY)
 
-  const [plans, setPlans] = useState(getPlansByCurrency({ currency: selectedCurrency }))
+  const [plans] = useQuery(getPlansByCurrency, { currency: selectedCurrency })
   useEffect(() => {
-    setPlans(getPlansByCurrency({ currency: selectedCurrency }))
+    invalidateQuery(getPlansByCurrency)
   }, [selectedCurrency])
 
   const [imageIndex, setImageIndex] = useState(0)

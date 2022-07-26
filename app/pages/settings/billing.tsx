@@ -36,8 +36,8 @@ import LocaleCurrency from "locale-currency"
 import Form from "app/core/components/Form"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import { useEffect, useState } from "react"
-import getPlansByCurrency from "app/core/utils/plans/getPlansByCurrency"
-import proPlanFeatures from "app/core/utils/plans/proPlanFeatures"
+import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
+import proPlanFeatures from "app/plans/utils/proPlanFeatures"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -88,9 +88,14 @@ const UserSettingsBillingPage = ({
   const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
   const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
 
-  const [plans, setPlans] = useState(getPlansByCurrency({ currency: selectedCurrency }))
+  // const [plans, setPlans] = useState(getPlansByCurrency({ currency: selectedCurrency }))
+  // useEffect(() => {
+  //   setPlans(getPlansByCurrency({ currency: selectedCurrency }))
+  // }, [selectedCurrency])
+
+  const [plans] = useQuery(getPlansByCurrency, { currency: selectedCurrency })
   useEffect(() => {
-    setPlans(getPlansByCurrency({ currency: selectedCurrency }))
+    invalidateQuery(getPlansByCurrency)
   }, [selectedCurrency])
 
   return (
