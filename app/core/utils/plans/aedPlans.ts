@@ -8,7 +8,7 @@ const aedPlans = [
     frequency: PlanFrequency.YEARLY,
     pricePerMonth: 99.99,
     pricePerYear: 1199.88,
-    currencySymbol: "AED ",
+    currencySymbol: "د.إ",
   } as Plan,
   {
     name: PlanName.PRO,
@@ -17,7 +17,7 @@ const aedPlans = [
     frequency: PlanFrequency.MONTHLY,
     pricePerMonth: 119.99,
     pricePerYear: 1439.88,
-    currencySymbol: "AED ",
+    currencySymbol: "د.إ",
   } as Plan,
 ] as Plan[]
 

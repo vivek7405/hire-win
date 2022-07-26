@@ -2,8 +2,13 @@ import { GetServerSidePropsContext, GetStaticPropsContext, Head, Image, Link, Ro
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import LogoBrand from "app/assets/LogoBrand"
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import LandingLayout from "app/core/layouts/LandingLayout"
+import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
+import Form from "app/core/components/Form"
+import { Currency, PlanFrequency } from "types"
+import LocaleCurrency from "locale-currency"
+import getPlansByCurrency from "app/core/utils/plans/getPlansByCurrency"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
@@ -33,6 +38,17 @@ import LandingLayout from "app/core/layouts/LandingLayout"
 
 export default function Home() {
   const screenshotsBucketURL = "https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots"
+
+  const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
+  const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
+
+  const [selectedFrequency, setSelectedFrequency] = useState(PlanFrequency.YEARLY)
+
+  const [plans, setPlans] = useState(getPlansByCurrency({ currency: selectedCurrency }))
+  useEffect(() => {
+    setPlans(getPlansByCurrency({ currency: selectedCurrency }))
+  }, [selectedCurrency])
+
   const [imageIndex, setImageIndex] = useState(0)
   const imageArray = [
     <Image
@@ -326,11 +342,77 @@ export default function Home() {
                   </ul>
                 </div>
                 <div className="flex-none mt-auto rounded-b rounded-t-none overflow-hidden p-6">
-                  <div className="w-full py-6 text-4xl font-bold text-center">
+                  {/* <div className="w-full py-6 text-4xl font-bold text-center">
                     <span className="text-base">Flat</span> $29.99{" "}
-                    <span className="text-base">/ month</span>
+                    <span className="text-base">/month</span>
+                  </div> */}
+                  {plans.map((plan) => {
+                    return (
+                      <div
+                        key={plan.priceId}
+                        className="w-full py-6"
+                        hidden={selectedFrequency !== plan.frequency}
+                      >
+                        <div className="w-full text-4xl font-bold text-center whitespace-nowrap">
+                          <span className="text-base">Flat</span> {plan.currencySymbol}
+                          {plan.pricePerMonth}
+                          <span className="text-base"> /month</span>
+                        </div>
+                        <div className="w-full text-base text-center">
+                          if paid {plan.frequency.toLowerCase()}
+                        </div>
+                      </div>
+                    )
+                  })}
+                  <div className="flex flex-col space-y-3 items-center">
+                    <Form noFormatting={true} onSubmit={async (values) => {}}>
+                      <LabeledToggleGroupField
+                        name="currency"
+                        paddingX={3}
+                        paddingY={1}
+                        value={selectedFrequency}
+                        options={Object.keys(PlanFrequency).map((frequency) => {
+                          return { label: frequency, value: frequency }
+                        })}
+                        onChange={async (value) => {
+                          setSelectedFrequency(value)
+                        }}
+                      />
+                    </Form>
+                    <Form noFormatting={true} onSubmit={async (values) => {}}>
+                      <LabeledToggleGroupField
+                        name="currency"
+                        paddingX={3}
+                        paddingY={1}
+                        value={selectedCurrency}
+                        options={Object.keys(Currency).map((currency) => {
+                          return { label: currency, value: currency }
+                        })}
+                        onChange={async (value) => {
+                          setSelectedCurrency(value)
+                        }}
+                      />
+                    </Form>
                   </div>
                 </div>
+                {/* <div className="flex justify-center mb-6">
+                  <Form noFormatting={true} onSubmit={async (values) => {}}>
+                    <LabeledToggleGroupField
+                      // name={`formQuestion-${fq.id}-behaviour`}
+                      name="currency"
+                      paddingX={3}
+                      paddingY={1}
+                      // defaultValue={}
+                      value={selectedCurrency}
+                      options={Object.keys(Currency).map((currency) => {
+                        return { label: currency, value: currency }
+                      })}
+                      onChange={async (value) => {
+                        setSelectedCurrency(value)
+                      }}
+                    />
+                  </Form>
+                </div> */}
               </div>
             </div>
 
@@ -338,7 +420,9 @@ export default function Home() {
               <div className="flex flex-col space-y-5 w-full md:w-2/3 lg:w-2/3 text-lg md:text-2xl lg:text-3xl font-semibold">
                 <span>Create jobs, invite admins & interviewers,</span>
                 <span>Keep a track of candidates,</span>
-                <span>All with flat pricing!</span>
+                <span>
+                  All with <span className="bg-yellow-300">flat pricing!</span>
+                </span>
               </div>
             </div>
           </div>

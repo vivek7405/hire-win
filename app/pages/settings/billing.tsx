@@ -106,11 +106,9 @@ const UserSettingsBillingPage = ({
                     <>
                       <Form noFormatting={true} onSubmit={async (values) => {}}>
                         <LabeledToggleGroupField
-                          // name={`formQuestion-${fq.id}-behaviour`}
                           name="currency"
                           paddingX={3}
                           paddingY={1}
-                          // defaultValue={}
                           value={selectedCurrency}
                           options={Object.keys(Currency).map((currency) => {
                             return { label: currency, value: currency }
@@ -170,10 +168,10 @@ const UserSettingsBillingPage = ({
                     </div>
                   ) : (
                     <>
-                      <div className="md:grid md:gap-6 md:grid-flow-row md:grid-cols-3">
+                      <div className="flex flex-col md:flex-row lg:flex-row space-y-10 md:space-y-0 lg:space-y-0 md:space-x-10 lg:space-x-10">
                         {plans?.map((plan, i) => {
                           return (
-                            <div key={i} className="md:mt-0 space-y-4 lg:space-y-0 flex flex-col">
+                            <div key={i} className="flex flex-col md:mt-0 space-y-3 lg:space-y-0">
                               <div className="flex-1 pb-6">
                                 <h3 className="text-xl font-semibold text-gray-900">
                                   {plan.title}
@@ -214,7 +212,7 @@ const UserSettingsBillingPage = ({
                           )
                         })}
                       </div>
-                      <ul className="mt-6 space-y-6 text-xl">
+                      <ul className="mt-10 space-y-6 text-xl">
                         {proPlanFeatures.map((feature, j) => (
                           <li key={j} className="flex">
                             <span className="text-gray-500">- {feature}</span>
