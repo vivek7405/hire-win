@@ -250,7 +250,7 @@ export default function Home() {
             <iframe
               src={
                 process.env.NODE_ENV === "production"
-                  ? "https://hire.win/padason/software-engineer"
+                  ? "https://hire.win/padason"
                   : "http://localhost:3000/padason"
               }
               title="Job Board"
