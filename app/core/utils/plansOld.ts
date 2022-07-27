@@ -1,6 +1,6 @@
 import { Plan, PlanFrequency, PlanName } from "types"
 
-export const plans: Plan[] = [
+export const plansOld: Plan[] = [
   {
     name: PlanName.PRO,
     priceId: process.env.PRO_PLAN || "",

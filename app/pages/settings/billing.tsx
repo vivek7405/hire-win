@@ -35,7 +35,7 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import LocaleCurrency from "locale-currency"
 import Form from "app/core/components/Form"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
 import proPlanFeatures from "app/plans/utils/proPlanFeatures"
 
@@ -104,29 +104,30 @@ const UserSettingsBillingPage = ({
         <AuthLayout title="Settings" user={user}>
           <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
           <UserSettingsLayout>
-            <div className="bg-white md:col-span-2">
-              <div className="sm:overflow-hidden">
-                <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
-                  {!currentPlan && (
-                    <>
-                      <Form noFormatting={true} onSubmit={async (values) => {}}>
-                        <LabeledToggleGroupField
-                          name="currency"
-                          paddingX={3}
-                          paddingY={1}
-                          value={selectedCurrency}
-                          options={Object.keys(Currency).map((currency) => {
-                            return { label: currency, value: currency }
-                          })}
-                          onChange={async (value) => {
-                            setSelectedCurrency(value)
-                          }}
-                        />
-                      </Form>
-                      <br />
-                    </>
-                  )}
-                  {/* <div className="mb-6">
+            <Suspense fallback="Loading...">
+              <div className="bg-white md:col-span-2">
+                <div className="sm:overflow-hidden">
+                  <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
+                    {!currentPlan && (
+                      <>
+                        <Form noFormatting={true} onSubmit={async (values) => {}}>
+                          <LabeledToggleGroupField
+                            name="currency"
+                            paddingX={3}
+                            paddingY={1}
+                            value={selectedCurrency}
+                            options={Object.keys(Currency).map((currency) => {
+                              return { label: currency, value: currency }
+                            })}
+                            onChange={async (value) => {
+                              setSelectedCurrency(value)
+                            }}
+                          />
+                        </Form>
+                        <br />
+                      </>
+                    )}
+                    {/* <div className="mb-6">
                 <h2
                   id="billing-history-heading"
                   className="text-lg leading-6 font-medium text-gray-900"
@@ -135,100 +136,106 @@ const UserSettingsBillingPage = ({
                 </h2>
               </div> */}
 
-                  {currentPlan ? (
-                    <div className="my-5">
-                      <h3 className="text-xl font-bold">
-                        You are subscribed to the {currentPlan?.title}
-                      </h3>
-                      <br />
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        Manage subscription
-                      </h3>
-                      <div className="mt-2 md:flex md:items-start md:justify-between">
-                        <div className="max-w-xl text-sm text-gray-500">
-                          <p>
-                            View your past invoices, cancel your subscription, or update your card.
-                          </p>
-                        </div>
-                        <div className="mt-5 md:mt-0 md:ml-6 md:shrink-0 md:flex md:items-center">
-                          <button
-                            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-sm text-white bg-theme-600 hover:bg-theme-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-500 sm:text-sm"
-                            onClick={async (e) => {
-                              e.preventDefault()
-                              try {
-                                const url = await createStripeBillingPortalMutation({
-                                  companyId: session.companyId || "0",
-                                })
+                    <Suspense fallback="Loading...">
+                      {currentPlan ? (
+                        <div className="my-5">
+                          <h3 className="text-xl font-bold">
+                            You are subscribed to the {currentPlan?.title}
+                          </h3>
+                          <br />
+                          <h3 className="text-lg leading-6 font-medium text-gray-900">
+                            Manage subscription
+                          </h3>
+                          <div className="mt-2 md:flex md:items-start md:justify-between">
+                            <div className="max-w-xl text-sm text-gray-500">
+                              <p>
+                                View your past invoices, cancel your subscription, or update your
+                                card.
+                              </p>
+                            </div>
+                            <div className="mt-5 md:mt-0 md:ml-6 md:shrink-0 md:flex md:items-center">
+                              <button
+                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-sm text-white bg-theme-600 hover:bg-theme-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-theme-500 sm:text-sm"
+                                onClick={async (e) => {
+                                  e.preventDefault()
+                                  try {
+                                    const url = await createStripeBillingPortalMutation({
+                                      companyId: session.companyId || "0",
+                                    })
 
-                                if (url) window.location.href = url
-                              } catch (err) {
-                                toast.error("Unable to open Manage Billing")
-                              }
-                            }}
-                          >
-                            Manage billing
-                          </button>
+                                    if (url) window.location.href = url
+                                  } catch (err) {
+                                    toast.error("Unable to open Manage Billing")
+                                  }
+                                }}
+                              >
+                                Manage billing
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex flex-col md:flex-row lg:flex-row space-y-10 md:space-y-0 lg:space-y-0 md:space-x-10 lg:space-x-10">
-                        {plans?.map((plan, i) => {
-                          return (
-                            <div key={i} className="flex flex-col md:mt-0 space-y-3 lg:space-y-0">
-                              <div className="flex-1 pb-6">
-                                <h3 className="text-xl font-semibold text-gray-900">
-                                  {plan.title}
-                                </h3>
-                                <p className="mt-4 flex items-baseline text-gray-900">
-                                  <span className="text-5xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
-                                    {plan.currencySymbol}
-                                    {plan.pricePerMonth}
-                                  </span>
-                                  <span className="ml-1 text-lg text-gray-400">/month</span>
-                                </p>
-                                {plan.frequency === PlanFrequency.YEARLY && (
-                                  <p className="mt-4 flex items-baseline text-gray-900">
-                                    <span className="text-xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
-                                      {plan.currencySymbol}
-                                      {plan.pricePerYear}
-                                    </span>
-                                    <span className="ml-1 text-lg text-gray-400">/year</span>
-                                  </p>
-                                )}
-                                {/* <p className="mt-6 text-gray-800">{plan.description}</p> */}
-                                {/* <ul className="mt-6 space-y-4">
+                      ) : (
+                        <>
+                          <div className="flex flex-col md:flex-row lg:flex-row space-y-10 md:space-y-0 lg:space-y-0 md:space-x-10 lg:space-x-10">
+                            {plans?.map((plan, i) => {
+                              return (
+                                <div
+                                  key={i}
+                                  className="flex flex-col md:mt-0 space-y-3 lg:space-y-0"
+                                >
+                                  <div className="flex-1 pb-6">
+                                    <h3 className="text-xl font-semibold text-gray-900">
+                                      {plan.title}
+                                    </h3>
+                                    <p className="mt-4 flex items-baseline text-gray-900">
+                                      <span className="text-5xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
+                                        {plan.currencySymbol}
+                                        {plan.pricePerMonth}
+                                      </span>
+                                      <span className="ml-1 text-lg text-gray-400">/month</span>
+                                    </p>
+                                    {plan.frequency === PlanFrequency.YEARLY && (
+                                      <p className="mt-4 flex items-baseline text-gray-900">
+                                        <span className="text-xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
+                                          {plan.currencySymbol}
+                                          {plan.pricePerYear}
+                                        </span>
+                                        <span className="ml-1 text-lg text-gray-400">/year</span>
+                                      </p>
+                                    )}
+                                    {/* <p className="mt-6 text-gray-800">{plan.description}</p> */}
+                                    {/* <ul className="mt-6 space-y-4">
                                 {plan.features.map((feature, j) => (
                                   <li key={j} className="flex">
                                     <span className="text-gray-500">- {feature}</span>
                                   </li>
                                 ))}
                               </ul> */}
-                              </div>
-                              <SubscribeButton
-                                priceId={plan.priceId}
-                                frequency={plan.frequency}
-                                userId={user?.id!}
-                                quantity={1}
-                                type="new"
-                              />
-                            </div>
-                          )
-                        })}
-                      </div>
-                      <ul className="mt-10 space-y-6 text-xl">
-                        {proPlanFeatures.map((feature, j) => (
-                          <li key={j} className="flex">
-                            <span className="text-gray-500">- {feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                                  </div>
+                                  <SubscribeButton
+                                    priceId={plan.priceId}
+                                    frequency={plan.frequency}
+                                    userId={user?.id!}
+                                    quantity={1}
+                                    type="new"
+                                  />
+                                </div>
+                              )
+                            })}
+                          </div>
+                          <ul className="mt-10 space-y-6 text-xl">
+                            {proPlanFeatures.map((feature, j) => (
+                              <li key={j} className="flex">
+                                <span className="text-gray-500">- {feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+                    </Suspense>
 
-                  {/* If user is subscribed, show other plans to upgrade/downgrade */}
-                  {/* {currentPlan && (
+                    {/* If user is subscribed, show other plans to upgrade/downgrade */}
+                    {/* {currentPlan && (
                     <div className="md:grid md:gap-6 md:grid-flow-row md:grid-cols-3">
                       {plans?.map((plan, i) => {
                         if (plan !== currentPlan) {
@@ -277,9 +284,10 @@ const UserSettingsBillingPage = ({
                       })}
                     </div>
                   )} */}
+                  </div>
                 </div>
               </div>
-            </div>
+            </Suspense>
           </UserSettingsLayout>
         </AuthLayout>
       ) : (
