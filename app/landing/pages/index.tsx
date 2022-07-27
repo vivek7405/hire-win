@@ -380,7 +380,17 @@ export default function Home() {
                     <span className="text-base">Flat</span> $29.99{" "}
                     <span className="text-base">/month</span>
                   </div> */}
-                  <Suspense fallback="Loading...">
+                  <Suspense
+                    fallback={
+                      <div className="w-full py-6">
+                        <div className="w-full text-4xl font-bold text-center whitespace-nowrap">
+                          <span className="text-base">Flat</span> ...
+                          <span className="text-base"> /month</span>
+                        </div>
+                        <div className="w-full text-base text-center">if paid ...</div>
+                      </div>
+                    }
+                  >
                     <Plans
                       selectedCurrency={selectedCurrency}
                       selectedFrequency={selectedFrequency}

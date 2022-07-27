@@ -53,6 +53,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { where: { id: session.companyId || "0" } },
     { ...context }
   )
+  const companyUser = await invokeWithMiddleware(
+    getCompanyUser,
+    { where: { userId: session.userId || "0", companyId: session.companyId || "0" } },
+    { ...context }
+  )
 
   if (user && company) {
     return {
@@ -61,6 +66,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         user,
         company,
         currentPlan: checkPlan(company) as Plan | null,
+        companyUser,
       },
     }
   } else {
@@ -139,11 +145,9 @@ const UserSettingsBillingPage = ({
   // plans,
   user,
   currentPlan,
+  companyUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const session = useSession()
-  const [companyUser] = useQuery(getCompanyUser, {
-    where: { userId: session.userId || "0", companyId: session.companyId || "0" },
-  })
   const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
 
   const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
