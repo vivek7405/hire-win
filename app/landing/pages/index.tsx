@@ -432,8 +432,24 @@ export default function Home() {
                 <span>
                   All with <span className="bg-yellow-300">flat pricing!</span>
                 </span>
+                <span>
+                  <span className="font-normal text-base">
+                    We would be happy to provide you{" "}
+                    <span className="bg-yellow-300 font-semibold">refunds on yearly plan</span>{" "}
+                    should you wish to cancel{" "}
+                    <span className="bg-yellow-300 font-semibold">after 1 month of usage</span>
+                  </span>
+                </span>
               </div>
             </div>
+
+            {/* <div className="w-full mt-10">
+              We would be happy to provide you&nbsp;
+              <span className="bg-yellow-300 font-semibold whitespace-nowrap">
+                refunds on yearly plan
+              </span>
+              &nbsp;should you wish to cancel after 1 month of usage
+            </div> */}
           </div>
         </section>
 

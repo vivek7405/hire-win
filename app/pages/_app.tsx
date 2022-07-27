@@ -35,7 +35,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
 
   const handleRouteChange = (url) => {
-    ;(window as any).gtag("config", "G-CL7G43RP1E", {
+    ;(window as any).gtag("config", "G-W4VZMRWMTR", {
       page_path: url,
     })
   }
