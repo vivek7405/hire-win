@@ -102,6 +102,27 @@ const SignupPage: BlitzPage = () => {
                 placeholder="Enter your email"
                 autoFocus={true}
               />
+              <div className="text-xs text-neutral-500">
+                By signing up, you agree to the{" "}
+                <Link href={Routes.Terms()}>
+                  <a target="_blank" className="text-indigo-600 underline">
+                    Terms of Service
+                  </a>
+                </Link>{" "}
+                and{" "}
+                <Link href={Routes.Privacy()}>
+                  <a target="_blank" className="text-indigo-600 underline">
+                    Privacy Policy
+                  </a>
+                </Link>
+                , including{" "}
+                <Link href={Routes.Cookies()}>
+                  <a target="_blank" className="text-indigo-600 underline">
+                    Cookie Use
+                  </a>
+                </Link>
+                .
+              </div>
             </AuthForm>
           </div>
           {/* <SignupForm
