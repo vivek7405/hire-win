@@ -11,7 +11,7 @@ import Modal from "./Modal"
 import CompanyForm from "app/companies/components/CompanyForm"
 import { EditorState } from "draft-js"
 import updateCompanySession from "app/companies/mutations/updateCompanySession"
-import { CompanyUserRole } from "@prisma/client"
+import { CompanyUserRole, UserRole } from "@prisma/client"
 import Confirm from "./Confirm"
 import getCurrentPlan from "app/companies/queries/getCurrentPlan"
 import canCreateNewCompany from "app/companies/queries/canCreateNewCompany"
@@ -128,14 +128,13 @@ const NavbarContent = ({ user }: NavbarProps) => {
       href: "",
     },
   ]
-
-  // user &&
-  //   user.role === "ADMIN" &&
-  //   dropDownNav.push({
-  //     name: "Admin",
-  //     href: Routes.Admin().pathname,
-  //     current: router.route === Routes.Admin().pathname,
-  //   })
+  user &&
+    user.role === UserRole.ADMIN &&
+    dropDownNav.push({
+      name: "Admin",
+      href: Routes.Admin().pathname,
+      focus: router.route === Routes.Admin().pathname,
+    })
 
   useEffect(() => {
     const closeDropdownsOnResize = () => {
