@@ -2,12 +2,11 @@ import Guard from "app/guard/ability"
 import { paginate, resolver } from "blitz"
 import db, { Prisma } from "db"
 
-interface GetWorkflowsInput
-  extends Pick<Prisma.WorkflowFindManyArgs, "where" | "orderBy" | "skip" | "take"> {}
+interface GetWorkflowsInput extends Pick<Prisma.WorkflowFindManyArgs, "where" | "skip" | "take"> {}
 
 const getWorkflows = resolver.pipe(
   resolver.authorize(),
-  async ({ where, orderBy, skip = 0, take = 100 }: GetWorkflowsInput) => {
+  async ({ where, skip = 0, take = 100 }: GetWorkflowsInput) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant
     const {
       items: workflows,
@@ -22,8 +21,14 @@ const getWorkflows = resolver.pipe(
         db.workflow.findMany({
           ...paginateArgs,
           where,
-          orderBy,
-          include: { stages: { include: { stage: true } } },
+          include: {
+            stages: {
+              include: { stage: true, scoreCards: { include: { scoreCard: true } } },
+              orderBy: { order: "asc" },
+            },
+            jobs: true,
+          },
+          orderBy: { createdAt: "asc" },
         }),
     })
 

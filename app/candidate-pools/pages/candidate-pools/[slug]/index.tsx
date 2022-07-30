@@ -18,7 +18,7 @@ import {
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
-import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
+import getCandidatePoolsWOPagination from "app/candidate-pools/queries/getCandidatePoolsWOPagination"
 import Table from "app/core/components/Table"
 
 import { Candidate, CandidatePool, Job } from "@prisma/client"

@@ -31,6 +31,7 @@ import deleteWorkflow from "app/workflows/mutations/deleteWorkflow"
 import createWorkflow from "app/workflows/mutations/createWorkflow"
 import { Workflow } from "@prisma/client"
 import updateWorkflow from "app/workflows/mutations/updateWorkflow"
+import Pagination from "app/core/components/Pagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -56,7 +57,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const Workflows = () => {
+  const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const tablePage = Number(router.query.page) || 0
   const [query, setQuery] = useState({})
   const session = useSession()
 
@@ -83,12 +86,20 @@ const Workflows = () => {
     setQuery(search)
   }, [router.query])
 
-  const [workflows] = useQuery(getWorkflowsWOPagination, {
+  const [{ workflows, hasMore, count }] = usePaginatedQuery(getWorkflows, {
     where: {
       companyId: session.companyId || "0",
       ...query,
     },
+    skip: ITEMS_PER_PAGE * Number(tablePage),
+    take: ITEMS_PER_PAGE,
   })
+
+  let startPage = tablePage * ITEMS_PER_PAGE + 1
+  let endPage = startPage - 1 + ITEMS_PER_PAGE
+  if (endPage > count) {
+    endPage = count
+  }
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -119,7 +130,7 @@ const Workflows = () => {
             toast.success("Workflow Deleted", { id: toastId })
             setOpenConfirm(false)
             setWorkflowToDelete(null as any)
-            invalidateQuery(getWorkflowsWOPagination)
+            invalidateQuery(getWorkflows)
           } catch (error) {
             toast.error(`Deleting workflow failed - ${error.toString()}`, { id: toastId })
           }
@@ -145,7 +156,7 @@ const Workflows = () => {
                     initial: workflowToEdit,
                   })
                 : await createWorkflowMutation({ ...values })
-              await invalidateQuery(getWorkflowsWOPagination)
+              await invalidateQuery(getWorkflows)
               toast.success(
                 isEdit ? "Workflow updated successfully" : "Workflow added successfully",
                 {
@@ -187,6 +198,16 @@ const Workflows = () => {
           }}
         />
       </div>
+
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="workflow"
+      />
 
       {workflows?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No Workflows found</div>

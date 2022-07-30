@@ -97,7 +97,6 @@ const Stages = () => {
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
   let endPage = startPage - 1 + ITEMS_PER_PAGE
-
   if (endPage > count) {
     endPage = count
   }

@@ -22,7 +22,7 @@ import EmailTemplateForm from "app/email-templates/components/EmailTemplateForm"
 import toast from "react-hot-toast"
 import updateEmailTemplate from "app/email-templates/mutations/updateEmailTemplate"
 import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
-import getEmailTemplates from "app/email-templates/queries/getEmailTemplates"
+import getEmailTemplatesWOPagination from "app/email-templates/queries/getEmailTemplatesWOPagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -120,7 +120,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
               data: { ...values },
               initial: emailTemplate!,
             })
-            await invalidateQuery(getEmailTemplates)
+            await invalidateQuery(getEmailTemplatesWOPagination)
             toast.success("Template updated successfully", { id: toastId })
           } catch (error) {
             toast.error(`Failed to update template - ${error.toString()}`, { id: toastId })

@@ -13,7 +13,7 @@ import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
 import getEmails from "../queries/getEmails"
 import sendEmail from "../mutations/sendEmail"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
-import getEmailTemplates from "app/email-templates/queries/getEmailTemplates"
+import getEmailTemplatesWOPagination from "app/email-templates/queries/getEmailTemplatesWOPagination"
 import { EmailTemplatePlaceholders } from "types"
 import getInterviewDetail from "app/scheduling/interviews/queries/getInterviewDetail"
 import { JsonValue } from "aws-sdk/clients/glue"
@@ -36,7 +36,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
   })
   const [sendEmailMutation] = useMutation(sendEmail)
   const [emailTemplatesOpen, setEmailTemplatesOpen] = useState(false)
-  const [emailTemplates] = useQuery(getEmailTemplates, {
+  const [emailTemplates] = useQuery(getEmailTemplatesWOPagination, {
     where: { companyId: session.companyId || "0" },
   })
   const [selectedEmailTemplate, setSelectedEmailTemplate] = useState(null as any as EmailTemplate)

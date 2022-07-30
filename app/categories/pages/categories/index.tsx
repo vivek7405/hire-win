@@ -30,6 +30,8 @@ import CategoryForm from "app/categories/components/CategoryForm"
 import createCategory from "app/categories/mutations/createCategory"
 import updateCategory from "app/categories/mutations/updateCategory"
 import { TrashIcon } from "@heroicons/react/outline"
+import getCategories from "app/categories/queries/getCategories"
+import Pagination from "app/core/components/Pagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -55,7 +57,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const Categories = () => {
+  const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const tablePage = Number(router.query.page) || 0
   const session = useSession()
   const [query, setQuery] = useState({})
 
@@ -82,12 +86,20 @@ const Categories = () => {
     setQuery(search)
   }, [router.query])
 
-  const [categories] = useQuery(getCategoriesWOPagination, {
+  const [{ categories, hasMore, count }] = usePaginatedQuery(getCategories, {
     where: {
       companyId: session.companyId || "0",
       ...query,
     },
+    skip: ITEMS_PER_PAGE * Number(tablePage),
+    take: ITEMS_PER_PAGE,
   })
+
+  let startPage = tablePage * ITEMS_PER_PAGE + 1
+  let endPage = startPage - 1 + ITEMS_PER_PAGE
+  if (endPage > count) {
+    endPage = count
+  }
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -117,7 +129,7 @@ const Categories = () => {
           try {
             await deleteCategoryMutation({ where: { id: categoryToDelete?.id } })
             toast.success("Category Deleted", { id: toastId })
-            invalidateQuery(getCategoriesWOPagination)
+            invalidateQuery(getCategories)
           } catch (error) {
             toast.error(`Deleting category failed - ${error.toString()}`, { id: toastId })
           }
@@ -145,7 +157,7 @@ const Categories = () => {
                     initial: categoryToEdit,
                   })
                 : await createCategoryMutation({ ...values })
-              await invalidateQuery(getCategoriesWOPagination)
+              await invalidateQuery(getCategories)
               toast.success(
                 isEdit ? "Category updated successfully" : "Category added successfully",
                 { id: toastId }
@@ -185,6 +197,16 @@ const Categories = () => {
           }}
         />
       </div>
+
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="category"
+      />
 
       {categories?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No Categories found</div>

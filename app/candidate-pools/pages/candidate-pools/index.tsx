@@ -14,7 +14,7 @@ import {
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
-import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
+import getCandidatePoolsWOPagination from "app/candidate-pools/queries/getCandidatePoolsWOPagination"
 import Table from "app/core/components/Table"
 
 import { CandidatePool, Job } from "@prisma/client"
@@ -30,6 +30,8 @@ import deleteCandidatePool from "app/candidate-pools/mutations/deleteCandidatePo
 import Confirm from "app/core/components/Confirm"
 import Card from "app/core/components/Card"
 import { PencilIcon, TrashIcon } from "@heroicons/react/outline"
+import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
+import Pagination from "app/core/components/Pagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -54,20 +56,31 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const CandidatePools = ({ user }) => {
+const CandidatePools = () => {
+  const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const tablePage = Number(router.query.page) || 0
   const session = useSession()
   const [query, setQuery] = useState({})
   const [openConfirm, setOpenConfirm] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [createCandidatePoolMutation] = useMutation(createCandidatePool)
   const [updateCandidatePoolMutation] = useMutation(updateCandidatePool)
-  const [candidatePools] = useQuery(getCandidatePools, {
-    where: { companyId: session.companyId || "0", ...query },
-  })
   const [deleteCandidatePoolMutation] = useMutation(deleteCandidatePool)
   const [candidatePoolToEdit, setCandidatePoolToEdit] = useState(null as any as CandidatePool)
   const [candidatePoolToDelete, setCandidatePoolToDelete] = useState(null as any as CandidatePool)
+
+  const [{ candidatePools, hasMore, count }] = usePaginatedQuery(getCandidatePools, {
+    where: { companyId: session.companyId || "0", ...query },
+    skip: ITEMS_PER_PAGE * Number(tablePage),
+    take: ITEMS_PER_PAGE,
+  })
+
+  let startPage = tablePage * ITEMS_PER_PAGE + 1
+  let endPage = startPage - 1 + ITEMS_PER_PAGE
+  if (endPage > count) {
+    endPage = count
+  }
 
   useEffect(() => {
     const search = router.query.search
@@ -185,6 +198,16 @@ const CandidatePools = ({ user }) => {
         />
       </div>
 
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="candidate pool"
+      />
+
       {candidatePools?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No Candidate Pools found</div>
       ) : (
@@ -254,7 +277,7 @@ const CandidatePoolsHome = ({ user }: InferGetServerSidePropsType<typeof getServ
   return (
     <AuthLayout title="CandidatePoolsHome | hire-win" user={user}>
       <Suspense fallback="Loading...">
-        <CandidatePools user={user} />
+        <CandidatePools />
       </Suspense>
     </AuthLayout>
   )

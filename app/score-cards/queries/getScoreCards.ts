@@ -22,10 +22,12 @@ const getScoreCards = resolver.pipe(
         db.scoreCard.findMany({
           ...paginateArgs,
           where,
-          orderBy,
           include: {
-            cardQuestions: { include: { cardQuestion: true } },
+            cardQuestions: { include: { cardQuestion: true }, orderBy: { order: "asc" } },
             jobWorkflowStages: true,
+          },
+          orderBy: {
+            createdAt: "asc",
           },
         }),
     })
