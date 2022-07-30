@@ -13,7 +13,7 @@ export default resolver.pipe(
   resolver.authorize(),
   async ({ name, refreshToken }, ctx) => {
     const slug = slugify(name, { strict: true, lower: true })
-    await db.calendar.create({
+    const calendar = await db.calendar.create({
       data: {
         name: name,
         slug,
@@ -24,5 +24,22 @@ export default resolver.pipe(
         refreshToken: refreshToken,
       },
     })
+
+    const defaultCalendar = await db.defaultCalendar.findFirst({
+      where: { userId: ctx.session.userId },
+    })
+
+    if (!defaultCalendar) {
+      await db.defaultCalendar.create({
+        data: {
+          user: {
+            connect: { id: ctx.session.userId },
+          },
+          calendar: {
+            connect: { id: calendar.id },
+          },
+        },
+      })
+    }
   }
 )

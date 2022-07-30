@@ -129,6 +129,7 @@ const Schedules = ({ user }) => {
       >
         <AddScheduleForm
           header={`${scheduleToEdit ? "Edit" : "Add a new"} Schedule`}
+          isDefaultEdit={scheduleToEdit?.name?.toLowerCase() === "default" ? true : false}
           subHeader=""
           initialValues={
             scheduleToEdit
