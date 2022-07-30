@@ -1,7 +1,10 @@
 import Guard from "app/guard/ability"
-import { Ctx } from "blitz"
+import { getCalendarService } from "app/scheduling/calendars/calendar-service"
+import { Ctx, invoke } from "blitz"
 import db, { Interview, User } from "db"
 import { sendInterviewCancellationMailer } from "mailers/sendInterviewCancellationMailer"
+import getCalendar from "../queries/getCalendar"
+import getScheduleCalendar from "../queries/getScheduleCalendar"
 import verifyCancelCode from "../queries/verifyCancelCode"
 
 // async function sendCancellationMail(interview: Interview, meeting: Interview & { owner: User }) {
@@ -47,14 +50,37 @@ const cancelInterview = async (
     throw Error("Invalid Cancellation code")
   }
 
-  const interview = await db.interview.delete({
+  const interview = await db.interview.findUnique({
     where: { id: interviewId },
-    include: { interviewer: true, candidate: true },
+    include: {
+      interviewer: true,
+      job: true,
+      organizer: { include: { defaultCalendars: true } },
+      candidate: true,
+    },
   })
 
-  if (!interview?.interviewer) {
-    throw new Error("Interviewer doesn't exist for this interview")
+  if (!interview?.organizer) {
+    throw new Error("Organizer doesn't exist for this interview")
   }
+
+  const organizerCalendar = await db.calendar.findUnique({
+    where: { id: interview.calendarId },
+  })
+
+  if (!organizerCalendar) {
+    throw new Error("An error occured: Organizer doesn't have a connected calendar")
+  }
+
+  const calendarService = await getCalendarService(organizerCalendar)
+  await calendarService.cancelEvent(interview.eventId)
+
+  await db.interview.update({
+    where: { id: interviewId },
+    data: {
+      cancelled: true,
+    },
+  })
 
   const buildEmail = await sendInterviewCancellationMailer({ interview })
   await buildEmail.send()

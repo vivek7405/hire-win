@@ -154,7 +154,7 @@ export default resolver.pipe(
     const startDateUTC = moment(interviewInfo.startDate).utc().toDate()
 
     const calendarService = await getCalendarService(organizerCalendar)
-    await calendarService.createEvent({
+    const event = await calendarService.createEvent({
       organizer,
       interviewer: interviewDetail.interviewer,
       candidate,
@@ -182,9 +182,13 @@ export default resolver.pipe(
         },
         startDateUTC,
         duration: interviewDetail.duration,
+        calendarId: organizerCalendar.id,
+        eventId: event?.id,
+        calendarLink: event?.calendarLink,
+        meetingLink: event?.meetingLink,
         cancelCode: hashedCode,
       },
-      include: { candidate: true },
+      include: { candidate: true, job: true, organizer: true },
     })
 
     // const interviewDetailFromDb = await db.interviewDetail.findUnique({
@@ -200,8 +204,7 @@ export default resolver.pipe(
     //   throw new Error("Interview details not found")
     // }
 
-    const cancelLink =
-      process.env.NEXT_PUBLIC_APP_URL + "/cancelInterview/" + interview.id + "/" + cancelCode
+    const cancelLink = `${process.env.NEXT_PUBLIC_APP_URL}/cancelInterview/${interview.id}/${cancelCode}`
 
     const buildEmail = await sendInterviewConfirmationMailer({
       interview,

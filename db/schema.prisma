@@ -435,7 +435,6 @@ model Question {
 
   factory Boolean @default(false)
 
-
   company   Company @relation(fields: [companyId], references: [id])
   companyId String
 
@@ -768,7 +767,14 @@ model Interview {
   otherAttendees User[]
   startDateUTC   DateTime
   duration       Int
-  cancelCode     String
+
+  calendarId   String @default("")
+  eventId      String @default("")
+  calendarLink String @default("")
+  meetingLink  String @default("")
+  cancelCode   String
+
+  cancelled Boolean @default(false)
 }
 
 model Comment {

@@ -6,12 +6,14 @@
  */
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
-import db, { Candidate, Interview, InterviewDetail, User } from "db"
+import db, { Candidate, Interview, InterviewDetail, Job, User } from "db"
 import { createICalendarEvent } from "app/scheduling/interviews/utils/createCalendarEvent"
 import { InterviewDetailType } from "types"
 
 type SendInterviewConfirmationMailerInput = {
-  interview: Interview & { candidate: Pick<Candidate, "email" | "name"> }
+  interview: Interview & { job: Pick<Job, "title"> } & {
+    candidate: Pick<Candidate, "email" | "name">
+  } & { organizer: Pick<User, "email"> }
   interviewDetail: InterviewDetailType
   organizer: Pick<User, "email" | "name">
   otherAttendees: Pick<User, "email" | "name">[]
@@ -37,13 +39,15 @@ export async function sendInterviewConfirmationMailer({
   const msg = {
     from: "noreply@hire.win",
     to: interview?.candidate?.email,
-    subject: "Interview confirmation",
+    subject: `Interview scheduled for ${interview?.job?.title}`,
     html: `
-      <h1>Your interview has been scheduled with ${interviewDetail?.interviewer?.name}.</h1>
+      <h1>Your interview has been scheduled for ${interview?.job?.title}.</h1>
       <br />
-      <p>You must have got a meeting invite. If not, contact the interviewer on the following email: ${interviewDetail?.interviewer?.email}</p>
+      <p>You must have got a meeting invite. You may join the meeting here: ${interview?.meetingLink}</p>
       <br />
-      <p>You may cancel the meeting by clicking on the following link: ${cancelLink}</p>
+      <p>For any queries, contact the organiser: ${interview?.organizer?.email}</p>
+      <br />
+      <p>You may cancel the meeting here: ${cancelLink}</p>
     `,
   }
 

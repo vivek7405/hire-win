@@ -6,10 +6,10 @@
  */
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
-import db, { Candidate, Interview, InterviewDetail, User } from "db"
+import db, { Candidate, Interview, InterviewDetail, Job, User } from "db"
 
 type SendInterviewCancellationMailerInput = {
-  interview: Interview & { interviewer: User } & {
+  interview: Interview & { interviewer: User } & { organizer: User } & { job: Job } & {
     candidate: Candidate
   }
 }
@@ -29,11 +29,11 @@ export async function sendInterviewCancellationMailer({
   const msg = {
     from: "noreply@hire.win",
     to: interview?.candidate?.email,
-    subject: "Interview cancelled",
+    subject: `Interview for ${interview?.job?.title} cancelled`,
     html: `
-      <h1>Your interview with ${interview?.interviewer?.name} has been cancelled.</h1>
+      <h1>Your interview for the job ${interview?.job?.title} has been cancelled.</h1>
       <br />
-      <p>For any queries, please contact the interviewer on the following email: ${interview?.interviewer?.email}</p>      
+      <p>For any queries, please contact the organizer on the following email: ${interview?.organizer?.email}</p>
     `,
   }
 

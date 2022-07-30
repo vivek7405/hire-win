@@ -1,7 +1,11 @@
 import { google, calendar_v3 } from "googleapis"
 import { createAuthenticatedGoogleOauth } from "./helpers/GoogleClient"
 import db, { Calendar } from "db"
-import { CalendarService, CreateEventInterview } from "app/scheduling/calendars/calendar-service"
+import {
+  CalendarService,
+  CreatedCalendarEvent,
+  CreateEventInterview,
+} from "app/scheduling/calendars/calendar-service"
 import { addMinutes } from "date-fns"
 import { boilDownTimeIntervals } from "../utils/boildown-intervals"
 import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator"
@@ -34,7 +38,7 @@ export class GoogleCalendarService implements CalendarService {
       where: { id: interview?.interviewer?.id },
     })
 
-    await this.calendar.events.insert({
+    const event = await this.calendar.events.insert({
       calendarId: "primary",
       sendNotifications: true,
       conferenceDataVersion: 1,
@@ -69,6 +73,23 @@ export class GoogleCalendarService implements CalendarService {
           },
         },
       },
+    })
+
+    if (event) {
+      return {
+        id: event.data.id,
+        calendarLink: event.data.htmlLink,
+        meetingLink: event.data.hangoutLink,
+      } as CreatedCalendarEvent
+    } else {
+      return null
+    }
+  }
+
+  public async cancelEvent(eventId) {
+    await this.calendar.events.delete({
+      eventId,
+      calendarId: "primary",
     })
   }
 

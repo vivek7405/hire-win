@@ -109,6 +109,8 @@ const PickAndSchedule = ({
     endDateUTC: new Date(moment(selectedDay)?.endOf("month")?.format("YYYY-MM-DD")),
   })
 
+  const [isScheduling, setIsScheduling] = useState(false)
+
   useEffect(() => {
     if (selectedDay) {
       return
@@ -178,12 +180,13 @@ const PickAndSchedule = ({
     }
   }
 
-  const onSubmit = async () => {
+  const onScheduleClick = async () => {
     if (!selectedTimeSlot || selectedTimeSlot.start < new Date()) {
       toast.error("Please select a time slot. The time slot must be in the future.")
       return
     }
 
+    setIsScheduling(true)
     try {
       await scheduleInterviewMutation({
         jobId: candidate?.jobId,
@@ -198,6 +201,7 @@ const PickAndSchedule = ({
     } catch (error) {
       toast.error(`Something went wrong: ${error.message}`)
     }
+    setIsScheduling(false)
   }
 
   return (
@@ -252,10 +256,11 @@ const PickAndSchedule = ({
       />
       {selectedTimeSlot && (
         <button
-          className="bg-theme-600 hover:bg-theme-700 p-2 rounded-lg text-white"
-          onClick={() => onSubmit()}
+          className="bg-theme-600 hover:bg-theme-700 p-2 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isScheduling}
+          onClick={() => onScheduleClick()}
         >
-          Schedule
+          {isScheduling ? "Scheduling..." : "Schedule"}
         </button>
       )}
     </>

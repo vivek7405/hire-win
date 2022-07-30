@@ -198,16 +198,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 //   }
 // }
 
-const getResume = async (resume) => {
-  if (resume) {
+const getResume = async (Key) => {
+  if (Key) {
     const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/files/getFile`
     const config = {
       headers: {
         "content-type": "application/json",
       },
     }
-    const response = await axios.post(url, resume, config)
+    const response = await axios.post(url, { Key }, config)
     return response
+  } else {
+    return null
   }
 }
 
@@ -354,12 +356,12 @@ const SingleCandidatePageContent = ({
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
     if (resume?.Key) {
-      getResume(resume).then((response) => {
+      getResume(resume.Key).then((response) => {
         const file = response?.data?.Body
         setFile(file)
       })
     }
-  }, [resume])
+  }, [resume.Key])
 
   const [candidateToReject, setCandidateToReject] = useState(null as any)
   const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)
@@ -556,7 +558,7 @@ const SingleCandidatePageContent = ({
             e.preventDefault()
 
             if (
-              (selectedWorkflowStage?.order || 0) ===
+              (candidate?.workflowStage?.order || 0) ===
               (candidate?.job?.workflow?.stages?.length || 0)
             ) {
               toast.error("The candidate is already in the last stage")
@@ -614,7 +616,7 @@ const SingleCandidatePageContent = ({
                   onSelect={async (e) => {
                     e.preventDefault()
 
-                    if (selectedWorkflowStage?.id === ws?.id) {
+                    if (candidate?.workflowStage?.id === ws?.id) {
                       toast.error(`The candidate is already in the ${ws?.stage?.name} stage`)
                     } else {
                       setCandidateToMove(candidate)
@@ -827,7 +829,7 @@ const SingleCandidatePageContent = ({
               workflowStages?.find((ws) => ws.id === candidateToMove.workflowStageId)?.order || 0
             const nextStage = workflowStages?.find((ws) => ws.order === currentStageOrder + 1)
             await updateCandidateStg(candidateToMove, moveToWorkflowStage?.id || nextStage?.id)
-            setSelectedWorkflowStage(moveToWorkflowStage!)
+            setSelectedWorkflowStage(moveToWorkflowStage || nextStage)
             invalidateQuery(getCandidateInterviewsByStage)
             setOpenCandidateMoveConfirm(false)
             setCandidateToMove(null)

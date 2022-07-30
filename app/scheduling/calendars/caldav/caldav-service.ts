@@ -284,6 +284,8 @@ export class CaldavService implements CalendarService {
     return makeRequestTo(this.calendar, opts)
   }
 
+  public async cancelEvent(eventId) {}
+
   // currently not working on baikal's default calender
   public async getTakenTimeSlots(start: Date, end: Date): Promise<ExternalEvent[]> {
     const response = await this.makeRequest({
@@ -340,5 +342,7 @@ END:VCALENDAR\r\n`.trimLeft()
     if (response.res.statusMessage !== "Created") {
       throw response.res
     }
+
+    return null
   }
 }

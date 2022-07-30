@@ -1,4 +1,8 @@
-import { CalendarService, CreateEventInterview } from "app/scheduling/calendars/calendar-service"
+import {
+  CalendarService,
+  CreatedCalendarEvent,
+  CreateEventInterview,
+} from "app/scheduling/calendars/calendar-service"
 import {
   AuthorizationHeader,
   getAuthorizationHeader,
@@ -8,6 +12,7 @@ import db, { Calendar } from "db"
 import { boilDownTimeIntervals } from "app/scheduling/calendars/utils/boildown-intervals"
 import makeRequestTo from "app/scheduling/calendars/outlookcalendar/helper/callMicrosoftAPI"
 import { zonedTimeToUtc } from "date-fns-tz"
+import axios from "axios"
 
 export class OutlookCalendarService implements CalendarService {
   private authorizationHeader: AuthorizationHeader
@@ -96,7 +101,33 @@ export class OutlookCalendarService implements CalendarService {
       headers: { ...this.authorizationHeader, "content-type": "application/json" },
     }
     try {
+      const event = await makeRequestTo(options)
+
+      if (event) {
+        return {
+          id: event.id,
+          calendarLink: event.webLink,
+          meetingLink: event.onlineMeeting.joinUrl,
+        } as CreatedCalendarEvent
+      } else {
+        return null
+      }
+    } catch (err) {
+      throw new Error("Error while requesting:" + err)
+    }
+  }
+
+  public async cancelEvent(eventId) {
+    const url = `https://graph.microsoft.com/v1.0/me/events/${eventId}/cancel`
+    const options = {
+      method: "POST" as const,
+      url: url,
+      body: JSON.stringify({}),
+      headers: { ...this.authorizationHeader, "content-type": "application/json" },
+    }
+    try {
       await makeRequestTo(options)
+      return
     } catch (err) {
       throw new Error("Error while requesting:" + err)
     }

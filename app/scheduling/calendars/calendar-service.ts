@@ -24,8 +24,15 @@ export interface ExternalEvent {
   end: Date
 }
 
+export type CreatedCalendarEvent = {
+  id: string
+  calendarLink: string
+  meetingLink: string
+}
+
 export interface CalendarService {
-  createEvent(interview: CreateEventInterview): Promise<void>
+  createEvent(interview: CreateEventInterview): Promise<CreatedCalendarEvent | null>
+  cancelEvent(eventId: string): Promise<void>
   getTakenTimeSlots(start: Date, end: Date): Promise<ExternalEvent[]>
 }
 

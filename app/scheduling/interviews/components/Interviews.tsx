@@ -1,4 +1,4 @@
-import { TrashIcon } from "@heroicons/react/outline"
+import { TrashIcon, XIcon } from "@heroicons/react/outline"
 import { Interview, InterviewDetail, JobUser, JobUserRole, User } from "@prisma/client"
 import Confirm from "app/core/components/Confirm"
 import Modal from "app/core/components/Modal"
@@ -136,13 +136,24 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
         <div className="w-full mt-3 flex flex-col space-y-3">
           {candidateStageInterviews?.length === 0 && <p>No interviews scheduled</p>}
           {candidateStageInterviews
-            ?.filter((interview) => interview.startDateUTC >= new Date())
+            ?.filter(
+              (interview) =>
+                !interview.cancelled &&
+                moment.utc(interview.startDateUTC).local().toDate() <= new Date() &&
+                new Date() <=
+                  moment
+                    .utc(interview.startDateUTC)
+                    .local()
+                    .add(interview.duration, "minutes")
+                    .toDate()
+            )
             .map((interview, index) => {
               return (
                 <>
-                  {index === 0 && <span className="font-semibold">Upcoming</span>}
+                  {index === 0 && <span className="font-semibold">Ongoing</span>}
                   <CandidateInterview
                     key={interview.id}
+                    type={CandidateInterviewType.ONGOING}
                     interview={interview}
                     user={user as any}
                     setOpenConfirm={setOpenConfirm}
@@ -152,13 +163,56 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
               )
             })}
           {candidateStageInterviews
-            ?.filter((interview) => interview.startDateUTC < new Date())
+            ?.filter(
+              (interview) =>
+                !interview.cancelled &&
+                moment.utc(interview.startDateUTC).local().toDate() > new Date()
+            )
+            .map((interview, index) => {
+              return (
+                <>
+                  {index === 0 && <span className="font-semibold">Upcoming</span>}
+                  <CandidateInterview
+                    key={interview.id}
+                    type={CandidateInterviewType.UPCOMING}
+                    interview={interview}
+                    user={user as any}
+                    setOpenConfirm={setOpenConfirm}
+                    setInterviewToDelete={setInterviewToDelete}
+                  />
+                </>
+              )
+            })}
+          {candidateStageInterviews
+            ?.filter(
+              (interview) =>
+                !interview.cancelled &&
+                moment.utc(interview.startDateUTC).local().toDate() < new Date()
+            )
             .map((interview, index) => {
               return (
                 <>
                   {index === 0 && <span className="font-semibold">Past</span>}
                   <CandidateInterview
                     key={interview.id}
+                    type={CandidateInterviewType.PAST}
+                    interview={interview}
+                    user={user as any}
+                    setOpenConfirm={setOpenConfirm}
+                    setInterviewToDelete={setInterviewToDelete}
+                  />
+                </>
+              )
+            })}
+          {candidateStageInterviews
+            ?.filter((interview) => interview.cancelled)
+            .map((interview, index) => {
+              return (
+                <>
+                  {index === 0 && <span className="font-semibold">Cancelled</span>}
+                  <CandidateInterview
+                    key={interview.id}
+                    type={CandidateInterviewType.CANCELLED}
                     interview={interview}
                     user={user as any}
                     setOpenConfirm={setOpenConfirm}
@@ -173,7 +227,15 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
   )
 }
 
+enum CandidateInterviewType {
+  ONGOING = "ONGOING",
+  UPCOMING = "UPCOMING",
+  PAST = "PAST",
+  CANCELLED = "CANCELLED",
+}
+
 type CandidateInterviewProps = {
+  type: CandidateInterviewType
   interview: Interview & { organizer: User } & { interviewer: User } & {
     otherAttendees: User[]
   }
@@ -182,6 +244,7 @@ type CandidateInterviewProps = {
   setInterviewToDelete: any
 }
 const CandidateInterview = ({
+  type,
   interview,
   user,
   setOpenConfirm,
@@ -189,23 +252,48 @@ const CandidateInterview = ({
 }: CandidateInterviewProps) => {
   return (
     <div key={interview.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
-      <button
-        className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={
-          user?.id !== interview?.interviewerId &&
-          user?.id !== interview?.organizerId &&
-          user?.jobUsers?.find((JobUser) => JobUser.jobId === interview?.jobId)?.role !== "OWNER"
-        }
-        onClick={() => {
-          setOpenConfirm(true)
-          setInterviewToDelete(interview)
-        }}
-      >
-        <TrashIcon className="w-5 h-5 text-red-500 hover:text-red-600" />
-      </button>
-      <b className="capitalize">{moment(interview.startDateUTC).local().fromNow()}</b>
+      {type !== CandidateInterviewType.CANCELLED && (
+        <button
+          title="Cancel Interview"
+          className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={
+            user?.id !== interview?.interviewerId &&
+            user?.id !== interview?.organizerId &&
+            user?.jobUsers?.find((JobUser) => JobUser.jobId === interview?.jobId)?.role !== "OWNER"
+          }
+          onClick={() => {
+            setOpenConfirm(true)
+            setInterviewToDelete(interview)
+          }}
+        >
+          <XIcon className="w-5 h-5 text-red-500 hover:text-red-600" />
+        </button>
+      )}
+      {type !== CandidateInterviewType.CANCELLED && (
+        <>
+          <b className="capitalize">
+            {type === CandidateInterviewType.ONGOING && "Started"}{" "}
+            {type === CandidateInterviewType.PAST && "Happened"}{" "}
+            {moment(interview.startDateUTC).local().fromNow()}
+          </b>
+          <br />
+        </>
+      )}
+      {moment(interview.startDateUTC).local().toLocaleString()}
       <br />
-      {moment(interview.startDateUTC).toLocaleString()}
+      {interview.meetingLink && (
+        <>
+          <br />
+          <a
+            className="text-indigo-600"
+            href={interview.meetingLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {interview.meetingLink}
+          </a>
+        </>
+      )}
       <br />
       Duration: <span className="whitespace-nowrap">{interview.duration} mins</span>
       <br />
@@ -229,6 +317,23 @@ const CandidateInterview = ({
           return attendee.name
         })
         ?.toString() || "NA"}
+      {type !== CandidateInterviewType.CANCELLED && interview.calendarLink && (
+        <>
+          <br />
+          <a
+            className="text-indigo-600"
+            href={interview.calendarLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View in calendar
+          </a>
+        </>
+      )}
+      {/* <br />
+      <a className="text-indigo-600" href={interview.cancelCode}>
+        Cancel
+      </a> */}
     </div>
   )
 }

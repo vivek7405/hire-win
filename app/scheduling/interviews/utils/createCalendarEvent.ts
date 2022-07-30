@@ -1,4 +1,4 @@
-import db, { Calendar, Candidate, Interview, InterviewDetail, User } from "db"
+import db, { Calendar, Candidate, Interview, InterviewDetail, Job, User } from "db"
 import * as ics from "ics"
 import { InterviewDetailType } from "types"
 
@@ -10,7 +10,9 @@ function durationToIcsDurationObject(durationInMinutes: number): ics.DurationObj
 }
 
 export async function createICalendarEvent(
-  interview: Interview & { candidate: Pick<Candidate, "email" | "name"> },
+  interview: Interview & { job: Pick<Job, "title"> } & {
+    candidate: Pick<Candidate, "email" | "name">
+  },
   interviewDetail: InterviewDetailType,
   organizer: Pick<User, "email" | "name">,
   otherAttendees: Pick<User, "email" | "name">[]
@@ -28,8 +30,8 @@ export async function createICalendarEvent(
       interview.startDateUTC.getMinutes(),
     ],
     duration: durationToIcsDurationObject(interviewDetail.duration),
-    title: `Interview with ${interview?.candidate?.name}`,
-    description: `Interview with ${interview?.candidate?.name}`,
+    title: `Interview for ${interview?.job?.title} with ${interview?.candidate?.name}`,
+    description: `Interview for ${interview?.job?.title} with ${interview?.candidate?.name}`,
     location: "",
     organizer: { name: organizer?.name, email: organizer?.email },
     attendees: [
