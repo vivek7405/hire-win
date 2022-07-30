@@ -14,7 +14,7 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import createEmailTemplate from "app/email-templates/mutations/createEmailTemplate"
 import path from "path"
 import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
-import getEmailTemplates from "app/email-templates/queries/getEmailTemplates"
+import getEmailTemplatesWOPagination from "app/email-templates/queries/getEmailTemplatesWOPagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -58,7 +58,7 @@ const NewEmailTemplate = ({ user }: InferGetServerSidePropsType<typeof getServer
               }
 
               await createEmailTemplateMutation({ ...values })
-              await invalidateQuery(getEmailTemplates)
+              await invalidateQuery(getEmailTemplatesWOPagination)
               toast.success("Template added successfully", { id: toastId })
             } catch (error) {
               toast.error(`Failed to add new template - ${error.toString()}`, { id: toastId })

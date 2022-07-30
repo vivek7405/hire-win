@@ -22,10 +22,12 @@ const getForms = resolver.pipe(
         db.form.findMany({
           ...paginateArgs,
           where,
-          orderBy,
           include: {
-            questions: { include: { question: true } },
+            questions: { include: { question: true }, orderBy: { order: "asc" } },
             jobs: true,
+          },
+          orderBy: {
+            createdAt: "asc",
           },
         }),
     })

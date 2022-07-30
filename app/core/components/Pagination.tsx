@@ -68,8 +68,13 @@ const Pagination = ({
             </>
           )}
           <span className="font-medium">{totalCount === 0 ? "No" : totalCount}</span>{" "}
-          {resultName || "result"}
-          {totalCount !== 1 && "s"}
+          {(resultName && resultName[resultName.length - 1] === "y"
+            ? totalCount !== 1
+              ? resultName.substring(0, resultName.length - 1)
+              : resultName
+            : resultName) || "result"}
+          {totalCount !== 1 &&
+            (resultName && resultName[resultName.length - 1] === "y" ? "ies" : "s")}
         </p>
       </div>
       <div className="flex-1 flex justify-end">

@@ -1,18 +1,38 @@
 import Guard from "app/guard/ability"
-import { resolver } from "blitz"
+import { paginate, resolver } from "blitz"
 import db, { Prisma } from "db"
 
-interface GetCandidatePoolsInput extends Pick<Prisma.CandidatePoolFindManyArgs, "where"> {}
+interface GetCandidatePoolsInput
+  extends Pick<Prisma.CandidatePoolFindManyArgs, "where" | "skip" | "take"> {}
 
-const getCandidatePoolsWOPagination = resolver.pipe(
+const getCandidatePools = resolver.pipe(
   resolver.authorize(),
-  async ({ where }: GetCandidatePoolsInput) => {
-    const categories = await db.candidatePool.findMany({
-      where,
-      include: { _count: { select: { candidates: true } } },
+  async ({ where, skip = 0, take = 100 }: GetCandidatePoolsInput) => {
+    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
+    const {
+      items: candidatePools,
+      hasMore,
+      nextPage,
+      count,
+    } = await paginate({
+      skip,
+      take,
+      count: () => db.candidatePool.count({ where }),
+      query: (paginateArgs) =>
+        db.candidatePool.findMany({
+          ...paginateArgs,
+          where,
+          include: { _count: { select: { candidates: true } } },
+        }),
     })
-    return categories
+
+    return {
+      candidatePools,
+      nextPage,
+      hasMore,
+      count,
+    }
   }
 )
 
-export default Guard.authorize("readAll", "candidatePool", getCandidatePoolsWOPagination)
+export default Guard.authorize("readAll", "candidatePool", getCandidatePools)

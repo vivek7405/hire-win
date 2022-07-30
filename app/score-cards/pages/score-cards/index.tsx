@@ -32,6 +32,7 @@ import toast from "react-hot-toast"
 import Modal from "app/core/components/Modal"
 import ScoreCardForm from "app/score-cards/components/ScoreCardForm"
 import Card from "app/core/components/Card"
+import Pagination from "app/core/components/Pagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -57,7 +58,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const ScoreCards = () => {
+  const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const tablePage = Number(router.query.page) || 0
   const [query, setQuery] = useState({})
   const session = useSession()
 
@@ -84,12 +87,20 @@ const ScoreCards = () => {
     setQuery(search)
   }, [router.query])
 
-  const [scoreCards] = useQuery(getScoreCardsWOPagination, {
+  const [{ scoreCards, hasMore, count }] = usePaginatedQuery(getScoreCards, {
     where: {
       companyId: session.companyId || "0",
       ...query,
     },
+    skip: ITEMS_PER_PAGE * Number(tablePage),
+    take: ITEMS_PER_PAGE,
   })
+
+  let startPage = tablePage * ITEMS_PER_PAGE + 1
+  let endPage = startPage - 1 + ITEMS_PER_PAGE
+  if (endPage > count) {
+    endPage = count
+  }
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -120,7 +131,7 @@ const ScoreCards = () => {
             toast.success("Score card deleted", { id: toastId })
             setOpenConfirm(false)
             setScoreCardToDelete(null as any)
-            invalidateQuery(getScoreCardsWOPagination)
+            invalidateQuery(getScoreCards)
           } catch (error) {
             toast.error(`Deleting score card failed - ${error.toString()}`, { id: toastId })
           }
@@ -146,7 +157,7 @@ const ScoreCards = () => {
                     initial: scoreCardToEdit,
                   })
                 : await createScoreCardMutation({ ...values })
-              await invalidateQuery(getScoreCardsWOPagination)
+              await invalidateQuery(getScoreCards)
               toast.success(
                 isEdit ? "Score Card updated successfully" : "Score Card added successfully",
                 {
@@ -188,6 +199,16 @@ const ScoreCards = () => {
           }}
         />
       </div>
+
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="score card"
+      />
 
       {scoreCards?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No Score Cards found</div>

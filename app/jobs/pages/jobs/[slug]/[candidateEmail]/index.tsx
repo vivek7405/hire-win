@@ -73,7 +73,7 @@ import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
 import Comments from "app/comments/components/Comments"
 import Emails from "app/emails/components/Emails"
-import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
+import getCandidatePoolsWOPagination from "app/candidate-pools/queries/getCandidatePoolsWOPagination"
 import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
@@ -341,7 +341,7 @@ const SingleCandidatePageContent = ({
   const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
-  const [candidatePools] = useQuery(getCandidatePools, {
+  const [candidatePools] = useQuery(getCandidatePoolsWOPagination, {
     where: { companyId: session.companyId || "0", candidates: { none: { id: candidate?.id } } },
   })
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
@@ -692,7 +692,7 @@ const SingleCandidatePageContent = ({
                   const toastId = toast.loading(`Adding candidate to pool - ${cp.name}`)
                   try {
                     await addCandidateToPoolMutation({ candidateId: candidate?.id, poolId: cp.id })
-                    await invalidateQuery(getCandidatePools)
+                    await invalidateQuery(getCandidatePoolsWOPagination)
                     toast.success(`Candidate added to pool - ${cp.name}`, { id: toastId })
                   } catch (error) {
                     toast.error(`Failed adding candidate to pool - ${error.toString()}`, {

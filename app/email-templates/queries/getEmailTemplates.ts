@@ -1,19 +1,39 @@
-import { Ctx, resolver } from "blitz"
+import { paginate, resolver } from "blitz"
 import db, { Prisma } from "db"
 
-interface GetEmailTemplatesInput extends Pick<Prisma.EmailTemplateFindManyArgs, "where"> {}
+interface GetEmailTemplatesInput
+  extends Pick<Prisma.EmailTemplateFindManyArgs, "where" | "skip" | "take"> {}
 
 const getEmailTemplates = resolver.pipe(
   resolver.authorize(),
-  async ({ where }: GetEmailTemplatesInput, ctx: Ctx) => {
-    const emailTemplates = await db.emailTemplate.findMany({
-      where,
-      include: {
-        _count: { select: { emails: true } },
-      },
-      orderBy: { createdAt: "asc" },
+  async ({ where, skip = 0, take = 100 }: GetEmailTemplatesInput) => {
+    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
+    const {
+      items: emailTemplates,
+      hasMore,
+      nextPage,
+      count,
+    } = await paginate({
+      skip,
+      take,
+      count: () => db.emailTemplate.count({ where }),
+      query: (paginateArgs) =>
+        db.emailTemplate.findMany({
+          ...paginateArgs,
+          where,
+          include: {
+            _count: { select: { emails: true } },
+          },
+          orderBy: { createdAt: "asc" },
+        }),
     })
-    return emailTemplates
+
+    return {
+      emailTemplates,
+      nextPage,
+      hasMore,
+      count,
+    }
   }
 )
 

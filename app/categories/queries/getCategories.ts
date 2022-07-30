@@ -22,8 +22,8 @@ const getCategories = resolver.pipe(
         db.category.findMany({
           ...paginateArgs,
           where,
-          orderBy,
-          include: { jobs: true },
+          include: { jobs: { select: { id: true, archived: true } } },
+          orderBy: { name: "asc" },
         }),
     })
 

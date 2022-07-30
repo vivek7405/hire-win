@@ -4,7 +4,7 @@ import AuthLayout from "app/core/layouts/AuthLayout"
 import Debouncer from "app/core/utils/debouncer"
 import EmailTemplateForm from "app/email-templates/components/EmailTemplateForm"
 import createEmailTemplate from "app/email-templates/mutations/createEmailTemplate"
-import getEmailTemplates from "app/email-templates/queries/getEmailTemplates"
+import getEmailTemplatesWOPagination from "app/email-templates/queries/getEmailTemplatesWOPagination"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import {
   GetServerSidePropsContext,
@@ -13,6 +13,7 @@ import {
   Link,
   Routes,
   useMutation,
+  usePaginatedQuery,
   useQuery,
   useRouter,
   useSession,
@@ -27,6 +28,8 @@ import { EmailTemplate } from "@prisma/client"
 import Confirm from "app/core/components/Confirm"
 import deleteEmailTemplate from "app/email-templates/mutations/deleteEmailTemplate"
 import updateEmailTemplate from "app/email-templates/mutations/updateEmailTemplate"
+import getEmailTemplates from "app/email-templates/queries/getEmailTemplates"
+import Pagination from "app/core/components/Pagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -51,8 +54,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const EmailTemplates = ({ user }) => {
+const EmailTemplates = () => {
+  const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const tablePage = Number(router.query.page) || 0
   const session = useSession()
   const [query, setQuery] = useState({})
   const [emailTemplateToDelete, setEmailTemplateToDelete] = useState(null as any as EmailTemplate)
@@ -60,11 +65,20 @@ const EmailTemplates = ({ user }) => {
   const [openModal, setOpenModal] = useState(false)
   const [createEmailTemplateMutation] = useMutation(createEmailTemplate)
   const [updateEmailTemplateMutation] = useMutation(updateEmailTemplate)
-  const [emailTemplates] = useQuery(getEmailTemplates, {
-    where: { ...query, companyId: session.companyId || "0" },
-  })
   const [deleteEmailTemplateMutation] = useMutation(deleteEmailTemplate)
   const [emailTemplateToEdit, setEmailTemplateToEdit] = useState(null as any as EmailTemplate)
+
+  const [{ emailTemplates, hasMore, count }] = usePaginatedQuery(getEmailTemplates, {
+    where: { ...query, companyId: session.companyId || "0" },
+    skip: ITEMS_PER_PAGE * Number(tablePage),
+    take: ITEMS_PER_PAGE,
+  })
+
+  let startPage = tablePage * ITEMS_PER_PAGE + 1
+  let endPage = startPage - 1 + ITEMS_PER_PAGE
+  if (endPage > count) {
+    endPage = count
+  }
 
   useEffect(() => {
     const search = router.query.search
@@ -192,6 +206,16 @@ const EmailTemplates = ({ user }) => {
         />
       </div>
 
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="email template"
+      />
+
       {emailTemplates?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No templates found.</div>
       ) : (
@@ -247,7 +271,7 @@ const EmailTemplatesHome = ({ user }: InferGetServerSidePropsType<typeof getServ
   return (
     <AuthLayout title="Email Templates | hire-win" user={user}>
       <Suspense fallback="Loading...">
-        <EmailTemplates user={user} />
+        <EmailTemplates />
       </Suspense>
     </AuthLayout>
   )

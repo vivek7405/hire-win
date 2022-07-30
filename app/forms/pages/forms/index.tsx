@@ -31,6 +31,7 @@ import toast from "react-hot-toast"
 import Modal from "app/core/components/Modal"
 import FormForm from "app/forms/components/FormForm"
 import Card from "app/core/components/Card"
+import Pagination from "app/core/components/Pagination"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -56,7 +57,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const Forms = () => {
+  const ITEMS_PER_PAGE = 12
   const router = useRouter()
+  const tablePage = Number(router.query.page) || 0
   const [query, setQuery] = useState({})
   const session = useSession()
 
@@ -83,12 +86,20 @@ const Forms = () => {
     setQuery(search)
   }, [router.query])
 
-  const [forms] = useQuery(getFormsWOPagination, {
+  const [{ forms, hasMore, count }] = usePaginatedQuery(getForms, {
     where: {
       companyId: session.companyId || "0",
       ...query,
     },
+    skip: ITEMS_PER_PAGE * Number(tablePage),
+    take: ITEMS_PER_PAGE,
   })
+
+  let startPage = tablePage * ITEMS_PER_PAGE + 1
+  let endPage = startPage - 1 + ITEMS_PER_PAGE
+  if (endPage > count) {
+    endPage = count
+  }
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -119,7 +130,7 @@ const Forms = () => {
             toast.success("Form Deleted", { id: toastId })
             setOpenConfirm(false)
             setFormToDelete(null as any)
-            invalidateQuery(getFormsWOPagination)
+            invalidateQuery(getForms)
           } catch (error) {
             toast.error(`Deleting form failed - ${error.toString()}`, { id: toastId })
           }
@@ -145,7 +156,7 @@ const Forms = () => {
                     initial: formToEdit,
                   })
                 : await createFormMutation({ ...values })
-              await invalidateQuery(getFormsWOPagination)
+              await invalidateQuery(getForms)
               toast.success(isEdit ? "Form updated successfully" : "Form added successfully", {
                 id: toastId,
               })
@@ -184,6 +195,16 @@ const Forms = () => {
           }}
         />
       </div>
+
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="form"
+      />
 
       {forms?.length === 0 ? (
         <div className="text-xl font-semibold text-neutral-500">No Forms found</div>
