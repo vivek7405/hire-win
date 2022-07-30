@@ -15,6 +15,7 @@ type AddScheduleFormProps = {
   onSubmit: any
   header: string
   subHeader: string
+  isDefaultEdit?: boolean
 }
 
 export const AddScheduleForm = (props: AddScheduleFormProps) => {
@@ -63,6 +64,7 @@ export const AddScheduleForm = (props: AddScheduleFormProps) => {
           type="text"
           name="name"
           label="Schedule Name"
+          disabled={props.isDefaultEdit || false}
           placeholder="e.g. Workdays"
         />
         <p>
