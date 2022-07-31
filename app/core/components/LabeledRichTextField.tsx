@@ -1,9 +1,10 @@
-import { forwardRef, PropsWithoutRef, useMemo, useState } from "react"
+import { forwardRef, PropsWithoutRef, useEffect, useMemo, useState } from "react"
 import { useFormContext, Controller } from "react-hook-form"
 import toast from "react-hot-toast"
 import { dynamic } from "blitz"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 import TemplatePlaceholders from "app/email-templates/components/TemplatePlaceholders"
+import styles from "./LabeledRichTextField.module.css"
 
 export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["div"]> {
   /** Field name. */
@@ -15,11 +16,21 @@ export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.Intrinsic
   toolbarHidden?: boolean
   readOnly?: boolean
   showTemplatePlaceholders?: boolean
+  noBorder?: boolean
 }
 
 export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFieldProps>(
   (
-    { label, outerProps, name, toolbarHidden, readOnly, showTemplatePlaceholders, ...props },
+    {
+      label,
+      outerProps,
+      name,
+      toolbarHidden,
+      readOnly,
+      showTemplatePlaceholders,
+      noBorder,
+      ...props
+    },
     ref
   ) => {
     const {
@@ -38,6 +49,19 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
         })
     }, [errors, name])
 
+    const [Editor, setEditor] = useState(null as any)
+
+    useEffect(() => {
+      setEditor(
+        dynamic(
+          () => {
+            return import("react-draft-wysiwyg").then((mod) => mod.Editor)
+          },
+          { ssr: false }
+        ) as any
+      )
+    }, [])
+
     return (
       <div {...outerProps}>
         {label && (
@@ -54,15 +78,11 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
             control={control}
             defaultValue=""
             render={({ field: { onChange, value } }) => {
-              const Editor = dynamic(
-                () => {
-                  return import("react-draft-wysiwyg").then((mod) => mod.Editor)
-                },
-                { ssr: false }
-              ) as any
-
-              return (
+              return Editor ? (
                 <Editor
+                  wrapperClassName={!noBorder ? styles.reactDraftWrapperClass : ""}
+                  editorClassName={!noBorder ? styles.reactDraftEditorClass : ""}
+                  toolbarClassName={!noBorder ? styles.reactDraftToolbarClass : ""}
                   toolbarHidden={toolbarHidden}
                   readOnly={readOnly}
                   editorState={value}
@@ -75,6 +95,8 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
                     ),
                   ]}
                 />
+              ) : (
+                <></>
               )
             }}
           />
