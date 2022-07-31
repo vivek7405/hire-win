@@ -12,7 +12,6 @@ import {
   usePaginatedQuery,
   useMutation,
   useQuery,
-  dynamic,
   invalidateQuery,
 } from "blitz"
 import path from "path"

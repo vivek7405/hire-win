@@ -1,4 +1,4 @@
-import { forwardRef, PropsWithoutRef, useMemo, useState } from "react"
+import { forwardRef, PropsWithoutRef, useEffect, useMemo, useState } from "react"
 import { useFormContext, Controller } from "react-hook-form"
 import toast from "react-hot-toast"
 import { dynamic } from "blitz"
@@ -49,6 +49,19 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
         })
     }, [errors, name])
 
+    const [Editor, setEditor] = useState(null as any)
+
+    useEffect(() => {
+      setEditor(
+        dynamic(
+          () => {
+            return import("react-draft-wysiwyg").then((mod) => mod.Editor)
+          },
+          { ssr: false }
+        ) as any
+      )
+    }, [])
+
     return (
       <div {...outerProps}>
         {label && (
@@ -65,14 +78,7 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
             control={control}
             defaultValue=""
             render={({ field: { onChange, value } }) => {
-              const Editor = dynamic(
-                () => {
-                  return import("react-draft-wysiwyg").then((mod) => mod.Editor)
-                },
-                { ssr: false }
-              ) as any
-
-              return (
+              return Editor ? (
                 <Editor
                   wrapperClassName={!noBorder ? styles.reactDraftWrapperClass : ""}
                   editorClassName={!noBorder ? styles.reactDraftEditorClass : ""}
@@ -89,6 +95,8 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
                     ),
                   ]}
                 />
+              ) : (
+                <></>
               )
             }}
           />
