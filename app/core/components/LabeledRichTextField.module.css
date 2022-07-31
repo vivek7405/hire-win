@@ -1,0 +1,11 @@
+.reactDraftWrapperClass {
+  @apply border border-gray-300 block w-full sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.reactDraftEditorClass {
+  @apply px-2 py-2;
+}
+
+.reactDraftToolbarClass {
+  @apply border-0 border-b-2 border-gray-100 rounded-t-md;
+}

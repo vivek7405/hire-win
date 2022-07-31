@@ -4,6 +4,7 @@ import toast from "react-hot-toast"
 import { dynamic } from "blitz"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 import TemplatePlaceholders from "app/email-templates/components/TemplatePlaceholders"
+import styles from "./LabeledRichTextField.module.css"
 
 export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["div"]> {
   /** Field name. */
@@ -15,11 +16,21 @@ export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.Intrinsic
   toolbarHidden?: boolean
   readOnly?: boolean
   showTemplatePlaceholders?: boolean
+  noBorder?: boolean
 }
 
 export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFieldProps>(
   (
-    { label, outerProps, name, toolbarHidden, readOnly, showTemplatePlaceholders, ...props },
+    {
+      label,
+      outerProps,
+      name,
+      toolbarHidden,
+      readOnly,
+      showTemplatePlaceholders,
+      noBorder,
+      ...props
+    },
     ref
   ) => {
     const {
@@ -63,6 +74,9 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
 
               return (
                 <Editor
+                  wrapperClassName={!noBorder ? styles.reactDraftWrapperClass : ""}
+                  editorClassName={!noBorder ? styles.reactDraftEditorClass : ""}
+                  toolbarClassName={!noBorder ? styles.reactDraftToolbarClass : ""}
                   toolbarHidden={toolbarHidden}
                   readOnly={readOnly}
                   editorState={value}

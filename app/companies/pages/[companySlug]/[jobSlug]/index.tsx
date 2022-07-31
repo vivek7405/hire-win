@@ -145,6 +145,7 @@ const JobDescriptionPage = ({
             testid="jobDescription"
             toolbarHidden={true}
             readOnly={true}
+            noBorder={true}
           />
         </Form>
       </Suspense>
