@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, Suspense, useCallback } from "react"
+import { useEffect, useState, Suspense } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -12,6 +12,7 @@ import {
   invalidateQuery,
   invokeWithMiddleware,
   useSession,
+  dynamic,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -26,6 +27,8 @@ import {
   DragDirection,
   ExtendedJob,
   ExtendedWorkflowStage,
+  IntroHint,
+  IntroStep,
   JobViewType,
   Plan,
   PlanName,
@@ -55,6 +58,9 @@ import setJobArchived from "app/jobs/mutations/setJobArchived"
 import RadioGroupField from "app/core/components/RadioGroupField"
 import getUserJobsByViewTypeAndCategory from "app/jobs/queries/getUserJobsByViewTypeAndCategory"
 import getUserJobCategoriesByViewType from "app/categories/queries/getUserJobCategoriesByViewType"
+import { StepsProps } from "intro.js-react"
+import usePreviousValue from "app/core/hooks/usePreviousValue"
+import { jobs } from "googleapis/build/src/apis/jobs"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -160,12 +166,24 @@ const CategoryFilterButtons = ({
   )
 }
 
-const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, viewType }) => {
+const Jobs = ({
+  user,
+  company,
+  currentPlan,
+  setOpenConfirm,
+  setConfirmMessage,
+  viewType,
+  introSteps,
+  introStepsEnabled,
+  isIntroFirstLoad,
+  setIsIntroFirstLoad,
+  Steps,
+}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const session = useSession()
   const tablePage = Number(router.query.page) || 0
-  const [data, setData] = useState<{}[]>([])
+  // const [data, setData] = useState<{}[]>([])
   const [searchString, setSearchString] = useState((router.query.search as string) || '""')
   // const [query, setQuery] = useState({})
 
@@ -232,6 +250,27 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
 
   return (
     <>
+      {Steps && jobUsers?.length === 0 && introStepsEnabled && isIntroFirstLoad && (
+        <Steps
+          enabled={introStepsEnabled || false}
+          steps={introSteps}
+          initialStep={0}
+          options={{
+            nextToDone: true,
+            dontShowAgain: true,
+            dontShowAgainLabel: "Don't show again",
+          }}
+          onExit={() => {
+            if (isIntroFirstLoad) {
+              setIsIntroFirstLoad(false)
+            }
+          }}
+        />
+      )}
+      {/* {Hints && introHintsEnabled && isIntroFirstLoad && (
+        <Hints enabled={introHintsEnabled || false} hints={introHints} />
+      )} */}
+
       <Confirm
         open={openJobArchiveConfirm}
         setOpen={setOpenJobArchiveConfirm}
@@ -421,12 +460,12 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                                       hidden: switchState,
                                     })
 
-                                    let newArr = [...data] as any
-                                    const updateIndex = newArr.findIndex((j) => j.id === job?.id)
-                                    if (updateIndex >= 0 && newArr[updateIndex]) {
-                                      newArr[updateIndex].hidden = switchState
-                                      setData(newArr)
-                                    }
+                                    // let newArr = [...data] as any
+                                    // const updateIndex = newArr.findIndex((j) => j.id === job?.id)
+                                    // if (updateIndex >= 0 && newArr[updateIndex]) {
+                                    //   newArr[updateIndex].hidden = switchState
+                                    //   setData(newArr)
+                                    // }
 
                                     toast.success(
                                       () => (
@@ -485,12 +524,12 @@ const Jobs = ({ user, company, currentPlan, setOpenConfirm, setConfirmMessage, v
                                       showSalary: switchState,
                                     })
 
-                                    let newArr = [...data] as any
-                                    const updateIndex = newArr.findIndex((j) => j.id === job?.id)
-                                    if (updateIndex >= 0 && newArr[updateIndex]) {
-                                      newArr[updateIndex].showSalary = switchState
-                                      setData(newArr)
-                                    }
+                                    // let newArr = [...data] as any
+                                    // const updateIndex = newArr.findIndex((j) => j.id === job?.id)
+                                    // if (updateIndex >= 0 && newArr[updateIndex]) {
+                                    //   newArr[updateIndex].showSalary = switchState
+                                    //   setData(newArr)
+                                    // }
 
                                     toast.success(
                                       () => (
@@ -635,8 +674,6 @@ const JobsHome = ({
   const [confirmMessage, setConfirmMessage] = useState(
     "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
   )
-  const [viewArchived, setViewArchived] = useState(false)
-  const [viewExpired, setViewExpired] = useState(false)
   const [viewType, setViewType] = useState(JobViewType.Active)
 
   const searchQuery = async (e) => {
@@ -760,8 +797,74 @@ const JobsHome = ({
     </button>
   )
 
+  const [introStepsEnabled, setIntroStepsEnabled] = useState(false)
+  // const [introHintsEnabled, setIntroHintsEnabled] = useState(false)
+  const [isIntroFirstLoad, setIsIntroFirstLoad] = useState(true)
+  useEffect(() => {
+    setTimeout(() => {
+      setIntroStepsEnabled(true)
+      // setIntroHintsEnabled(true)
+    }, 1000)
+  }, [])
+
+  const [introSteps, setIntroSteps] = useState([] as IntroStep[])
+  const [introHints, setIntroHints] = useState([] as IntroHint[])
+  const setNavbarIntroSteps = (navbarIntroSteps) => {
+    setIntroSteps([
+      {
+        title: "Welcome to hire.win",
+        intro: (
+          <span>
+            <p>
+              {`We'll`} walk you through a <b>quick intro</b> so that you better understand the
+              application.
+            </p>
+            <br />
+            <p>
+              <b>Click on the Next button</b> to proceed or else the close button to Skip
+            </p>
+          </span>
+        ),
+      },
+      ...navbarIntroSteps,
+      {
+        title: "That's it for now",
+        intro: (
+          <span>
+            <p>
+              {`You'll`} better understand the application once you <b>start using it</b>.
+            </p>
+            <br />
+            <p>
+              Feel free to reach out to us in case of any queries and {`we'll`} be happy to help 😊
+            </p>
+            <br />
+            <p>
+              Write us at <b>support@hire.win</b>
+            </p>
+          </span>
+        ),
+      },
+    ])
+  }
+  const setNavbarIntroHints = (navbarIntroHints) => {
+    setIntroHints(navbarIntroHints)
+  }
+
+  const Steps = dynamic(() => import("intro.js-react").then((mod) => mod.Steps), {
+    ssr: false,
+  }) as any
+  // const Hints = dynamic(() => import("intro.js-react").then((mod) => mod.Hints), {
+  //   ssr: false,
+  // }) as any
+
   return (
-    <AuthLayout title="Jobs | hire-win" user={user}>
+    <AuthLayout
+      title="Jobs | hire-win"
+      user={user}
+      setNavbarIntroSteps={setNavbarIntroSteps}
+      setNavbarIntroHints={setNavbarIntroHints}
+    >
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
@@ -782,12 +885,7 @@ const JobsHome = ({
           {newJobButton}
         </div>
 
-        <Form
-          noFormatting={true}
-          onSubmit={(value) => {
-            return value
-          }}
-        >
+        <Form noFormatting={true} onSubmit={async () => {}}>
           <RadioGroupField
             name="View"
             isBorder={true}
@@ -838,6 +936,11 @@ const JobsHome = ({
           currentPlan={currentPlan}
           setOpenConfirm={setOpenConfirm}
           setConfirmMessage={setConfirmMessage}
+          introSteps={introSteps}
+          introStepsEnabled={introStepsEnabled}
+          isIntroFirstLoad={isIntroFirstLoad}
+          setIsIntroFirstLoad={setIsIntroFirstLoad}
+          Steps={Steps}
         />
       </Suspense>
     </AuthLayout>

@@ -9,7 +9,6 @@ import {
   Router,
 } from "blitz"
 import { ErrorBoundary } from "react-error-boundary"
-import LoginForm from "app/auth/components/LoginForm"
 import { Suspense, useEffect } from "react"
 import { Toaster } from "react-hot-toast"
 import ProgressBar from "@badrap/bar-of-progress"
@@ -17,6 +16,7 @@ import "app/core/styles/index.css"
 import "react-phone-number-input/style.css"
 import "react-nice-dates/build/style.css"
 import "app/core/styles/custom.css"
+import "intro.js/introjs.css"
 import { IdProvider } from "@radix-ui/react-id"
 import LoginPage from "app/auth/pages/login"
 
