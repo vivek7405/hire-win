@@ -12,7 +12,9 @@ async function getCompanyUser({ where }: GetCompanyUserInput, ctx: Ctx) {
     include: { company: true, user: true },
   })) as any
 
-  companyUser.currentPlan = checkPlan(companyUser.company)
+  if (companyUser && companyUser.company) {
+    companyUser.currentPlan = checkPlan(companyUser.company)
+  }
 
   // if (!companyUser) throw new NotFoundError()
 

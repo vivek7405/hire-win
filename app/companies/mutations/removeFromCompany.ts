@@ -1,6 +1,6 @@
 import { Ctx } from "blitz"
 import Guard from "app/guard/ability"
-import db from "db"
+import db, { CompanyUserRole, JobUserRole } from "db"
 
 interface RemoveFromCompanyInput {
   companyId: string
@@ -10,17 +10,36 @@ interface RemoveFromCompanyInput {
 async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const jobUsers = await db.jobUser.findMany({
+  // Find jobs owned by user and transfer ownership to company owner
+  const jobUsersWhereOwner = await db.jobUser.findMany({
     where: {
-      user: {
-        id: userId,
-      },
+      userId,
+      role: JobUserRole.OWNER,
     },
   })
+  if (jobUsersWhereOwner) {
+    const companyUserOwner = await db.companyUser.findFirst({
+      where: {
+        companyId,
+        role: CompanyUserRole.OWNER,
+      },
+    })
+    // transfer ownership of all those jobs to company owner
+    await db.jobUser.updateMany({
+      where: {
+        userId: companyUserOwner?.userId,
+        jobId: { in: jobUsersWhereOwner.map((ju) => ju.jobId) },
+      },
+      data: {
+        role: JobUserRole.OWNER,
+      },
+    })
+  }
 
+  const jobUsersToDelete = await db.jobUser.findMany({ where: { userId } })
   await db.jobUser.deleteMany({
     where: {
-      userId: { in: jobUsers?.map((ju) => ju.userId) },
+      userId: { in: jobUsersToDelete?.map((ju) => ju.userId) },
     },
   })
 

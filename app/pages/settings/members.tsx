@@ -256,7 +256,7 @@ const UserSettingsMembersPage = ({
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200">
                           {m.userId === user?.id || m.role === "OWNER" ? (
-                            m.role
+                            titleCase(m.role)
                           ) : (
                             <select
                               defaultValue={m.role}
