@@ -61,6 +61,7 @@ import getUserJobCategoriesByViewType from "app/categories/queries/getUserJobCat
 import { StepsProps } from "intro.js-react"
 import usePreviousValue from "app/core/hooks/usePreviousValue"
 import { jobs } from "googleapis/build/src/apis/jobs"
+import getCompanyUsers from "app/companies/queries/getCompanyUsers"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -78,6 +79,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     {
       where: {
         companyId: session.companyId || "0",
+        userId: session.userId || "0",
+      },
+    },
+    { ...context }
+  )
+
+  const companyUsers = await invokeWithMiddleware(
+    getCompanyUsers,
+    {
+      where: {
+        // companyId: session.companyId || "0",
         userId: session.userId || "0",
       },
     },
@@ -104,6 +116,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         user,
         companyUserRole: companyUser.role,
         company: companyUser.company,
+        companyUsersLength: companyUsers?.length || 0,
         canCreate,
         currentPlan,
       },
@@ -178,6 +191,7 @@ const Jobs = ({
   isIntroFirstLoad,
   setIsIntroFirstLoad,
   Steps,
+  companyUsersLength,
 }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
@@ -250,23 +264,27 @@ const Jobs = ({
 
   return (
     <>
-      {Steps && jobUsers?.length === 0 && introStepsEnabled && isIntroFirstLoad && (
-        <Steps
-          enabled={introStepsEnabled || false}
-          steps={introSteps}
-          initialStep={0}
-          options={{
-            nextToDone: true,
-            dontShowAgain: true,
-            dontShowAgainLabel: "Don't show again",
-          }}
-          onExit={() => {
-            if (isIntroFirstLoad) {
-              setIsIntroFirstLoad(false)
-            }
-          }}
-        />
-      )}
+      {Steps &&
+        companyUsersLength === 1 &&
+        jobUsers?.length === 0 &&
+        introStepsEnabled &&
+        isIntroFirstLoad && (
+          <Steps
+            enabled={introStepsEnabled || false}
+            steps={introSteps}
+            initialStep={0}
+            options={{
+              nextToDone: true,
+              dontShowAgain: true,
+              dontShowAgainLabel: "Don't show again",
+            }}
+            onExit={() => {
+              if (isIntroFirstLoad) {
+                setIsIntroFirstLoad(false)
+              }
+            }}
+          />
+        )}
       {/* {Hints && introHintsEnabled && isIntroFirstLoad && (
         <Hints enabled={introHintsEnabled || false} hints={introHints} />
       )} */}
@@ -668,6 +686,7 @@ const JobsHome = ({
   company,
   canCreate,
   currentPlan,
+  companyUsersLength,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const [openConfirm, setOpenConfirm] = useState(false)
@@ -941,6 +960,7 @@ const JobsHome = ({
           isIntroFirstLoad={isIntroFirstLoad}
           setIsIntroFirstLoad={setIsIntroFirstLoad}
           Steps={Steps}
+          companyUsersLength={companyUsersLength}
         />
       </Suspense>
     </AuthLayout>
