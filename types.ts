@@ -35,6 +35,18 @@ export enum PlanFrequency {
   YEARLY = "YEARLY",
 }
 
+export type IntroStep = {
+  element: string
+  title: string
+  intro: any
+}
+
+export type IntroHint = {
+  element: string
+  hint: string
+  hintPosition?: string
+}
+
 export type Plan = {
   name: PlanName
   priceId: string

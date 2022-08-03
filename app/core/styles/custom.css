@@ -4,10 +4,12 @@
   --PhoneInput-color--focus: var(--theme-500);
 }
 
+/* phone input */
 .PhoneInputInput {
   @apply !border !border-gray-300 !px-2 !py-2 !block !w-full sm:!text-sm !rounded;
 }
 
+/* calendar date picker */
 .nice-dates-day.-selected:before {
   background-color: var(--theme-600);
 }
@@ -16,4 +18,15 @@
 }
 .nice-dates-day:hover:after {
   border: 2px solid var(--theme-600);
+}
+
+/* introjs */
+#introjs-dontShowAgain {
+  @apply px-2 border-gray-500 rounded-md;
+}
+.introjs-tooltiptext {
+  @apply flex flex-col space-y-4;
+}
+.introjs-button {
+  @apply w-fit;
 }
