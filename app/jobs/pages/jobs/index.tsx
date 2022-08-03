@@ -21,7 +21,6 @@ import Table from "app/core/components/Table"
 
 import Guard from "app/guard/ability"
 import Confirm from "app/core/components/Confirm"
-import { checkPlan } from "app/users/utils/checkPlan"
 import {
   CardType,
   DragDirection,
@@ -109,8 +108,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user && companyUser) {
     const { can: canCreate } = await Guard.can("create", "job", { session }, {})
 
-    const currentPlan = checkPlan(companyUser.company)
-
     return {
       props: {
         user,
@@ -118,7 +115,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         company: companyUser.company,
         companyUsersLength: companyUsers?.length || 0,
         canCreate,
-        currentPlan,
+        currentPlan: companyUser.currentPlan,
       },
     }
   } else {

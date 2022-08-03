@@ -1,21 +1,25 @@
-import { useState, useEffect, useCallback, Suspense } from "react"
-import { useRouter, useMutation, Link, Routes, Image, useSession, useQuery, dynamic } from "blitz"
-import { CheckIcon, MenuIcon, SparklesIcon, XIcon } from "@heroicons/react/outline"
+import { useState, useEffect, Suspense } from "react"
+import { useRouter, useMutation, Link, Routes, useSession, useQuery } from "blitz"
+import {
+  CheckIcon,
+  MenuIcon,
+  SparklesIcon,
+  TicketIcon,
+  XCircleIcon,
+  XIcon,
+  MinusCircleIcon,
+  BadgeCheckIcon,
+} from "@heroicons/react/outline"
 import { ExtendedUser, IntroHint, IntroStep } from "types"
 import logout from "app/auth/mutations/logout"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import Logo from "app/assets/Logo"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
-import Modal from "./Modal"
-import CompanyForm from "app/companies/components/CompanyForm"
-import { EditorState } from "draft-js"
 import updateCompanySession from "app/companies/mutations/updateCompanySession"
 import { CompanyUserRole, UserRole } from "@prisma/client"
 import Confirm from "./Confirm"
-import getCurrentPlan from "app/companies/queries/getCurrentPlan"
 import canCreateNewCompany from "app/companies/queries/canCreateNewCompany"
-import Guard from "app/guard/ability"
 
 type NavbarProps = {
   user?: ExtendedUser | null
@@ -274,20 +278,13 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
   const [updateCompanySessionMutation] = useMutation(updateCompanySession)
 
   const CompanySelectDropdown = ({ companyOpen, setCompanyOpen }) => {
-    const [currentPlan] = useQuery(getCurrentPlan, null)
-
     return (
       <div className="flex items-center space-x-2">
-        {currentPlan && (
-          <div title="This company is subscribed to the PRO plan">
-            <SparklesIcon width={20} height={20} className="text-yellow-300" />
-          </div>
-        )}
         <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
           <DropdownMenu.Trigger className="bg-theme-700 flex items-center text-sm text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
             <div
               title={selectedCompanyUser?.company?.name}
-              className="w-24 p-1 text-white font-semibold truncate"
+              className="w-24 py-1 px-2 text-white font-semibold truncate"
             >
               {selectedCompanyUser?.company?.name}
             </div>
@@ -318,8 +315,13 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                       <DropdownMenu.ItemIndicator className="flex items-center">
                         <CheckIcon className="w-4 h-4 absolute left-2" />
                       </DropdownMenu.ItemIndicator>
-                      <p className="ml-2">
-                        {cu.company?.name} (<span className="lowercase">{cu.role}</span>)
+                      <p className="ml-2 flex flex-nowrap space-x-1 items-center">
+                        <div className="flex">
+                          {cu.currentPlan && <BadgeCheckIcon width={18} height={18} />}
+                          {!cu.currentPlan && <MinusCircleIcon width={18} height={18} />}
+                        </div>
+                        <div>{cu.company?.name}</div>
+                        <div className="lowercase">({cu.role})</div>
                       </p>
                     </DropdownMenu.RadioItem>
                   </div>
