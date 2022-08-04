@@ -1,24 +1,4 @@
 import Guard from "app/guard/ability"
-import { resolver } from "blitz"
-import db, { Prisma } from "db"
+import getScoreCardsWOPaginationWOAbility from "./getScoreCardsWOPaginationWOAbility"
 
-interface GetScoreCardsInput extends Pick<Prisma.ScoreCardFindManyArgs, "where"> {}
-
-const getScoreCardsWOPagination = resolver.pipe(
-  resolver.authorize(),
-  async ({ where }: GetScoreCardsInput) => {
-    const scoreCards = await db.scoreCard.findMany({
-      where,
-      include: {
-        cardQuestions: { include: { cardQuestion: true }, orderBy: { order: "asc" } },
-        jobWorkflowStages: true,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    })
-    return scoreCards
-  }
-)
-
-export default Guard.authorize("readAll", "scoreCard", getScoreCardsWOPagination)
+export default Guard.authorize("readAll", "scoreCard", getScoreCardsWOPaginationWOAbility)

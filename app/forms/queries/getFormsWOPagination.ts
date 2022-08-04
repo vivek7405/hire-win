@@ -1,25 +1,4 @@
 import Guard from "app/guard/ability"
-import { resolver } from "blitz"
-import db, { Prisma } from "db"
+import getFormsWOPaginationWOAbility from "./getFormsWOPaginationWOAbility"
 
-interface GetFormsInput extends Pick<Prisma.FormFindManyArgs, "where"> {}
-
-const getFormsWOPagination = resolver.pipe(
-  resolver.authorize(),
-  async ({ where }: GetFormsInput) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const forms = await db.form.findMany({
-      where,
-      include: {
-        questions: { include: { question: true }, orderBy: { order: "asc" } },
-        jobs: true,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    })
-    return forms
-  }
-)
-
-export default Guard.authorize("readAll", "form", getFormsWOPagination)
+export default Guard.authorize("readAll", "form", getFormsWOPaginationWOAbility)

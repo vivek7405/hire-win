@@ -3,7 +3,7 @@ import { Form } from "app/core/components/Form"
 import LabeledSelectField from "app/core/components/LabeledSelectField"
 import getQuestionsWOPagination from "app/questions/queries/getQuestionsWOPagination"
 import { useQuery, useSession } from "blitz"
-import getFormQuestionsWOPagination from "../queries/getFormQuestionsWOPagination"
+import getFormQuestionsWOPaginationWOAbility from "../queries/getFormQuestionsWOPaginationWOAbility"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 
 type AddQuestionFormProps = {
@@ -17,7 +17,7 @@ type AddQuestionFormProps = {
 
 export const AddExistingQuestionsForm = (props: AddQuestionFormProps) => {
   const session = useSession()
-  const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
+  const [formQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
     where: { formId: props.formId },
   })
   const [questions] = useQuery(getQuestionsWOPagination, {

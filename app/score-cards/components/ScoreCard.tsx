@@ -12,7 +12,7 @@ import LabeledSelectField from "app/core/components/LabeledSelectField"
 import LabeledPhoneNumberField from "app/core/components/LabeledPhoneNumberField"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
-import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreCardQuestionsWOPagination"
+import getScoreCardQuestionsWOPaginationWOAbility from "app/score-cards/queries/getScoreCardQuestionsWOPaginationWOAbility"
 import {
   ExtendedScoreCardQuestion,
   ExtendedCardQuestion,
@@ -55,7 +55,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
   const isScoreDisabled = interviewDetail?.interviewer?.id !== props.userId
   const disabled = !props.preview && isScoreDisabled
 
-  const [queryScoreCardQuestions] = useQuery(getScoreCardQuestionsWOPagination, {
+  const [queryScoreCardQuestions] = useQuery(getScoreCardQuestionsWOPaginationWOAbility, {
     where: { scoreCardId: props.scoreCardId || defaultScoreCard?.id },
   })
 

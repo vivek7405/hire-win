@@ -41,7 +41,7 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
 import factoryFormQuestions from "app/questions/utils/factoryFormQuestions"
-import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
+import getFormQuestionsWOPaginationWOAbility from "app/forms/queries/getFormQuestionsWOPaginationWOAbility"
 import QuestionForm from "app/questions/components/QuestionForm"
 import createQuestion from "app/questions/mutations/createQuestion"
 import addExistingFormQuestions from "app/forms/mutations/addExistingFormQuestions"
@@ -162,7 +162,7 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
   //   endPage = count
   // }
 
-  const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
+  const [formQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
     where: {
       formId: form?.id,
       ...query,
@@ -595,7 +595,7 @@ const SingleFormPage = ({
                             initial: questionToEdit,
                           })
                         : await addNewQuestionToFormMutation({ formId: form?.id, ...values })
-                      await invalidateQuery(getFormQuestionsWOPagination)
+                      await invalidateQuery(getFormQuestionsWOPaginationWOAbility)
                       toast.success(
                         isEdit ? "Question updated successfully" : "Question added successfully",
                         {
