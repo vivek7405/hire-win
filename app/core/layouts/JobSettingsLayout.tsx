@@ -1,13 +1,9 @@
 import React, { ReactNode, Suspense } from "react"
-import { useRouter, Link } from "blitz"
-import {
-  CreditCardIcon,
-  CogIcon,
-  UserGroupIcon,
-  KeyIcon,
-  ClockIcon,
-} from "@heroicons/react/outline"
+import { useRouter, Link, useSession, useQuery } from "blitz"
+import { UserGroupIcon, ClockIcon, CollectionIcon } from "@heroicons/react/outline"
 import { ExtendedJob } from "types"
+import { JobUserRole } from "@prisma/client"
+import getJobUser from "app/jobs/queries/getJobUser"
 
 type LayoutProps = {
   children: ReactNode
@@ -16,22 +12,30 @@ type LayoutProps = {
 
 const JobSettingsLayout = ({ job, children }: LayoutProps) => {
   const router = useRouter()
+  const session = useSession()
+  const [jobUser] = useQuery(getJobUser, {
+    where: { userId: session.userId || "0", jobId: job?.id || "0" },
+  })
 
   const subNavigation = [
-    {
-      name: "Details",
-      href: `/jobs/${job?.slug}/settings`,
-      current: router.route === `/jobs/[slug]/settings`,
-      icon: CogIcon,
-      canView: true,
-    },
-    {
-      name: "Members",
-      href: `/jobs/${job?.slug}/settings/members`,
-      current: router.route === `/jobs/[slug]/settings/members`,
-      icon: UserGroupIcon,
-      canView: true,
-    },
+    jobUser?.role !== JobUserRole.USER
+      ? {
+          name: "Details",
+          href: `/jobs/${job?.slug}/settings`,
+          current: router.route === `/jobs/[slug]/settings`,
+          icon: CollectionIcon,
+          canView: true,
+        }
+      : null,
+    jobUser?.role !== JobUserRole.USER
+      ? {
+          name: "Members",
+          href: `/jobs/${job?.slug}/settings/members`,
+          current: router.route === `/jobs/[slug]/settings/members`,
+          icon: UserGroupIcon,
+          canView: true,
+        }
+      : null,
     {
       name: "Scheduling",
       href: `/jobs/${job?.slug}/settings/scheduling`,
@@ -51,8 +55,10 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
   return (
     <div className="flex flex-col lg:flex-row mt-6 lg:space-x-4">
       <div className="mb-6 lg:mb-0 w-full lg:w-1/5">
-        {subNavigation.map(
-          (item) =>
+        {subNavigation.map((item) => {
+          if (!item) return <></>
+
+          return (
             item.canView && (
               <Link prefetch={true} href={item.href} passHref key={item.name}>
                 <a
@@ -72,7 +78,8 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
                 </a>
               </Link>
             )
-        )}
+          )
+        })}
       </div>
       <div className="space-y-6 w-full lg:w-4/5">
         <Suspense fallback="Loading">{children}</Suspense>
