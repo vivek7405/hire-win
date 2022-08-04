@@ -1,19 +1,4 @@
 import Guard from "app/guard/ability"
-import { resolver } from "blitz"
-import db, { Prisma } from "db"
+import getCategoriesWOPaginationWOAbility from "./getCategoriesWOPaginationWOAbility"
 
-interface GetCategoriesInput extends Pick<Prisma.CategoryFindManyArgs, "where"> {}
-
-const getCategoriesWOPagination = resolver.pipe(
-  resolver.authorize(),
-  async ({ where }: GetCategoriesInput) => {
-    const categories = await db.category.findMany({
-      where,
-      include: { jobs: { select: { id: true, archived: true } } },
-      orderBy: { name: "asc" },
-    })
-    return categories
-  }
-)
-
-export default Guard.authorize("readAll", "category", getCategoriesWOPagination)
+export default Guard.authorize("readAll", "category", getCategoriesWOPaginationWOAbility)

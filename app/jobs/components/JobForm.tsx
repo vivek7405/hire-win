@@ -6,17 +6,7 @@ import {
 } from "app/score-cards/validations"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { useQuery } from "blitz"
-import getCategoriesWOPagination from "app/categories/queries/getCategoriesWOPagination"
-import {
-  Category,
-  Workflow,
-  Form,
-  SalaryType,
-  EmploymentType,
-  ScoreCardJobWorkflowStage,
-  ScoreCard,
-} from "@prisma/client"
-import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
+import { Category, Form, SalaryType, EmploymentType, ScoreCard } from "@prisma/client"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import getFormsWOPagination from "app/forms/queries/getFormsWOPagination"
 import { Suspense, useEffect, useState } from "react"
@@ -26,13 +16,16 @@ import { titleCase } from "app/core/utils/titleCase"
 import LabeledTextValidatedField from "app/core/components/LabeledTextValidatedField"
 import ApplicationForm from "../../candidates/components/ApplicationForm"
 import toast from "react-hot-toast"
-import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
+import getFormQuestionsWOPaginationWOAbility from "app/forms/queries/getFormQuestionsWOPaginationWOAbility"
 import MultiStepForm from "app/core/components/MultiStepForm"
 import { ExtendedWorkflow, FormStep } from "types"
 import { z } from "zod"
 import { ArrowSmDownIcon } from "@heroicons/react/outline"
-import getScoreCardsWOPagination from "app/score-cards/queries/getScoreCardsWOPagination"
 import { useFormContext } from "react-hook-form"
+import getCategoriesWOPaginationWOAbility from "app/categories/queries/getCategoriesWOPaginationWOAbility"
+import getWorkflowsWOPaginationWOAbility from "app/workflows/queries/getWorkflowsWOPaginationWOAbility"
+import getScoreCardsWOPaginationWOAbility from "app/score-cards/queries/getScoreCardsWOPaginationWOAbility"
+import getFormsWOPaginationWOAbility from "app/forms/queries/getFormsWOPaginationWOAbility"
 
 const Step1Basic = () => {
   return (
@@ -65,7 +58,7 @@ type Step2ExtraProps = {
   // user: any
 }
 const Step2Extra = (props: Step2ExtraProps) => {
-  const [categories] = useQuery(getCategoriesWOPagination, {
+  const [categories] = useQuery(getCategoriesWOPaginationWOAbility, {
     where: { companyId: props.companyId },
   })
 
@@ -284,13 +277,15 @@ type Step5WorkflowProps = {
 const Step5Workflow = (props: Step5WorkflowProps) => {
   const { getValues, setValue, register } = useFormContext()
 
-  const [workflows] = useQuery(getWorkflowsWOPagination, { where: { companyId: props.companyId } })
+  const [workflows] = useQuery(getWorkflowsWOPaginationWOAbility, {
+    where: { companyId: props.companyId },
+  })
   const defaultWorkflow = workflows.find((w) => w.name === "Default")
   const [selectedWorkflowId, setSelectedWorkflowId] = useState(
     getValues("workflowId") || props.workflow?.id || defaultWorkflow?.id
   )
 
-  const [scoreCards] = useQuery(getScoreCardsWOPagination, {
+  const [scoreCards] = useQuery(getScoreCardsWOPaginationWOAbility, {
     where: { companyId: props.companyId },
   })
   const defaultScoreCard = scoreCards.find((w) => w.name === "Default")
@@ -433,11 +428,11 @@ type Step6FormProps = {
   companyId: string
 }
 const Step6Form = (props: Step6FormProps) => {
-  const [forms] = useQuery(getFormsWOPagination, { where: { companyId: props.companyId } })
+  const [forms] = useQuery(getFormsWOPaginationWOAbility, { where: { companyId: props.companyId } })
   const [selectedFormId, setSelectedFormId] = useState(
     props.form?.id || forms.find((f) => f.name === "Default")?.id
   )
-  const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
+  const [formQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
     where: { formId: selectedFormId! },
     orderBy: { order: "asc" },
   })

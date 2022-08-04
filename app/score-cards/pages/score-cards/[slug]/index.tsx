@@ -41,7 +41,7 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import Form from "app/core/components/Form"
 import updateScoreCardQuestion from "app/score-cards/mutations/updateScoreCardQuestion"
 import factoryScoreCardQuestions from "app/card-questions/utils/factoryScoreCardQuestions"
-import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreCardQuestionsWOPagination"
+import getScoreCardQuestionsWOPaginationWOAbility from "app/score-cards/queries/getScoreCardQuestionsWOPaginationWOAbility"
 import CardQuestionForm from "app/card-questions/components/CardQuestionForm"
 import createCardQuestion from "app/card-questions/mutations/createCardQuestion"
 import addExistingScoreCardQuestions from "app/score-cards/mutations/addExistingScoreCardQuestions"
@@ -171,7 +171,7 @@ export const CardQuestions = ({
   //   endPage = count
   // }
 
-  const [scoreCardQuestions] = useQuery(getScoreCardQuestionsWOPagination, {
+  const [scoreCardQuestions] = useQuery(getScoreCardQuestionsWOPaginationWOAbility, {
     where: {
       scoreCardId: scoreCard?.id,
       ...query,
@@ -623,7 +623,7 @@ const SingleScoreCardPage = ({
                             scoreCardId: scoreCard?.id,
                             ...values,
                           })
-                      await invalidateQuery(getScoreCardQuestionsWOPagination)
+                      await invalidateQuery(getScoreCardQuestionsWOPaginationWOAbility)
                       toast.success(
                         isEdit ? "Question updated successfully" : "Question added successfully",
                         {

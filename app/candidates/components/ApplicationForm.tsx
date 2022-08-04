@@ -13,7 +13,7 @@ import LabeledSelectField from "app/core/components/LabeledSelectField"
 import LabeledPhoneNumberField from "app/core/components/LabeledPhoneNumberField"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
-import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
+import getFormQuestionsWOPaginationWOAbility from "app/forms/queries/getFormQuestionsWOPaginationWOAbility"
 import { ExtendedFormQuestion, ExtendedQuestion } from "types"
 import { AttachmentZodObj } from "../validations"
 
@@ -30,7 +30,7 @@ type ApplicationFormProps = {
 }
 
 export const ApplicationForm = (props: ApplicationFormProps) => {
-  const [queryFormQuestions] = useQuery(getFormQuestionsWOPagination, {
+  const [queryFormQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
     where: { formId: props.formId },
   })
 
