@@ -670,8 +670,7 @@ model Candidate {
 
 enum CandidateSource {
   Manual
-  Job_Board
-  LinkedIn
+  Careers_Page
 }
 
 model DefaultCalendar {

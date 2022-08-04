@@ -253,7 +253,7 @@ export default function Home() {
                   ? "https://hire.win/padason"
                   : "http://localhost:3000/padason"
               }
-              title="Job Board"
+              title="Careers Page"
               className="w-full h-full rounded-b-lg"
             ></iframe>
           </div>
@@ -673,10 +673,10 @@ export default function Home() {
                         Free & Pro
                       </p>
                       <div className="w-full font-bold text-xl text-neutral-800 px-6">
-                        Job Board with Theme Customization
+                        Careers Page with Theme Customization
                       </div>
                       <p className="text-neutral-600 text-base px-6 mb-5">
-                        Automated Job Board that lists your active jobs. Customise the theme based
+                        Automated Careers Page that lists your active jobs. Customise the theme based
                         on your company branding.
                       </p>
                     </a>
@@ -724,7 +724,7 @@ export default function Home() {
                         Free & Pro
                       </p>
                       <div className="w-full font-bold text-xl text-neutral-800 px-6">
-                        Embeddable Job Board Widget
+                        Embeddable Careers Page Widget
                       </div>
                       <p className="text-neutral-600 text-base px-6 mb-5">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam at ipsum eu
@@ -1173,7 +1173,7 @@ export default function Home() {
                         Those who need a Careers Page or a Job Application Page
                       </h3>
                       <p className="text-justify text-neutral-600 text-lg lg:mb-8">
-                        Just create jobs and you have your Job Board/Careers Page up and running
+                        Just create jobs and you have your Careers Page up and running
                         automatically. Embed it to your website in minutes or share it to social
                         media! You may embed/share links to individual jobs as well.
                         <br />

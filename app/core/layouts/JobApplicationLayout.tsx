@@ -84,7 +84,7 @@ const JobApplicationLayout = ({
     <>
       <Head>
         {isCareersPage && (
-          <title>{`Job Board | ${titleCase(company?.name?.toLocaleLowerCase())}`}</title>
+          <title>{`Careers Page | ${titleCase(company?.name?.toLocaleLowerCase())}`}</title>
         )}
         {!isCareersPage && (
           <title>{`Job Application | ${titleCase(job?.title?.toLocaleLowerCase())} | ${titleCase(
