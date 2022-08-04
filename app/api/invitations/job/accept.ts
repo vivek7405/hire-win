@@ -91,6 +91,6 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
     //   })
     // }
 
-    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job?.slug}`)
+    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/jobs`)
   }
 }
