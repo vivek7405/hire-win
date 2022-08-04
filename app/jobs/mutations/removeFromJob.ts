@@ -1,6 +1,6 @@
 import { Ctx } from "blitz"
 import Guard from "app/guard/ability"
-import db from "db"
+import db, { CompanyUserRole } from "db"
 import stripe from "app/core/utils/stripe"
 
 interface InviteToJobInput {
@@ -20,13 +20,35 @@ async function removeFromJob({ jobId, userId }: InviteToJobInput, ctx: Ctx) {
         id: userId,
       },
     },
+    include: { job: true },
   })
 
-  await db.jobUser.delete({
-    where: {
-      id: jobUser?.id,
-    },
-  })
+  if (jobUser) {
+    const companyUserOwner = await db.companyUser.findFirst({
+      where: {
+        companyId: jobUser?.job.companyId,
+        role: CompanyUserRole.OWNER,
+      },
+    })
+
+    // Assign company owner as interviewer instead of the user being removed
+    // Job Workflow Stage Level - InterviewDetail
+    // Candidate Level - CandidateWorkflowStageInterviewer
+    await db.interviewDetail.updateMany({
+      where: { interviewerId: userId, jobId },
+      data: { interviewerId: companyUserOwner?.userId },
+    })
+    await db.candidateWorkflowStageInterviewer.updateMany({
+      where: { interviewerId: userId, candidate: { jobId } },
+      data: { interviewerId: companyUserOwner?.userId },
+    })
+
+    await db.jobUser.delete({
+      where: {
+        id: jobUser?.id,
+      },
+    })
+  }
 
   // const job = await db.job.findFirst({
   //   where: {

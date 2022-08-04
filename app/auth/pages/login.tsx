@@ -14,6 +14,7 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
 import LogoBrand from "app/assets/LogoBrand"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
+import getCompanyUsers from "app/companies/queries/getCompanyUsers"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -23,7 +24,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
 
-  const companyUser = await invokeWithMiddleware(
+  let companyUser = await invokeWithMiddleware(
     getCompanyUser,
     {
       where: {
@@ -34,13 +35,37 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { ...context }
   )
 
-  if (user && !companyUser) {
-    return {
-      redirect: {
-        destination: "/companies/new",
-        permanent: false,
+  const companyUsers = await invokeWithMiddleware(
+    getCompanyUsers,
+    {
+      where: {
+        userId: session.userId || "0",
       },
-      props: {},
+    },
+    { ...context }
+  )
+
+  if (user && !companyUser) {
+    if (companyUsers && companyUsers.length > 0) {
+      await session.$setPublicData({ companyId: companyUsers[0]?.companyId || "0" })
+      companyUser = await invokeWithMiddleware(
+        getCompanyUser,
+        {
+          where: {
+            companyId: session.companyId || "0",
+            userId: session.userId || "0",
+          },
+        },
+        { ...context }
+      )
+    } else {
+      return {
+        redirect: {
+          destination: "/companies/new",
+          permanent: false,
+        },
+        props: {},
+      }
     }
   }
 

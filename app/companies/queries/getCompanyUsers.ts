@@ -13,7 +13,9 @@ async function getCompanyUsers({ where }: GetCompanyUsersInput, ctx: Ctx) {
   })) as any
 
   companyUsers.forEach((cu) => {
-    cu.currentPlan = checkPlan(cu.company)
+    if (cu && cu.company) {
+      cu.currentPlan = checkPlan(cu.company)
+    }
   })
 
   // if (!companyUsers) throw new NotFoundError()

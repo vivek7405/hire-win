@@ -73,6 +73,7 @@ import ApplicationForm from "app/candidates/components/ApplicationForm"
 import createCandidate from "app/candidates/mutations/createCandidate"
 import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
 import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswerForDisplay"
+import getCompanyUsers from "app/companies/queries/getCompanyUsers"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -84,7 +85,17 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
 
-  const companyUser = await invokeWithMiddleware(
+  const companyUsers = await invokeWithMiddleware(
+    getCompanyUsers,
+    {
+      where: {
+        userId: session.userId || "0",
+      },
+    },
+    { ...context }
+  )
+
+  let companyUser = await invokeWithMiddleware(
     getCompanyUser,
     {
       where: {
@@ -96,12 +107,26 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   )
 
   if (user && !companyUser) {
-    return {
-      redirect: {
-        destination: "/companies/new",
-        permanent: false,
-      },
-      props: {},
+    if (companyUsers && companyUsers.length > 0) {
+      await session.$setPublicData({ companyId: companyUsers[0]?.companyId || "0" })
+      companyUser = await invokeWithMiddleware(
+        getCompanyUser,
+        {
+          where: {
+            companyId: session.companyId || "0",
+            userId: session.userId || "0",
+          },
+        },
+        { ...context }
+      )
+    } else {
+      return {
+        redirect: {
+          destination: "/companies/new",
+          permanent: false,
+        },
+        props: {},
+      }
     }
   }
 

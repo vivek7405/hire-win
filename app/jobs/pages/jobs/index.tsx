@@ -73,7 +73,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
 
-  const companyUser = await invokeWithMiddleware(
+  let companyUser = await invokeWithMiddleware(
     getCompanyUser,
     {
       where: {
@@ -96,12 +96,26 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   )
 
   if (user && !companyUser) {
-    return {
-      redirect: {
-        destination: "/companies/new",
-        permanent: false,
-      },
-      props: {},
+    if (companyUsers && companyUsers.length > 0) {
+      await session.$setPublicData({ companyId: companyUsers[0]?.companyId || "0" })
+      companyUser = await invokeWithMiddleware(
+        getCompanyUser,
+        {
+          where: {
+            companyId: session.companyId || "0",
+            userId: session.userId || "0",
+          },
+        },
+        { ...context }
+      )
+    } else {
+      return {
+        redirect: {
+          destination: "/companies/new",
+          permanent: false,
+        },
+        props: {},
+      }
     }
   }
 
