@@ -26,6 +26,7 @@ import getCategoriesWOPaginationWOAbility from "app/categories/queries/getCatego
 import getWorkflowsWOPaginationWOAbility from "app/workflows/queries/getWorkflowsWOPaginationWOAbility"
 import getScoreCardsWOPaginationWOAbility from "app/score-cards/queries/getScoreCardsWOPaginationWOAbility"
 import getFormsWOPaginationWOAbility from "app/forms/queries/getFormsWOPaginationWOAbility"
+import getSalaryIntervalFromSalaryType from "../utils/getSalaryIntervalFromSalaryType"
 
 const Step1Basic = () => {
   return (
@@ -238,27 +239,7 @@ const Step4Salary = () => {
             testid="salaryType"
             defaultValue={Object.keys(SalaryType).find((type) => type === SalaryType.YEAR)}
             options={Object.keys(SalaryType).map((salaryType) => {
-              let type = ""
-              switch (salaryType) {
-                case SalaryType.HOUR:
-                  type = "Hourly"
-                  break
-                case SalaryType.DAY:
-                  type = "Daily"
-                  break
-                case SalaryType.WEEK:
-                  type = "Weekly"
-                  break
-                case SalaryType.MONTH:
-                  type = "Monthly"
-                  break
-                case SalaryType.YEAR:
-                  type = "Yearly"
-                  break
-                default:
-                  type = "Hourly"
-                  break
-              }
+              const type = getSalaryIntervalFromSalaryType(salaryType)
               return { label: type, value: salaryType }
             })}
           />
