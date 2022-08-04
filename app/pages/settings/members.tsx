@@ -242,7 +242,7 @@ const UserSettingsMembersPage = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {company?.users.map((m) => {
+                  {company?.users?.map((m) => {
                     return (
                       <tr className="bg-white" key={m.id}>
                         <td
@@ -285,8 +285,8 @@ const UserSettingsMembersPage = ({
                               }}
                             >
                               {Object.values(CompanyUserRole)
-                                .filter((m) => m !== "OWNER")
-                                .map((m, i) => {
+                                ?.filter((m) => m !== "OWNER")
+                                ?.map((m, i) => {
                                   return (
                                     <option key={i} value={m}>
                                       {titleCase(m)}
