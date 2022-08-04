@@ -248,7 +248,7 @@ const JobSettingsMembersPage = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {jobData?.users.map((m, i) => {
+                  {jobData?.users?.map((m, i) => {
                     return (
                       <tr className="bg-white" key={i}>
                         <td
@@ -294,8 +294,8 @@ const JobSettingsMembersPage = ({
                               }}
                             >
                               {Object.values(JobUserRole)
-                                .filter((m) => m !== "OWNER")
-                                .map((m, i) => {
+                                ?.filter((m) => m !== "OWNER")
+                                ?.map((m, i) => {
                                   return (
                                     <option key={i} value={m}>
                                       {titleCase(m)}
