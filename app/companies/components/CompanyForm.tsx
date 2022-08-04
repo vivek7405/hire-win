@@ -40,7 +40,7 @@ export const CompanyForm = (props: CompanyFormProps) => {
           type="text"
           name="website"
           label="Website"
-          placeholder="This shall be used to navigate to your website from job boards"
+          placeholder="This shall be used to navigate to your website from careers page"
           testid="userUpdateWebsite"
         />
 
@@ -49,7 +49,7 @@ export const CompanyForm = (props: CompanyFormProps) => {
         <LabeledRichTextField
           name="info"
           label="Info"
-          placeholder="This shall appear on job boards"
+          placeholder="This shall appear on careers page"
           testid="userUpdateCompanyInfo"
         />
 

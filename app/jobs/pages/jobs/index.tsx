@@ -465,6 +465,7 @@ const Jobs = ({
                             >
                               <LabeledToggleSwitch
                                 name="toggleJobHidden"
+                                title="hide job from careers page"
                                 label="Hidden"
                                 flex={true}
                                 height={4}
@@ -476,7 +477,7 @@ const Jobs = ({
                                     <span>
                                       <b>
                                         {switchState ? "Hiding" : "Unhiding"} job - {job?.title}{" "}
-                                        from Job Board
+                                        from Careers Page
                                       </b>
                                     </span>
                                   ))
@@ -540,7 +541,7 @@ const Jobs = ({
                                       <b>
                                         {switchState ? "Showing" : "Hiding"} salary -{" "}
                                         {job?.showSalary} {switchState ? "on" : "from"}
-                                        Job Board
+                                        Careers Page
                                       </b>
                                     </span>
                                   ))

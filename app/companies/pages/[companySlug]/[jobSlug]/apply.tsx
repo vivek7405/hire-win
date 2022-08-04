@@ -156,7 +156,7 @@ const ApplyToJob = ({
                 name: values.Name,
                 email: values.Email,
                 resume: values.Resume,
-                source: CandidateSource.Job_Board,
+                source: CandidateSource.Careers_Page,
                 answers:
                   job?.form?.questions?.map((fq) => {
                     const val = values[fq.question?.name] || ""
