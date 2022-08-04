@@ -34,6 +34,7 @@ import { Company, CompanyUser, Job, JobUser, User } from "@prisma/client"
 import { checkPlan } from "app/users/utils/checkPlan"
 import getCompanyJobsForCareersPage from "app/jobs/queries/getCompanyJobsForCareersPage"
 import getCompanyJobCategoriesForFilter from "app/categories/queries/getCompanyJobCategoriesForFilter"
+import getSalaryIntervalFromSalaryType from "app/jobs/utils/getSalaryIntervalFromSalaryType"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -280,7 +281,8 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
                           <p className="text-gray-500 text-sm">
                             {getSymbolFromCurrency(job.currency)}
                             {job.minSalary} - {getSymbolFromCurrency(job.currency)}
-                            {job.maxSalary}
+                            {job.maxSalary}{" "}
+                            {getSalaryIntervalFromSalaryType(job.salaryType)?.toLowerCase()}
                           </p>
                         )}
                       </div>
