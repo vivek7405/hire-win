@@ -10,6 +10,13 @@ interface RemoveFromCompanyInput {
 async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, ctx: Ctx) {
   ctx.session.$authorize()
 
+  const companyUserOwner = await db.companyUser.findFirst({
+    where: {
+      companyId,
+      role: CompanyUserRole.OWNER,
+    },
+  })
+
   // Find jobs owned by user and transfer ownership to company owner
   const jobUsersWhereOwner = await db.jobUser.findMany({
     where: {
@@ -18,12 +25,6 @@ async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, 
     },
   })
   if (jobUsersWhereOwner) {
-    const companyUserOwner = await db.companyUser.findFirst({
-      where: {
-        companyId,
-        role: CompanyUserRole.OWNER,
-      },
-    })
     // transfer ownership of all those jobs to company owner
     await db.jobUser.updateMany({
       where: {
@@ -36,6 +37,19 @@ async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, 
     })
   }
 
+  // Assign company owner as interviewer instead of the user being removed
+  // Job Workflow Stage Level - InterviewDetail
+  // Candidate Level - CandidateWorkflowStageInterviewer
+  await db.interviewDetail.updateMany({
+    where: { interviewerId: userId },
+    data: { interviewerId: companyUserOwner?.userId },
+  })
+  await db.candidateWorkflowStageInterviewer.updateMany({
+    where: { interviewerId: userId },
+    data: { interviewerId: companyUserOwner?.userId },
+  })
+
+  // Remove the user from all the jobs they are a member
   const jobUsersToDelete = await db.jobUser.findMany({ where: { userId } })
   await db.jobUser.deleteMany({
     where: {
@@ -54,6 +68,7 @@ async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, 
     },
   })
 
+  // Finally remove the user from the company
   await db.companyUser.delete({
     where: {
       id: companyUser?.id,
