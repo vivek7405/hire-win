@@ -318,7 +318,8 @@ export default function Home() {
             <div className="w-full text-center pt-2">
               <div className="mt-1">
                 <span className="text-2xl lg:text-3xl font-bold">
-                  <span className="bg-yellow-300">No nonsense</span> per user per job pricing
+                  <span className="bg-yellow-300">No nonsense</span> per user per job pricing,
+                  instead we offer Flat Pricing!
                 </span>
               </div>
             </div>
@@ -455,7 +456,7 @@ export default function Home() {
                 <span>
                   All with <span className="bg-yellow-300">flat pricing!</span>
                 </span>
-                <span>
+                <span className="px-6 text-justify md:text-center lg:text-center">
                   <span className="font-normal text-base">
                     We would be happy to provide you{" "}
                     <span className="bg-yellow-300 font-semibold">refunds on yearly plan</span>{" "}
@@ -530,12 +531,12 @@ export default function Home() {
 
             <div className="w-full text-center pt-2">
               <div className="mt-1">
-                <span className="text-2xl md:text-3xl lg:text-3xl font-bold">
+                <span className="text-2xl md:text-3xl lg:text-3xl font-bold px-2">
                   Write us at <span className="bg-yellow-300">support@hire.win</span> for any
                   queries
                 </span>
               </div>
-              <div className="mt-10 px-28">
+              <div className="mt-10 px-6 md:px-10 text-justify md:text-center lg:text-center">
                 {`If it's an issue with your account or you need to report a bug, make sure you attach a screenshot with appropriate details. We'll respond to you as soon as we can!`}
               </div>
             </div>
