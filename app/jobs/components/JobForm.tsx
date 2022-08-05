@@ -49,6 +49,8 @@ const Step1Basic = () => {
         placeholder="Description"
         testid="jobDescription"
       />
+
+      <CheckboxField name="postToGoogle" label="Post to Google Jobs" testid="postToGoogle" />
     </>
   )
 }
@@ -499,6 +501,7 @@ export const JobForm = (props: JobFormProps) => {
       title: z.string().nonempty({ message: "Required" }),
       remote: z.boolean(),
       description: z.any(),
+      postToGoogle: z.boolean(),
     }),
   }
   const stp2: FormStep = {

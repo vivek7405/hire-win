@@ -10,6 +10,7 @@ export const Job = z.object({
   title: z.string().nonempty({ message: "Required" }),
   remote: z.boolean(),
   description: z.any(),
+  postToGoogle: z.boolean(),
 
   categoryId: z.string().optional(),
   employmentType: z.array(z.nativeEnum(EmploymentType)),

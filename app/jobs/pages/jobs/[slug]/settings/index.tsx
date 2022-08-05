@@ -141,6 +141,7 @@ const JobSettingsPage = ({
             state: job?.state,
             city: job?.city,
             remote: job?.remote,
+            postToGoogle: job?.postToGoogle,
             currency: job?.currency,
             minSalary: job?.minSalary,
             maxSalary: job?.maxSalary,
