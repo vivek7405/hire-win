@@ -315,8 +315,9 @@ const SingleCandidatePageContent = ({
   })
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
 
+  const [candidatePoolsOpenMobile, setCandidatePoolsOpenMobile] = useState(false)
+  const [candidatePoolsOpenTablet, setCandidatePoolsOpenTablet] = useState(false)
   const [candidatePoolsOpenDesktop, setCandidatePoolsOpenDesktop] = useState(false)
-  const [candidatePoolsOpenMobileAndTablet, setCandidatePoolsOpenMobileAndTablet] = useState(false)
 
   const [stagesOpenMobile, setStagesOpenMobile] = useState(false)
   const [stagesOpenTablet, setStagesOpenTablet] = useState(false)
@@ -841,8 +842,8 @@ const SingleCandidatePageContent = ({
             setStagesOpen={setStagesOpenMobile}
           />
           <AddToPoolButton
-            candidatePoolsOpen={candidatePoolsOpenMobileAndTablet}
-            setCandidatePoolsOpen={setCandidatePoolsOpenMobileAndTablet}
+            candidatePoolsOpen={candidatePoolsOpenMobile}
+            setCandidatePoolsOpen={setCandidatePoolsOpenMobile}
           />
         </div>
       </div>
@@ -866,8 +867,8 @@ const SingleCandidatePageContent = ({
             setStagesOpen={setStagesOpenTablet}
           />
           <AddToPoolButton
-            candidatePoolsOpen={candidatePoolsOpenMobileAndTablet}
-            setCandidatePoolsOpen={setCandidatePoolsOpenMobileAndTablet}
+            candidatePoolsOpen={candidatePoolsOpenTablet}
+            setCandidatePoolsOpen={setCandidatePoolsOpenTablet}
           />
         </div>
       </div>
