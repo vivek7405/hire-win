@@ -215,6 +215,8 @@ model Job {
   validThrough   DateTime?
   description    Json?
 
+  postToGoogle Boolean @default(false)
+
   tokens Token[]
   users  JobUser[]
 

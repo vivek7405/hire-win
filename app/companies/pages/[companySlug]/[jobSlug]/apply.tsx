@@ -126,7 +126,11 @@ const ApplyToJob = ({
 
   // Post job to Google if on paid plan
   return (
-    <JobApplicationLayout job={job} company={company} addGoogleJobPostingScript={!!currentPlan}>
+    <JobApplicationLayout
+      job={job}
+      company={company}
+      addGoogleJobPostingScript={!!currentPlan && (job?.postToGoogle || false)}
+    >
       <Suspense fallback="Loading...">
         <button
           type="button"
