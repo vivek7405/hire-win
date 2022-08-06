@@ -149,7 +149,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
   useMemo(async () => {
     let data: ExtendedWorkflowStage[] = []
 
-    await workflowStages.forEach((workflowStage) => {
+    await workflowStages?.forEach((workflowStage) => {
       data = [...data, { ...workflowStage }]
       setData(data)
     })
@@ -378,7 +378,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
   }
 
   const getCards = (workflowStages) => {
-    return workflowStages.map((ws) => {
+    return workflowStages?.map((ws) => {
       return {
         id: ws?.id,
         title: ws.stage?.name,
