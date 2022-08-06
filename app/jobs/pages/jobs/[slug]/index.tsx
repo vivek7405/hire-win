@@ -414,7 +414,7 @@ const Candidates = (props: CandidateProps) => {
   // useMemo(async () => {
   //   let data: ExtendedCandidate[] = []
 
-  //   await candidates.forEach((candidate) => {
+  //   await candidates?.forEach((candidate) => {
   //     data = [...data, { ...(candidate as any) }]
   //     setData(data)
   //   })

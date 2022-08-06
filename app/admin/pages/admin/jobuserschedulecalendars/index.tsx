@@ -91,7 +91,7 @@ const Jobuserschedulecalendars = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await jobuserschedulecalendars.forEach((jobuserschedulecalendar) => {
+    await jobuserschedulecalendars?.forEach((jobuserschedulecalendar) => {
       data = [
         ...data,
         {

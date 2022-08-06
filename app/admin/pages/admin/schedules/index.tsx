@@ -88,7 +88,7 @@ const Schedules = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await schedules.forEach((schedule) => {
+    await schedules?.forEach((schedule) => {
       data = [
         ...data,
         {

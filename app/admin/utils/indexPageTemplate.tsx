@@ -89,7 +89,7 @@ const __ModelName__s = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await __modelName__s.forEach((__modelName__) => {
+    await __modelName__s?.forEach((__modelName__) => {
       data = [
         ...data,
         {

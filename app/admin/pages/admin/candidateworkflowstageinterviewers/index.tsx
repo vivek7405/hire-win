@@ -91,7 +91,7 @@ const Candidateworkflowstageinterviewers = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await candidateworkflowstageinterviewers.forEach((candidateworkflowstageinterviewer) => {
+    await candidateworkflowstageinterviewers?.forEach((candidateworkflowstageinterviewer) => {
       data = [
         ...data,
         {

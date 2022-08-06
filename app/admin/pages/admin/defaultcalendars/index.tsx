@@ -88,7 +88,7 @@ const Defaultcalendars = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await defaultcalendars.forEach((defaultcalendar) => {
+    await defaultcalendars?.forEach((defaultcalendar) => {
       data = [
         ...data,
         {

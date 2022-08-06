@@ -345,12 +345,12 @@ const Forms = () => {
 //   useMemo(async () => {
 //     let data: {}[] = []
 
-//     await forms.forEach((form) => {
+//     await forms?.forEach((form) => {
 //       data = [
 //         ...data,
 //         {
 //           ...form,
-//           canUpdate: form.companyId === session.companyId,
+//           canUpdate: form?.companyId === session?.companyId,
 //         },
 //       ]
 

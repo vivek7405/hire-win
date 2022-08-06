@@ -88,7 +88,7 @@ const Workflowstages = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await workflowstages.forEach((workflowstage) => {
+    await workflowstages?.forEach((workflowstage) => {
       data = [
         ...data,
         {

@@ -35,11 +35,11 @@ export const ThemePickerField = forwardRef<HTMLInputElement, ThemePickerFieldPro
 
     useMemo(() => {
       const error = Array.isArray(errors[name])
-        ? errors[name].join(", ")
+        ? errors[name]?.join(", ")
         : errors[name]?.message || errors[name]
 
       error &&
-        toast.error(`${name.charAt(0).toUpperCase() + name.slice(1)}: ${error}`, {
+        toast.error(`${name?.charAt(0)?.toUpperCase() + name?.slice(1)}: ${error}`, {
           id: errors[name],
         })
     }, [errors, name])

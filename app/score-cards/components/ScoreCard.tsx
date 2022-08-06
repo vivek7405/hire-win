@@ -69,7 +69,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
   useMemo(async () => {
     let data: ExtendedScoreCardQuestion[] = []
 
-    await scoreCardQuestions.forEach((sq) => {
+    await scoreCardQuestions?.forEach((sq) => {
       data = [...data, { ...sq }]
       setData(data)
     })

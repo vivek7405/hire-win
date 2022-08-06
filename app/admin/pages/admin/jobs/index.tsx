@@ -88,7 +88,7 @@ const Jobs = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await jobs.forEach((job) => {
+    await jobs?.forEach((job) => {
       data = [
         ...data,
         {

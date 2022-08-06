@@ -88,7 +88,7 @@ const Cardquestions = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await cardquestions.forEach((cardquestion) => {
+    await cardquestions?.forEach((cardquestion) => {
       data = [
         ...data,
         {

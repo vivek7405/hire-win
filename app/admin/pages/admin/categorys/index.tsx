@@ -88,7 +88,7 @@ const Categorys = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await categorys.forEach((category) => {
+    await categorys?.forEach((category) => {
       data = [
         ...data,
         {

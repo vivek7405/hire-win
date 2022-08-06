@@ -83,7 +83,7 @@ const Sessions = ({ user }) => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await sessions.forEach((session) => {
+    await sessions?.forEach((session) => {
       data = [
         ...data,
         {

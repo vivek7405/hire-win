@@ -88,7 +88,7 @@ const Companys = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await companys.forEach((company) => {
+    await companys?.forEach((company) => {
       data = [
         ...data,
         {

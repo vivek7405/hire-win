@@ -88,7 +88,7 @@ const Stages = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await stages.forEach((stage) => {
+    await stages?.forEach((stage) => {
       data = [
         ...data,
         {

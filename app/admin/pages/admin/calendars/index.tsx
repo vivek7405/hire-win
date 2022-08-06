@@ -88,7 +88,7 @@ const Calendars = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await calendars.forEach((calendar) => {
+    await calendars?.forEach((calendar) => {
       data = [
         ...data,
         {

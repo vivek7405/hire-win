@@ -326,7 +326,7 @@ const SingleCandidatePageContent = ({
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
     if (resume?.Key) {
-      getResume(resume.Key).then((response) => {
+      getResume(resume?.Key).then((response) => {
         const file = response?.data?.Body
         setFile(file)
       })

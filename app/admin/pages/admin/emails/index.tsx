@@ -88,7 +88,7 @@ const Emails = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await emails.forEach((email) => {
+    await emails?.forEach((email) => {
       data = [
         ...data,
         {

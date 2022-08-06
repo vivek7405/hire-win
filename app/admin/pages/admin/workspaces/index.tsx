@@ -95,7 +95,7 @@ const Workspaces = ({ user }) => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await workspaces.forEach((workspace) => {
+    await workspaces?.forEach((workspace) => {
       data = [
         ...data,
         {

@@ -88,7 +88,7 @@ const Formquestions = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await formquestions.forEach((formquestion) => {
+    await formquestions?.forEach((formquestion) => {
       data = [
         ...data,
         {

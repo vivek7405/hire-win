@@ -88,7 +88,7 @@ const Answers = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await answers.forEach((answer) => {
+    await answers?.forEach((answer) => {
       data = [
         ...data,
         {

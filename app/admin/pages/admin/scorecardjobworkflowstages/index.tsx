@@ -91,7 +91,7 @@ const Scorecardjobworkflowstages = () => {
   useMemo(async () => {
     let data: {}[] = []
 
-    await scorecardjobworkflowstages.forEach((scorecardjobworkflowstage) => {
+    await scorecardjobworkflowstages?.forEach((scorecardjobworkflowstage) => {
       data = [
         ...data,
         {
