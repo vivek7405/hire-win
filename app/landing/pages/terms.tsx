@@ -233,7 +233,7 @@ export default function Terms() {
         <p>
           <br />
         </p>{" "}
-        <h1 className="font-bold">Return and Refund Policy</h1>{" "}
+        <h1 className="font-bold">Cancellation and Refund Policy</h1>{" "}
         <p>
           <span>
             Thanks for shopping with us. We appreciate the fact that you like to buy the stuff we
@@ -245,9 +245,12 @@ export default function Terms() {
             thing to remember is that by placing an order or making a purchase from us, you agree to
             the terms along with our Privacy Policy.
             <br />
-            If, for any reason, You are not completely satisfied with any good or service that we
-            provide, {`don't`} hesitate to contact us and we will discuss any of the issues you are
-            going through with our product.
+            If, for any reason, you are not completely satisfied with any service that we provide,{" "}
+            {`don't`} hesitate to contact us and we will discuss any of the issues you are going
+            through with our product. You may refer to our{" "}
+            <Link href={Routes.Refunds()}>
+              <a className="text-indigo-600">cancellation and refund policy</a>
+            </Link>
           </span>
         </p>{" "}
         <p>

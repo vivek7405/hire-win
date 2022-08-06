@@ -458,10 +458,20 @@ export default function Home() {
                 </span>
                 <span className="px-6 text-justify md:text-center lg:text-center">
                   <span className="font-normal text-base">
-                    We would be happy to provide you{" "}
+                    You may review our{" "}
+                    <Link href={Routes.Refunds()}>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-indigo-600 hover:text-indigo-700 hover:underline"
+                      >
+                        cancellation and refund policy
+                      </a>
+                    </Link>
+                    {/* We would be happy to provide you{" "}
                     <span className="bg-yellow-300 font-semibold">refunds on yearly plan</span>{" "}
                     should you wish to cancel{" "}
-                    <span className="bg-yellow-300 font-semibold">after 1 month of usage</span>
+                    <span className="bg-yellow-300 font-semibold">after 1 month of usage</span> */}
                   </span>
                 </span>
               </div>
@@ -537,7 +547,17 @@ export default function Home() {
                 </span>
               </div>
               <div className="mt-10 px-6 md:px-10 text-justify md:text-center lg:text-center">
-                {`If it's an issue with your account or you need to report a bug, make sure you attach a screenshot with appropriate details. We'll respond to you as soon as we can!`}
+                Visit our{" "}
+                <Link href={Routes.Support()}>
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-indigo-600 hover:text-indigo-700 hover:underline"
+                  >
+                    support page
+                  </a>
+                </Link>{" "}
+                for more details
               </div>
             </div>
           </div>
