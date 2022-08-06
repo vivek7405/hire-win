@@ -182,7 +182,7 @@ export const CardQuestions = ({
   useMemo(async () => {
     let data: ExtendedScoreCardQuestion[] = []
 
-    await scoreCardQuestions.forEach((scoreCardQuestion) => {
+    await scoreCardQuestions?.forEach((scoreCardQuestion) => {
       data = [...data, { ...(scoreCardQuestion as any) }]
       setData(data)
     })
@@ -190,7 +190,7 @@ export const CardQuestions = ({
 
   const getCards = useCallback(
     (scoreCardQuestions) => {
-      return scoreCardQuestions.map((sq: ExtendedScoreCardQuestion) => {
+      return scoreCardQuestions?.map((sq: ExtendedScoreCardQuestion) => {
         return {
           id: sq?.id,
           title: sq.cardQuestion?.name,
@@ -393,8 +393,8 @@ export const CardQuestions = ({
 
               // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
               if (
-                source.index < factoryScoreCardQuestions.length ||
-                destination.index < factoryScoreCardQuestions.length
+                source.index < factoryScoreCardQuestions?.length ||
+                destination.index < factoryScoreCardQuestions?.length
               ) {
                 toast.error("Order for Factory Questions can't be changed")
                 return
@@ -444,12 +444,12 @@ export const CardQuestions = ({
             noSearch={true}
             columns={columns}
             data={data}
-            pageCount={scoreCardQuestions.length}
+            pageCount={scoreCardQuestions?.length}
             pageIndex={tablePage}
             pageSize={ITEMS_PER_PAGE}
             hasNext={false}
             hasPrevious={false}
-            totalCount={scoreCardQuestions.length}
+            totalCount={scoreCardQuestions?.length}
             startPage={1}
             endPage={1}
             noPagination={true}

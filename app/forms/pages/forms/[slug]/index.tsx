@@ -173,7 +173,7 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
   useMemo(async () => {
     let data: ExtendedFormQuestion[] = []
 
-    await formQuestions.forEach((formQuestion) => {
+    await formQuestions?.forEach((formQuestion) => {
       data = [...data, { ...formQuestion }]
       setData(data)
     })
@@ -181,7 +181,7 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
 
   const getCards = useCallback(
     (formQuestions) => {
-      return formQuestions.map((fq) => {
+      return formQuestions?.map((fq) => {
         return {
           id: fq?.id,
           title: fq.question?.name,
@@ -382,8 +382,8 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
 
               // Don't allow drag for 1st and last index since Sourced & Hired can't be changed
               if (
-                source.index < factoryFormQuestions.length ||
-                destination.index < factoryFormQuestions.length
+                source.index < factoryFormQuestions?.length ||
+                destination.index < factoryFormQuestions?.length
               ) {
                 toast.error("Order for Factory Questions can't be changed")
                 return
@@ -433,12 +433,12 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
             noSearch={true}
             columns={columns}
             data={data}
-            pageCount={formQuestions.length}
+            pageCount={formQuestions?.length}
             pageIndex={tablePage}
             pageSize={ITEMS_PER_PAGE}
             hasNext={false}
             hasPrevious={false}
-            totalCount={formQuestions.length}
+            totalCount={formQuestions?.length}
             startPage={1}
             endPage={1}
             noPagination={true}

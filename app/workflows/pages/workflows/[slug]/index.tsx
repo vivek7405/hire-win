@@ -244,7 +244,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
 
   //                 <div className="flex">
   //                   <button
-  //                     disabled={workflowStage.order === workflowStages.length - 1}
+  //                     disabled={workflowStage.order === workflowStages?.length - 1}
   //                     title="Move Down"
   //                     className="align-middle disabled:cursor-not-allowed transition duration-150 ease-in-out hover:scale-150 disabled:hover:scale-100"
   //                     onClick={async (e) => {
@@ -268,7 +268,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
   //                         )
   //                         const x = workflowStage.order
   //                         const y = workflowStage.order - 1
-  //                         if (x <= workflowStages.length - 1 && y <= workflowStages.length - 1) {
+  //                         if (x <= workflowStages?.length - 1 && y <= workflowStages?.length - 1) {
   //                           const row = workflowStages[x]!
   //                           workflowStages[x] = {
   //                             ...workflowStages[y]!,
@@ -288,11 +288,11 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
   //                       }
   //                     }}
   //                   >
-  //                     {!(workflowStage.order === workflowStages.length - 1) && (
+  //                     {!(workflowStage.order === workflowStages?.length - 1) && (
   //                       <ArrowDownIcon className="h-5 cursor-pointer text-theme-500 hover:text-theme-600" />
   //                     )}
 
-  //                     {workflowStage.order === workflowStages.length - 1 && (
+  //                     {workflowStage.order === workflowStages?.length - 1 && (
   //                       <ArrowDownIcon className="h-5 cursor-not-allowed text-gray-300" />
   //                     )}
   //                   </button>
@@ -322,7 +322,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
   //                         )
   //                         const x = workflowStage.order - 1
   //                         const y = workflowStage.order - 2
-  //                         if (x <= workflowStages.length - 1 && y <= workflowStages.length - 1) {
+  //                         if (x <= workflowStages?.length - 1 && y <= workflowStages?.length - 1) {
   //                           const row = workflowStages[x]!
   //                           workflowStages[x] = {
   //                             ...workflowStages[y]!,
@@ -570,12 +570,12 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
         noMarginRight={true}
         columns={columns}
         data={data}
-        pageCount={Math.ceil(workflowStages.length / ITEMS_PER_PAGE)}
+        pageCount={Math.ceil(workflowStages?.length / ITEMS_PER_PAGE)}
         pageIndex={tablePage}
         pageSize={ITEMS_PER_PAGE}
         hasNext={false}
         hasPrevious={false}
-        totalCount={workflowStages.length}
+        totalCount={workflowStages?.length}
         startPage={1}
         endPage={1}
         noPagination={true}
