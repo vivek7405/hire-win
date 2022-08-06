@@ -754,7 +754,7 @@ export default function Privacy() {
           </li>{" "}
           <li>
             <span>
-              Request that a business that sells a {`consumer's`} personal data, not sell the
+              Request that a business that sells a {`consumer's`} personal data, not sell the{" "}
               {`consumer's`} personal data.
             </span>
           </li>
@@ -813,8 +813,7 @@ export default function Privacy() {
           <li>
             <span>
               Right to request that a business that sells a {`consumer's`} personal data, not sell
-              the
-              {`consumer's`} personal data.
+              the {`consumer's`} personal data.
             </span>
           </li>
         </ul>{" "}
