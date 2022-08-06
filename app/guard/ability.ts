@@ -85,11 +85,17 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       const owner = job.users.find((p) => p.role === JobUserRole.OWNER)
       const admins = job.users.filter((m) => m.role === JobUserRole.ADMIN)
 
-      return (
-        (admins?.some((a) => a.userId === ctx.session.userId) ||
-          owner?.userId === ctx.session.userId) &&
-        isFreePlanCandidateLimitAvailable(args)
-      )
+      // If the user is logged in
+      if (ctx?.session?.userId) {
+        return (
+          (admins?.some((a) => a.userId === ctx.session.userId) ||
+            owner?.userId === ctx.session.userId) &&
+          isFreePlanCandidateLimitAvailable(args)
+        )
+      } else {
+        // if the candidate is applying from careers page, the user won't be logged in
+        return isFreePlanCandidateLimitAvailable(args)
+      }
     })
 
     can("access", "jobListing", async (args) => {
