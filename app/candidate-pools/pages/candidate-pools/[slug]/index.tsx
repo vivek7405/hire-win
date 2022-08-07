@@ -25,12 +25,12 @@ import Card from "app/core/components/Card"
 import { TrashIcon, XIcon } from "@heroicons/react/outline"
 import getCandidatePool from "app/candidate-pools/queries/getCandidatePool"
 import removeCandidateFromPool from "app/candidate-pools/mutations/removeCandidateFromPool"
-import getCandidates from "app/candidates/queries/getCandidates"
 import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import Pagination from "app/core/components/Pagination"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
+import getCandidatesWOAbility from "app/candidates/queries/getCandidatesWOAbility"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -125,7 +125,7 @@ export const Candidates = ({ slug }) => {
     return debouncer.execute(e)
   }
 
-  const [{ candidates, hasMore, count }] = usePaginatedQuery(getCandidates, {
+  const [{ candidates, hasMore, count }] = usePaginatedQuery(getCandidatesWOAbility, {
     where: {
       candidatePools: {
         some: {
@@ -163,7 +163,7 @@ export const Candidates = ({ slug }) => {
               candidateId: candidateToRemoveFromPool.id,
               candidatePoolSlug: slug,
             })
-            invalidateQuery(getCandidates)
+            invalidateQuery(getCandidatesWOAbility)
             toast.success("Candidate removed from Pool", { id: toastId })
           } catch (error) {
             toast.error(`Failed to remove candidate from pool - ${error.toString()}`, {

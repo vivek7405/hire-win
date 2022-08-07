@@ -3,7 +3,7 @@ import { Form } from "app/core/components/Form"
 import LabeledSelectField from "app/core/components/LabeledSelectField"
 import getCardQuestionsWOPagination from "app/card-questions/queries/getCardQuestionsWOPagination"
 import { useQuery } from "blitz"
-import getScoreCardQuestionsWOPaginationWOAbility from "../queries/getScoreCardQuestionsWOPaginationWOAbility"
+import getScoreCardQuestionsWOPagination from "../queries/getScoreCardQuestionsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 
 type AddExistingCardQuestionsFormProps = {
@@ -17,7 +17,7 @@ type AddExistingCardQuestionsFormProps = {
 }
 
 export const AddExistingCardQuestionsForm = (props: AddExistingCardQuestionsFormProps) => {
-  const [scoreCardQuestions] = useQuery(getScoreCardQuestionsWOPaginationWOAbility, {
+  const [scoreCardQuestions] = useQuery(getScoreCardQuestionsWOPagination, {
     where: { scoreCardId: props.scoreCardId },
   })
   const [cardQuestions] = useQuery(getCardQuestionsWOPagination, {

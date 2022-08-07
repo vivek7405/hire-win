@@ -79,22 +79,24 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { ...context }
   )
 
-  const { can: canUpdate } = await Guard.can(
-    "update",
+  const { can: canRead } = await Guard.can(
+    "read",
     "candidate",
     { session },
     {
       where: {
-        jobId_email: {
-          jobId: job?.id,
-          email: context?.params?.candidateEmail as string,
-        },
+        jobId: job?.id,
+        email: context?.params?.candidateEmail as string,
       },
     }
   )
 
   if (user) {
     try {
+      if (!canRead) {
+        throw new AuthorizationError()
+      }
+
       const candidate = await invokeWithMiddleware(
         getCandidate,
         {
@@ -107,7 +109,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         return {
           props: {
             user: user,
-            canUpdate: canUpdate,
             candidateEmail: candidate?.email as string,
             jobId: candidate?.jobId,
             // candidate: candidate,
@@ -240,7 +241,6 @@ const getCards = (candidate: ExtendedCandidate) => {
 const SingleCandidatePage = ({
   user,
   error,
-  canUpdate,
   candidateEmail,
   jobId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -256,7 +256,6 @@ const SingleCandidatePage = ({
         <SingleCandidatePageContent
           user={user as any}
           error={error as any}
-          canUpdate={canUpdate as any}
           candidateEmail={candidateEmail as any}
           jobId={jobId}
         />
@@ -268,7 +267,6 @@ const SingleCandidatePage = ({
 const SingleCandidatePageContent = ({
   user,
   error,
-  canUpdate,
   candidateEmail,
   jobId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -279,8 +277,6 @@ const SingleCandidatePageContent = ({
     Emails = "Emails",
   }
 
-  // const { user, error, canUpdate } = props
-  // const [candidate, setCandidate] = useState(props.candidate)
   const [candidate] = useQuery(getCandidate, { where: { email: candidateEmail, jobId } })
   const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
   const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
