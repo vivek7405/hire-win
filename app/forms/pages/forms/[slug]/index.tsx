@@ -41,7 +41,7 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
 import factoryFormQuestions from "app/questions/utils/factoryFormQuestions"
-import getFormQuestionsWOPaginationWOAbility from "app/forms/queries/getFormQuestionsWOPaginationWOAbility"
+import getFormQuestionsWOPagination from "app/forms/queries/getFormQuestionsWOPagination"
 import QuestionForm from "app/questions/components/QuestionForm"
 import createQuestion from "app/questions/mutations/createQuestion"
 import addExistingFormQuestions from "app/forms/mutations/addExistingFormQuestions"
@@ -164,7 +164,7 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
   //   endPage = count
   // }
 
-  const [formQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
+  const [formQuestions] = useQuery(getFormQuestionsWOPagination, {
     where: {
       formId: form?.id,
       ...query,
@@ -357,7 +357,7 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
               formId: formQuestionToRemove.formId,
               order: formQuestionToRemove.order,
             })
-            invalidateQuery(getFormQuestionsWOPaginationWOAbility)
+            invalidateQuery(getFormQuestionsWOPagination)
             toast.success(
               () => <span>Question removed - {formQuestionToRemove.question.name}</span>,
               {
@@ -529,6 +529,7 @@ const SingleFormPage = ({
                 header="Add Questions from Pool"
                 open={openAddExistingQuestions}
                 setOpen={setOpenAddExistingQuestions}
+                noOverflow={true}
               >
                 <AddExistingQuestionsForm
                   schema={FormQuestions}
@@ -541,10 +542,10 @@ const SingleFormPage = ({
                         formId: form?.id as string,
                         questionIds: values.questionIds,
                       })
+                      invalidateQuery(getFormQuestionsWOPagination)
                       toast.success(() => <span>Question(s) added</span>, {
                         id: toastId,
                       })
-                      router.reload()
                     } catch (error) {
                       toast.error(
                         "Sorry, we had an unexpected error. Please try again. - " +
@@ -552,6 +553,7 @@ const SingleFormPage = ({
                         { id: toastId }
                       )
                     }
+                    setOpenAddExistingQuestions(false)
                   }}
                 />
               </Modal>
@@ -602,7 +604,7 @@ const SingleFormPage = ({
                             initial: questionToEdit,
                           })
                         : await addNewQuestionToFormMutation({ formId: form?.id, ...values })
-                      await invalidateQuery(getFormQuestionsWOPaginationWOAbility)
+                      await invalidateQuery(getFormQuestionsWOPagination)
                       toast.success(
                         isEdit ? "Question updated successfully" : "Question added successfully",
                         {

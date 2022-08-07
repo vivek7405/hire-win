@@ -41,7 +41,7 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import Form from "app/core/components/Form"
 import updateScoreCardQuestion from "app/score-cards/mutations/updateScoreCardQuestion"
 import factoryScoreCardQuestions from "app/card-questions/utils/factoryScoreCardQuestions"
-import getScoreCardQuestionsWOPaginationWOAbility from "app/score-cards/queries/getScoreCardQuestionsWOPaginationWOAbility"
+import getScoreCardQuestionsWOPagination from "app/score-cards/queries/getScoreCardQuestionsWOPagination"
 import CardQuestionForm from "app/card-questions/components/CardQuestionForm"
 import createCardQuestion from "app/card-questions/mutations/createCardQuestion"
 import addExistingScoreCardQuestions from "app/score-cards/mutations/addExistingScoreCardQuestions"
@@ -171,7 +171,7 @@ export const CardQuestions = ({
   //   endPage = count
   // }
 
-  const [scoreCardQuestions] = useQuery(getScoreCardQuestionsWOPaginationWOAbility, {
+  const [scoreCardQuestions] = useQuery(getScoreCardQuestionsWOPagination, {
     where: {
       scoreCardId: scoreCard?.id,
       ...query,
@@ -366,7 +366,7 @@ export const CardQuestions = ({
               scoreCardId: scoreCardQuestionToRemove.scoreCardId,
               order: scoreCardQuestionToRemove.order,
             })
-            invalidateQuery(getScoreCardQuestionsWOPaginationWOAbility)
+            invalidateQuery(getScoreCardQuestionsWOPagination)
             toast.success(
               () => <span>Question removed - {scoreCardQuestionToRemove.cardQuestion?.name}</span>,
               {
@@ -563,6 +563,7 @@ const SingleScoreCardPage = ({
                 header="Add Questions from Pool"
                 open={openAddExistingCardQuestions}
                 setOpen={setOpenAddExistingCardQuestions}
+                noOverflow={true}
               >
                 <AddExistingCardQuestionsForm
                   schema={ScoreCardQuestions}
@@ -576,10 +577,10 @@ const SingleScoreCardPage = ({
                         scoreCardId: scoreCard?.id as string,
                         cardQuestionIds: values.cardQuestionIds,
                       })
+                      invalidateQuery(getScoreCardQuestionsWOPagination)
                       toast.success(() => <span>CardQuestion(s) added</span>, {
                         id: toastId,
                       })
-                      router.reload()
                     } catch (error) {
                       toast.error(
                         "Sorry, we had an unexpected error. Please try again. - " +
@@ -587,6 +588,7 @@ const SingleScoreCardPage = ({
                         { id: toastId }
                       )
                     }
+                    setOpenAddExistingCardQuestions(false)
                   }}
                 />
               </Modal>
@@ -628,7 +630,7 @@ const SingleScoreCardPage = ({
                             scoreCardId: scoreCard?.id,
                             ...values,
                           })
-                      await invalidateQuery(getScoreCardQuestionsWOPaginationWOAbility)
+                      await invalidateQuery(getScoreCardQuestionsWOPagination)
                       toast.success(
                         isEdit ? "Question updated successfully" : "Question added successfully",
                         {

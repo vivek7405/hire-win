@@ -804,10 +804,10 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           include: {
             job: {
               include: {
-                // users: true,
-                company: {
-                  include: { users: true },
-                },
+                users: true,
+                // company: {
+                //   include: { users: true },
+                // },
               },
             },
           },
@@ -815,7 +815,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
         return (
           ctx.session?.companyId === candidate?.job?.companyId &&
-          candidate?.job?.company?.users.some((m) => m.userId === ctx.session.userId) === true
+          candidate?.job?.users?.some((m) => m.userId === ctx.session.userId) === true
         )
       })
       can("readAll", "candidate", async (args) => {

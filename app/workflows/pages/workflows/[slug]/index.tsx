@@ -692,6 +692,7 @@ const SingleWorkflowPage = ({
                 header="Add Stages from Pool"
                 open={openAddExistingStage}
                 setOpen={setOpenAddExistingStage}
+                noOverflow={true}
               >
                 <AddExistingStagesForm
                   schema={WorkflowStages}
@@ -704,10 +705,10 @@ const SingleWorkflowPage = ({
                         workflowId: workflow?.id as string,
                         stageIds: values.stageIds,
                       })
+                      invalidateQuery(getWorkflowStagesWOPagination)
                       toast.success(() => <span>Stage(s) added</span>, {
                         id: toastId,
                       })
-                      router.reload()
                     } catch (error) {
                       toast.error(
                         "Sorry, we had an unexpected error. Please try again. - " +
@@ -715,6 +716,7 @@ const SingleWorkflowPage = ({
                         { id: toastId }
                       )
                     }
+                    setOpenAddExistingStage(false)
                   }}
                 />
               </Modal>
