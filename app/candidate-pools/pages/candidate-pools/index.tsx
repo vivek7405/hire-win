@@ -123,7 +123,7 @@ const CandidatePools = () => {
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Candidate Pool`)
           try {
-            await deleteCandidatePoolMutation(candidatePoolToDelete?.id)
+            await deleteCandidatePoolMutation({ where: { id: candidatePoolToDelete?.id } })
             toast.success("Candidate Pool Deleted", { id: toastId })
             setOpenConfirm(false)
             setCandidatePoolToDelete(null as any)

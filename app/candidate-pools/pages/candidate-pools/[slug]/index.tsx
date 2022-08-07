@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, Suspense } from "react"
+import { useEffect, useState, Suspense } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -6,7 +6,6 @@ import {
   Link,
   useRouter,
   usePaginatedQuery,
-  useQuery,
   useMutation,
   invalidateQuery,
   invokeWithMiddleware,
@@ -18,19 +17,9 @@ import {
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import path from "path"
-import getCandidatePoolsWOPagination from "app/candidate-pools/queries/getCandidatePoolsWOPagination"
-import Table from "app/core/components/Table"
-
-import { Candidate, CandidatePool, Job } from "@prisma/client"
-import { CardType, DragDirection, ExtendedCandidatePool } from "types"
+import { Candidate, Job } from "@prisma/client"
 import Debouncer from "app/core/utils/debouncer"
-import Cards from "app/core/components/Cards"
-import Modal from "app/core/components/Modal"
-import CandidatePoolForm from "app/candidate-pools/components/CandidatePoolForm"
 import toast from "react-hot-toast"
-import createCandidatePool from "app/candidate-pools/mutations/createCandidatePool"
-import updateCandidatePool from "app/candidate-pools/mutations/updateCandidatePool"
-import deleteCandidatePool from "app/candidate-pools/mutations/deleteCandidatePool"
 import Confirm from "app/core/components/Confirm"
 import Card from "app/core/components/Card"
 import { TrashIcon } from "@heroicons/react/outline"
