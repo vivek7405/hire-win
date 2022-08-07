@@ -51,7 +51,7 @@ export async function sendInterviewReminderMailer({
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "send-meeting-reminder",
+            MessageStream: "interview",
           })
         } catch (e) {
           throw new Error(

@@ -46,7 +46,7 @@ export function forgotPasswordMailer({ to, token }: ResetPasswordMailer) {
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "forgot-password",
+            MessageStream: "outbound",
           })
         } catch {
           throw new Error(
