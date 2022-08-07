@@ -60,7 +60,7 @@ const EmailTemplates = () => {
   const tablePage = Number(router.query.page) || 0
   const session = useSession()
   const [query, setQuery] = useState({})
-  const [emailTemplateToDelete, setEmailTemplateToDelete] = useState(null as any as EmailTemplate)
+  const [emailTemplateToDelete, setEmailTemplateToDelete] = useState(null as EmailTemplate | null)
   const [openConfirm, setOpenConfirm] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [createEmailTemplateMutation] = useMutation(createEmailTemplate)
@@ -117,18 +117,21 @@ const EmailTemplates = () => {
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
-        header={`Delete Email Template - ${emailTemplateToDelete?.subject}`}
+        header={`Delete Email Template - ${emailTemplateToDelete?.name}`}
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Email Template`)
           try {
-            await deleteEmailTemplateMutation(emailTemplateToDelete?.id)
+            if (!emailTemplateToDelete) {
+              throw new Error("No email template set to delete")
+            }
+            await deleteEmailTemplateMutation(emailTemplateToDelete.id)
             toast.success("Email Template Deleted", { id: toastId })
             invalidateQuery(getEmailTemplates)
           } catch (error) {
             toast.error(`Deleting email template failed - ${error.toString()}`, { id: toastId })
           }
           setOpenConfirm(false)
-          setEmailTemplateToDelete(null as any)
+          setEmailTemplateToDelete(null)
         }}
       >
         Are you sure you want to delete the email template?

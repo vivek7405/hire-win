@@ -64,7 +64,7 @@ const Categories = () => {
   const [query, setQuery] = useState({})
 
   const [openConfirm, setOpenConfirm] = useState(false)
-  const [categoryToDelete, setCategoryToDelete] = useState(null as any as Category)
+  const [categoryToDelete, setCategoryToDelete] = useState(null as Category | null)
   const [deleteCategoryMutation] = useMutation(deleteCategory)
   const [categoryToEdit, setCategoryToEdit] = useState(null as any as Category)
   const [openModal, setOpenModal] = useState(false)
@@ -127,14 +127,17 @@ const Categories = () => {
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Category`)
           try {
-            await deleteCategoryMutation({ where: { id: categoryToDelete?.id } })
-            toast.success("Category Deleted", { id: toastId })
+            if (!categoryToDelete) {
+              throw new Error("No category set to delete")
+            }
+            await deleteCategoryMutation({ where: { id: categoryToDelete.id } })
             invalidateQuery(getCategories)
+            toast.success("Category Deleted", { id: toastId })
           } catch (error) {
             toast.error(`Deleting category failed - ${error.toString()}`, { id: toastId })
           }
           setOpenConfirm(false)
-          setCategoryToDelete(null as any)
+          setCategoryToDelete(null)
         }}
       >
         Are you sure you want to delete the category?

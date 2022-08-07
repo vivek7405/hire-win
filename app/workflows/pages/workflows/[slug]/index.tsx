@@ -29,7 +29,7 @@ import toast from "react-hot-toast"
 import createWorkflowStage from "app/workflows/mutations/createWorkflowStage"
 import { WorkflowStages } from "app/workflows/validations"
 
-import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon } from "@heroicons/react/outline"
+import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
 import { CardType, DragDirection, ExtendedWorkflowStage, ShiftDirection } from "types"
 import shiftWorkflowStage from "app/workflows/mutations/shiftWorkflowStage"
 import Confirm from "app/core/components/Confirm"
@@ -118,7 +118,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
   const [removeStageFromWorkflowMutation] = useMutation(removeStageFromWorkflow)
   const [openConfirm, setOpenConfirm] = React.useState(false)
   const [workflowStageToRemove, setWorkflowStageToRemove] = React.useState(
-    {} as ExtendedWorkflowStage
+    null as ExtendedWorkflowStage | null
   )
 
   useEffect(() => {
@@ -426,7 +426,7 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
                         setOpenConfirm(true)
                       }}
                     >
-                      <TrashIcon className="h-5 w-5" />
+                      <XIcon className="h-5 w-5" />
                     </button>
                   </div>
                 )}
@@ -460,19 +460,23 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
         open={openConfirm}
         setOpen={setOpenConfirm}
         header={
-          Object.entries(workflowStageToRemove).length
+          workflowStageToRemove
             ? `Remove Stage - ${workflowStageToRemove.stage.name}?`
             : "Remove Stage?"
         }
         onSuccess={async () => {
           const toastId = toast.loading(() => (
-            <span>Removing Stage {workflowStageToRemove.stage.name}</span>
+            <span>Removing Stage {workflowStageToRemove?.stage?.name}</span>
           ))
           try {
+            if (!workflowStageToRemove) {
+              throw new Error("No stage set to remove")
+            }
             await removeStageFromWorkflowMutation({
               workflowId: workflowStageToRemove.workflowId,
               order: workflowStageToRemove.order,
             })
+            invalidateQuery(getWorkflowStagesWOPagination)
             toast.success(() => <span>Stage removed - {workflowStageToRemove.stage.name}</span>, {
               id: toastId,
             })
@@ -482,7 +486,8 @@ export const Stages = ({ user, workflow, setStageToEdit, setOpenAddNewStage }) =
               { id: toastId }
             )
           }
-          router.reload()
+          setOpenConfirm(false)
+          setWorkflowStageToRemove(null)
         }}
       >
         Are you sure you want to remove this stage from the workflow?

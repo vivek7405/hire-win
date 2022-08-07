@@ -65,7 +65,7 @@ const ScoreCards = () => {
   const session = useSession()
 
   const [openConfirm, setOpenConfirm] = useState(false)
-  const [scoreCardToDelete, setScoreCardToDelete] = useState(null as any as ScoreCard)
+  const [scoreCardToDelete, setScoreCardToDelete] = useState(null as ScoreCard | null)
   const [deleteScoreCardMutation] = useMutation(deleteScoreCard)
   const [scoreCardToEdit, setScoreCardToEdit] = useState(null as any as ScoreCard)
   const [openModal, setOpenModal] = useState(false)
@@ -127,14 +127,17 @@ const ScoreCards = () => {
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting score card`)
           try {
-            await deleteScoreCardMutation({ id: scoreCardToDelete?.id })
+            if (!scoreCardToDelete) {
+              throw new Error("No score card set to delete")
+            }
+            await deleteScoreCardMutation({ id: scoreCardToDelete.id })
             toast.success("Score card deleted", { id: toastId })
-            setOpenConfirm(false)
-            setScoreCardToDelete(null as any)
             invalidateQuery(getScoreCards)
           } catch (error) {
             toast.error(`Deleting score card failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setScoreCardToDelete(null)
         }}
       >
         Are you sure you want to delete the score card?

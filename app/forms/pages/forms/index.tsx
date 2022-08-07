@@ -64,7 +64,7 @@ const Forms = () => {
   const session = useSession()
 
   const [openConfirm, setOpenConfirm] = useState(false)
-  const [formToDelete, setFormToDelete] = useState(null as any as Form)
+  const [formToDelete, setFormToDelete] = useState(null as Form | null)
   const [deleteFormMutation] = useMutation(deleteForm)
   const [formToEdit, setFormToEdit] = useState(null as any as Form)
   const [openModal, setOpenModal] = useState(false)
@@ -126,14 +126,17 @@ const Forms = () => {
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Form`)
           try {
-            await deleteFormMutation({ id: formToDelete?.id })
-            toast.success("Form Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setFormToDelete(null as any)
+            if (!formToDelete) {
+              throw new Error("No form set to delete")
+            }
+            await deleteFormMutation({ id: formToDelete.id })
             invalidateQuery(getForms)
+            toast.success("Form Deleted", { id: toastId })
           } catch (error) {
             toast.error(`Deleting form failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setFormToDelete(null)
         }}
       >
         Are you sure you want to delete the form?
