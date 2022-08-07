@@ -18,6 +18,7 @@ import Form from "app/core/components/Form"
 import { Currency, PlanFrequency } from "types"
 import LocaleCurrency from "locale-currency"
 import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
+import getCurrencySymbol from "app/plans/utils/getCurrencySymbol"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
@@ -347,7 +348,9 @@ export default function Home() {
                   </ul>
                 </div>
                 <div className="flex-none mt-auto rounded-b rounded-t-none overflow-hidden p-6">
-                  <div className="w-full py-6 text-4xl font-bold text-center">$0.00</div>
+                  <div className="w-full py-6 text-4xl font-bold text-center">
+                    {getCurrencySymbol(selectedCurrency) || "$"}0.00
+                  </div>
                 </div>
               </div>
               <div className="text-black flex flex-col w-5/6 lg:w-1/3 mx-auto lg:mx-0 rounded-lg bg-white bg-gradient-to-br from-red-100 via-purple-100 to-indigo-300 shadow hover:shadow-lg">

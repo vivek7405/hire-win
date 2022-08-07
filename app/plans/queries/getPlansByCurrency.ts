@@ -27,7 +27,7 @@ const getPlansByCurrency = async ({ currency }: GetPlansInputType) => {
     case Currency.AED:
       return aedPlans
     default:
-      return inrPlans
+      return usdPlans
   }
 }
 
