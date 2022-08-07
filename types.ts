@@ -35,6 +35,12 @@ export enum PlanFrequency {
   YEARLY = "YEARLY",
 }
 
+export enum ToggleSize {
+  SMALL = "SMALL",
+  MEDIUM = "MEDIUM",
+  LARGE = "LARGE",
+}
+
 export type IntroStep = {
   element: string
   title: string

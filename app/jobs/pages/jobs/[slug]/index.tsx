@@ -891,7 +891,7 @@ const SingleJobPageContent = ({
     <>
       {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.OWNER ||
         user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.ADMIN) && (
-        <div className="text-theme-600 py-2">
+        <div className="text-theme-600 py-2 flex items-center justify-center">
           <Form
             noFormatting={true}
             onSubmit={(value) => {
@@ -914,7 +914,7 @@ const SingleJobPageContent = ({
   )
 
   const viewRejectedToggle = (
-    <div className="text-theme-600 py-2">
+    <div className="text-theme-600 py-2 flex items-center justify-center">
       <Form
         noFormatting={true}
         onSubmit={(value) => {
@@ -935,7 +935,7 @@ const SingleJobPageContent = ({
   )
 
   const tableViewToggle = (
-    <div className="text-theme-600 py-2">
+    <div className="text-theme-600 py-2 flex items-center justify-center">
       <Form
         noFormatting={true}
         onSubmit={(value) => {

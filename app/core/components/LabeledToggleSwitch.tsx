@@ -2,6 +2,7 @@ import { forwardRef, PropsWithoutRef, useEffect, useMemo } from "react"
 import { useFormContext, Controller } from "react-hook-form"
 import toast from "react-hot-toast"
 import * as ToggleSwitch from "@radix-ui/react-switch"
+import { ToggleSize } from "types"
 
 export interface LabeledToggleSwitchProps extends PropsWithoutRef<JSX.IntrinsicElements["div"]> {
   /** Field name. */
@@ -12,14 +13,13 @@ export interface LabeledToggleSwitchProps extends PropsWithoutRef<JSX.IntrinsicE
   testid?: string
   defaultChecked?: boolean
   value?: boolean
-  width?: number
-  height?: number
   onChange?: any
+  size?: ToggleSize
   flex?: boolean
 }
 
 export const LabeledToggleSwitch = forwardRef<HTMLInputElement, LabeledToggleSwitchProps>(
-  ({ label, outerProps, name, defaultChecked, width, height, flex, ...props }, ref) => {
+  ({ label, outerProps, name, defaultChecked, size, flex, ...props }, ref) => {
     const {
       control,
       formState: { isSubmitting, errors },
@@ -51,7 +51,7 @@ export const LabeledToggleSwitch = forwardRef<HTMLInputElement, LabeledToggleSwi
             {label}
           </label>
         )}
-        <div className={label && (flex ? "ml-1" : "mt-1")}>
+        <div className={label && `${flex ? "ml-1" : "mt-1"} flex items-center justify-center`}>
           <Controller
             name={name}
             control={control}
@@ -66,16 +66,33 @@ export const LabeledToggleSwitch = forwardRef<HTMLInputElement, LabeledToggleSwi
                   defaultChecked={!!defaultChecked}
                   // defaultValue={defaultValue || ""}
                   aria-label="Text alignment"
-                  className={`flex justify-center items-center
-                  w-${height ? height * 2 : 10} h-${height ? height + 1 : 6}
-                  rounded-full border-theme-600 border-2`}
+                  className={`flex justify-center items-center                  
+                  ${
+                    size
+                      ? size === ToggleSize.SMALL
+                        ? "w-9 h-5"
+                        : size === ToggleSize.MEDIUM
+                        ? "w-10 h-6"
+                        : "w-11 h-7"
+                      : "w-9 h-5"
+                  }
+                  rounded-full
+                  ${value ? "border-theme-600 bg-theme-600" : "border-neutral-500 bg-neutral-500"}
+                  border-2`}
                 >
                   <ToggleSwitch.Thumb
                     className={`inline-block rounded-full
-                    w-${height || 5} h-${height || 5}
+                    ${
+                      size
+                        ? size === ToggleSize.SMALL
+                          ? "w-4 h-4"
+                          : size === ToggleSize.MEDIUM
+                          ? "w-5 h-5"
+                          : "w-6 h-6"
+                        : "w-4 h-4"
+                    }
                     ${value ? `translate-x-2` : `-translate-x-2`}
-                    bg-theme-600
-                    hover:bg-theme-700 text-white font-medium text-xs
+                    bg-white font-medium text-xs
                     leading-tight uppercase focus:outline-none
                     focus:ring-0 transition duration-150 ease-in-out`}
                   />
