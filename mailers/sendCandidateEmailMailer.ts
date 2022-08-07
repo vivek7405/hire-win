@@ -47,7 +47,7 @@ export async function sendCandidateEmailMailer({
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "send-candidate-email",
+            MessageStream: "candidate",
           })
         } catch (e) {
           throw new Error(

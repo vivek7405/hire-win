@@ -52,7 +52,7 @@ export async function inviteToJobMailer({ to, token, jobId }: InviteToJobInput) 
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "invite-to-job",
+            MessageStream: "invite",
           })
         } catch (e) {
           throw new Error(

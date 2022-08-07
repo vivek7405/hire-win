@@ -65,7 +65,7 @@ export async function sendInterviewConfirmationMailer({
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "send-meeting-confirmation",
+            MessageStream: "interview",
             Attachments: [
               {
                 Name: "appointment.ics",

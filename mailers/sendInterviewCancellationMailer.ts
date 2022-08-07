@@ -51,7 +51,7 @@ export async function sendInterviewCancellationMailer({
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "send-meeting-cancellation",
+            MessageStream: "interview",
           })
         } catch (e) {
           throw new Error(

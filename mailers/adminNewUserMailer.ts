@@ -45,7 +45,7 @@ export function adminNewUserMailer({ to, token }: ResetPasswordMailer) {
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),
-            MessageStream: "admin-new-user",
+            MessageStream: "outbound",
           })
         } catch {
           throw new Error(
