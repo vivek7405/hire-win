@@ -7,8 +7,7 @@ const DeleteWorkflow = z.object({
 })
 
 export default resolver.pipe(resolver.zod(DeleteWorkflow), resolver.authorize(), async ({ id }) => {
-  // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-  const workflowStage = await db.workflowStage.deleteMany({ where: { workflowId: id } })
+  await db.workflowStage.deleteMany({ where: { workflowId: id } })
   const workflow = await db.workflow.delete({ where: { id } })
 
   return workflow

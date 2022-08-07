@@ -7,7 +7,7 @@ const DeleteForm = z.object({
 })
 
 export default resolver.pipe(resolver.zod(DeleteForm), resolver.authorize(), async ({ id }) => {
-  const formQuestion = await db.formQuestion.deleteMany({ where: { formId: id } })
+  await db.formQuestion.deleteMany({ where: { formId: id } })
   const form = await db.form.delete({ where: { id } })
 
   return form
