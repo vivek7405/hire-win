@@ -468,8 +468,6 @@ const Jobs = ({
                                 title="hide job from careers page"
                                 label="Hidden"
                                 flex={true}
-                                height={4}
-                                width={3}
                                 value={job?.hidden}
                                 defaultChecked={job?.hidden}
                                 onChange={async (switchState: boolean) => {
@@ -531,8 +529,6 @@ const Jobs = ({
                                 name="toggleJobSalaryVisibility"
                                 label="Salary"
                                 flex={true}
-                                height={4}
-                                width={3}
                                 value={job?.showSalary}
                                 defaultChecked={job?.showSalary}
                                 onChange={async (switchState: boolean) => {
