@@ -22,7 +22,7 @@ import Debouncer from "app/core/utils/debouncer"
 import toast from "react-hot-toast"
 import Confirm from "app/core/components/Confirm"
 import Card from "app/core/components/Card"
-import { TrashIcon } from "@heroicons/react/outline"
+import { TrashIcon, XIcon } from "@heroicons/react/outline"
 import getCandidatePool from "app/candidate-pools/queries/getCandidatePool"
 import removeCandidateFromPool from "app/candidate-pools/mutations/removeCandidateFromPool"
 import getCandidates from "app/candidates/queries/getCandidates"
@@ -90,7 +90,7 @@ export const Candidates = ({ slug }) => {
   const [query, setQuery] = useState({})
   const [openConfirm, setOpenConfirm] = useState(false)
   const [candidateToRemoveFromPool, setCandidateToRemoveFromPool] = useState(
-    null as any as Candidate & { job: Pick<Job, "slug"> }
+    null as (Candidate & { job: Pick<Job, "slug"> }) | null
   )
   const [removeCandidateFromPoolMutation] = useMutation(removeCandidateFromPool)
 
@@ -156,19 +156,22 @@ export const Candidates = ({ slug }) => {
         onSuccess={async () => {
           const toastId = toast.loading(`Removing Candidate from Pool`)
           try {
+            if (!candidateToRemoveFromPool) {
+              throw new Error("No candidate set to remove")
+            }
             await removeCandidateFromPoolMutation({
-              candidateId: candidateToRemoveFromPool?.id,
+              candidateId: candidateToRemoveFromPool.id,
               candidatePoolSlug: slug,
             })
-            toast.success("Candidate removed from Pool", { id: toastId })
-            setOpenConfirm(false)
-            setCandidateToRemoveFromPool(null as any)
             invalidateQuery(getCandidates)
+            toast.success("Candidate removed from Pool", { id: toastId })
           } catch (error) {
             toast.error(`Failed to remove candidate from pool - ${error.toString()}`, {
               id: toastId,
             })
           }
+          setOpenConfirm(false)
+          setCandidateToRemoveFromPool(null)
         }}
       >
         Are you sure you want to remove the candidate from pool?
@@ -223,7 +226,7 @@ export const Candidates = ({ slug }) => {
                       <button
                         id={"delete-" + candidate.id}
                         className="float-right text-red-600 hover:text-red-800"
-                        title="Delete Candidate Pool"
+                        title="Remove Candidate"
                         type="button"
                         onClick={(e) => {
                           e.preventDefault()
@@ -231,7 +234,7 @@ export const Candidates = ({ slug }) => {
                           setOpenConfirm(true)
                         }}
                       >
-                        <TrashIcon className="w-5 h-5" />
+                        <XIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </div>

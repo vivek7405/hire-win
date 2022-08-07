@@ -30,7 +30,7 @@ import toast from "react-hot-toast"
 import createFormQuestion from "app/forms/mutations/createFormQuestion"
 import { FormQuestion, FormQuestions } from "app/forms/validations"
 
-import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon } from "@heroicons/react/outline"
+import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
 import { CardType, DragDirection, ExtendedFormQuestion, ShiftDirection } from "types"
 import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
@@ -126,7 +126,9 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
   const [updateFormQuestionMutation] = useMutation(updateFormQuestion)
   const [removeQuestionFromFormMutation] = useMutation(removeQuestionFromForm)
   const [openConfirm, setOpenConfirm] = React.useState(false)
-  const [formQuestionToRemove, setFormQuestionToRemove] = React.useState({} as ExtendedFormQuestion)
+  const [formQuestionToRemove, setFormQuestionToRemove] = React.useState(
+    null as ExtendedFormQuestion | null
+  )
 
   useEffect(() => {
     const search = router.query.search
@@ -226,7 +228,7 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
                           setOpenConfirm(true)
                         }}
                       >
-                        <TrashIcon className="h-5 w-5" />
+                        <XIcon className="h-5 w-5" />
                       </button>
                     </div>
                   )}
@@ -339,19 +341,23 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
         open={openConfirm}
         setOpen={setOpenConfirm}
         header={
-          Object.entries(formQuestionToRemove).length
-            ? `Remove Question - ${formQuestionToRemove.question.name}?`
+          formQuestionToRemove
+            ? `Remove Question - ${formQuestionToRemove.question?.name}?`
             : "Remove Question?"
         }
         onSuccess={async () => {
           const toastId = toast.loading(() => (
-            <span>Removing Question {formQuestionToRemove.question.name}</span>
+            <span>Removing Question {formQuestionToRemove?.question?.name}</span>
           ))
           try {
+            if (!formQuestionToRemove) {
+              throw new Error("No question set to remove")
+            }
             await removeQuestionFromFormMutation({
               formId: formQuestionToRemove.formId,
               order: formQuestionToRemove.order,
             })
+            invalidateQuery(getFormQuestionsWOPaginationWOAbility)
             toast.success(
               () => <span>Question removed - {formQuestionToRemove.question.name}</span>,
               {
@@ -364,7 +370,8 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
               { id: toastId }
             )
           }
-          router.reload()
+          setOpenConfirm(false)
+          setFormQuestionToRemove(null)
         }}
       >
         Are you sure you want to remove this question from the form?

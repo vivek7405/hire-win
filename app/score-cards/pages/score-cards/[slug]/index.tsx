@@ -31,7 +31,7 @@ import toast from "react-hot-toast"
 import createScoreCardQuestion from "app/score-cards/mutations/createScoreCardQuestion"
 import { ScoreCardQuestion, ScoreCardQuestions } from "app/score-cards/validations"
 
-import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon } from "@heroicons/react/outline"
+import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
 import { CardType, DragDirection, ExtendedScoreCardQuestion, ShiftDirection } from "types"
 import shiftScoreCardQuestion from "app/score-cards/mutations/shiftScoreCardQuestion"
 import Confirm from "app/core/components/Confirm"
@@ -134,7 +134,7 @@ export const CardQuestions = ({
   const [removeCardQuestionFromScoreCardMutation] = useMutation(removeCardQuestionFromScoreCard)
   const [openConfirm, setOpenConfirm] = React.useState(false)
   const [scoreCardQuestionToRemove, setScoreCardQuestionToRemove] = React.useState(
-    {} as ExtendedScoreCardQuestion
+    null as ExtendedScoreCardQuestion | null
   )
 
   useEffect(() => {
@@ -238,7 +238,7 @@ export const CardQuestions = ({
                           setOpenConfirm(true)
                         }}
                       >
-                        <TrashIcon className="h-5 w-5" />
+                        <XIcon className="h-5 w-5" />
                       </button>
                     </div>
                   )}
@@ -350,21 +350,25 @@ export const CardQuestions = ({
         open={openConfirm}
         setOpen={setOpenConfirm}
         header={
-          Object.entries(scoreCardQuestionToRemove).length
-            ? `Remove Question - ${scoreCardQuestionToRemove.cardQuestion.name}?`
+          scoreCardQuestionToRemove
+            ? `Remove Question - ${scoreCardQuestionToRemove.cardQuestion?.name}?`
             : "Remove Question?"
         }
         onSuccess={async () => {
           const toastId = toast.loading(() => (
-            <span>Removing Question {scoreCardQuestionToRemove.cardQuestion.name}</span>
+            <span>Removing Question {scoreCardQuestionToRemove?.cardQuestion?.name}</span>
           ))
           try {
+            if (!scoreCardQuestionToRemove) {
+              throw new Error("No question set to delete")
+            }
             await removeCardQuestionFromScoreCardMutation({
               scoreCardId: scoreCardQuestionToRemove.scoreCardId,
               order: scoreCardQuestionToRemove.order,
             })
+            invalidateQuery(getScoreCardQuestionsWOPaginationWOAbility)
             toast.success(
-              () => <span>Question removed - {scoreCardQuestionToRemove.cardQuestion.name}</span>,
+              () => <span>Question removed - {scoreCardQuestionToRemove.cardQuestion?.name}</span>,
               {
                 id: toastId,
               }
@@ -376,6 +380,7 @@ export const CardQuestions = ({
             )
           }
           setOpenConfirm(false)
+          setScoreCardQuestionToRemove(null)
         }}
       >
         Are you sure you want to remove this Question from the Score Card?

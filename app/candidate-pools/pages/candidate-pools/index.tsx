@@ -68,7 +68,7 @@ const CandidatePools = () => {
   const [updateCandidatePoolMutation] = useMutation(updateCandidatePool)
   const [deleteCandidatePoolMutation] = useMutation(deleteCandidatePool)
   const [candidatePoolToEdit, setCandidatePoolToEdit] = useState(null as any as CandidatePool)
-  const [candidatePoolToDelete, setCandidatePoolToDelete] = useState(null as any as CandidatePool)
+  const [candidatePoolToDelete, setCandidatePoolToDelete] = useState(null as CandidatePool | null)
 
   const [{ candidatePools, hasMore, count }] = usePaginatedQuery(getCandidatePools, {
     where: { companyId: session.companyId || "0", ...query },
@@ -123,14 +123,17 @@ const CandidatePools = () => {
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Candidate Pool`)
           try {
-            await deleteCandidatePoolMutation({ where: { id: candidatePoolToDelete?.id } })
+            if (!candidatePoolToDelete) {
+              throw new Error("No candidate pool set to delete")
+            }
+            await deleteCandidatePoolMutation({ where: { id: candidatePoolToDelete.id } })
             toast.success("Candidate Pool Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setCandidatePoolToDelete(null as any)
             invalidateQuery(getCandidatePools)
           } catch (error) {
             toast.error(`Deleting candidate pool failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setCandidatePoolToDelete(null)
         }}
       >
         Are you sure you want to delete the candidate pool?

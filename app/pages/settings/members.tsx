@@ -27,7 +27,7 @@ import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
 import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
-import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon } from "@heroicons/react/outline"
+import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon, XIcon } from "@heroicons/react/outline"
 
 import { CompanyUser, CompanyUserRole, User } from "db"
 // import updateMemberRole from "app/jobs/mutations/updateMemberRole"
@@ -329,14 +329,15 @@ const UserSettingsMembersPage = ({
                               </Confirm>
 
                               <button
-                                className="bg-red-500 rounded-full flex flex-col justify-center items-center"
+                                title="Remove User"
+                                className="text-red-600 hover:text-red-800"
                                 onClick={async (e) => {
                                   e.preventDefault()
                                   setMemberToDelete(m)
                                   setOpenConfirmDelete(true)
                                 }}
                               >
-                                <XCircleIcon className="w-auto h-6 text-red-100" />
+                                <XIcon className="w-5 h-5" />
                               </button>
                             </>
                           )}

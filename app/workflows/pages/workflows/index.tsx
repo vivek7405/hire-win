@@ -64,7 +64,7 @@ const Workflows = () => {
   const session = useSession()
 
   const [openConfirm, setOpenConfirm] = useState(false)
-  const [workflowToDelete, setWorkflowToDelete] = useState(null as any as Workflow)
+  const [workflowToDelete, setWorkflowToDelete] = useState(null as Workflow | null)
   const [deleteWorkflowMutation] = useMutation(deleteWorkflow)
   const [workflowToEdit, setWorkflowToEdit] = useState(null as any as Workflow)
   const [openModal, setOpenModal] = useState(false)
@@ -126,14 +126,17 @@ const Workflows = () => {
         onSuccess={async () => {
           const toastId = toast.loading(`Deleting Workflow`)
           try {
-            await deleteWorkflowMutation({ id: workflowToDelete?.id })
-            toast.success("Workflow Deleted", { id: toastId })
-            setOpenConfirm(false)
-            setWorkflowToDelete(null as any)
+            if (!workflowToDelete) {
+              throw new Error("No workflow set to delete")
+            }
+            await deleteWorkflowMutation({ id: workflowToDelete.id })
             invalidateQuery(getWorkflows)
+            toast.success("Workflow Deleted", { id: toastId })
           } catch (error) {
             toast.error(`Deleting workflow failed - ${error.toString()}`, { id: toastId })
           }
+          setOpenConfirm(false)
+          setWorkflowToDelete(null)
         }}
       >
         Are you sure you want to delete the workflow?
