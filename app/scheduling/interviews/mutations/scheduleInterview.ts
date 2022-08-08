@@ -1,7 +1,6 @@
 import { NotFoundError, resolver, invoke, Ctx, invalidateQuery } from "blitz"
 import db from "db"
 import { addMinutes, subMinutes } from "date-fns"
-import reminderQueue from "../api/queues/reminders"
 import * as z from "zod"
 import { getCalendarService } from "app/scheduling/calendars/calendar-service"
 // import { getEmailService } from "../../email"
@@ -156,11 +155,12 @@ export default resolver.pipe(
     const calendarService = await getCalendarService(organizerCalendar)
     const event = await calendarService.createEvent({
       organizer,
-      interviewer: interviewDetail.interviewer,
+      interviewer: interviewDetail?.interviewer,
+      job: interviewDetail?.job,
       candidate,
       otherAttendees: otherAttendees,
       startDateUTC,
-      duration: interviewDetail.duration,
+      duration: interviewDetail?.duration,
     })
 
     const cancelCode = uuid.v4()
@@ -181,8 +181,8 @@ export default resolver.pipe(
           }),
         },
         startDateUTC,
-        duration: interviewDetail.duration,
-        calendarId: organizerCalendar.id,
+        duration: interviewDetail?.duration,
+        calendarId: organizerCalendar?.id,
         eventId: event?.id,
         calendarLink: event?.calendarLink,
         meetingLink: event?.meetingLink,
@@ -204,21 +204,15 @@ export default resolver.pipe(
     //   throw new Error("Interview details not found")
     // }
 
-    const cancelLink = `${process.env.NEXT_PUBLIC_APP_URL}/cancelInterview/${interview.id}/${cancelCode}`
-
-    const buildEmail = await sendInterviewConfirmationMailer({
-      interview,
-      interviewDetail,
-      organizer,
-      otherAttendees,
-      cancelLink,
-    })
-    await buildEmail.send()
-
-    const startTime = subMinutes(startDateUTC, 30)
-    if (startTime > addMinutes(new Date(), 30)) {
-      await reminderQueue.enqueue(interview.id, { runAt: startTime })
-    }
+    // const cancelLink = `${process.env.NEXT_PUBLIC_APP_URL}/cancelInterview/${interview.id}/${cancelCode}`
+    // const buildEmail = await sendInterviewConfirmationMailer({
+    //   interview,
+    //   interviewDetail,
+    //   organizer,
+    //   otherAttendees,
+    //   cancelLink,
+    // })
+    // await buildEmail.send()
 
     return interview
   }

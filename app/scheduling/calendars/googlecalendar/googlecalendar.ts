@@ -41,11 +41,12 @@ export class GoogleCalendarService implements CalendarService {
     const event = await this.calendar.events.insert({
       calendarId: "primary",
       sendNotifications: true,
+      sendUpdates: "all",
       conferenceDataVersion: 1,
       requestBody: {
-        summary: `Interview with ${interview.candidate.name}`,
+        summary: `Interview of ${interview?.candidate?.name} for ${interview?.job?.title}`,
         location: "",
-        description: `Interview with ${interview.candidate.name}`,
+        description: "This meeting was booked via hire.win",
         start: {
           dateTime: startDate.toISOString(),
           timeZone: "Etc/UTC",

@@ -94,10 +94,12 @@ const getCandidateSpecificInterviewDetails = async ({
           workflowStageId,
         },
       },
+      include: { job: true },
     })
 
     return {
-      interviewer: interviewer,
+      interviewer,
+      job: interviewDetail?.job,
       calendar: interviewer?.calendars?.find(
         (cal) => cal.id === (scheduleCalendar?.calendarId || defaultCalendarId)
       ),
@@ -128,6 +130,7 @@ const getJobStageInterviewDetails = async ({
               defaultCalendars: { include: { calendar: true } },
             },
           },
+          job: true,
         },
       },
       jobUserScheduleCalendars: {
@@ -146,6 +149,7 @@ const getJobStageInterviewDetails = async ({
 
     return {
       interviewer: interviewDetail?.interviewer,
+      job: interviewDetail?.job,
       calendar: scheduleCalendar?.calendar,
       schedule: scheduleCalendar?.schedule,
       duration: interviewDetail?.duration || 30,
@@ -198,10 +202,12 @@ const getJobOwnerInterviewDetails = async ({
           workflowStageId,
         },
       },
+      include: { job: true },
     })
 
     return {
       interviewer: interviewer,
+      job: interviewDetail?.job,
       calendar: interviewer?.calendars?.find(
         (cal) => cal.id === (scheduleCalendar?.calendarId || defaultCalendarId)
       ),

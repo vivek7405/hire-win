@@ -58,6 +58,12 @@ export async function sendInterviewConfirmationMailer({
         try {
           const postmark = require("postmark")
           const client = new postmark.ServerClient(postmarkServerClient)
+          const attachmentContent = await createICalendarEvent(
+            interview,
+            interviewDetail,
+            organizer,
+            otherAttendees
+          )
 
           client.sendEmail({
             From: msg.from,
@@ -69,12 +75,7 @@ export async function sendInterviewConfirmationMailer({
             Attachments: [
               {
                 Name: "appointment.ics",
-                Content: createICalendarEvent(
-                  interview,
-                  interviewDetail,
-                  organizer,
-                  otherAttendees
-                ),
+                Content: attachmentContent,
                 ContentType: "text/calendar",
               },
             ],

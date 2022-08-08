@@ -1,6 +1,6 @@
 import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
-import { Calendar, DailySchedule, Prisma, Schedule, UserRole } from "@prisma/client"
+import { Calendar, DailySchedule, Job, Prisma, Schedule, UserRole } from "@prisma/client"
 
 export enum Currency {
   INR = "INR",
@@ -222,6 +222,7 @@ export type InterviewDetailType = {
       dailySchedules: DailySchedule[]
     })[]
   }
+  job: Job
   calendar: Calendar
   schedule: Schedule
   duration: number

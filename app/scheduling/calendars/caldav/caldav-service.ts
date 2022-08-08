@@ -326,7 +326,7 @@ LAST-MODIFIED:${formatDateAsICS(dateNow)}
 DTSTAMP:${formatDateAsICS(dateNow)}
 CREATED:${formatDateAsICS(dateNow)}
 LOCATION:${``}
-SUMMARY:${`Interview with ${interview.candidate.name}`}
+SUMMARY:${`Interview of ${interview?.candidate?.name} for ${interview?.job?.title}`}
 CLASS:PUBLIC
 END:VEVENT
 END:VCALENDAR\r\n`.trimLeft()
