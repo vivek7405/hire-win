@@ -45,7 +45,7 @@ export class OutlookCalendarService implements CalendarService {
     })
 
     const body = {
-      Subject: `Interview with ${interview.candidate.name}`,
+      Subject: `Interview of ${interview?.candidate?.name} for ${interview?.job?.title}`,
       Body: {
         ContentType: "HTML",
         Content: "This meeting was booked via hire.win",
@@ -107,7 +107,7 @@ export class OutlookCalendarService implements CalendarService {
         return {
           id: event.id,
           calendarLink: event.webLink,
-          meetingLink: event.onlineMeeting.joinUrl,
+          meetingLink: event.onlineMeeting?.joinUrl,
         } as CreatedCalendarEvent
       } else {
         return null

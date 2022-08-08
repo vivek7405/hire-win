@@ -30,8 +30,8 @@ export async function createICalendarEvent(
       interview.startDateUTC.getMinutes(),
     ],
     duration: durationToIcsDurationObject(interviewDetail.duration),
-    title: `Interview for ${interview?.job?.title} with ${interview?.candidate?.name}`,
-    description: `Interview for ${interview?.job?.title} with ${interview?.candidate?.name}`,
+    title: `Interview of ${interview?.candidate?.name} scheduled for ${interview?.job?.title}`,
+    description: `Interview of ${interview?.candidate?.name} scheduled for ${interview?.job?.title}`,
     location: "",
     organizer: { name: organizer?.name, email: organizer?.email },
     attendees: [
