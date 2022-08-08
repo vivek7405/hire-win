@@ -27,6 +27,7 @@ async function getCompanyJobsForCareersPage(
 
   const where = {
     archived: false,
+    hidden: false,
     validThrough,
     companyId: companyId || "0",
     categoryId: categoryId || {},
