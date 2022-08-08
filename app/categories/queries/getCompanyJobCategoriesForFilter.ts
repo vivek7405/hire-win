@@ -22,6 +22,7 @@ const getCompanyJobCategoriesForFilter = async (
       jobs: {
         some: {
           archived: false,
+          hidden: false,
           validThrough,
           title: {
             contains: JSON.parse(searchString),
