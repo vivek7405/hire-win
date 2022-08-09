@@ -78,7 +78,7 @@ export default function Support({}) {
                         <br />
                         India - 364001
                         <br />
-                        M. +91-7405323541
+                        Tel. +91 79 4604 9362
                       </div>
                     </div>
                   </div>
