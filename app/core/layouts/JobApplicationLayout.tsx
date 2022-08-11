@@ -126,17 +126,33 @@ const JobApplicationLayout = ({
                 </span>
               )}
               <div className="flex flex-wrap justify-center items-center mx-3">
-                <span>{job?.city},&nbsp;</span>
+                {/* <span>{job?.city},&nbsp;</span>
                 <span>
                   {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name},&nbsp;
                 </span>
-                <span>{Country.getCountryByCode(job?.country!)?.name}</span>
-                {job?.category && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{job?.category?.name}</span>}
-                {job?.employmentType && (
+                <span>{Country.getCountryByCode(job?.country!)?.name}</span> */}
+                {(job?.city || job?.state || job?.country) && (
                   <span>
-                    &nbsp;&nbsp;·&nbsp;&nbsp;
-                    {titleCase(job?.employmentType?.join(" ")?.replaceAll("_", " "))}
+                    {job?.city && <span>{job?.city},&nbsp;</span>}
+                    {job?.state && job?.country && (
+                      <span>
+                        {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
+                        ,&nbsp;
+                      </span>
+                    )}
+                    {job?.country && <span>{Country.getCountryByCode(job?.country!)?.name}</span>}
                   </span>
+                )}
+                {(job?.city || job?.state || job?.country) &&
+                  (job?.category || (job?.employmentType && job?.employmentType?.length > 0)) && (
+                    <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+                  )}
+                {job?.category && <span>{job?.category?.name}</span>}
+                {job?.category && job?.employmentType && job?.employmentType?.length > 0 && (
+                  <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+                )}
+                {job?.employmentType && job?.employmentType && job?.employmentType?.length > 0 && (
+                  <span>{titleCase(job?.employmentType?.join(" ")?.replaceAll("_", " "))}</span>
                 )}
               </div>
             </div>
