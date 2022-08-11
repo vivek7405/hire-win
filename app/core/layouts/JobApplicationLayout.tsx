@@ -177,7 +177,7 @@ const JobApplicationLayout = ({
             <div className="flex justify-center items-center">
               <span>Powered by&nbsp;</span>
               <span className="underline hover:text-neutral-200">
-                <Link prefetch={true} href={Routes.JobsHome()}>
+                <Link prefetch={true} href={Routes.Home()}>
                   hire.win
                 </Link>
               </span>
