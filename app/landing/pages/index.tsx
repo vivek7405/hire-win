@@ -198,6 +198,12 @@ export default function Home() {
             Applicant Tracking, Collaborating, Interviewing & more!
           </p>
 
+          <h1 className="my-4 text-2xl lg:text-4xl font-black leading-tight">
+            <Link href={Routes.Beta()}>
+              <a className="hover:underline">30% off for 3 months - BETA30</a>
+            </Link>
+          </h1>
+
           <Link prefetch={true} href={Routes.SignupPage()}>
             <a>
               <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
@@ -317,7 +323,13 @@ export default function Home() {
             </div>
 
             <div className="w-full text-center pt-2">
-              <div className="mt-1">
+              <h1 className="my-4 text-2xl lg:text-4xl font-black leading-tight">
+                <Link href={Routes.Beta()}>
+                  <a className="hover:underline">30% off for 3 months - BETA30</a>
+                </Link>
+              </h1>
+
+              <div className="mt-10">
                 <span className="text-2xl lg:text-3xl font-bold">
                   <span className="bg-yellow-300">No nonsense</span> per user per job pricing,
                   instead we offer Flat Pricing!
