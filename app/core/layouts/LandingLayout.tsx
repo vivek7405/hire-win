@@ -54,12 +54,17 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
       <div className="px-6 md:px-0 lg:px-0 bg-gradient-to-r from-fuchsia-100 via-purple-200 to-indigo-200 leading-relaxed tracking-wide flex flex-col min-h-screen">
         <nav id="header" className="w-full z-30 top-0 py-1">
           <div className="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
-            <div className="w-44 h-10 lg:h-16 lg:w-72">
+            <div className="w-44 h-10 lg:h-16 lg:w-72 flex">
               <Link href={Routes.Home()}>
                 <a>
                   <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
                 </a>
               </Link>
+              <span className="text-xs">
+                <Link href={Routes.Beta()}>
+                  <a className="text-indigo-600 hover:text-indigo-800 font-semibold">BETA</a>
+                </Link>
+              </span>
             </div>
 
             <div className="block lg:hidden">

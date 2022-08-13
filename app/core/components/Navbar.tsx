@@ -406,11 +406,18 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
 
       <nav className="bg-theme-600 py-2">
         <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
-          <Link prefetch={true} href={Routes.JobsHome()}>
-            <a className="w-12 h-12">
-              <Logo fill="white" strokeWidth={0.1} />
-            </a>
-          </Link>
+          <span className="flex">
+            <Link prefetch={true} href={Routes.JobsHome()}>
+              <a className="w-12 h-12">
+                <Logo fill="white" strokeWidth={0.1} />
+              </a>
+            </Link>
+            <span className="text-xs">
+              <Link href={Routes.Beta()}>
+                <a className="text-neutral-200 hover:text-neutral-300">BETA</a>
+              </Link>
+            </span>
+          </span>
 
           {companyUser && (
             <>
