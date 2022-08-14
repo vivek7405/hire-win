@@ -179,6 +179,12 @@ export default resolver.pipe(
       ],
     })
 
+    console.log("availableSlots:")
+    console.log(availableSlots)
+
+    console.log("Schedule timezone (interviewerSchedule?.timezone || ''):")
+    console.log(interviewerSchedule?.timezone || "")
+
     return availableSlots
   }
 )
