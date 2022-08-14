@@ -30,29 +30,6 @@ export function computeAvailableSlots({
   const result: TimeSlot[] = []
 
   const endOfSearch = new Date(+between.end - durationInMilliseconds)
-
-  // while loop seems to go in infinite loop when -
-  // the server is in US
-  // schedule timezone is set to Asia/Kolkata
-  // client is in India
-  // Clicks on Schedule button
-
-  // Adding console logs to detect the issue
-  console.log("between:")
-  console.log(between)
-
-  console.log("cursor (between.start):")
-  console.log(cursor)
-
-  console.log("+between.end:")
-  console.log(+between.end)
-
-  console.log("durationInMilliseconds")
-  console.log(durationInMilliseconds)
-
-  console.log("endOfSearch (new Date(+between.end - durationInMilliseconds)):")
-  console.log(endOfSearch)
-
   while (cursor <= endOfSearch) {
     const potentialSlot: TimeSlot = {
       start: cursor,
