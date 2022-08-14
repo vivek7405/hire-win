@@ -120,6 +120,9 @@ export default resolver.pipe(
 
     let takenTimeSlots = await getTakenSlots(calendars, startDateUTC, endDateUTC)
 
+    console.log("Taken time slots")
+    console.log(takenTimeSlots)
+
     if (organizer?.id !== interviewer?.id) {
       if (organizer?.calendars) {
         await takenTimeSlots.push(
