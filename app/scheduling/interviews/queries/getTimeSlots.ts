@@ -14,17 +14,40 @@ import {
 import * as z from "zod"
 
 function applySchedule(date: Date, schedule: Schedule, type: "start" | "end", timezone: string) {
+  console.log("Now inside applySchedule...")
   const specificSchedule = schedule[getDay(date)]
+
+  console.log("Specific schedule:")
+  console.log(specificSchedule)
   if (!specificSchedule) {
     if (type === "end") {
-      return endOfLastWorkDayBefore(date, schedule, timezone)
+      console.log("Finding endOfLastWorkDayBefore...")
+
+      const endOfLastWorkingDay = endOfLastWorkDayBefore(date, schedule, timezone)
+
+      console.log("Returning from endOfLastWorkDayBefore:")
+      console.log(endOfLastWorkingDay)
+
+      return endOfLastWorkingDay
     } else {
-      return startOfFirstWorkDayOnOrAfter(date, schedule, timezone)
+      console.log("Finding startOfFirstWorkDayOnOrAfter...")
+
+      const startOfFirstWorkDay = startOfFirstWorkDayOnOrAfter(date, schedule, timezone)
+
+      console.log("Returning from startOfFirstWorkDayOnOrAfter:")
+      console.log(startOfFirstWorkDay)
+
+      return startOfFirstWorkDay
     }
   }
 
   let newDate = setHours(date, specificSchedule[type].hour)
   newDate = setMinutes(newDate, specificSchedule[type].minute)
+
+  console.log("Returning from applySchedule:")
+  console.log("newDate:")
+  console.log(newDate)
+
   return newDate
 }
 
@@ -155,6 +178,19 @@ export default resolver.pipe(
       )
     }
 
+    console.log("startDateUTC:")
+    console.log(startDateUTC)
+
+    console.log("timezone:")
+    console.log(interviewerSchedule?.timezone || "")
+
+    console.log("utcToZonedTime:")
+    console.log(utcToZonedTime(startDateUTC, interviewerSchedule?.timezone || ""))
+
+    console.log("schedule:")
+    console.log(schedule)
+
+    console.log("Finding between...")
     const between = {
       start: applySchedule(
         utcToZonedTime(startDateUTC, interviewerSchedule?.timezone || ""),
@@ -169,7 +205,12 @@ export default resolver.pipe(
         interviewerSchedule?.timezone || ""
       ),
     }
+    console.log("between found:")
+    console.log(between)
 
+    console.log("takenTimeSlots:")
+    console.log(takenTimeSlots)
+    console.log("Entering computeAvailableSlots...")
     const availableSlots = computeAvailableSlots({
       between,
       durationInMilliseconds: (duration || 30) * 60 * 1000,
@@ -178,6 +219,8 @@ export default resolver.pipe(
         ...scheduleToTakenSlots(schedule!, between, interviewerSchedule?.timezone || ""),
       ],
     })
+    console.log("Leaving computeAvailableSlots. Available slots:")
+    console.log(availableSlots)
 
     return availableSlots
   }

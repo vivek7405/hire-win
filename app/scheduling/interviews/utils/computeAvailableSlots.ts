@@ -25,11 +25,20 @@ export function computeAvailableSlots({
   durationInMilliseconds,
   takenSlots,
 }: ComputeAvailabilitySlotsArgs): TimeSlot[] {
+  console.log("Now inside computeAvailableSlots...")
+
   let cursor = between.start
 
   const result: TimeSlot[] = []
 
   const endOfSearch = new Date(+between.end - durationInMilliseconds)
+
+  console.log("Entering while (cursor <= endOfSearch)")
+  console.log("cursor:")
+  console.log(cursor)
+  console.log("endOfSearch:")
+  console.log(endOfSearch)
+
   while (cursor <= endOfSearch) {
     const potentialSlot: TimeSlot = {
       start: cursor,
@@ -45,5 +54,10 @@ export function computeAvailableSlots({
       cursor = collidingSlot.end
     }
   }
+  console.log("Left while (cursor <= endOfSearch)")
+
+  console.log("Leaving computeAvailableSlots:")
+  console.log(result)
+
   return result
 }
