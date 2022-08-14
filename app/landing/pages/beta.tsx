@@ -19,7 +19,7 @@ export default function Beta({}) {
         <h1 className="font-bold text-5xl text-center">hire.win | BETA</h1>
       </div>
       <section id="pricing" className="bg-gray-100 py-8 mt-16">
-        <div className="container mx-auto px-2 pb-6 text-neutral-800">
+        <div className="px-2 pb-6 text-neutral-800">
           <div className="w-full text-center pt-2">
             <div className="mt-1 lg:px-14">
               <span className="text-2xl lg:text-3xl font-bold">We are still a BETA software</span>

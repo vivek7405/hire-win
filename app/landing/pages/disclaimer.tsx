@@ -19,7 +19,7 @@ export default function Disclaimer({}) {
         <h1 className="font-bold text-5xl">Disclaimer</h1>
       </div>
       <div>
-        <h1>Disclaimer</h1> <p>Updated at 2022-07-27</p>{" "}
+        <h1 className="font-bold">Disclaimer</h1> <p>Updated at 2022-07-27</p>{" "}
         <p>
           <span>
             <a>hire.win</a> hereby grants you access to <a>https://hire.win.</a> (“the Website”) and
@@ -29,7 +29,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Definitions and key terms</h1>{" "}
+        <h1 className="font-bold">Definitions and key terms</h1>{" "}
         <p>
           <span>
             To help explain things as clearly as possible in this Disclaimer, every time any of
@@ -82,7 +82,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Limited liability</h1>{" "}
+        <h1 className="font-bold">Limited liability</h1>{" "}
         <p>
           <span>
             We endeavour to update and/or supplement the content of our service on a regular basis.
@@ -116,7 +116,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Links to Other Websites Disclaimer</h1>{" "}
+        <h1 className="font-bold">Links to Other Websites Disclaimer</h1>{" "}
         <p>
           <span>
             This Disclaimer applies only to the Services. The Services may contain links to other
@@ -138,7 +138,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Errors and Omissions Disclaimer</h1>{" "}
+        <h1 className="font-bold">Errors and Omissions Disclaimer</h1>{" "}
         <p>
           <span>
             We are not responsible for any content, code or any other imprecision.
@@ -157,7 +157,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Copyright Disclaimer</h1>{" "}
+        <h1 className="font-bold">Copyright Disclaimer</h1>{" "}
         <p>
           <span>
             All intellectual property rights concerning these materials are vested in{" "}
@@ -170,7 +170,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>General Disclaimer</h1>{" "}
+        <h1 className="font-bold">General Disclaimer</h1>{" "}
         <p>
           <span>
             The <a>hire.win</a> Service and its contents are provided {`"`}as is{`"`} and {`"`}as
@@ -196,7 +196,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Testimonials Disclosure</h1>{" "}
+        <h1 className="font-bold">Testimonials Disclosure</h1>{" "}
         <p>
           <span>
             Any testimonials provided on this platform are opinions of those providing them. The
@@ -224,7 +224,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Your Consent</h1>{" "}
+        <h1 className="font-bold">Your Consent</h1>{" "}
         <p>
           <span>
             {`We've`} updated our Disclaimer to provide you with complete transparency into what is
@@ -236,7 +236,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Changes To Our Disclaimer</h1>{" "}
+        <h1 className="font-bold">Changes To Our Disclaimer</h1>{" "}
         <p>
           <span>
             Should we update, amend or make any changes to this document so that they accurately
@@ -249,7 +249,7 @@ export default function Disclaimer({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Contact Us</h1>{" "}
+        <h1 className="font-bold">Contact Us</h1>{" "}
         <p>
           <span>{`Don't`} hesitate to contact us if you have any questions.</span>
         </p>{" "}

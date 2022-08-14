@@ -867,7 +867,7 @@ const JobsHome = ({
             </p>
             <br />
             <p>
-              Write us at <b>support@hire.win</b>
+              Write us to <b>support@hire.win</b>
             </p>
           </span>
         ),
