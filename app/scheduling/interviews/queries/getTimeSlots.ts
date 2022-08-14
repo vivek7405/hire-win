@@ -33,6 +33,7 @@ async function getTakenSlots(
   startDateUTC: Date,
   endDateUTC: Date
 ): Promise<ExternalEvent[]> {
+  console.log("Getting taken time slots...")
   const result = await Promise.all(
     calendars.map(async (calendar) => {
       const calendarService = await getCalendarService(calendar)
@@ -45,6 +46,9 @@ async function getTakenSlots(
       return calendarSlots
     })
   )
+  console.log("Got taken time slots:")
+  console.log(result)
+
   const takenTimeSlots: ExternalEvent[] = []
   result.forEach((values) => {
     values.forEach((slots) => {
@@ -104,6 +108,7 @@ export default resolver.pipe(
       include: { dailySchedules: true },
     })
 
+    console.log("Getting schedule...")
     const schedule = interviewerSchedule?.dailySchedules.reduce(
       (res: Schedule, item: DailySchedule) => {
         res[Days[item.day]] = {
@@ -114,6 +119,8 @@ export default resolver.pipe(
       },
       {}
     )
+    console.log("Got schedule:")
+    console.log(schedule)
 
     const calendars = interviewer?.calendars || []
     if (calendars.length === 0) return null
@@ -155,6 +162,7 @@ export default resolver.pipe(
       )
     }
 
+    console.log("Getting between...")
     const between = {
       start: applySchedule(
         utcToZonedTime(startDateUTC, interviewerSchedule?.timezone || ""),
@@ -169,7 +177,10 @@ export default resolver.pipe(
         interviewerSchedule?.timezone || ""
       ),
     }
+    console.log("Got between:")
+    console.log(between)
 
+    console.log("Computing available slots...")
     const availableSlots = computeAvailableSlots({
       between,
       durationInMilliseconds: (duration || 30) * 60 * 1000,
@@ -178,6 +189,7 @@ export default resolver.pipe(
         ...scheduleToTakenSlots(schedule!, between, interviewerSchedule?.timezone || ""),
       ],
     })
+    console.log("Computed available slots...")
 
     return availableSlots
   }
