@@ -18,12 +18,12 @@ export default function EULA({}) {
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl">EULA</h1>
       </div>
-      {/* <div>
-        <h1>End-User License Agreement</h1> <p>Updated at 2022-07-27</p>{" "}
+      <div>
+        <h1 className="font-bold">End-User License Agreement</h1> <p>Updated at 2022-07-27</p>{" "}
         <p>
           <br />
         </p>{" "}
-        <h1>Definitions and key terms</h1>{" "}
+        <h1 className="font-bold">Definitions and key terms</h1>{" "}
         <p>
           <span>
             To help explain things as clearly as possible in this Eula, every time any of these
@@ -98,7 +98,7 @@ export default function EULA({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Introduction</h1>{" "}
+        <h1 className="font-bold">Introduction</h1>{" "}
         <p>
           <span>
             This End User License Agreement (the “Agreement”) is a binding agreement between you
@@ -140,7 +140,7 @@ export default function EULA({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>License</h1>{" "}
+        <h1 className="font-bold">License</h1>{" "}
         <p>
           <span>
             Subject to the terms of this Agreement and, if applicable, those terms provided in the
@@ -171,7 +171,7 @@ export default function EULA({}) {
         <p>
           <br />
         </p>{" "}
-        <h1>Restrictions</h1>{" "}
+        <h1 className="font-bold">Restrictions</h1>{" "}
         <p>
           <span>
             You agree not to, and you will not permit others to:
@@ -200,7 +200,7 @@ export default function EULA({}) {
             <p>
               <br />
             </p>{" "}
-            <h1>Intellectual Property</h1>{" "}
+            <h1 className="font-bold">Intellectual Property</h1>{" "}
             <p>
               <span>
                 All intellectual property rights, including copyrights, patents, patent disclosures
@@ -241,7 +241,7 @@ export default function EULA({}) {
             <p>
               <br />
             </p>{" "}
-            <h1>Your Suggestions</h1>{" "}
+            <h1 className="font-bold">Your Suggestions</h1>{" "}
             <p>
               <span>
                 Any feedback, comments, ideas, improvements or suggestions (collectively,
@@ -256,7 +256,7 @@ export default function EULA({}) {
             <p>
               <br />
             </p>{" "}
-            <h1>Modifications to Application</h1>{" "}
+            <h1 className="font-bold">Modifications to Application</h1>{" "}
             <p>
               <span>
                 <a>hire.win</a> reserves the right to modify, suspend or discontinue, temporarily or
@@ -267,7 +267,7 @@ export default function EULA({}) {
             <p>
               <br />
             </p>{" "}
-            <h1>Updates to Application</h1>{" "}
+            <h1 className="font-bold">Updates to Application</h1>{" "}
             <p>
               <span>
                 <a>hire.win</a> may from time to time provide enhancements or improvements to the
@@ -288,7 +288,7 @@ export default function EULA({}) {
             <p>
               <br />
             </p>{" "}
-            <h1>Third-Party Services</h1>{" "}
+            <h1 className="font-bold">Third-Party Services</h1>{" "}
             <p>
               <span>
                 The Application may display, include or make available third-party content
@@ -313,7 +313,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Term and Termination</h1>{" "}
+                <h1 className="font-bold">Term and Termination</h1>{" "}
                 <p>
                   <span>
                     This Agreement shall remain in effect until terminated by you or <a>hire.win</a>
@@ -341,7 +341,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Indemnification</h1>{" "}
+                <h1 className="font-bold">Indemnification</h1>{" "}
                 <p>
                   <span>
                     You agree to indemnify, defend and hold harmless <a>hire.win</a> and its
@@ -361,7 +361,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>No Warranties</h1>{" "}
+                <h1 className="font-bold">No Warranties</h1>{" "}
                 <p>
                   <span>
                     The Application is provided to you {`"`}AS IS{`"`} and {`"`}AS AVAILABLE{`"`}{" "}
@@ -400,7 +400,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Limitation of Liability</h1>{" "}
+                <h1 className="font-bold">Limitation of Liability</h1>{" "}
                 <p>
                   <span>
                     Notwithstanding any damages that you might incur, the entire liability of{" "}
@@ -429,7 +429,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Severability</h1>{" "}
+                <h1 className="font-bold">Severability</h1>{" "}
                 <p>
                   <span>
                     If any provision of this Agreement is held to be unenforceable or invalid, such
@@ -441,7 +441,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Waiver</h1>{" "}
+                <h1 className="font-bold">Waiver</h1>{" "}
                 <p>
                   <span>
                     No failure to exercise, and no delay in exercising, on the part of either party,
@@ -455,7 +455,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Amendments to this Agreement</h1>{" "}
+                <h1 className="font-bold">Amendments to this Agreement</h1>{" "}
                 <p>
                   <span>
                     <a>hire.win</a> reserves the right, at its sole discretion, to modify or replace
@@ -472,7 +472,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Governing Law</h1>{" "}
+                <h1 className="font-bold">Governing Law</h1>{" "}
                 <p>
                   <span>
                     The laws of India, excluding its conflicts of law rules, shall govern this
@@ -483,7 +483,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Changes to this agreement</h1>{" "}
+                <h1 className="font-bold">Changes to this agreement</h1>{" "}
                 <p>
                   <span>
                     We reserve the exclusive right to make changes to this Agreement from time to
@@ -507,7 +507,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>No Employment or Agency Relationship</h1>{" "}
+                <h1 className="font-bold">No Employment or Agency Relationship</h1>{" "}
                 <p>
                   <span>
                     No provision of this Agreement, or any part of relationship between you and{" "}
@@ -519,7 +519,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Equitable Relief</h1>{" "}
+                <h1 className="font-bold">Equitable Relief</h1>{" "}
                 <p>
                   <span>
                     You acknowledge and agree that your breach of this Agreement would cause{" "}
@@ -533,7 +533,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Headings</h1>{" "}
+                <h1 className="font-bold">Headings</h1>{" "}
                 <p>
                   <span>
                     The headings in this Agreement are for reference only and shall not limit the
@@ -543,7 +543,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Geographic Restrictions</h1>{" "}
+                <h1 className="font-bold">Geographic Restrictions</h1>{" "}
                 <p>
                   <span>
                     The Company is based in India and provided for access and use primarily by
@@ -555,7 +555,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Limitation of Time to File Claims</h1>{" "}
+                <h1 className="font-bold">Limitation of Time to File Claims</h1>{" "}
                 <p>
                   <span>
                     Any cause of action or claim you may have arising out of or relating to this
@@ -567,7 +567,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Entire Agreement</h1>{" "}
+                <h1 className="font-bold">Entire Agreement</h1>{" "}
                 <p>
                   <span>
                     The Agreement constitutes the entire agreement between you and <a>hire.win</a>{" "}
@@ -585,7 +585,7 @@ export default function EULA({}) {
                 <p>
                   <br />
                 </p>{" "}
-                <h1>Contact Us</h1>{" "}
+                <h1 className="font-bold">Contact Us</h1>{" "}
                 <p>
                   <span>
                     {`Don't`} hesitate to contact us if you have any questions about this Agreement.
@@ -602,7 +602,7 @@ export default function EULA({}) {
             </p>
           </span>
         </p>
-      </div> */}
+      </div>
     </LandingLayout>
   )
 }
