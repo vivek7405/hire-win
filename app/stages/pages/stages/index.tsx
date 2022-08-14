@@ -139,16 +139,29 @@ const Stages = () => {
         Are you sure you want to delete the stage?
       </Confirm>
 
-      <button
-        className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-        onClick={(e) => {
-          e.preventDefault()
-          setStageToEdit(null as any)
-          setOpenModal(true)
-        }}
-      >
-        New Stage
-      </button>
+      <div>
+        <button
+          className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+          onClick={(e) => {
+            e.preventDefault()
+            setStageToEdit(null as any)
+            setOpenModal(true)
+          }}
+        >
+          New Stage
+        </button>
+      </div>
+      <div className="flex mb-2">
+        <input
+          placeholder="Search"
+          type="text"
+          defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+          className={`border border-gray-300 mr-2 md:w-1/4 lg:w-1/4 px-2 py-2 w-full rounded`}
+          onChange={(e) => {
+            execDebouncer(e)
+          }}
+        />
+      </div>
 
       <Modal header="Stage" open={openModal} setOpen={setOpenModal}>
         <StageForm
@@ -182,16 +195,6 @@ const Stages = () => {
           }}
         />
       </Modal>
-
-      <input
-        placeholder="Search"
-        type="text"
-        defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-        className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
-        onChange={(e) => {
-          execDebouncer(e)
-        }}
-      />
 
       <Pagination
         endPage={endPage}

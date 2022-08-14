@@ -14,6 +14,11 @@ async function updateScoreCard({ where, data, initial }: UpdateScoreCardInput, c
 
   const { name } = ScoreCardObj.parse(data)
 
+  // Don't allow updating the name for Default Score Card
+  if (initial?.name?.toLowerCase() === "default") {
+    throw new Error("Cannot update the name for 'Default' score card")
+  }
+
   const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
   //   slug,

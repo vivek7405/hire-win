@@ -507,21 +507,21 @@ const SingleFormPage = ({
       {canUpdate && (
         <div className="space-y-6">
           <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
-            <div className="space-x-8 flex flex-row justify-between">
+            <div className="space-x-8 flex flex-row justify-center">
               <Link prefetch={true} href={Routes.QuestionsHome()} passHref>
                 <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
                   Question Pool
                 </a>
               </Link>
 
-              <Link prefetch={true} href={Routes.FormSettingsPage({ slug: form?.slug! })} passHref>
+              {/* <Link prefetch={true} href={Routes.FormSettingsPage({ slug: form?.slug! })} passHref>
                 <a
                   className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
                   data-testid={`${form?.name && `${form?.name}-`}settingsLink`}
                 >
                   Form Settings
                 </a>
-              </Link>
+              </Link> */}
             </div>
 
             <div className="flex flex-row justify-between space-x-3">
