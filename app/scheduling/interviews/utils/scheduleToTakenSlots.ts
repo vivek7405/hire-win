@@ -41,20 +41,12 @@ export function scheduleToTakenSlots(
   between: TimeSlot,
   timezone: string
 ): TimeSlot[] {
-  console.log("Now inside scheduleToTakenSlots...")
-
   if (Object.keys(schedule).length === 0) {
     return [between]
   }
 
   const result: TimeSlot[] = []
   let cursor = between.start
-
-  console.log("cursor:")
-  console.log(cursor)
-  console.log("addDays(between.end, 1):")
-  console.log(addDays(between.end, 1))
-  console.log("Entering while (cursor <= addDays(between.end, 1))")
 
   while (cursor <= addDays(between.end, 1)) {
     const slot: TimeSlot = {
@@ -64,10 +56,5 @@ export function scheduleToTakenSlots(
     result.push(slot)
     cursor = addDays(slot.end, 1)
   }
-
-  console.log("Exited while (cursor <= addDays(between.end, 1))")
-  console.log("result:")
-  console.log(result)
-
   return result
 }
