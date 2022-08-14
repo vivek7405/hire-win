@@ -15,6 +15,11 @@ async function updateWorkflow({ where, data, initial }: UpdateWorkflowInput, ctx
 
   const { name } = WorkflowObj.parse(data)
 
+  // Don't allow updating the name for Default Workflow
+  if (initial?.name?.toLowerCase() === "default") {
+    throw new Error("Cannot update the name for 'Default' workflow")
+  }
+
   const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
   //   slug,

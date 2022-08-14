@@ -14,6 +14,11 @@ async function updateForm({ where, data, initial }: UpdateFormInput, ctx: Ctx) {
 
   const { name } = FormObj.parse(data)
 
+  // Don't allow updating the name for Default Form
+  if (initial?.name?.toLowerCase() === "default") {
+    throw new Error("Cannot update the name for 'Default' form")
+  }
+
   const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
   //   slug,

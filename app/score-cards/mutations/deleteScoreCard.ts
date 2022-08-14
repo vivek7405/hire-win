@@ -10,9 +10,16 @@ export default resolver.pipe(
   resolver.zod(DeleteScoreCard),
   resolver.authorize(),
   async ({ id }) => {
-    await db.scoreCardQuestion.deleteMany({ where: { scoreCardId: id } })
-    const scoreCard = await db.scoreCard.delete({ where: { id } })
+    const scoreCard = await db.scoreCard.findUnique({ where: { id } })
 
-    return scoreCard
+    // Don't allow deleting the Default Score card
+    if (scoreCard?.name?.toLowerCase() === "default") {
+      throw new Error("Cannot delete the 'Default' score card")
+    }
+
+    await db.scoreCardQuestion.deleteMany({ where: { scoreCardId: id } })
+    const deletedScoreCard = await db.scoreCard.delete({ where: { id } })
+
+    return deletedScoreCard
   }
 )

@@ -7,8 +7,15 @@ const DeleteWorkflow = z.object({
 })
 
 export default resolver.pipe(resolver.zod(DeleteWorkflow), resolver.authorize(), async ({ id }) => {
-  await db.workflowStage.deleteMany({ where: { workflowId: id } })
-  const workflow = await db.workflow.delete({ where: { id } })
+  const workflow = await db.workflow.findUnique({ where: { id } })
 
-  return workflow
+  // Don't allow deleting the Default Workflow
+  if (workflow?.name?.toLowerCase() === "default") {
+    throw new Error("Cannot delete the 'Default' workflow")
+  }
+
+  await db.workflowStage.deleteMany({ where: { workflowId: id } })
+  const deletedWorkflow = await db.workflow.delete({ where: { id } })
+
+  return deletedWorkflow
 })
