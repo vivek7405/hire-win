@@ -47,6 +47,9 @@ export const SignupForm = (props: SignupFormProps) => {
           try {
             values["companyId"] = props.companyId || "0"
             values["email"] = props.email || ""
+            values["timezone"] = Intl?.DateTimeFormat()
+              ?.resolvedOptions()
+              ?.timeZone?.replace("Calcutta", "Kolkata")
             await signupMutation(values)
             props.onSuccess?.()
           } catch (error) {
