@@ -73,6 +73,7 @@
     "intro.js-react": "0.6.0",
     "jscodeshift": "0.13.0",
     "locale-currency": "0.0.2",
+    "moment-timezone": "0.5.34",
     "nearest-color": "0.4.4",
     "node-ical": "0.15.1",
     "postcss": "8.4.6",
