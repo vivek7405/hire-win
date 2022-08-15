@@ -47,7 +47,6 @@ export function scheduleToTakenSlots(
 
   const result: TimeSlot[] = []
   let cursor = between.start
-  let prevCursor = cursor
 
   while (cursor <= addDays(between.end, 1)) {
     const slot: TimeSlot = {
@@ -56,13 +55,6 @@ export function scheduleToTakenSlots(
     }
     result.push(slot)
     cursor = addDays(slot.end, 1)
-
-    if (cursor?.getTime() === prevCursor?.getTime()) {
-      break
-    } else {
-      prevCursor = cursor
-    }
   }
-
   return result
 }
