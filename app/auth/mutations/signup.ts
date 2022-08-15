@@ -19,9 +19,10 @@ type signupProps = {
   companyName?: string
   companyId?: string
   password: string
+  timezone?: string | null | undefined
 }
 export default async function signup(
-  { name, email, companyName, companyId, password }: signupProps,
+  { name, email, companyName, companyId, password, timezone }: signupProps,
   ctx: Ctx
 ) {
   if (!email) {
@@ -86,7 +87,7 @@ export default async function signup(
   await addSchedule(
     {
       name: "Default",
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezone: timezone || "UTC",
       schedule: initialSchedule,
       factory: true,
     },

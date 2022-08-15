@@ -12,6 +12,8 @@ import {
   timeStringToPartialTime,
 } from "../utils/scheduleToTakenSlots"
 import * as z from "zod"
+import moment from "moment-timezone"
+import { TimeSlot } from "app/scheduling/interviews/types"
 
 function applySchedule(date: Date, schedule: Schedule, type: "start" | "end", timezone: string) {
   const specificSchedule = schedule[getDay(date)]
@@ -52,6 +54,34 @@ async function getTakenSlots(
     })
   })
   return takenTimeSlots
+}
+
+function getActualUTCDate(date, timezone) {
+  // const hours = date?.getHours()
+  // const formattedHours = ("0" + hours).slice(-2)
+
+  // const minutes = date?.getMinutes()
+  // const formattedMinutes = ("0" + minutes)?.slice(-2)
+
+  // const seconds = date?.getSeconds()
+  // const formattedSeconds = ("0" + seconds)?.slice(-2)
+
+  // const timeString = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+
+  const dateString = date?.toDateString()
+  const timeString = `${("0" + date?.getHours())?.slice(-2)}:${("0" + date?.getMinutes())?.slice(
+    -2
+  )}:${("0" + date?.getSeconds())?.slice(-2)}`
+
+  const utcOffset = moment(`${dateString} ${timeString}`)
+    .tz(timezone || "UTC")
+    .utcOffset()
+
+  const actualUTCDateString = moment(`${dateString} ${timeString}`)
+    .utcOffset(-utcOffset)
+    .format("YYYY-MM-DD HH:mm:ss")
+
+  return new Date(actualUTCDateString)
 }
 
 export default resolver.pipe(
@@ -156,29 +186,32 @@ export default resolver.pipe(
     }
 
     const between = {
-      start: applySchedule(
-        utcToZonedTime(startDateUTC, interviewerSchedule?.timezone || ""),
-        schedule!,
-        "start",
-        interviewerSchedule?.timezone || ""
-      ),
-      end: applySchedule(
-        utcToZonedTime(endDateUTC, interviewerSchedule?.timezone || ""),
-        schedule!,
-        "end",
-        interviewerSchedule?.timezone || ""
-      ),
+      start: applySchedule(utcToZonedTime(startDateUTC, "UTC"), schedule!, "start", "UTC"),
+      end: applySchedule(utcToZonedTime(endDateUTC, "UTC"), schedule!, "end", "UTC"),
     }
 
+    // These available slots are actually in the schedule timezone but are returned in UTC
+    // We need to convert them to actual UTC datetime
     const availableSlots = computeAvailableSlots({
       between,
       durationInMilliseconds: (duration || 30) * 60 * 1000,
-      takenSlots: [
-        ...takenTimeSlots,
-        ...scheduleToTakenSlots(schedule!, between, interviewerSchedule?.timezone || ""),
-      ],
+      takenSlots: [...takenTimeSlots, ...scheduleToTakenSlots(schedule!, between, "UTC")],
     })
 
-    return availableSlots
+    const availableSlotsUTC: TimeSlot[] = []
+
+    try {
+      availableSlots?.forEach((slot) => {
+        const slotStart = getActualUTCDate(slot.start, interviewerSchedule?.timezone)
+        const slotEnd = getActualUTCDate(slot.end, interviewerSchedule?.timezone)
+
+        availableSlotsUTC.push({
+          start: slotStart,
+          end: slotEnd,
+        })
+      })
+    } catch (error) {}
+
+    return availableSlotsUTC?.length > 0 ? availableSlotsUTC : availableSlots
   }
 )
