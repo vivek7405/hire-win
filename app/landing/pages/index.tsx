@@ -204,18 +204,31 @@ export default function Home() {
             </Link>
           </h1>
 
-          <Link prefetch={true} href={Routes.SignupPage()}>
-            <a>
-              <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
-                Sign Up
-              </button>
+          <div className="flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-3 md:space-y-0 lg:space-y-0 md:space-x-3 lg:space-x-3">
+            <a
+              href="https://www.producthunt.com/posts/hire-win?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-hire&#0045;win"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=356023&theme=light"
+                alt="hire&#0046;win - Interviewing&#0032;Kit&#0032;with&#0032;careers&#0032;page | Product Hunt"
+                className="w-48 md:w-56 lg:w-64"
+              />
             </a>
-          </Link>
-          <Link prefetch={true} href={Routes.LoginPage()}>
+            <Link prefetch={true} href={Routes.SignupPage()}>
+              <a>
+                <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 hover:underline text-white font-extrabold rounded py-3 lg:py-4 px-8 shadow-lg w-48">
+                  Sign Up
+                </button>
+              </a>
+            </Link>
+            {/* <Link prefetch={true} href={Routes.LoginPage()}>
             <a className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-neutral-600 font-extrabold py-2 lg:py-4 px-8">
               Login
             </a>
-          </Link>
+          </Link> */}
+          </div>
         </div>
 
         <h1 className="text-center pt-8 pb-4 font-bold text-xl lg:text-2xl">
