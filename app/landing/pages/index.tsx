@@ -205,7 +205,7 @@ export default function Home() {
           </h1>
 
           <div className="flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-3 md:space-y-0 lg:space-y-0 md:space-x-3 lg:space-x-3">
-            <a
+            {/* <a
               href="https://www.producthunt.com/posts/hire-win?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-hire&#0045;win"
               target="_blank"
               rel="noreferrer"
@@ -214,6 +214,20 @@ export default function Home() {
                 src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=356023&theme=light"
                 alt="hire&#0046;win - Interviewing&#0032;Kit&#0032;with&#0032;careers&#0032;page | Product Hunt"
                 className="w-48 md:w-56 lg:w-64"
+              />
+            </a> */}
+            <a
+              href="https://www.producthunt.com/products/hire-win?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-hire&#0045;win"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=356023&theme=light&period=daily"
+                alt="hire&#0046;win - Interviewing&#0032;Kit&#0032;with&#0032;Careers&#0032;Page | Product Hunt"
+                className="w-48 md:w-56 lg:w-64"
+                // style="width: 250px; height: 54px;"
+                // width="250"
+                // height="54"
               />
             </a>
             <Link prefetch={true} href={Routes.SignupPage()}>
@@ -279,12 +293,31 @@ export default function Home() {
           </div>
         </div>
 
-        <section id="screenshots" className="bg-gray-100 py-8 px-4 mt-16 hidden lg:block">
-          <h1 className="text-center pb-4 lg:pb-8 font-bold text-3xl lg:text-5xl">
-            Pictures speak louder than words!
-          </h1>
+        <section id="screenshots" className="bg-gray-100 py-8 px-4 mt-16">
+          <div className="pb-4 lg:pb-8 space-y-2">
+            <h1 className="text-center font-bold text-3xl lg:text-5xl">
+              Pictures speak louder than words!
+            </h1>
+            <h2 className="text-center text-xs">
+              (Horizontal Scroll on Images - Use scroll wheel while holding the shift key if using
+              mouse)
+            </h2>
+          </div>
 
-          <div className="text-indigo-600 font-bold text-2xl lg:text-4xl text-center">
+          <div className="mt-4">
+            <iframe
+              // style="border: none;"
+              className="border-0 w-full h-screen"
+              src="https://cards.producthunt.com/cards/posts/356023?v=1"
+              // width="500"
+              // height="405"
+              frameBorder="0"
+              scrolling="no"
+              allowFullScreen
+            ></iframe>
+          </div>
+
+          {/* <div className="text-indigo-600 font-bold text-2xl lg:text-4xl text-center">
             <button
               className="hover:underline"
               onClick={() => {
@@ -321,7 +354,7 @@ export default function Home() {
                 )
               })}
             </div>
-          </div>
+          </div> */}
         </section>
 
         <section id="pricing" className="bg-gray-100 py-8 px-4 mt-16">
