@@ -460,8 +460,8 @@ const Step6Form = (props: Step6FormProps) => {
           <div className="w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl relative top-0">
             <div className="w-full h-full rounded-2xl">
               <ApplicationForm
-                header="Job Application Form"
-                subHeader="Preview"
+                header="Job Application Form (Preview)"
+                subHeader="This is how the Application Form will look for this job"
                 formId={selectedFormId!}
                 preview={true}
                 onSubmit={async (values) => {
