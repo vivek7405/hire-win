@@ -107,7 +107,7 @@ const SignupWithEmailConfirmedPage = ({
                 window.location.href = url.replace(/&next=/g, "")
               } else {
                 // router.push("/")
-                window.location.href = "/"
+                window.location.href = "/jobs"
               }
             }}
           />

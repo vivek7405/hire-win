@@ -61,7 +61,7 @@ const SignupPage: BlitzPage = () => {
 
         <div className="bg-white rounded p-6 w-full max-w-xl shadow-sm">
           <div className="flex flex-col space-y-6">
-            <div className="text-center">
+            {/* <div className="text-center">
               <h1 className="text-gray-800 text-2xl font-medium">Start Your Journey</h1>
               <p className="text-gray-500">
                 Already have an account?{" "}
@@ -123,7 +123,35 @@ const SignupPage: BlitzPage = () => {
                 </Link>
                 .
               </div>
-            </AuthForm>
+            </AuthForm> */}
+            <SignupForm
+              // email={email}
+              // companyId={companyId}
+              onSuccess={() => {
+                if (router.query.next) {
+                  let url = ""
+
+                  /*
+                  Loop through the router.query object and build the url string.
+
+                  If there are more params other than "next", make sure the second entry in the array is prepended with ? and everything else with &
+                */
+
+                  for (const [index, [key, value]] of Object.entries(
+                    Object.entries(router.query)
+                  )) {
+                    url += `${Number(index) === 1 ? "?" : "&"}${key}=${value}`
+                  }
+
+                  // Then we push the newly built url, while remove the next param with regex
+                  // router.push(url.replace(/&next=/g, ""))
+                  window.location.href = url.replace(/&next=/g, "")
+                } else {
+                  // router.push("/")
+                  window.location.href = "/jobs"
+                }
+              }}
+            />
           </div>
           {/* <SignupForm
             onSuccess={() => {
