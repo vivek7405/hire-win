@@ -6,8 +6,8 @@ const aedPlans = [
     priceId: process.env.PRO_AED_YEARLY || "",
     title: "Yearly",
     frequency: PlanFrequency.YEARLY,
-    pricePerMonth: 99.99,
-    pricePerYear: 1199.88,
+    pricePerMonth: 229,
+    pricePerYear: 2748,
     currencySymbol: "د.إ",
   } as Plan,
   {
@@ -15,8 +15,8 @@ const aedPlans = [
     priceId: process.env.PRO_AED_MONTHLY || "",
     title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
-    pricePerMonth: 119.99,
-    pricePerYear: 1439.88,
+    pricePerMonth: 269,
+    pricePerYear: 3228,
     currencySymbol: "د.إ",
   } as Plan,
 ] as Plan[]

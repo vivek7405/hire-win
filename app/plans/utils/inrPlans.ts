@@ -6,8 +6,8 @@ const inrPlans = [
     priceId: process.env.PRO_INR_YEARLY || "",
     title: "Yearly",
     frequency: PlanFrequency.YEARLY,
-    pricePerMonth: 1999,
-    pricePerYear: 23988,
+    pricePerMonth: 4999,
+    pricePerYear: 59988,
     currencySymbol: "₹",
   } as Plan,
   {
@@ -15,8 +15,8 @@ const inrPlans = [
     priceId: process.env.PRO_INR_MONTHLY || "",
     title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
-    pricePerMonth: 2299,
-    pricePerYear: 27588,
+    pricePerMonth: 5999,
+    pricePerYear: 71988,
     currencySymbol: "₹",
   } as Plan,
 ] as Plan[]

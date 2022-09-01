@@ -6,8 +6,8 @@ const audPlans = [
     priceId: process.env.PRO_AUD_YEARLY || "",
     title: "Yearly",
     frequency: PlanFrequency.YEARLY,
-    pricePerMonth: 39.99,
-    pricePerYear: 479.88,
+    pricePerMonth: 89,
+    pricePerYear: 1068,
     currencySymbol: "$",
   } as Plan,
   {
@@ -15,8 +15,8 @@ const audPlans = [
     priceId: process.env.PRO_AUD_MONTHLY || "",
     title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
-    pricePerMonth: 44.99,
-    pricePerYear: 539.88,
+    pricePerMonth: 99,
+    pricePerYear: 1188,
     currencySymbol: "$",
   } as Plan,
 ] as Plan[]
