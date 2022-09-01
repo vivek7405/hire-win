@@ -6,8 +6,8 @@ const gbpPlans = [
     priceId: process.env.PRO_GBP_YEARLY || "",
     title: "Yearly",
     frequency: PlanFrequency.YEARLY,
-    pricePerMonth: 20.99,
-    pricePerYear: 251.88,
+    pricePerMonth: 49,
+    pricePerYear: 588,
     currencySymbol: "£",
   } as Plan,
   {
@@ -15,8 +15,8 @@ const gbpPlans = [
     priceId: process.env.PRO_GBP_MONTHLY || "",
     title: "Monthly",
     frequency: PlanFrequency.MONTHLY,
-    pricePerMonth: 24.99,
-    pricePerYear: 299.88,
+    pricePerMonth: 59,
+    pricePerYear: 708,
     currencySymbol: "£",
   } as Plan,
 ] as Plan[]
