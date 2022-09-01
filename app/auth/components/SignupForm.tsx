@@ -42,11 +42,11 @@ export const SignupForm = (props: SignupFormProps) => {
           companyId: z.string().optional(),
           password: z.string().nonempty({ message: "Required" }),
         })}
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ email: props.email || "", password: "" }}
         onSubmit={async (values) => {
           try {
             values["companyId"] = props.companyId || "0"
-            values["email"] = props.email || ""
+            values["email"] = values["email"] || ""
             values["timezone"] = Intl?.DateTimeFormat()
               ?.resolvedOptions()
               ?.timeZone?.replace("Calcutta", "Kolkata")
