@@ -1,4 +1,4 @@
-import { checkPlan } from "app/users/utils/checkPlan"
+import { checkPlan } from "app/companies/utils/checkPlan"
 import { Ctx } from "blitz"
 import db from "db"
 

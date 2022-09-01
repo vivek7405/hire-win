@@ -1,5 +1,5 @@
 import Guard from "app/guard/ability"
-import { checkPlan } from "app/users/utils/checkPlan"
+import { checkPlan } from "app/companies/utils/checkPlan"
 import { Ctx, NotFoundError } from "blitz"
 import db, { Company, CompanyUser, Prisma, User } from "db"
 import { Plan } from "types"

@@ -32,7 +32,7 @@ import createCandidate from "app/candidates/mutations/createCandidate"
 import { CandidateSource } from "@prisma/client"
 import toast from "react-hot-toast"
 import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
-import { checkPlan } from "app/users/utils/checkPlan"
+import { checkPlan } from "app/companies/utils/checkPlan"
 import getCompany from "app/companies/queries/getCompany"
 import Guard from "app/guard/ability"
 

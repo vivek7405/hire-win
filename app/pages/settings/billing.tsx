@@ -26,7 +26,7 @@ import SubscribeButton from "app/users/components/SubscribeButton"
 import { Currency, Plan, PlanFrequency } from "types"
 import { CheckIcon, CurrencyEuroIcon } from "@heroicons/react/outline"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
-import { checkPlan } from "app/users/utils/checkPlan"
+import { checkPlan } from "app/companies/utils/checkPlan"
 // import { plans } from "app/core/utils/plans"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
@@ -194,7 +194,7 @@ const UserSettingsBillingPage = ({
                     {currentPlan ? (
                       <div className="my-5">
                         <h3 className="text-xl font-bold">
-                          You are subscribed to the {currentPlan?.title}
+                          You are subscribed to the {currentPlan?.title} Plan
                         </h3>
                         <br />
                         <h3 className="text-lg leading-6 font-medium text-gray-900">
