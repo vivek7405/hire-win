@@ -14,6 +14,9 @@ type InvitationFormProps = {
   onSubmit: any
   isJobInvitation: boolean
   jobId?: string
+  header?: string
+  subHeader?: string
+  submitText?: string
 }
 
 export const InvitationForm = (props: InvitationFormProps) => {
@@ -24,11 +27,14 @@ export const InvitationForm = (props: InvitationFormProps) => {
   return (
     <>
       <Form
-        header="Invite a User"
-        subHeader={`Invite a new member to the ${
-          props.isJobInvitation ? "Job" : "Company"
-        }. An email will be sent to the user.`}
-        submitText="Invite"
+        header={props.header || "Invite a User"}
+        subHeader={
+          props.subHeader ||
+          `Invite a new member to the ${
+            props.isJobInvitation ? "Job" : "Company"
+          }. An email will be sent to the user.`
+        }
+        submitText={props.submitText || "Invite"}
         schema={z.object({
           email: z.string().email().nonempty({ message: "Required" }),
         })}
@@ -42,7 +48,7 @@ export const InvitationForm = (props: InvitationFormProps) => {
             options={companyUsers?.map((cu) => {
               return { label: `${cu.user?.name} - ${cu.user?.email}`, value: cu.user?.email }
             })}
-            placeholder="select user to invite"
+            placeholder="Select a user to add"
           />
         ) : (
           <LabeledTextField
