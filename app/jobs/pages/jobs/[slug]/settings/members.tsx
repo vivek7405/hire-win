@@ -21,7 +21,7 @@ import Guard from "app/guard/ability"
 
 import InvitationForm from "app/jobs/components/InvitationForm"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
-import inviteToJob from "app/jobs/mutations/inviteToJob"
+// import inviteToJob from "app/jobs/mutations/inviteToJob"
 import removeFromJob from "app/jobs/mutations/removeFromJob"
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
@@ -44,6 +44,7 @@ import assignScheduleToJobStage from "app/jobs/mutations/assignScheduleToJobStag
 import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStage"
 import getCompany from "app/companies/queries/getCompany"
 import { titleCase } from "app/core/utils/titleCase"
+import addUserToJob from "app/jobs/mutations/addUserToJob"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -151,7 +152,8 @@ const JobSettingsMembersPage = ({
   const router = useRouter()
   const [openInvite, setOpenInvite] = useState(false)
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false)
-  const [inviteToJobMutation] = useMutation(inviteToJob)
+  // const [inviteToJobMutation] = useMutation(inviteToJob)
+  const [addUserToJobMutation] = useMutation(addUserToJob)
   const [removeFromJobMutation] = useMutation(removeFromJob)
   const [changePermissionMutation] = useMutation(updateMemberRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
@@ -176,19 +178,31 @@ const JobSettingsMembersPage = ({
               >
                 Members
               </h2>
-              <Modal header="Invite A User" open={openInvite} setOpen={setOpenInvite}>
+              <Modal
+                header="Add User to Job"
+                open={openInvite}
+                setOpen={setOpenInvite}
+                noOverflow={true}
+              >
                 <InvitationForm
+                  header="Add User"
+                  subHeader="Add an existing company user to this job"
+                  submitText="Add"
                   jobId={job?.id || "0"}
                   isJobInvitation={true}
                   initialValues={{ email: "" }}
                   onSubmit={async (values) => {
                     const toastId = toast.loading(() => <span>Inviting {values.email}</span>)
                     try {
-                      await inviteToJobMutation({
+                      // await inviteToJobMutation({
+                      //   jobId: jobData?.id as string,
+                      //   email: values.email,
+                      // })
+                      await addUserToJobMutation({
                         jobId: jobData?.id as string,
                         email: values.email,
                       })
-                      toast.success(() => <span>{values.email} invited</span>, { id: toastId })
+                      toast.success(() => <span>User added</span>, { id: toastId })
                     } catch (error) {
                       toast.error(
                         "Sorry, we had an unexpected error. Please try again. - " +
@@ -196,6 +210,8 @@ const JobSettingsMembersPage = ({
                         { id: toastId }
                       )
                     }
+                    setOpenInvite(false)
+                    router.reload()
                   }}
                 />
               </Modal>
@@ -207,8 +223,8 @@ const JobSettingsMembersPage = ({
                   router.push(Routes.UserSettingsBillingPage())
                 }}
               >
-                Upgrade to the Pro Plan to invite unlimited users. You cannot invite users on the
-                Free plan.
+                Upgrade to the Pro Plan to add unlimited users. You cannot add users on the Free
+                plan.
               </Confirm>
               <button
                 onClick={(e) => {
@@ -222,7 +238,7 @@ const JobSettingsMembersPage = ({
                 data-testid={`open-inviteUser-modal`}
                 className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
               >
-                Invite User
+                Add User
               </button>
             </div>
 
@@ -285,7 +301,6 @@ const JobSettingsMembersPage = ({
                                     },
                                   })
                                   toast.success("Member updated", { id: toastId })
-                                  router.reload()
                                 } catch (e) {
                                   toast.error(
                                     `Sorry, we had an unexpected error. Please try again. - ${e.toString()}`
@@ -319,17 +334,16 @@ const JobSettingsMembersPage = ({
                                       jobId: jobData?.id as string,
                                       userId: m.user.id,
                                     })
-                                    toast.success(`${m.user.email} removed`, {
+                                    toast.success(`User removed`, {
                                       id: toastId,
                                     })
+                                    router.reload()
                                   } catch (error) {
                                     toast.error(
                                       `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
                                       { id: toastId }
                                     )
                                   }
-                                  setOpenInvite(false)
-                                  router.reload()
                                 }}
                               >
                                 Are you sure you want to remove this user from the job?
