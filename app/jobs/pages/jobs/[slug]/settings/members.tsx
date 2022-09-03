@@ -45,6 +45,8 @@ import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStag
 import getCompany from "app/companies/queries/getCompany"
 import { titleCase } from "app/core/utils/titleCase"
 import addUserToJob from "app/jobs/mutations/addUserToJob"
+import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
+import { SubscriptionStatus } from "types"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -63,7 +65,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { ...context }
   )
 
-  const currentPlan = checkPlan(company)
+  // const currentPlan = checkPlan(company)
+  const subscriptionStatus = await invokeWithMiddleware(
+    getCompanySubscriptionStatus,
+    { companyId: company?.id || "0" },
+    { ...context }
+  )
 
   const { can: canUpdate } = await Guard.can(
     "update",
@@ -102,7 +109,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             job: job,
             canUpdate,
-            currentPlan,
+            subscriptionStatus,
             isOwner,
           },
         }
@@ -145,7 +152,7 @@ const JobSettingsMembersPage = ({
   user,
   job,
   canUpdate,
-  currentPlan,
+  subscriptionStatus,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -229,7 +236,10 @@ const JobSettingsMembersPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
-                  if (currentPlan) {
+                  if (
+                    subscriptionStatus === SubscriptionStatus.ACTIVE ||
+                    subscriptionStatus === SubscriptionStatus.TRIALING
+                  ) {
                     setOpenInvite(true)
                   } else {
                     setOpenConfirmBilling(true)

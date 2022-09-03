@@ -22,7 +22,7 @@ import Table from "app/core/components/Table"
 
 import getUser from "app/users/queries/getUser"
 import SingleFileUploadField from "app/core/components/SingleFileUploadField"
-import { AttachmentObject, ExtendedJob, ExtendedUser } from "types"
+import { AttachmentObject, ExtendedJob, ExtendedUser, SubscriptionStatus } from "types"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { Form } from "app/core/components/Form"
 import getJob from "app/jobs/queries/getJob"
@@ -35,6 +35,7 @@ import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import getCompany from "app/companies/queries/getCompany"
 import Guard from "app/guard/ability"
+import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -55,7 +56,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   )
 
   if (company) {
-    const currentPlan = checkPlan(company)
+    // const currentPlan = checkPlan(company)
+    const subscriptionStatus = await invokeWithMiddleware(
+      getCompanySubscriptionStatus,
+      { companyId: company.id },
+      { ...context }
+    )
 
     const job = await invokeWithMiddleware(
       getJob,
@@ -78,7 +84,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           props: {
             company,
             job,
-            currentPlan,
+            subscriptionStatus,
           },
         }
       } else {
@@ -114,7 +120,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const ApplyToJob = ({
   company,
   job,
-  currentPlan,
+  subscriptionStatus,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -129,7 +135,11 @@ const ApplyToJob = ({
     <JobApplicationLayout
       job={job}
       company={company}
-      addGoogleJobPostingScript={!!currentPlan && (job?.postToGoogle || false)}
+      addGoogleJobPostingScript={
+        (subscriptionStatus === SubscriptionStatus.ACTIVE ||
+          subscriptionStatus === SubscriptionStatus.TRIALING) &&
+        (job?.postToGoogle || false)
+      }
     >
       <Suspense fallback="Loading...">
         <button

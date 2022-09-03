@@ -31,6 +31,7 @@ import {
   JobViewType,
   Plan,
   PlanName,
+  SubscriptionStatus,
 } from "types"
 import { Candidate, Category, CompanyUserRole, Stage, WorkflowStage } from "@prisma/client"
 import moment from "moment"
@@ -41,7 +42,13 @@ import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
 import setJobHidden from "app/jobs/mutations/setJobHidden"
 import toast from "react-hot-toast"
 import Cards from "app/core/components/Cards"
-import { ArchiveIcon, CogIcon, ExternalLinkIcon, RefreshIcon } from "@heroicons/react/outline"
+import {
+  ArchiveIcon,
+  CogIcon,
+  ExclamationCircleIcon,
+  ExternalLinkIcon,
+  RefreshIcon,
+} from "@heroicons/react/outline"
 import getCategories from "app/categories/queries/getCategories"
 import Card from "app/core/components/Card"
 import Pagination from "app/core/components/Pagination"
@@ -129,7 +136,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         company: companyUser.company,
         companyUsersLength: companyUsers?.length || 0,
         canCreate,
-        currentPlan: companyUser.currentPlan,
+        subscriptionStatus: companyUser.subscriptionStatus,
       },
     }
   } else {
@@ -193,7 +200,7 @@ const CategoryFilterButtons = ({
 const Jobs = ({
   user,
   company,
-  currentPlan,
+  subscriptionStatus,
   setOpenConfirm,
   setConfirmMessage,
   viewType,
@@ -382,7 +389,11 @@ const Jobs = ({
           .map((jobUser) => {
             return {
               ...jobUser.job,
-              hasByPassedPlanLimit: !currentPlan && jobUsers?.length > 1,
+              hasByPassedPlanLimit:
+                !(
+                  subscriptionStatus === SubscriptionStatus.ACTIVE ||
+                  subscriptionStatus === SubscriptionStatus.TRIALING
+                ) && jobUsers?.length > 1,
               canUpdate: jobUser.role === "OWNER" || jobUser.role === "ADMIN",
             }
           })
@@ -693,7 +704,7 @@ const JobsHome = ({
   companyUserRole,
   company,
   canCreate,
-  currentPlan,
+  subscriptionStatus,
   companyUsersLength,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -802,7 +813,12 @@ const JobsHome = ({
             setCancelButtonText("Ok")
             setHideConfirmButton(true)
           } else {
-            if (!currentPlan) {
+            if (
+              !(
+                subscriptionStatus === SubscriptionStatus.ACTIVE ||
+                subscriptionStatus === SubscriptionStatus.TRIALING
+              )
+            ) {
               setConfirmHeader("Upgrade to the Pro Plan?")
               setConfirmMessage(
                 "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
@@ -960,7 +976,7 @@ const JobsHome = ({
           viewType={viewType}
           user={user}
           company={company}
-          currentPlan={currentPlan}
+          subscriptionStatus={subscriptionStatus}
           setOpenConfirm={setOpenConfirm}
           setConfirmMessage={setConfirmMessage}
           introSteps={introSteps}

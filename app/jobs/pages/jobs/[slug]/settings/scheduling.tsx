@@ -43,6 +43,7 @@ import getDefaultCalendarByUser from "app/scheduling/calendars/queries/getDefaul
 import assignScheduleToJobStage from "app/jobs/mutations/assignScheduleToJobStage"
 import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStage"
 import getCompany from "app/companies/queries/getCompany"
+import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -61,7 +62,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { ...context }
   )
 
-  const currentPlan = checkPlan(company)
+  // const currentPlan = checkPlan(company)
+  const subscriptionStatus = await invokeWithMiddleware(
+    getCompanySubscriptionStatus,
+    { companyId: company?.id || "0" },
+    { ...context }
+  )
 
   const { can: canUpdate } = await Guard.can(
     "update",
@@ -100,7 +106,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           user: user,
           job: job,
           canUpdate,
-          currentPlan,
+          subscriptionStatus,
           isOwner,
         },
       }
@@ -568,7 +574,7 @@ const JobSettingsSchedulingPage = ({
   user,
   job,
   canUpdate,
-  currentPlan,
+  subscriptionStatus,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
