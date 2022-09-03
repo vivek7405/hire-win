@@ -9,8 +9,6 @@ export default async function getCompanySubscription(
   { companyId }: CompanySubscriptionInput,
   ctx: Ctx
 ) {
-  ctx.session.$authorize()
-
   const company = await db.company.findFirst({
     where: { id: companyId || "0" },
   })
