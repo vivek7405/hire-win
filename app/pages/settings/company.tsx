@@ -32,6 +32,7 @@ import CompanyForm from "app/companies/components/CompanyForm"
 import getCompanyUser from "app/companies/queries/getCompanyUser"
 import { CompanyUserRole } from "@prisma/client"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
+import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -48,12 +49,18 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { ...context }
   )
 
+  const subscriptionStatus = await invokeWithMiddleware(
+    getCompanySubscriptionStatus,
+    { companyId: company?.id || "0" },
+    { ...context }
+  )
+
   if (user && company) {
     return {
       props: {
         user,
         company,
-        currentPlan: checkPlan(company) as Plan | null,
+        subscriptionStatus,
       },
     }
   } else {
@@ -70,7 +77,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const UserSettingsCompanyPage = ({
   user,
   company,
-  currentPlan,
+  subscriptionStatus,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
   const [updateCompanyMutation] = useMutation(updateCompany)

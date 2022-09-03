@@ -18,7 +18,14 @@ import Table from "app/core/components/Table"
 
 import getUser from "app/users/queries/getUser"
 import SingleFileUploadField from "app/core/components/SingleFileUploadField"
-import { AttachmentObject, CardType, DragDirection, ExtendedJob, Plan } from "types"
+import {
+  AttachmentObject,
+  CardType,
+  DragDirection,
+  ExtendedJob,
+  Plan,
+  SubscriptionStatus,
+} from "types"
 import { titleCase } from "app/core/utils/titleCase"
 import draftToHtml from "draftjs-to-html"
 import { Country, State } from "country-state-city"
@@ -35,6 +42,8 @@ import { checkPlan } from "app/companies/utils/checkPlan"
 import getCompanyJobsForCareersPage from "app/jobs/queries/getCompanyJobsForCareersPage"
 import getCompanyJobCategoriesForFilter from "app/categories/queries/getCompanyJobCategoriesForFilter"
 import getSalaryIntervalFromSalaryType from "app/jobs/utils/getSalaryIntervalFromSalaryType"
+import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
+import Stripe from "stripe"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -55,8 +64,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // const user = await getCurrentUserServer({ ...context })
 
   if (company) {
-    const currentPlan = checkPlan(company)
-    return { props: { company, currentPlan } }
+    // const currentPlan = checkPlan(company)
+    const subscriptionStatus = await invokeWithMiddleware(
+      getCompanySubscriptionStatus,
+      { companyId: company.id },
+      { ...context }
+    )
+    return { props: { company, subscriptionStatus } }
   } else {
     return {
       redirect: {
@@ -70,9 +84,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 type JobsProps = {
   company: Company
-  currentPlan: Plan | null | undefined
+  subscriptionStatus: Stripe.Subscription.Status | null | undefined
 }
-const Jobs = ({ company, currentPlan }: JobsProps) => {
+const Jobs = ({ company, subscriptionStatus }: JobsProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -240,7 +254,14 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
       <div>
         {jobs?.map((job) => {
           // Filter jobs whose free candidate limit has reached
-          if (!currentPlan && job.candidates.length >= 25) return <></>
+          if (
+            !(
+              subscriptionStatus === SubscriptionStatus.ACTIVE ||
+              subscriptionStatus === SubscriptionStatus.TRIALING
+            ) &&
+            job.candidates.length >= 25
+          )
+            return <></>
 
           return (
             <div key={job.id}>
@@ -341,7 +362,7 @@ const Jobs = ({ company, currentPlan }: JobsProps) => {
 
 const CareersPage = ({
   company,
-  currentPlan,
+  subscriptionStatus,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <JobApplicationLayout company={company} isCareersPage={true}>
@@ -351,7 +372,7 @@ const CareersPage = ({
           className="mt-1 mb-8"
           dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
         />
-        <Jobs company={company!} currentPlan={currentPlan} />
+        <Jobs company={company!} subscriptionStatus={subscriptionStatus} />
       </Suspense>
     </JobApplicationLayout>
   )

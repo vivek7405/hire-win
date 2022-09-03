@@ -2,6 +2,8 @@ import db, { CompanyUserRole, JobUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import moment from "moment"
+import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
+import { SubscriptionStatus } from "types"
 
 type ExtendedResourceTypes =
   | "job"
@@ -56,8 +58,17 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       if (!job || !job?.company) return false
 
-      const currentPlan = checkPlan(job.company)
-      if (!currentPlan) {
+      // const currentPlan = checkPlan(job.company)
+      const subscriptionStatus = await getCompanySubscriptionStatus(
+        { companyId: job.companyId },
+        ctx
+      )
+      if (
+        !(
+          subscriptionStatus === SubscriptionStatus.ACTIVE ||
+          subscriptionStatus === SubscriptionStatus.TRIALING
+        )
+      ) {
         if (job._count.candidates >= 25) {
           return false
         }
@@ -128,8 +139,20 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
         const allUserJobsLength = company?.jobs?.length || 0
         if (allUserJobsLength >= 1) {
-          const currentPlan = checkPlan(company)
-          if (!currentPlan) return false
+          // const currentPlan = checkPlan(company)
+          // if (!currentPlan) return false
+          const subscriptionStatus = await getCompanySubscriptionStatus(
+            { companyId: company?.id || "0" },
+            ctx
+          )
+          if (
+            !(
+              subscriptionStatus === SubscriptionStatus.ACTIVE ||
+              subscriptionStatus === SubscriptionStatus.TRIALING
+            )
+          ) {
+            return false
+          }
         }
 
         // Only company owner and admins can create jobs, company users can't
@@ -169,8 +192,20 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
         const allCompanyJobsLength = company?.jobs?.length || 0
         if (allCompanyJobsLength > 1) {
-          const currentPlan = checkPlan(company)
-          if (!currentPlan) return false
+          // const currentPlan = checkPlan(company)
+          // if (!currentPlan) return false
+          const subscriptionStatus = await getCompanySubscriptionStatus(
+            { companyId: company?.id || "0" },
+            ctx
+          )
+          if (
+            !(
+              subscriptionStatus === SubscriptionStatus.ACTIVE ||
+              subscriptionStatus === SubscriptionStatus.TRIALING
+            )
+          ) {
+            return false
+          }
         }
 
         return job?.companyId === ctx.session.companyId
@@ -205,8 +240,20 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
         const allCompanyJobsLength = company?.jobs?.length || 0
         if (allCompanyJobsLength > 1) {
-          const currentPlan = checkPlan(company)
-          if (!currentPlan) return false
+          // const currentPlan = checkPlan(company)
+          // if (!currentPlan) return false
+          const subscriptionStatus = await getCompanySubscriptionStatus(
+            { companyId: company?.id || "0" },
+            ctx
+          )
+          if (
+            !(
+              subscriptionStatus === SubscriptionStatus.ACTIVE ||
+              subscriptionStatus === SubscriptionStatus.TRIALING
+            )
+          ) {
+            return false
+          }
         }
 
         const owner = job?.users.find((u) => u.role === JobUserRole.OWNER)
@@ -234,8 +281,20 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             jobs: true,
           },
         })
-        const currentPlan = checkPlan(company)
-        if (!currentPlan) return false
+        // const currentPlan = checkPlan(company)
+        // if (!currentPlan) return false
+        const subscriptionStatus = await getCompanySubscriptionStatus(
+          { companyId: company?.id || "0" },
+          ctx
+        )
+        if (
+          !(
+            subscriptionStatus === SubscriptionStatus.ACTIVE ||
+            subscriptionStatus === SubscriptionStatus.TRIALING
+          )
+        ) {
+          return false
+        }
 
         const owner = job?.users.find((p) => p.role === JobUserRole.OWNER)
         const admins = job?.users.filter((m) => m.role === JobUserRole.ADMIN)
@@ -321,7 +380,22 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
 
         if (companyUsers && companyUsers.length >= 1) {
-          const allCompaniesOnProPlan = companyUsers.every((cu) => checkPlan(cu.company))
+          // const allCompaniesOnProPlan = companyUsers.every((cu) => checkPlan(cu.company))
+          let allCompaniesOnProPlan = true
+          for (const cu of companyUsers) {
+            const subscriptionStatus = await getCompanySubscriptionStatus(
+              { companyId: cu.companyId },
+              ctx
+            )
+            if (
+              !(
+                subscriptionStatus === SubscriptionStatus.ACTIVE ||
+                subscriptionStatus === SubscriptionStatus.TRIALING
+              )
+            ) {
+              allCompaniesOnProPlan = false
+            }
+          }
           return allCompaniesOnProPlan
         } else {
           // User with no company can create one
@@ -346,8 +420,20 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             users: true,
           },
         })
-        const currentPlan = checkPlan(company)
-        if (!currentPlan) return false
+        // const currentPlan = checkPlan(company)
+        // if (!currentPlan) return false
+        const subscriptionStatus = await getCompanySubscriptionStatus(
+          { companyId: company?.id || "0" },
+          ctx
+        )
+        if (
+          !(
+            subscriptionStatus === SubscriptionStatus.ACTIVE ||
+            subscriptionStatus === SubscriptionStatus.TRIALING
+          )
+        ) {
+          return false
+        }
 
         const owner = company?.users.find((u) => u.role === CompanyUserRole.OWNER)
         const admins = company?.users.filter((u) => u.role === CompanyUserRole.ADMIN)

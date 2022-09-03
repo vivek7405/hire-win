@@ -10,7 +10,7 @@ import {
   MinusCircleIcon,
   BadgeCheckIcon,
 } from "@heroicons/react/outline"
-import { ExtendedUser, IntroHint, IntroStep } from "types"
+import { ExtendedUser, IntroHint, IntroStep, SubscriptionStatus } from "types"
 import logout from "app/auth/mutations/logout"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import Logo from "app/assets/Logo"
@@ -37,9 +37,6 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
   const [openConfirm, setOpenConfirm] = useState(false)
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
-  })
-  const [companyUsers] = useQuery(getCompanyUsers, {
-    where: { userId: session?.userId || "0" },
   })
   const [canCreateCompany] = useQuery(canCreateNewCompany, null)
 
@@ -278,6 +275,10 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
   const [updateCompanySessionMutation] = useMutation(updateCompanySession)
 
   const CompanySelectDropdown = ({ companyOpen, setCompanyOpen }) => {
+    const [companyUsers] = useQuery(getCompanyUsers, {
+      where: { userId: session?.userId || "0" },
+    })
+
     return (
       <div className="flex items-center space-x-2">
         <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
@@ -317,8 +318,14 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                       </DropdownMenu.ItemIndicator>
                       <p className="ml-2 flex flex-nowrap space-x-1 items-center">
                         <div className="flex">
-                          {cu.currentPlan && <BadgeCheckIcon width={18} height={18} />}
-                          {!cu.currentPlan && <MinusCircleIcon width={18} height={18} />}
+                          {(cu.subscriptionStatus === SubscriptionStatus.ACTIVE ||
+                            cu.subscriptionStatus === SubscriptionStatus.TRIALING) && (
+                            <BadgeCheckIcon width={18} height={18} />
+                          )}
+                          {!(
+                            cu.subscriptionStatus === SubscriptionStatus.ACTIVE ||
+                            cu.subscriptionStatus === SubscriptionStatus.TRIALING
+                          ) && <MinusCircleIcon width={18} height={18} />}
                         </div>
                         <div>{cu.company?.name}</div>
                         <div className="lowercase">({cu.role})</div>

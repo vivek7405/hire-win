@@ -23,7 +23,7 @@ import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/themeHelpers"
 import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
 import SubscribeButton from "app/users/components/SubscribeButton"
-import { Currency, Plan, PlanFrequency } from "types"
+import { Currency, Plan, PlanFrequency, SubscriptionStatus } from "types"
 import { CheckIcon, CurrencyEuroIcon } from "@heroicons/react/outline"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
 import { checkPlan } from "app/companies/utils/checkPlan"
@@ -38,6 +38,8 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import { Suspense, useEffect, useState } from "react"
 import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
 import proPlanFeatures from "app/plans/utils/proPlanFeatures"
+import { data } from "cheerio/lib/api/attributes"
+import getCompanySubscription from "app/companies/queries/getCompanySubscription"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -59,13 +61,19 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     { ...context }
   )
 
+  const subscription = await invokeWithMiddleware(
+    getCompanySubscription,
+    { companyId: company?.id || "0" },
+    { ...context }
+  )
+
   if (user && company) {
     return {
       props: {
         // plans,
         user,
         company,
-        currentPlan: checkPlan(company) as Plan | null,
+        subscription,
         companyUser,
       },
     }
@@ -144,7 +152,7 @@ const Plans = ({ user, selectedCurrency }) => {
 const UserSettingsBillingPage = ({
   // plans,
   user,
-  currentPlan,
+  subscription,
   companyUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const session = useSession()
@@ -163,7 +171,10 @@ const UserSettingsBillingPage = ({
               <div className="bg-white md:col-span-2">
                 <div className="sm:overflow-hidden">
                   <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
-                    {!currentPlan && (
+                    {!(
+                      subscription?.status === SubscriptionStatus.ACTIVE ||
+                      subscription?.status === SubscriptionStatus.TRIALING
+                    ) && (
                       <>
                         <Form noFormatting={true} onSubmit={async (values) => {}}>
                           <LabeledToggleGroupField
@@ -183,18 +194,21 @@ const UserSettingsBillingPage = ({
                       </>
                     )}
                     {/* <div className="mb-6">
-                <h2
-                  id="billing-history-heading"
-                  className="text-lg leading-6 font-medium text-gray-900"
-                >
-                  Plans
-                </h2>
-              </div> */}
+                      <h2
+                        id="billing-history-heading"
+                        className="text-lg leading-6 font-medium text-gray-900"
+                      >
+                        Plans
+                      </h2>
+                    </div> */}
 
-                    {currentPlan ? (
+                    {subscription?.status === SubscriptionStatus.ACTIVE ||
+                    subscription?.status === SubscriptionStatus.TRIALING ? (
                       <div className="my-5">
                         <h3 className="text-xl font-bold">
-                          You are subscribed to the {currentPlan?.title} Plan
+                          You are subscribed to the{" "}
+                          <span className="capitalize">{`${subscription?.items?.data[0]?.price?.recurring?.interval}ly`}</span>{" "}
+                          Plan
                         </h3>
                         <br />
                         <h3 className="text-lg leading-6 font-medium text-gray-900">
