@@ -58,7 +58,7 @@ const Plans = ({ selectedCurrency, selectedFrequency }) => {
         return (
           <div
             key={plan.priceId}
-            className="w-full py-6"
+            className="w-full pb-6"
             hidden={selectedFrequency !== plan.frequency}
           >
             <div className="w-full text-4xl font-bold text-center whitespace-nowrap">
@@ -198,11 +198,11 @@ export default function Home() {
             Applicant Tracking, Collaborating, Interviewing & more!
           </p>
 
-          <h1 className="my-4 text-2xl lg:text-4xl font-black leading-tight">
+          {/* <h1 className="my-4 text-2xl lg:text-4xl font-black leading-tight">
             <Link href={Routes.Beta()}>
               <a className="hover:underline">30% off for 3 months - BETA30</a>
             </Link>
-          </h1>
+          </h1> */}
 
           <div className="flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-3 md:space-y-0 lg:space-y-0 md:space-x-3 lg:space-x-3">
             {/* <a
@@ -224,7 +224,7 @@ export default function Home() {
               <img
                 src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=356023&theme=light&period=daily"
                 alt="hire&#0046;win - Interviewing&#0032;Kit&#0032;with&#0032;Careers&#0032;Page | Product Hunt"
-                className="w-48 md:w-56 lg:w-64"
+                className="w-72"
                 // style="width: 250px; height: 54px;"
                 // width="250"
                 // height="54"
@@ -232,8 +232,8 @@ export default function Home() {
             </a>
             <Link prefetch={true} href={Routes.SignupPage()}>
               <a>
-                <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 hover:underline text-white font-extrabold rounded py-3 lg:py-4 px-8 shadow-lg w-48">
-                  Sign Up
+                <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 hover:underline text-white font-extrabold rounded py-4 px-8 shadow-lg w-72 text-xl">
+                  Start a free 30 day trial
                 </button>
               </a>
             </Link>
@@ -367,18 +367,16 @@ export default function Home() {
             </div>
 
             <div className="w-full text-center pt-2">
-              <h1 className="my-4 text-2xl lg:text-4xl font-black leading-tight">
+              {/* <h1 className="my-4 text-2xl lg:text-4xl font-black leading-tight">
                 <Link href={Routes.Beta()}>
                   <a className="hover:underline">30% off for 3 months - BETA30</a>
                 </Link>
-              </h1>
+              </h1> */}
 
-              <div className="mt-10">
-                <span className="text-2xl lg:text-3xl font-bold">
-                  <span className="bg-yellow-300">No nonsense</span> per user per job pricing,
-                  instead we offer Flat Pricing!
-                </span>
-              </div>
+              <span className="text-2xl lg:text-3xl font-bold">
+                <span className="bg-yellow-300">No nonsense</span> per user per job pricing, instead
+                we offer Flat Pricing!
+              </span>
             </div>
 
             <div className="flex flex-col md:flex-row lg:flex-row justify-center my-12 md:space-x-8 lg:space-x-8 space-y-8 md:space-y-0 lg:space-y-0">
@@ -638,8 +636,15 @@ export default function Home() {
               <div className="mt-6">
                 <Link prefetch={true} href={Routes.SignupPage()}>
                   <a>
-                    <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded my-2 md:my-6 py-3 lg:py-4 px-8 shadow-lg w-48">
-                      Sign Up
+                    <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white hover:shadow-indigo-500 shadow-lg rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
+                      <span className="font-extrabold text-xl">Start a free 30 day trial</span>
+                      <br />
+                      <span className="font-light hidden md:block lg:block">
+                        no credit card required, cancel any time
+                      </span>
+                      <span className="font-light md:hidden lg:hidden">
+                        no credit card required
+                      </span>
                     </button>
                   </a>
                 </Link>

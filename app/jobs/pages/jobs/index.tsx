@@ -68,6 +68,7 @@ import { StepsProps } from "intro.js-react"
 import usePreviousValue from "app/core/hooks/usePreviousValue"
 import { jobs } from "googleapis/build/src/apis/jobs"
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
+import getCompanySubscription from "app/companies/queries/getCompanySubscription"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -129,6 +130,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user && companyUser) {
     const { can: canCreate } = await Guard.can("create", "job", { session }, {})
 
+    const subscription = await invokeWithMiddleware(
+      getCompanySubscription,
+      { companyId: companyUser.companyId },
+      { ...context }
+    )
+
     return {
       props: {
         user,
@@ -136,7 +143,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         company: companyUser.company,
         companyUsersLength: companyUsers?.length || 0,
         canCreate,
-        subscriptionStatus: companyUser.subscriptionStatus,
+        subscription,
       },
     }
   } else {
@@ -200,7 +207,7 @@ const CategoryFilterButtons = ({
 const Jobs = ({
   user,
   company,
-  subscriptionStatus,
+  subscription,
   setOpenConfirm,
   setConfirmMessage,
   viewType,
@@ -391,8 +398,8 @@ const Jobs = ({
               ...jobUser.job,
               hasByPassedPlanLimit:
                 !(
-                  subscriptionStatus === SubscriptionStatus.ACTIVE ||
-                  subscriptionStatus === SubscriptionStatus.TRIALING
+                  subscription?.status === SubscriptionStatus.ACTIVE ||
+                  subscription?.status === SubscriptionStatus.TRIALING
                 ) && jobUsers?.length > 1,
               canUpdate: jobUser.role === "OWNER" || jobUser.role === "ADMIN",
             }
@@ -704,7 +711,7 @@ const JobsHome = ({
   companyUserRole,
   company,
   canCreate,
-  subscriptionStatus,
+  subscription,
   companyUsersLength,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -782,12 +789,40 @@ const JobsHome = ({
     />
   )
 
+  const subscriptionLink =
+    companyUserRole === CompanyUserRole.OWNER ? (
+      <>
+        <Link
+          prefetch={true}
+          href={Routes.UserSettingsBillingPage({ companySlug: company?.slug! })}
+          passHref
+        >
+          <a className="flex items-center py-2 whitespace-nowrap">
+            {subscription?.status === SubscriptionStatus.TRIALING && subscription?.trial_end ? (
+              <span className="text-yellow-600 hover:underline py-1 px-3 border-2 rounded-full border-yellow-500">
+                Trial ends {moment.unix(subscription?.trial_end)?.local()?.fromNow()}
+              </span>
+            ) : subscription?.status !== SubscriptionStatus.ACTIVE ? (
+              <span className="text-red-600 flex items-center hover:underline py-1 px-3 border-2 rounded-full border-red-500">
+                <ExclamationCircleIcon className="w-4 h-4 mr-1" />
+                <span>Subscribe Plan</span>
+              </span>
+            ) : (
+              <></>
+            )}
+          </a>
+        </Link>
+      </>
+    ) : (
+      <></>
+    )
+
   const viewCareersPageLink = (
     <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
       <a
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center underline text-theme-600 mx-6 py-2 hover:text-theme-800 whitespace-nowrap"
+        className="flex items-center underline text-theme-600 py-2 hover:text-theme-800 whitespace-nowrap"
       >
         <span>View Careers Page</span>
         <ExternalLinkIcon className="w-4 h-4 ml-1" />
@@ -815,8 +850,8 @@ const JobsHome = ({
           } else {
             if (
               !(
-                subscriptionStatus === SubscriptionStatus.ACTIVE ||
-                subscriptionStatus === SubscriptionStatus.TRIALING
+                subscription?.status === SubscriptionStatus.ACTIVE ||
+                subscription?.status === SubscriptionStatus.TRIALING
               )
             ) {
               setConfirmHeader("Upgrade to the Pro Plan?")
@@ -940,7 +975,10 @@ const JobsHome = ({
           />
         </Form>
 
-        <div className="flex justify-center">{viewCareersPageLink}</div>
+        <div className="flex justify-center space-x-6">
+          {subscriptionLink}
+          {viewCareersPageLink}
+        </div>
       </div>
 
       {/* Tablet and Desktop Menu */}
@@ -965,7 +1003,8 @@ const JobsHome = ({
           </Form>
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center space-x-6">
+          {subscriptionLink}
           {viewCareersPageLink}
           {newJobButton}
         </div>
@@ -976,7 +1015,7 @@ const JobsHome = ({
           viewType={viewType}
           user={user}
           company={company}
-          subscriptionStatus={subscriptionStatus}
+          subscription={subscription}
           setOpenConfirm={setOpenConfirm}
           setConfirmMessage={setConfirmMessage}
           introSteps={introSteps}

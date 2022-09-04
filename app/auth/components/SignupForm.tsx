@@ -5,6 +5,10 @@ import signup from "app/auth/mutations/signup"
 import { Signup } from "app/auth/validations"
 import toast from "react-hot-toast"
 import { z } from "zod"
+import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
+import { Currency } from "types"
+import { useState } from "react"
+import LocaleCurrency from "locale-currency"
 
 type SignupFormProps = {
   onSuccess?: () => void
@@ -14,6 +18,8 @@ type SignupFormProps = {
 
 export const SignupForm = (props: SignupFormProps) => {
   const [signupMutation] = useMutation(signup)
+  const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
+  const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
 
   return (
     <div className="flex flex-col space-y-6">
@@ -41,6 +47,10 @@ export const SignupForm = (props: SignupFormProps) => {
               : z.string().optional(),
           companyId: z.string().optional(),
           password: z.string().nonempty({ message: "Required" }),
+          currency:
+            !props.email || props.email === ""
+              ? z.nativeEnum(Currency)
+              : z.nativeEnum(Currency).optional(),
         })}
         initialValues={{ email: props.email || "", password: "" }}
         onSubmit={async (values) => {
@@ -92,6 +102,21 @@ export const SignupForm = (props: SignupFormProps) => {
           type="password"
           testid="signupPassword"
         />
+        {(!props.email || props.email === "") && (
+          <LabeledToggleGroupField
+            name="currency"
+            label="Preferred currency for billing"
+            paddingX={3}
+            paddingY={1}
+            value={selectedCurrency}
+            options={Object.keys(Currency).map((currency) => {
+              return { label: currency, value: currency }
+            })}
+            onChange={async (value) => {
+              setSelectedCurrency(value)
+            }}
+          />
+        )}
         <div>
           <label className="text-xs text-neutral-500">
             By signing up, you agree to the{" "}
