@@ -9,7 +9,7 @@ import addCalendar from "app/scheduling/calendars/mutations/addCalendar"
 import addSchedule from "app/scheduling/schedules/mutations/addSchedule"
 import { mapValues } from "app/core/utils/map-values"
 import stripe from "app/core/utils/stripe"
-import { PlanName } from "types"
+import { Currency, PlanName } from "types"
 import provideTrail from "app/core/utils/provideTrial"
 import createFactoryItems from "./createFactoryItems"
 
@@ -20,9 +20,10 @@ type signupProps = {
   companyId?: string
   password: string
   timezone?: string | null | undefined
+  currency?: Currency
 }
 export default async function signup(
-  { name, email, companyName, companyId, password, timezone }: signupProps,
+  { name, email, companyName, companyId, password, timezone, currency }: signupProps,
   ctx: Ctx
 ) {
   if (!email) {
@@ -82,6 +83,7 @@ export default async function signup(
 
   if (!existingCompany) {
     await createFactoryItems({ companyId: compId }, ctx)
+    currency && (await provideTrail(user?.id, compId, currency))
   }
 
   await addSchedule(
@@ -93,8 +95,6 @@ export default async function signup(
     },
     ctx
   )
-
-  // await provideTrail(user?.id, compId)
 
   return user
 }

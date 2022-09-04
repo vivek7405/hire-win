@@ -40,6 +40,7 @@ import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
 import proPlanFeatures from "app/plans/utils/proPlanFeatures"
 import { data } from "cheerio/lib/api/attributes"
 import getCompanySubscription from "app/companies/queries/getCompanySubscription"
+import moment from "moment"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -171,7 +172,7 @@ const UserSettingsBillingPage = ({
               <div className="bg-white md:col-span-2">
                 <div className="sm:overflow-hidden">
                   <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
-                    {!(
+                    {/* {!(
                       subscription?.status === SubscriptionStatus.ACTIVE ||
                       subscription?.status === SubscriptionStatus.TRIALING
                     ) && (
@@ -193,7 +194,7 @@ const UserSettingsBillingPage = ({
                         <br />
                       </>
                     )}
-                    {/* <div className="mb-6">
+                    <div className="mb-6">
                       <h2
                         id="billing-history-heading"
                         className="text-lg leading-6 font-medium text-gray-900"
@@ -206,9 +207,19 @@ const UserSettingsBillingPage = ({
                     subscription?.status === SubscriptionStatus.TRIALING ? (
                       <div className="my-5">
                         <h3 className="text-xl font-bold">
-                          You are subscribed to the{" "}
-                          <span className="capitalize">{`${subscription?.items?.data[0]?.price?.recurring?.interval}ly`}</span>{" "}
-                          Plan
+                          {subscription?.status === SubscriptionStatus.TRIALING &&
+                          subscription?.trial_end ? (
+                            <span>
+                              Your free trial ends{" "}
+                              {moment.unix(subscription?.trial_end)?.local()?.fromNow()}
+                            </span>
+                          ) : (
+                            <span>
+                              You are subscribed to the{" "}
+                              <span className="capitalize">{`${subscription?.items?.data[0]?.price?.recurring?.interval}ly`}</span>{" "}
+                              Plan
+                            </span>
+                          )}
                         </h3>
                         <br />
                         <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -243,9 +254,26 @@ const UserSettingsBillingPage = ({
                         </div>
                       </div>
                     ) : (
-                      <Suspense fallback="Loading...">
-                        <Plans selectedCurrency={selectedCurrency} user={user} />
-                      </Suspense>
+                      <>
+                        <Form noFormatting={true} onSubmit={async (values) => {}}>
+                          <LabeledToggleGroupField
+                            name="currency"
+                            paddingX={3}
+                            paddingY={1}
+                            value={selectedCurrency}
+                            options={Object.keys(Currency).map((currency) => {
+                              return { label: currency, value: currency }
+                            })}
+                            onChange={async (value) => {
+                              setSelectedCurrency(value)
+                            }}
+                          />
+                        </Form>
+                        <br />
+                        <Suspense fallback="Loading...">
+                          <Plans selectedCurrency={selectedCurrency} user={user} />
+                        </Suspense>
+                      </>
                     )}
 
                     {/* If user is subscribed, show other plans to upgrade/downgrade */}
