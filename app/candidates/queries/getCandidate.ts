@@ -13,7 +13,10 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
           form: {
             include: { questions: { include: { question: { include: { options: true } } } } },
           },
-          stages: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
+          stages: {
+            include: { interviewer: true, scoreCardQuestions: true, scores: true },
+            orderBy: { order: "asc" },
+          },
         },
       },
       stage: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },

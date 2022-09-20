@@ -53,7 +53,10 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
           form: {
             include: { questions: { include: { question: { include: { options: true } } } } },
           },
-          stages: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
+          stages: {
+            include: { interviewer: true, scoreCardQuestions: true, scores: true },
+            orderBy: { order: "asc" },
+          },
           // workflow: { include: { stages: { include: { stage: true, interviewDetails: true } } } },
           // scoreCards: {
           //   include: {

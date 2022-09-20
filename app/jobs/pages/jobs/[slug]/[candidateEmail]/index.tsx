@@ -532,7 +532,10 @@ const SingleCandidatePageContent = ({
             }
           }}
         >
-          Move to Next Stage
+          Move to{" "}
+          {(candidate?.stage?.order || 0) === (candidate?.job?.stages?.length || 0)
+            ? "Next Stage"
+            : candidate?.job?.stages[candidate?.stage?.order || 0]?.name}
         </button>
         <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
           <DropdownMenu.Trigger
