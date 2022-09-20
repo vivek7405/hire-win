@@ -1,6 +1,13 @@
 import React, { ReactNode, Suspense } from "react"
 import { useRouter, Link, useSession, useQuery } from "blitz"
-import { UserGroupIcon, ClockIcon, CollectionIcon } from "@heroicons/react/outline"
+import {
+  ClockIcon,
+  CollectionIcon,
+  DatabaseIcon,
+  HomeIcon,
+  StarIcon,
+  UserGroupIcon,
+} from "@heroicons/react/outline"
 import { ExtendedJob } from "types"
 import { JobUserRole } from "@prisma/client"
 import getJobUser from "app/jobs/queries/getJobUser"
@@ -23,7 +30,25 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
           name: "Details",
           href: `/jobs/${job?.slug}/settings`,
           current: router.route === `/jobs/[slug]/settings`,
+          icon: DatabaseIcon,
+          canView: true,
+        }
+      : null,
+    jobUser?.role !== JobUserRole.USER
+      ? {
+          name: "Stages",
+          href: `/jobs/${job?.slug}/settings/stages`,
+          current: router.route === `/jobs/[slug]/settings/stages`,
           icon: CollectionIcon,
+          canView: true,
+        }
+      : null,
+    jobUser?.role !== JobUserRole.USER
+      ? {
+          name: "Score Cards",
+          href: `/jobs/${job?.slug}/settings/score-cards`,
+          current: router.route.includes(`/jobs/[slug]/settings/score-cards`),
+          icon: StarIcon,
           canView: true,
         }
       : null,

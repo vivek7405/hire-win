@@ -10,16 +10,12 @@ type UpdateStageInput = Pick<Prisma.StageUpdateArgs, "where" | "data"> & {
   initial: Stage
 }
 
-async function updateStage({ where, data, initial }: UpdateStageInput, ctx: Ctx) {
+async function updateStage({ where, data }: UpdateStageInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { name } = StageObj.parse(data)
 
   const slug = slugify(name, { strict: true, lower: true })
-  // const newSlug = await findFreeSlug(
-  //   slug,
-  //   async (e) => await db.stage.findFirst({ where: { slug: e } })
-  // )
 
   const stage = await db.stage.update({
     where,
@@ -32,4 +28,4 @@ async function updateStage({ where, data, initial }: UpdateStageInput, ctx: Ctx)
   return stage
 }
 
-export default Guard.authorize("update", "stage", updateStage)
+export default updateStage

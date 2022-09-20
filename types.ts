@@ -121,11 +121,11 @@ export type ExtendedJob = Prisma.JobGetPayload<{
   include: {
     users: true
     category: true
-    workflow: { include: { stages: { include: { stage: true; interviewDetails: true } } } }
+    stages: {
+      include: { scoreCardQuestions: true; interviewer: true; stageUserScheduleCalendars: true }
+    }
     form: { include: { questions: { include: { question: true } } } }
     candidates: true
-    scoreCards: { include: { scoreCard: true } }
-    interviewDetails: true
   }
 }>
 export type ExtendedCandidate = Prisma.CandidateGetPayload<{
@@ -133,26 +133,12 @@ export type ExtendedCandidate = Prisma.CandidateGetPayload<{
     job: {
       include: {
         form: { include: { questions: { include: { question: { include: { options: true } } } } } }
-        workflow: { include: { stages: { include: { stage: true; interviewDetails: true } } } }
-        scoreCards: {
-          include: {
-            scoreCard: {
-              include: { cardQuestions: { include: { cardQuestion: true; scores: true } } }
-            }
-          }
-        }
+        stages: { include: { interviewer: true; scoreCardQuestions: true; scores: true } }
       }
     }
-    workflowStage: { include: { stage: true; interviewDetails: true } }
-    answers: {
-      include: {
-        question: {
-          include: {
-            options: true
-          }
-        }
-      }
-    }
+    stage: { include: { interviewer: true; scoreCardQuestions: true; scores: true } }
+    answers: { include: { question: { include: { options: true } } } }
+    scores: true
   }
 }>
 export type ExtendedCategory = Prisma.CategoryGetPayload<{ include: { jobs: true } }>
@@ -177,13 +163,15 @@ export type ExtendedAnswer = Prisma.AnswerGetPayload<{
     }
   }
 }>
-export type ExtendedStage = Prisma.StageGetPayload<{ include: { workflows: true } }>
-export type ExtendedWorkflow = Prisma.WorkflowGetPayload<{
-  include: { stages: { include: { stage: true; scoreCards: { include: { scoreCard: true } } } } }
+export type ExtendedStage = Prisma.StageGetPayload<{
+  include: { scoreCardQuestions: true; scores: true; interviewer: true }
 }>
-export type ExtendedWorkflowStage = Prisma.WorkflowStageGetPayload<{
-  include: { stage: true; scoreCards: { include: { scoreCard: true } }; interviewDetails: true }
-}>
+// export type ExtendedWorkflow = Prisma.WorkflowGetPayload<{
+//   include: { stages: { include: { stage: true; scoreCards: { include: { scoreCard: true } } } } }
+// }>
+// export type ExtendedWorkflowStage = Prisma.WorkflowStageGetPayload<{
+//   include: { stage: true; scoreCards: { include: { scoreCard: true } }; interviewDetails: true }
+// }>
 
 export type ExtendedQuestion = Prisma.QuestionGetPayload<{
   include: { forms: true; options: true }
@@ -199,24 +187,23 @@ export type ExtendedFormQuestion = Prisma.FormQuestionGetPayload<{
   }
 }>
 
-export type ExtendedCardQuestion = Prisma.CardQuestionGetPayload<{
-  include: { scoreCards: true }
-}>
-export type ExtendedScoreCard = Prisma.ScoreCardGetPayload<{
-  include: {
-    cardQuestions: {
-      include: {
-        cardQuestion: true
-        scoreCard: { include: { jobWorkflowStages: true } }
-        scores: { include: { candidate: true } }
-      }
-    }
-  }
-}>
+// export type ExtendedCardQuestion = Prisma.CardQuestionGetPayload<{
+//   include: { scoreCards: true }
+// }>
+// export type ExtendedScoreCard = Prisma.ScoreCardGetPayload<{
+//   include: {
+//     cardQuestions: {
+//       include: {
+//         cardQuestion: true
+//         scoreCard: { include: { jobWorkflowStages: true } }
+//         scores: { include: { candidate: true } }
+//       }
+//     }
+//   }
+// }>
 export type ExtendedScoreCardQuestion = Prisma.ScoreCardQuestionGetPayload<{
   include: {
-    scoreCard: { include: { jobWorkflowStages: true } }
-    cardQuestion: true
+    stage: true
     scores: { include: { candidate: true } }
   }
 }> & { showNote: boolean }

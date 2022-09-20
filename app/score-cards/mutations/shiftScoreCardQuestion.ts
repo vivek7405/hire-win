@@ -5,20 +5,20 @@ import { ShiftDirection } from "types"
 import range from "app/core/utils/range"
 
 type ShiftScoreCardQuestionInput = {
-  scoreCardId: string
+  stageId: string
   sourceOrder: number
   destOrder: number
 }
 
 async function shiftScoreCardQuestion(
-  { scoreCardId, sourceOrder, destOrder }: ShiftScoreCardQuestionInput,
+  { stageId, sourceOrder, destOrder }: ShiftScoreCardQuestionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
   const scoreCardQuestions = await db.scoreCardQuestion.findMany({
     where: {
-      scoreCardId: scoreCardId,
+      stageId,
       order: {
         in:
           sourceOrder < destOrder
@@ -39,10 +39,10 @@ async function shiftScoreCardQuestion(
       }
     })
 
-    const updateScoreCardQuestions = await db.scoreCard.update({
-      where: { id: scoreCardId },
+    const updateScoreCardQuestionOrderBehaviours = await db.stage.update({
+      where: { id: stageId },
       data: {
-        cardQuestions: {
+        scoreCardQuestions: {
           updateMany: scoreCardQuestions?.map((ws) => {
             return {
               where: {
@@ -56,10 +56,10 @@ async function shiftScoreCardQuestion(
         },
       },
     })
-    return updateScoreCardQuestions
+    return updateScoreCardQuestionOrderBehaviours
   } else {
     throw new Error("Order incorrect")
   }
 }
 
-export default Guard.authorize("update", "scoreCard", shiftScoreCardQuestion)
+export default shiftScoreCardQuestion

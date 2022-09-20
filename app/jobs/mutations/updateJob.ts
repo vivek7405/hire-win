@@ -19,7 +19,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     title,
     description,
     categoryId,
-    workflowId,
+    // workflowId,
     formId,
     country,
     state,
@@ -32,7 +32,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     salaryType,
     employmentType,
     validThrough,
-    scoreCards,
+    // scoreCards,
   } = Job.parse(data)
 
   const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
@@ -53,7 +53,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
       slug: initial.title !== title ? newSlug : initial.slug,
       description,
       categoryId: categoryId || null,
-      workflowId: workflowId || null,
+      // workflowId: workflowId || null,
       formId: formId || null,
       country,
       state,
@@ -68,22 +68,22 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
       validThrough: moment(validThrough || undefined)
         .utc()
         .toDate(),
-      scoreCards: {
-        delete: initial?.scoreCards?.map((sc) => {
-          return { id: sc.id }
-        }),
-        upsert: scoreCards?.map((sc) => {
-          return {
-            create: { scoreCardId: sc.scoreCardId, workflowStageId: sc.workflowStageId },
-            update: { scoreCardId: sc.scoreCardId, workflowStageId: sc.workflowStageId },
-            where: { id: sc.id || "" },
-          }
-        }),
-      },
+      // scoreCards: {
+      //   delete: initial?.scoreCards?.map((sc) => {
+      //     return { id: sc.id }
+      //   }),
+      //   upsert: scoreCards?.map((sc) => {
+      //     return {
+      //       create: { scoreCardId: sc.scoreCardId, workflowStageId: sc.workflowStageId },
+      //       update: { scoreCardId: sc.scoreCardId, workflowStageId: sc.workflowStageId },
+      //       where: { id: sc.id || "" },
+      //     }
+      //   }),
+      // },
     },
   })
 
   return job
 }
 
-export default Guard.authorize("update", "job", updateJob)
+export default updateJob

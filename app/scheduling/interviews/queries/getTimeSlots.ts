@@ -3,7 +3,7 @@ import { endOfLastWorkDayBefore, startOfFirstWorkDayOnOrAfter } from "../utils/s
 import { Ctx, resolver } from "blitz"
 import { getDay, setHours, setMinutes } from "date-fns"
 import { utcToZonedTime } from "date-fns-tz"
-import db, { Calendar, DailySchedule, InterviewDetail } from "db"
+import db, { Calendar, DailySchedule } from "db"
 import { computeAvailableSlots } from "../utils/computeAvailableSlots"
 import {
   Days,

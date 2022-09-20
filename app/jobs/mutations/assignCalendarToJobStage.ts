@@ -1,5 +1,5 @@
 import { AuthenticationError, Ctx } from "blitz"
-import db, { InterviewDetail, Prisma } from "db"
+import db, { Prisma } from "db"
 import { Job } from "app/jobs/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
@@ -8,13 +8,12 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { customTsParser } from "@blitzjs/installer"
 
 type InterviewDetailInputProps = {
-  jobId: string
-  workflowStageId: string
+  stageId: string
   calendarId: string
 }
 
 async function assignCalendarToJobStage(
-  { jobId, workflowStageId, calendarId }: InterviewDetailInputProps,
+  { stageId, calendarId }: InterviewDetailInputProps,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
@@ -24,11 +23,10 @@ async function assignCalendarToJobStage(
     include: { defaultCalendars: true, schedules: true, calendars: true },
   })
 
-  const existingScheduleCalendar = await db.jobUserScheduleCalendar.findUnique({
+  const existingScheduleCalendar = await db.stageUserScheduleCalendar.findUnique({
     where: {
-      jobId_workflowStageId_userId: {
-        jobId,
-        workflowStageId,
+      stageId_userId: {
+        stageId,
         userId: user?.id || "0",
       },
     },
@@ -36,7 +34,7 @@ async function assignCalendarToJobStage(
 
   if (existingScheduleCalendar) {
     // update
-    const updatedScheduleCalendar = await db.jobUserScheduleCalendar.update({
+    const updatedScheduleCalendar = await db.stageUserScheduleCalendar.update({
       where: { id: existingScheduleCalendar.id },
       data: { calendarId },
     })
@@ -50,11 +48,10 @@ async function assignCalendarToJobStage(
       user?.defaultCalendars?.find((cal) => cal.userId === user.id)?.calendarId || null
 
     // create
-    if (jobId && workflowStageId && defaultScheduleId && (calId || defaultCalendarId)) {
-      const createdScheduleCalendar = await db.jobUserScheduleCalendar.create({
+    if (stageId && defaultScheduleId && (calId || defaultCalendarId)) {
+      const createdScheduleCalendar = await db.stageUserScheduleCalendar.create({
         data: {
-          jobId,
-          workflowStageId,
+          stageId,
           userId: ctx.session.userId,
           scheduleId: defaultScheduleId,
           calendarId: calId || defaultCalendarId,

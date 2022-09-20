@@ -3,18 +3,15 @@ import db from "db"
 
 type GetCommentsInput = {
   candidateId: string
-  workflowStageId: string
+  stageId: string
 }
-async function getCandidateStageComments(
-  { candidateId, workflowStageId }: GetCommentsInput,
-  ctx: Ctx
-) {
+async function getCandidateStageComments({ candidateId, stageId }: GetCommentsInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const comments = await db.comment.findMany({
     where: {
       candidateId,
-      workflowStageId,
+      stageId,
       parentCommentId: null,
     },
     include: {

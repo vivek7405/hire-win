@@ -10,9 +10,9 @@ import getCalendar from "../queries/getCalendar"
 import { sendInterviewConfirmationMailer } from "mailers/sendInterviewConfirmationMailer"
 import moment from "moment"
 import bcrypt from "bcrypt"
-import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
 import { InterviewDetailType } from "types"
 import getScheduleCalendar from "../queries/getScheduleCalendar"
+import getCandidateInterviewer from "app/candidates/queries/getCandidateInterviewer"
 
 // async function sendConfirmationMail(
 //   interview: Interview,
@@ -69,13 +69,13 @@ export default resolver.pipe(
     z.object({
       // interviewDetailId: z.string(),
       jobId: z.string(),
-      workflowStageId: z.string(),
+      stageId: z.string(),
       candidateId: z.string(),
       startDate: z.date(),
       otherAttendees: z.array(z.string()),
     })
   ),
-  async (interviewInfo, ctx: Ctx) => {
+  async (props, ctx: Ctx) => {
     // const interviewDetail = await db.interviewDetail.findUnique({
     //   where: {
     //     jobId_workflowStageId: {
@@ -86,23 +86,23 @@ export default resolver.pipe(
     //   include: { interviewer: { include: { calendars: true, defaultCalendars: true } } },
     // })
 
-    const interviewDetail = (await getCandidateInterviewDetail({
-      workflowStageId: interviewInfo.workflowStageId,
-      candidateId: interviewInfo.candidateId,
-      jobId: interviewInfo.jobId,
-    })) as InterviewDetailType
+    // const interviewDetail = (await getCandidateInterviewDetail({
+    //   workflowStageId: interviewInfo.workflowStageId,
+    //   candidateId: interviewInfo.candidateId,
+    //   jobId: interviewInfo.jobId,
+    // })) as InterviewDetailType
 
     const candidate = await db.candidate.findUnique({
-      where: { id: interviewInfo.candidateId },
+      where: { id: props.candidateId },
       select: { id: true, email: true, name: true },
     })
     const job = await db.job.findUnique({
-      where: { id: interviewInfo.jobId },
-      select: { id: true },
+      where: { id: props.jobId },
+      select: { id: true, title: true },
     })
-    const workflowStage = await db.workflowStage.findUnique({
-      where: { id: interviewInfo.workflowStageId },
-      select: { id: true },
+    const stage = await db.stage.findUnique({
+      where: { id: props.stageId },
+      select: { id: true, interviewer: true, duration: true },
     })
     const organizer = await db.user.findUnique({
       where: { id: ctx.session.userId || "0" },
@@ -115,11 +115,16 @@ export default resolver.pipe(
       },
     })
     const otherAttendees = await db.user.findMany({
-      where: { id: { in: interviewInfo.otherAttendees?.map((userId) => userId) } },
+      where: { id: { in: props.otherAttendees?.map((userId) => userId) } },
       select: { id: true, email: true, name: true },
     })
 
-    if (!interviewDetail || !candidate || !job || !workflowStage || !organizer) {
+    const interviewer = await getCandidateInterviewer(
+      { stageId: props.stageId, candidateId: props.candidateId },
+      ctx
+    )
+
+    if (!candidate || !job || !stage || !organizer) {
       throw new NotFoundError()
     }
 
@@ -130,8 +135,7 @@ export default resolver.pipe(
 
     const scheduleCalendar = await getScheduleCalendar(
       {
-        jobId: job.id,
-        workflowStageId: workflowStage.id,
+        stageId: props.stageId || "0",
         userId: organizer.id,
       },
       ctx
@@ -150,17 +154,17 @@ export default resolver.pipe(
       throw new Error("An error occured: Organizer doesn't have a connected calendar")
     }
 
-    const startDateUTC = moment(interviewInfo.startDate).utc().toDate()
+    const startDateUTC = moment(props.startDate).utc().toDate()
 
     const calendarService = await getCalendarService(organizerCalendar)
     const event = await calendarService.createEvent({
       organizer,
-      interviewer: interviewDetail?.interviewer,
-      job: interviewDetail?.job,
+      interviewer,
+      job,
       candidate,
       otherAttendees: otherAttendees,
       startDateUTC,
-      duration: interviewDetail?.duration,
+      duration: stage?.duration,
     })
 
     const cancelCode = uuid.v4()
@@ -172,16 +176,16 @@ export default resolver.pipe(
         // },
         candidate: { connect: { id: candidate.id } },
         job: { connect: { id: job.id } },
-        workflowStage: { connect: { id: workflowStage.id } },
+        stage: { connect: { id: stage?.id || "0" } },
         organizer: { connect: { id: organizer.id } },
-        interviewer: { connect: { id: interviewDetail.interviewer?.id } },
+        interviewer: { connect: { id: stage.interviewer?.id } },
         otherAttendees: {
           connect: otherAttendees?.map((attendee) => {
             return { id: attendee.id }
           }),
         },
         startDateUTC,
-        duration: interviewDetail?.duration,
+        duration: stage?.duration,
         calendarId: organizerCalendar?.id,
         eventId: event?.id,
         calendarLink: event?.calendarLink,

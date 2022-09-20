@@ -1,9 +1,9 @@
 import { TrashIcon, XIcon } from "@heroicons/react/outline"
-import { Interview, InterviewDetail, JobUser, JobUserRole, User } from "@prisma/client"
+import { Interview, JobUser, JobUserRole, User } from "@prisma/client"
 import Confirm from "app/core/components/Confirm"
 import Modal from "app/core/components/Modal"
 import setCandidateInterviewer from "app/candidates/mutations/setCandidateInterviewer"
-import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
+import getCandidateInterviewer from "app/candidates/queries/getCandidateInterviewer"
 import getJobMembers from "app/jobs/queries/getJobMembers"
 import { invalidateQuery, useMutation, useQuery, useSession } from "blitz"
 import moment from "moment"
@@ -12,25 +12,28 @@ import toast from "react-hot-toast"
 import cancelInterview from "../mutations/cancelInterview"
 import getCandidateInterviewsByStage from "../queries/getCandidateInterviewsByStage"
 import ScheduleInterview from "./ScheduleInterview"
+import getStage from "app/stages/queries/getStage"
+import getCandidate from "app/candidates/queries/getCandidate"
 
-const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
+const Interviews = ({ user, stageId, candidate }) => {
   const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
   const [cancelInterviewMutation] = useMutation(cancelInterview)
   const [interviewToDelete, setInterviewToDelete] = useState(null as any as Interview)
   const [openConfirm, setOpenConfirm] = useState(false)
   const [candidateStageInterviews] = useQuery(getCandidateInterviewsByStage, {
     candidateId: candidate?.id || "0",
-    workflowStageId: selectedWorkflowStage?.id || "0",
+    stageId: stageId || "0",
   })
-  const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
-    workflowStageId: selectedWorkflowStage?.id,
-    candidateId: candidate?.id,
-    jobId: candidate?.job?.id,
-  })
+  const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
 
   const session = useSession()
   const [jobUsers] = useQuery(getJobMembers, { where: { id: candidate.jobId } })
   const [setCandidateInterviewerMutation] = useMutation(setCandidateInterviewer)
+
+  const [interviewer] = useQuery(getCandidateInterviewer, {
+    candidateId: candidate?.id || "0",
+    stageId: stageId || "0",
+  })
 
   return (
     <>
@@ -40,8 +43,9 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
         setOpen={setOpenScheduleInterviewModal}
       >
         <ScheduleInterview
-          interviewDetail={interviewDetail!}
-          workflowStageId={selectedWorkflowStage?.id}
+          // interviewDetail={interviewDetail!}
+          interviewer={interviewer}
+          stageId={stageId || "0"}
           candidateId={candidate?.id || "0"}
           setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
         />
@@ -78,22 +82,23 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
           <select
             className="border border-gray-300 px-2 py-1 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
             name="interviewerId"
-            placeholder={`Interviewer for ${selectedWorkflowStage?.stage?.name}`}
+            placeholder={`Interviewer for ${stage?.name}`}
             disabled={
               jobUsers?.users?.find((usr) => usr.id === session.userId)?.role === JobUserRole.USER
             }
-            value={interviewDetail?.interviewer?.id?.toString()}
+            value={interviewer?.id?.toString()}
             onChange={async (e) => {
               const selectedInterviewerId = e.target.value
               const toastId = toast.loading(() => <span>Updating Interviewer</span>)
               try {
                 await setCandidateInterviewerMutation({
                   candidateId: candidate?.id,
-                  workflowStageId: selectedWorkflowStage?.id || "0",
+                  stageId: stageId || "0",
                   interviewerId: selectedInterviewerId || "0",
                 })
 
-                await invalidateQuery(getCandidateInterviewDetail)
+                await invalidateQuery(getCandidateInterviewer)
+                await invalidateQuery(getCandidate)
 
                 toast.success(() => <span>Interviewer assigned to candidate stage</span>, {
                   id: toastId,
@@ -122,7 +127,7 @@ const Interviews = ({ user, selectedWorkflowStage, candidate }) => {
               // selectedWorkflowStage?.interviewDetails?.find(
               //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
               // )?.interviewerId !== user?.id &&
-              interviewDetail?.interviewer?.id !== user?.id &&
+              interviewer?.id !== user?.id &&
               user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
               user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
             }

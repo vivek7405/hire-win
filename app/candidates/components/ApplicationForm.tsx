@@ -218,7 +218,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
       <Form
         submitText="Submit"
         submitDisabled={props.submitDisabled}
-        // submitDisabled={props.preview}
+        submitHidden={props.preview}
         schema={zodObj}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}

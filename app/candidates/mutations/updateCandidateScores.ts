@@ -13,7 +13,7 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
   const scoresToDelete = await db.score.findMany({
     where: {
       candidateId: id,
-      workflowStageId: scores && scores.length > 0 ? scores[0]?.workflowStageId : "0",
+      stageId: scores && scores.length > 0 ? scores[0]?.stageId : "0",
     },
   })
 
@@ -28,13 +28,13 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
             rating: score.rating,
             note: score.note,
             scoreCardQuestionId: score.scoreCardQuestionId!,
-            workflowStageId: score.workflowStageId,
+            stageId: score.stageId,
           },
           update: {
             rating: score.rating,
             note: score.note,
             scoreCardQuestionId: score.scoreCardQuestionId!,
-            workflowStageId: score.workflowStageId,
+            stageId: score.stageId,
           },
           where: {
             id: "0",
@@ -42,37 +42,6 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
         }
       }),
     },
-    // scores: {
-    //   create: scores
-    //     ?.filter((score) => !alreadyExists.map((sc) => sc.id).includes(score.id || "0"))
-    //     ?.map((score) => {
-    //       return {
-    //         rating: score.rating,
-    //         note: score.note,
-    //         scoreCardQuestionId: score.scoreCardQuestionId!,
-    //         workflowStageId: score.workflowStageId,
-    //       }
-    //     }),
-    //   update: scores
-    //     ?.filter((score) => alreadyExists.map((sc) => sc.id).includes(score.id || "0"))
-    //     ?.map((score) => {
-    //       return {
-    //         where: {
-    //           candidateId_scoreCardQuestionId_workflowStageId: {
-    //             candidateId: id!,
-    //             scoreCardQuestionId: score.scoreCardQuestionId!,
-    //             workflowStageId: score.workflowStageId,
-    //           },
-    //         },
-    //         data: {
-    //           rating: score.rating,
-    //           note: score.note,
-    //           scoreCardQuestionId: score.scoreCardQuestionId!,
-    //           workflowStageId: score.workflowStageId,
-    //         },
-    //       }
-    //     }),
-    // },
   }
 
   const candidate = await db.candidate.update({
@@ -84,27 +53,29 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
           form: {
             include: { questions: { include: { question: { include: { options: true } } } } },
           },
-          workflow: { include: { stages: { include: { stage: true, interviewDetails: true } } } },
-          scoreCards: {
-            include: {
-              scoreCard: {
-                include: {
-                  cardQuestions: { include: { cardQuestion: true, scores: true } },
-                  jobWorkflowStages: {
-                    include: {
-                      scoreCard: {
-                        include: { cardQuestions: { include: { cardQuestion: true } } },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          stages: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
+          // workflow: { include: { stages: { include: { stage: true, interviewDetails: true } } } },
+          // scoreCards: {
+          //   include: {
+          //     scoreCard: {
+          //       include: {
+          //         cardQuestions: { include: { cardQuestion: true, scores: true } },
+          //         jobWorkflowStages: {
+          //           include: {
+          //             scoreCard: {
+          //               include: { cardQuestions: { include: { cardQuestion: true } } },
+          //             },
+          //           },
+          //         },
+          //       },
+          //     },
+          //   },
+          // },
         },
       },
       scores: true,
-      workflowStage: { include: { stage: true, interviewDetails: true } },
+      stage: { include: { interviewer: true } },
+      // workflowStage: { include: { stage: true, interviewDetails: true } },
       answers: { include: { question: { include: { options: true } } } },
     },
   })

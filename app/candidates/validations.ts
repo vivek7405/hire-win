@@ -20,7 +20,7 @@ export const Candidate = z.object({
   scores: z.array(Score).optional(),
   jobId: z.string().optional(),
   source: z.nativeEnum(CandidateSource),
-  workflowStageId: z.string().optional(),
+  stageId: z.string().optional(),
   rejected: z.boolean().optional(),
 })
 export type CandidateInputType = z.infer<typeof Candidate>

@@ -32,7 +32,6 @@ import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon, XIcon } from "@heroicon
 import { CompanyUser, CompanyUserRole, User } from "db"
 // import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/companies/utils/checkPlan"
-import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import Form from "app/core/components/Form"
 import assignInterviewerToJobStage from "app/jobs/mutations/assignInterviewerToJobStage"

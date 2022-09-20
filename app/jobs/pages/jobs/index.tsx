@@ -25,7 +25,6 @@ import {
   CardType,
   DragDirection,
   ExtendedJob,
-  ExtendedWorkflowStage,
   IntroHint,
   IntroStep,
   JobViewType,
@@ -33,7 +32,7 @@ import {
   PlanName,
   SubscriptionStatus,
 } from "types"
-import { Candidate, Category, CompanyUserRole, Stage, WorkflowStage } from "@prisma/client"
+import { Candidate, Category, CompanyUserRole, Stage } from "@prisma/client"
 import moment from "moment"
 import { Country, State } from "country-state-city"
 import { titleCase } from "app/core/utils/titleCase"
@@ -405,8 +404,8 @@ const Jobs = ({
             }
           })
           ?.map((job) => {
-            const stages: (WorkflowStage & { stage: Stage })[] =
-              job?.workflow?.stages?.sort((a, b) => {
+            const stages: Stage[] =
+              job?.stages?.sort((a, b) => {
                 return a?.order - b?.order
               }) || []
 
@@ -644,20 +643,17 @@ const Jobs = ({
                             })}
                           </div> */}
                       <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center">
-                        {stages?.map((ws) => {
+                        {stages?.map((stage) => {
                           return (
                             <div
-                              key={ws.id}
+                              key={stage.id}
                               className="overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
                             >
                               <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
-                                {ws.stage?.name}
+                                {stage?.name}
                               </div>
                               <div className="text-neutral-500">
-                                {
-                                  job?.candidates?.filter((c) => c.workflowStageId === ws.id)
-                                    ?.length
-                                }
+                                {job?.candidates?.filter((c) => c.stageId === stage.id)?.length}
                               </div>
                             </div>
                           )

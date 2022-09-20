@@ -2,14 +2,14 @@ import db from "db"
 
 type GetCandidateInterviewsByStageInput = {
   candidateId: string
-  workflowStageId: string
+  stageId: string
 }
 export default async function getCandidateInterviewsByStage({
   candidateId,
-  workflowStageId,
+  stageId,
 }: GetCandidateInterviewsByStageInput) {
   const candidateStageInterviews = await db.interview.findMany({
-    where: { candidateId, workflowStageId },
+    where: { candidateId, stageId },
     include: { organizer: true, interviewer: true, otherAttendees: true },
     orderBy: { startDateUTC: "asc" },
   })

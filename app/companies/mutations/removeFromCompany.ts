@@ -40,11 +40,12 @@ async function removeFromCompany({ companyId, userId }: RemoveFromCompanyInput, 
   // Assign company owner as interviewer instead of the user being removed
   // Job Workflow Stage Level - InterviewDetail
   // Candidate Level - CandidateWorkflowStageInterviewer
-  await db.interviewDetail.updateMany({
+
+  await db.stage.updateMany({
     where: { interviewerId: userId },
     data: { interviewerId: companyUserOwner?.userId },
   })
-  await db.candidateWorkflowStageInterviewer.updateMany({
+  await db.candidateStageInterviewer.updateMany({
     where: { interviewerId: userId },
     data: { interviewerId: companyUserOwner?.userId },
   })

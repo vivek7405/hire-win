@@ -3,22 +3,26 @@ import db from "db"
 import Guard from "app/guard/ability"
 
 type RemoveCardQuestionFromScoreCardInput = {
-  scoreCardId: string
-  order: number
+  stageId: string
+  slug: string
 }
 
 async function removeCardQuestionFromScoreCard(
-  { scoreCardId, order }: RemoveCardQuestionFromScoreCardInput,
+  { stageId, slug }: RemoveCardQuestionFromScoreCardInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
+  const scoreCardQuestion = await db.scoreCardQuestion.findFirst({
+    where: { slug },
+  })
+
   // Get all cardQuestions with order greater than equal to the given order
   const scoreCardQuestions = await db.scoreCardQuestion.findMany({
     where: {
-      scoreCardId: scoreCardId,
+      stageId,
       order: {
-        gte: order,
+        gte: scoreCardQuestion?.order || 0,
       },
     },
     orderBy: { order: "asc" },
@@ -27,10 +31,9 @@ async function removeCardQuestionFromScoreCard(
   if (scoreCardQuestions?.length > 0) {
     const deleteCardQuestion = await db.scoreCardQuestion.delete({
       where: {
-        scoreCardId_cardQuestionId_order: {
-          scoreCardId: scoreCardId,
-          cardQuestionId: scoreCardQuestions[0]!.cardQuestionId,
-          order: order,
+        stageId_slug: {
+          stageId,
+          slug,
         },
       },
     })
@@ -40,28 +43,28 @@ async function removeCardQuestionFromScoreCard(
       // First cardQuestion is deleted so slice it off and get the remaining cardQuestions to reorder
       const scoreCardQuestionsToReorder = scoreCardQuestions.slice(1)
 
-      scoreCardQuestionsToReorder.forEach((ws) => {
-        ws.order -= 1
+      scoreCardQuestionsToReorder.forEach((question) => {
+        question.order -= 1
       })
 
-      const updateScoreCardQuestions = await db.scoreCard.update({
-        where: { id: scoreCardId },
+      const updateScoreCardQuestionOrderBehaviours = await db.stage.update({
+        where: { id: stageId },
         data: {
-          cardQuestions: {
-            updateMany: scoreCardQuestionsToReorder?.map((ws) => {
+          scoreCardQuestions: {
+            updateMany: scoreCardQuestionsToReorder?.map((question) => {
               return {
                 where: {
-                  id: ws.id,
+                  id: question.id,
                 },
                 data: {
-                  order: ws.order,
+                  order: question.order,
                 },
               }
             }),
           },
         },
       })
-      return [deleteCardQuestion, updateScoreCardQuestions]
+      return [deleteCardQuestion, updateScoreCardQuestionOrderBehaviours]
     }
   } else {
     throw new Error("Incorrect cardQuestion details passed")
@@ -70,4 +73,4 @@ async function removeCardQuestionFromScoreCard(
   return null
 }
 
-export default Guard.authorize("update", "scoreCard", removeCardQuestionFromScoreCard)
+export default removeCardQuestionFromScoreCard

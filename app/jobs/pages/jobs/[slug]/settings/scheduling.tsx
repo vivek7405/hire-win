@@ -32,7 +32,6 @@ import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon } from "@heroicons/react
 import { JobUserRole, User } from "db"
 import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/companies/utils/checkPlan"
-import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import Form from "app/core/components/Form"
 import assignInterviewerToJobStage from "app/jobs/mutations/assignInterviewerToJobStage"
@@ -145,7 +144,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStagesMsg }) => {
+const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) => {
   const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
   const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
   const [schedules] = useQuery(getSchedulesWOPagination, { where: { userId: user?.id } })
@@ -156,7 +155,7 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
     <>
       <div className="mb-6 flex flex-col justify-center items-center">
         <h3 className="font-semibold text-lg">{header}</h3>
-        {(workflowStages?.length || 0) > 0 ? (
+        {(stages?.length || 0) > 0 ? (
           // <div className="mt-5 w-full flex flex-col items-center justify-center space-y-2">
           //   <div className="flex">
           //     <div className="overflow-auto p-1 w-32 flex flex-col items-center justify-center">
@@ -408,13 +407,13 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
           // </div>
 
           <div className="w-full flex flex-col space-y-20 md:space-y-1 lg:space-y-1 mt-6 items-center md:justify-center lg:justify-center">
-            {workflowStages?.map((ws, index) => {
-              const existingScheduleCalendar = ws.jobUserScheduleCalendars?.find(
+            {stages?.map((stage, index) => {
+              const existingScheduleCalendar = stage.jobUserScheduleCalendars?.find(
                 (int) => int.jobId === job.id && int.userId === user?.id
               )
 
               return (
-                <div key={ws.id}>
+                <div key={stage.id}>
                   {index === 0 && (
                     <div className="bg-white w-full hidden md:flex lg:flex space-y-2 md:space-y-0 lg:space-y-0 md:space-x-6 lg:space-x-6 items-center justify-center p-1">
                       <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
@@ -456,7 +455,7 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
                       <p className="block md:hidden lg:hidden text-xs text-neutral-500">Stage</p>
                       <div className="overflow-auto p-2 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
                         <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
-                          {ws.stage?.name}
+                          {stage?.name}
                         </div>
                       </div>
                     </div>
@@ -479,8 +478,7 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
                           const toastId = toast.loading(() => <span>Updating Schedule</span>)
                           try {
                             await assignScheduleToJobStageMutation({
-                              jobId: job?.id,
-                              workflowStageId: ws.id,
+                              stageId: stage.id,
                               scheduleId: selectedScheduleId || "0",
                             })
                             await invalidateQuery(getJob)
@@ -526,8 +524,7 @@ const ScheduleCalendarAssignment = ({ job, user, workflowStages, header, noStage
                               const toastId = toast.loading(() => <span>Updating Calendar</span>)
                               try {
                                 await assignCalendarToJobStageMutation({
-                                  jobId: job?.id,
-                                  workflowStageId: ws.id,
+                                  stageId: stage.id,
                                   calendarId: selectedCalendarId || "0",
                                 })
                                 await invalidateQuery(getJob)
@@ -609,11 +606,7 @@ const JobSettingsSchedulingPage = ({
                 <ScheduleCalendarAssignment
                   job={job}
                   user={user}
-                  workflowStages={job?.workflow?.stages?.filter((ws) =>
-                    ws.interviewDetails?.some(
-                      (int) => int.jobId === job?.id && int.interviewerId === user?.id
-                    )
-                  )}
+                  stages={job?.stages?.filter((stage) => stage.interviewerId === user?.id)}
                   header="Stages assigned to you"
                   noStagesMsg="There are no stages assigned to you for interview"
                 />
@@ -622,12 +615,7 @@ const JobSettingsSchedulingPage = ({
                 <ScheduleCalendarAssignment
                   job={job}
                   user={user}
-                  workflowStages={job?.workflow?.stages?.filter(
-                    (ws) =>
-                      !ws.interviewDetails?.some(
-                        (int) => int.jobId === job?.id && int.interviewerId === user?.id
-                      )
-                  )}
+                  stages={job?.stages?.filter((stage) => stage.interviewerId !== user?.id)}
                   header="Other Stages"
                   noStagesMsg="No other stages available"
                 />

@@ -6,7 +6,7 @@
  */
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
-import db, { Candidate, Interview, InterviewDetail, Job, User } from "db"
+import db, { Candidate, Interview, Job, User } from "db"
 import { createICalendarEvent } from "app/scheduling/interviews/utils/createCalendarEvent"
 import { InterviewDetailType } from "types"
 
@@ -14,7 +14,8 @@ type SendInterviewConfirmationMailerInput = {
   interview: Interview & { job: Pick<Job, "title"> } & {
     candidate: Pick<Candidate, "email" | "name">
   } & { organizer: Pick<User, "email"> }
-  interviewDetail: InterviewDetailType
+  interviewer: User
+  duration: number
   organizer: Pick<User, "email" | "name">
   otherAttendees: Pick<User, "email" | "name">[]
   cancelLink: string
@@ -22,7 +23,8 @@ type SendInterviewConfirmationMailerInput = {
 
 export async function sendInterviewConfirmationMailer({
   interview,
-  interviewDetail,
+  interviewer,
+  duration,
   organizer,
   otherAttendees,
   cancelLink,
@@ -60,7 +62,8 @@ export async function sendInterviewConfirmationMailer({
           const client = new postmark.ServerClient(postmarkServerClient)
           const attachmentContent = await createICalendarEvent(
             interview,
-            interviewDetail,
+            interviewer,
+            duration,
             organizer,
             otherAttendees
           )

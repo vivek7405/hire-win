@@ -130,7 +130,7 @@ const JobSettingsPage = ({
           companyId={session.companyId || "0"}
           user={user}
           category={job?.category!}
-          workflow={job?.workflow!}
+          // workflow={job?.workflow!}
           form={job?.form!}
           jobId={job?.id}
           header="Job Details"
@@ -152,9 +152,9 @@ const JobSettingsPage = ({
               ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
               : EditorState.createEmpty(),
             categoryId: job?.category?.id,
-            workflowId: job?.workflow?.id,
+            // workflowId: job?.workflow?.id,
             formId: job?.form?.id,
-            scoreCards: job?.scoreCards,
+            // scoreCards: job?.scoreCards,
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating Job</span>)

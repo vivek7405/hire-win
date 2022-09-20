@@ -1,10 +1,10 @@
-import { FormQuestionBehaviour, Question, QuestionType } from "@prisma/client"
+import { Behaviour, Question, QuestionType } from "@prisma/client"
 import { ExtendedFormQuestion } from "types"
 
 const factoryFormQuestions = [
   {
     order: 1,
-    behaviour: FormQuestionBehaviour.REQUIRED,
+    behaviour: Behaviour.REQUIRED,
     allowBehaviourEdit: false,
     question: {
       name: "Name",
@@ -15,7 +15,7 @@ const factoryFormQuestions = [
   } as ExtendedFormQuestion,
   {
     order: 2,
-    behaviour: FormQuestionBehaviour.REQUIRED,
+    behaviour: Behaviour.REQUIRED,
     allowBehaviourEdit: false,
     question: {
       name: "Email",
@@ -26,7 +26,7 @@ const factoryFormQuestions = [
   } as ExtendedFormQuestion,
   {
     order: 3,
-    behaviour: FormQuestionBehaviour.REQUIRED,
+    behaviour: Behaviour.REQUIRED,
     allowBehaviourEdit: true,
     question: {
       name: "Resume",

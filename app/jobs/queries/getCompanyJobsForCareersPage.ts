@@ -53,7 +53,8 @@ async function getCompanyJobsForCareersPage(
         include: {
           category: true,
           candidates: true,
-          workflow: { include: { stages: { include: { stage: true } } } },
+          stages: true,
+          // workflow: { include: { stages: { include: { stage: true } } } },
         },
       }),
   })

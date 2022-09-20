@@ -1,4 +1,4 @@
-import db, { Calendar, Candidate, Interview, InterviewDetail, Job, User } from "db"
+import db, { Calendar, Candidate, Interview, Job, User } from "db"
 import * as ics from "ics"
 import { InterviewDetailType } from "types"
 
@@ -13,13 +13,14 @@ export async function createICalendarEvent(
   interview: Interview & { job: Pick<Job, "title"> } & {
     candidate: Pick<Candidate, "email" | "name">
   },
-  interviewDetail: InterviewDetailType,
+  interviewer: User,
+  duration: number,
   organizer: Pick<User, "email" | "name">,
   otherAttendees: Pick<User, "email" | "name">[]
 ) {
-  const interviewer = await db.user.findFirst({
-    where: { id: interviewDetail?.interviewer?.id },
-  })
+  // const interviewer = await db.user.findFirst({
+  //   where: { id: interviewDetail?.interviewer?.id },
+  // })
 
   const { error, value } = ics.createEvent({
     start: [
@@ -29,7 +30,7 @@ export async function createICalendarEvent(
       interview.startDateUTC.getHours(),
       interview.startDateUTC.getMinutes(),
     ],
-    duration: durationToIcsDurationObject(interviewDetail.duration),
+    duration: durationToIcsDurationObject(duration),
     title: `Interview of ${interview?.candidate?.name} scheduled for ${interview?.job?.title}`,
     description: `Interview of ${interview?.candidate?.name} scheduled for ${interview?.job?.title}`,
     location: "",

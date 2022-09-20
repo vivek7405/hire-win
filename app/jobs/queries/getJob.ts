@@ -10,21 +10,32 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
     include: {
       category: true,
       candidates: true,
-      workflow: {
+      stages: {
         include: {
-          stages: {
-            include: {
-              stage: true,
-              scoreCards: { include: { scoreCard: true } },
-              interviewDetails: true,
-              jobUserScheduleCalendars: true,
-            },
-            orderBy: {
-              order: "asc",
-            },
-          },
+          scoreCardQuestions: true,
+          interviewer: true,
+          // interviewDetails: true,
+          stageUserScheduleCalendars: true,
+        },
+        orderBy: {
+          order: "asc",
         },
       },
+      // workflow: {
+      //   include: {
+      //     stages: {
+      //       include: {
+      //         stage: true,
+      //         scoreCards: { include: { scoreCard: true } },
+      //         interviewDetails: true,
+      //         jobUserScheduleCalendars: true,
+      //       },
+      //       orderBy: {
+      //         order: "asc",
+      //       },
+      //     },
+      //   },
+      // },
       form: {
         include: {
           questions: {
@@ -48,8 +59,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
           },
         },
       },
-      scoreCards: { include: { scoreCard: true } },
-      interviewDetails: true,
+      // interviewDetails: true,
     },
   })
 

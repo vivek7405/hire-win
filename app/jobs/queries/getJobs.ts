@@ -26,7 +26,8 @@ async function getJobs({ where, orderBy, skip = 0, take = 100 }: GetJobsInput, c
             include: {
               category: true,
               candidates: true,
-              workflow: { include: { stages: { include: { stage: true } } } },
+              stages: true,
+              // workflow: { include: { stages: { include: { stage: true } } } },
             },
           },
         },

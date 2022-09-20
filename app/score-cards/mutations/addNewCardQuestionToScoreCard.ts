@@ -1,20 +1,17 @@
 import { Ctx, AuthenticationError } from "blitz"
 import db from "db"
-import { ScoreCardQuestions, ScoreCardQuestionsInputType } from "app/score-cards/validations"
+// import { ScoreCardQuestions, ScoreCardQuestionsInputType } from "app/score-cards/validations"
 import Guard from "app/guard/ability"
-import factoryScoreCardQuestions from "app/card-questions/utils/factoryScoreCardQuestions"
-import { CardQuestion, CardQuestionInputType } from "app/card-questions/validations"
-import createQuestion from "app/card-questions/mutations/createCardQuestion"
+import { ScoreCardQuestionInputType, ScoreCardQuestionObj } from "../validations"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import shiftScoreCardQuestion from "./shiftScoreCardQuestion"
 import { ShiftDirection } from "types"
-import createScoreCardQuestion from "./createScoreCardQuestion"
 
-async function addNewCardQuestionToScoreCard(data: CardQuestionInputType, ctx: Ctx) {
+async function addNewCardQuestionToScoreCard(data: ScoreCardQuestionInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { scoreCardId, name } = CardQuestion.parse(data)
+  const { stageId, name } = ScoreCardQuestionObj.parse(data)
   // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   // if (!user) throw new AuthenticationError()
 
@@ -24,47 +21,23 @@ async function addNewCardQuestionToScoreCard(data: CardQuestionInputType, ctx: C
   //   async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
   // )
 
-  const existingCardQuestion = await db.cardQuestion.findFirst({
-    where: { name, companyId: ctx.session.companyId || "0" },
-  })
-  const order = (await db.scoreCardQuestion.count({ where: { scoreCardId: scoreCardId } })) + 1
+  // const existingCardQuestion = await db.cardQuestion.findFirst({
+  //   where: { name, companyId: ctx.session.companyId || "0" },
+  // })
+  const order = (await db.scoreCardQuestion.count({ where: { stageId: stageId || "0" } })) + 1
 
   // Add New or connect existing cardQuestion and put it to the last position
-  const scoreCard = await db.scoreCard.update({
-    where: { id: scoreCardId },
+  const scoreCardQuestion = await db.scoreCardQuestion.create({
     data: {
-      cardQuestions: {
-        create: [
-          {
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            order,
-            cardQuestion: {
-              connectOrCreate: {
-                where: { id: existingCardQuestion?.id || "" },
-                create: {
-                  name,
-                  slug,
-                  company: {
-                    connect: {
-                      id: ctx.session.companyId || "0",
-                    },
-                  },
-                  createdBy: {
-                    connect: {
-                      id: ctx.session.userId || "0",
-                    },
-                  },
-                },
-              },
-            },
-          },
-        ],
-      },
+      stageId: stageId || "0",
+      name,
+      slug,
+      order,
+      createdById: ctx.session.userId || "0",
     },
   })
 
-  return scoreCard
+  return scoreCardQuestion
 }
 
-export default Guard.authorize("create", "scoreCardQuestion", addNewCardQuestionToScoreCard)
+export default addNewCardQuestionToScoreCard

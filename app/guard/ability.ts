@@ -555,179 +555,194 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("create", "stage")
       can("update", "stage")
-      can("read", "stage", async (args) => {
-        const stage = await db.stage.findFirst({
-          where: args.where,
-        })
+      can("read", "stage")
+      can("readAll", "stage")
+      // can("read", "stage", async (args) => {
+      //   const stage = await db.stage.findFirst({
+      //     where: args.where,
+      //   })
 
-        return stage?.companyId === ctx.session.companyId
-      })
-      can("readAll", "stage", async (args) => {
-        const stages = await db.stage.findMany({
-          where: args.where,
-        })
+      //   return stage?.companyId === ctx.session.companyId
+      // })
+      // can("readAll", "stage", async (args) => {
+      //   const stages = await db.stage.findMany({
+      //     where: args.where,
+      //   })
 
-        return stages.every((p) => p.companyId === ctx.session.companyId) === true
-      })
+      //   return stages.every((p) => p.companyId === ctx.session.companyId) === true
+      // })
 
       can("create", "workflowStage")
-      can("read", "workflowStage", async (args) => {
-        const workflowStage = await db.workflowStage.findFirst({
-          where: args.where,
-          include: {
-            workflow: true,
-          },
-        })
+      can("read", "workflowStage")
+      can("readAll", "workflowStage")
+      can("update", "workflowStage")
+      // can("read", "workflowStage", async (args) => {
+      //   const workflowStage = await db.workflowStage.findFirst({
+      //     where: args.where,
+      //     include: {
+      //       workflow: true,
+      //     },
+      //   })
 
-        return workflowStage?.workflow.companyId === ctx.session.companyId
-      })
-      can("readAll", "workflowStage", async (args) => {
-        const workflowStages = await db.workflowStage.findMany({
-          where: args.where,
-          include: {
-            workflow: true,
-          },
-        })
+      //   return workflowStage?.workflow.companyId === ctx.session.companyId
+      // })
+      // can("readAll", "workflowStage", async (args) => {
+      //   const workflowStages = await db.workflowStage.findMany({
+      //     where: args.where,
+      //     include: {
+      //       workflow: true,
+      //     },
+      //   })
 
-        return workflowStages.every((p) => p.workflow.companyId === ctx.session.companyId) === true
-      })
-      can("update", "workflowStage", async (args) => {
-        const workflowStage = await db.workflowStage.findFirst({
-          where: args.where,
-          include: {
-            workflow: true,
-          },
-        })
+      //   return workflowStages.every((p) => p.workflow.companyId === ctx.session.companyId) === true
+      // })
+      // can("update", "workflowStage", async (args) => {
+      //   const workflowStage = await db.workflowStage.findFirst({
+      //     where: args.where,
+      //     include: {
+      //       workflow: true,
+      //     },
+      //   })
 
-        return workflowStage?.workflow.companyId === ctx.session.companyId
-      })
+      //   return workflowStage?.workflow.companyId === ctx.session.companyId
+      // })
 
       can("create", "workflow")
       can("update", "workflow")
-      can("read", "workflow", async (args) => {
-        const companyUser = await db.companyUser.findUnique({
-          where: {
-            userId_companyId: {
-              userId: ctx.session.userId || "0",
-              companyId: ctx.session.companyId || "0",
-            },
-          },
-        })
-        if (companyUser?.role === CompanyUserRole.USER) {
-          return false
-        }
+      can("read", "workflow")
+      can("readAll", "workflow")
+      // can("read", "workflow", async (args) => {
+      //   const companyUser = await db.companyUser.findUnique({
+      //     where: {
+      //       userId_companyId: {
+      //         userId: ctx.session.userId || "0",
+      //         companyId: ctx.session.companyId || "0",
+      //       },
+      //     },
+      //   })
+      //   if (companyUser?.role === CompanyUserRole.USER) {
+      //     return false
+      //   }
 
-        const workflow = await db.workflow.findFirst({
-          where: args.where,
-        })
+      //   const workflow = await db.workflow.findFirst({
+      //     where: args.where,
+      //   })
 
-        return workflow?.companyId === ctx.session.companyId
-      })
-      can("readAll", "workflow", async (args) => {
-        const companyUser = await db.companyUser.findUnique({
-          where: {
-            userId_companyId: {
-              userId: ctx.session.userId || "0",
-              companyId: ctx.session.companyId || "0",
-            },
-          },
-        })
-        if (companyUser?.role === CompanyUserRole.USER) {
-          return false
-        }
+      //   return workflow?.companyId === ctx.session.companyId
+      // })
+      // can("readAll", "workflow", async (args) => {
+      //   const companyUser = await db.companyUser.findUnique({
+      //     where: {
+      //       userId_companyId: {
+      //         userId: ctx.session.userId || "0",
+      //         companyId: ctx.session.companyId || "0",
+      //       },
+      //     },
+      //   })
+      //   if (companyUser?.role === CompanyUserRole.USER) {
+      //     return false
+      //   }
 
-        const workflows = await db.workflow.findMany({
-          where: args.where,
-        })
+      //   const workflows = await db.workflow.findMany({
+      //     where: args.where,
+      //   })
 
-        return workflows.every((p) => p.companyId === ctx.session.companyId) === true
-      })
+      //   return workflows.every((p) => p.companyId === ctx.session.companyId) === true
+      // })
 
       can("create", "cardQuestion")
-      can("read", "cardQuestion", async (args) => {
-        const cardQuestion = await db.cardQuestion.findFirst({
-          where: args.where,
-        })
+      can("read", "cardQuestion")
+      can("update", "cardQuestion")
+      can("readAll", "cardQuestion")
+      // can("read", "cardQuestion", async (args) => {
+      //   const cardQuestion = await db.cardQuestion.findFirst({
+      //     where: args.where,
+      //   })
 
-        return cardQuestion?.companyId === ctx.session.companyId
-      })
-      can("update", "cardQuestion", async (args) => {
-        const cardQuestion = await db.cardQuestion.findUnique({
-          where: args.where,
-        })
+      //   return cardQuestion?.companyId === ctx.session.companyId
+      // })
+      // can("update", "cardQuestion", async (args) => {
+      //   const cardQuestion = await db.cardQuestion.findUnique({
+      //     where: args.where,
+      //   })
 
-        return !cardQuestion?.factory && cardQuestion?.companyId === ctx.session.companyId
-      })
-      can("readAll", "cardQuestion", async (args) => {
-        const cardQuestions = await db.cardQuestion.findMany({
-          where: args.where,
-        })
+      //   return !cardQuestion?.factory && cardQuestion?.companyId === ctx.session.companyId
+      // })
+      // can("readAll", "cardQuestion", async (args) => {
+      //   const cardQuestions = await db.cardQuestion.findMany({
+      //     where: args.where,
+      //   })
 
-        return cardQuestions.every((p) => p.companyId === ctx.session.companyId) === true
-      })
+      //   return cardQuestions.every((p) => p.companyId === ctx.session.companyId) === true
+      // })
 
       can("create", "scoreCardQuestion")
-      can("read", "scoreCardQuestion", async (args) => {
-        const scoreCardQuestion = await db.scoreCardQuestion.findFirst({
-          where: args.where,
-          include: {
-            scoreCard: true,
-          },
-        })
+      can("read", "scoreCardQuestion")
+      can("readAll", "scoreCardQuestion")
+      can("update", "scoreCardQuestion")
+      // can("read", "scoreCardQuestion", async (args) => {
+      //   const scoreCardQuestion = await db.scoreCardQuestion.findFirst({
+      //     where: args.where,
+      //     include: {
+      //       scoreCard: true,
+      //     },
+      //   })
 
-        return scoreCardQuestion?.scoreCard.companyId === ctx.session.companyId
-      })
-      can("readAll", "scoreCardQuestion", async (args) => {
-        const scoreCardQuestions = await db.scoreCardQuestion.findMany({
-          where: args.where,
-          include: {
-            scoreCard: true,
-          },
-        })
+      //   return scoreCardQuestion?.scoreCard.companyId === ctx.session.companyId
+      // })
+      // can("readAll", "scoreCardQuestion", async (args) => {
+      //   const scoreCardQuestions = await db.scoreCardQuestion.findMany({
+      //     where: args.where,
+      //     include: {
+      //       scoreCard: true,
+      //     },
+      //   })
 
-        return (
-          scoreCardQuestions.every((p) => p.scoreCard.companyId === ctx.session.companyId) === true
-        )
-      })
-      can("update", "scoreCardQuestion", async (args) => {
-        const scoreCardQuestion = await db.scoreCardQuestion.findUnique({
-          where: args.where,
-          include: {
-            scoreCard: true,
-          },
-        })
+      //   return (
+      //     scoreCardQuestions.every((p) => p.scoreCard.companyId === ctx.session.companyId) === true
+      //   )
+      // })
+      // can("update", "scoreCardQuestion", async (args) => {
+      //   const scoreCardQuestion = await db.scoreCardQuestion.findUnique({
+      //     where: args.where,
+      //     include: {
+      //       scoreCard: true,
+      //     },
+      //   })
 
-        return scoreCardQuestion?.scoreCard.companyId === ctx.session.companyId
-      })
+      //   return scoreCardQuestion?.scoreCard.companyId === ctx.session.companyId
+      // })
 
       can("create", "scoreCard")
       can("update", "scoreCard")
-      can("read", "scoreCard", async (args) => {
-        const scoreCard = await db.scoreCard.findFirst({
-          where: args.where,
-        })
+      can("read", "scoreCard")
+      can("readAll", "scoreCard")
+      // can("read", "scoreCard", async (args) => {
+      //   const scoreCard = await db.scoreCard.findFirst({
+      //     where: args.where,
+      //   })
 
-        return scoreCard?.companyId === ctx.session.companyId
-      })
-      can("readAll", "scoreCard", async (args) => {
-        const companyUser = await db.companyUser.findUnique({
-          where: {
-            userId_companyId: {
-              userId: ctx.session.userId || "0",
-              companyId: ctx.session.companyId || "0",
-            },
-          },
-        })
-        if (companyUser?.role === CompanyUserRole.USER) {
-          return false
-        }
+      //   return scoreCard?.companyId === ctx.session.companyId
+      // })
+      // can("readAll", "scoreCard", async (args) => {
+      //   const companyUser = await db.companyUser.findUnique({
+      //     where: {
+      //       userId_companyId: {
+      //         userId: ctx.session.userId || "0",
+      //         companyId: ctx.session.companyId || "0",
+      //       },
+      //     },
+      //   })
+      //   if (companyUser?.role === CompanyUserRole.USER) {
+      //     return false
+      //   }
 
-        const scoreCards = await db.scoreCard.findMany({
-          where: args.where,
-        })
+      //   const scoreCards = await db.scoreCard.findMany({
+      //     where: args.where,
+      //   })
 
-        return scoreCards.every((p) => p.companyId === ctx.session.companyId) === true
-      })
+      //   return scoreCards.every((p) => p.companyId === ctx.session.companyId) === true
+      // })
 
       can("create", "schedule")
       can("update", "schedule")

@@ -36,7 +36,7 @@ import shiftFormQuestion from "app/forms/mutations/shiftFormQuestion"
 import Confirm from "app/core/components/Confirm"
 import removeQuestionFromForm from "app/forms/mutations/removeQuestionFromForm"
 import ApplicationForm from "app/candidates/components/ApplicationForm"
-import { FormQuestionBehaviour, Question, QuestionOption, QuestionType } from "@prisma/client"
+import { Behaviour, Question, QuestionOption, QuestionType } from "@prisma/client"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
 import updateFormQuestion from "app/forms/mutations/updateFormQuestion"
@@ -248,9 +248,9 @@ export const Questions = ({ user, form, setQuestionToEdit, setOpenAddNewQuestion
                         name={`formQuestion-${fq.id}-behaviour`}
                         paddingX={3}
                         paddingY={1}
-                        defaultValue={fq?.behaviour || FormQuestionBehaviour.OPTIONAL}
+                        defaultValue={fq?.behaviour || Behaviour.OPTIONAL}
                         value={fq?.behaviour}
-                        options={Object.keys(FormQuestionBehaviour).map((formQuestionBehaviour) => {
+                        options={Object.keys(Behaviour).map((formQuestionBehaviour) => {
                           return { label: formQuestionBehaviour, value: formQuestionBehaviour }
                         })}
                         onChange={async (value) => {

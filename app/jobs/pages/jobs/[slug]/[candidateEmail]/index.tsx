@@ -21,16 +21,15 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 import getCandidate from "app/candidates/queries/getCandidate"
-import { AttachmentObject, CardType, ExtendedCandidate, ExtendedScoreCard } from "types"
+import { AttachmentObject, CardType, ExtendedCandidate, ExtendedStage } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { JobUserRole } from "@prisma/client"
+import { JobUserRole, Stage } from "@prisma/client"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
 import Form from "app/core/components/Form"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import updateCandidateScores from "app/candidates/mutations/updateCandidateScores"
-import linkScoreCardWithJobWorkflowStage from "app/jobs/mutations/linkScoreCardWithJobWorkflowStage"
 import Modal from "app/core/components/Modal"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/getCandidateInterviewsByStage"
@@ -50,13 +49,13 @@ import addCandidateToPool from "app/candidate-pools/mutations/addCandidateToPool
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
 import updateCandidateStage from "app/candidates/mutations/updateCandidateStage"
-import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
 import ApplicationForm from "app/candidates/components/ApplicationForm"
 import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
 import updateCandidate from "app/candidates/mutations/updateCandidate"
 import Card from "app/core/components/Card"
 import getJob from "app/jobs/queries/getJob"
 import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswerForDisplay"
+import getCandidateInterviewer from "app/candidates/queries/getCandidateInterviewer"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -232,9 +231,9 @@ const getCards = (candidate: ExtendedCandidate) => {
   )
 }
 
-// const getScoreCardJobWorkflowStage = (candidate, selectedWorkflowStageId) => {
+// const getScoreCardJobWorkflowStage = (candidate, selectedStageId) => {
 //   return candidate?.job?.scoreCards?.find(
-//     (sc) => sc.workflowStageId === selectedWorkflowStageId || candidate?.workflowStageId
+//     (sc) => sc.workflowStageId === selectedStageId || candidate?.workflowStageId
 //   )
 // }
 
@@ -279,22 +278,24 @@ const SingleCandidatePageContent = ({
 
   const [candidate] = useQuery(getCandidate, { where: { email: candidateEmail, jobId } })
   const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
-  const [selectedWorkflowStage, setSelectedWorkflowStage] = useState(candidate?.workflowStage)
-  // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedWorkflowStage?.id)?.scoreCardId || ""
-  const [scoreCardId, setScoreCardId] = useState(
-    candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
-      ?.scoreCardId || ""
+  const [selectedStage, setSelectedStage] = useState(
+    candidate?.stage as ExtendedStage | null | undefined
   )
-  useEffect(() => {
-    setScoreCardId(
-      candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedWorkflowStage?.id)
-        ?.scoreCardId || ""
-    )
-  }, [candidate, selectedWorkflowStage])
+  // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedStage?.id)?.scoreCardId || ""
+  // const [scoreCardId, setScoreCardId] = useState(
+  //   candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedStage?.id)
+  //     ?.scoreCardId || ""
+  // )
+  // useEffect(() => {
+  //   setScoreCardId(
+  //     candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedStage?.id)
+  //       ?.scoreCardId || ""
+  //   )
+  // }, [candidate, selectedStage])
 
-  useEffect(() => {
-    setSelectedWorkflowStage(candidate?.workflowStage)
-  }, [candidate?.workflowStage])
+  // useEffect(() => {
+  //   setSelectedStage(candidate?.stage)
+  // }, [candidate?.stage])
 
   const [file, setFile] = useState(null as any)
   // const [cards, setCards] = useState(getCards(candidate!))
@@ -305,7 +306,6 @@ const SingleCandidatePageContent = ({
   const router = useRouter()
   const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
-  const [linkScoreCardWithJobWorkflowStageMutation] = useMutation(linkScoreCardWithJobWorkflowStage)
   const [candidatePools] = useQuery(getCandidatePoolsWOPagination, {
     where: { companyId: session.companyId || "0", candidates: { none: { id: candidate?.id } } },
   })
@@ -335,19 +335,19 @@ const SingleCandidatePageContent = ({
 
   const [openCandidateMoveConfirm, setOpenCandidateMoveConfirm] = useState(false)
   const [candidateToMove, setCandidateToMove] = useState(null as any)
-  const [moveToWorkflowStage, setMoveToWorkflowStage] = useState(null as any)
+  const [moveToStage, setMoveToStage] = useState(null as ExtendedStage | null | undefined)
   const [openEditModal, setOpenEditModal] = useState(false)
 
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
   const [updateCandidateMutation] = useMutation(updateCandidate)
 
   // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
-  //   where: { candidateId: candidate.id, workflowStageId: selectedWorkflowStage?.id },
+  //   where: { candidateId: candidate.id, workflowStageId: selectedStage?.id },
   // })
 
   // const getExistingCandidateInterviewer = useCallback(() => {
-  //   const existingInterviewDetail = selectedWorkflowStage?.interviewDetails?.find(
-  //     (int) => int.workflowStageId === selectedWorkflowStage?.id && int.jobId === candidate?.jobId
+  //   const existingInterviewDetail = selectedStage?.interviewDetails?.find(
+  //     (int) => int.workflowStageId === selectedStage?.id && int.jobId === candidate?.jobId
   //   )
   //   const existingJobInterviewer: User | null | undefined = jobData?.users?.find(
   //     (member) => member?.userId === existingInterviewDetail?.interviewerId
@@ -362,15 +362,15 @@ const SingleCandidatePageContent = ({
   //   candidate?.jobId,
   //   candidateWorkflowStageInterviewer?.interviewer?.id,
   //   jobData?.users,
-  //   selectedWorkflowStage?.id,
-  //   selectedWorkflowStage?.interviewDetails,
+  //   selectedStage?.id,
+  //   selectedStage?.interviewDetails,
   // ])
 
-  const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
-    workflowStageId: candidate?.workflowStageId!, // selectedWorkflowStage?.id!,
-    candidateId: candidate?.id,
-    jobId: candidate?.jobId,
-  })
+  // const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
+  //   stageId: candidate?.stageId!, // selectedStage?.id!,
+  //   candidateId: candidate?.id,
+  //   jobId: candidate?.jobId,
+  // })
 
   // let ratingsArray = [] as number[]
   // candidate?.scores?.forEach((score) => {
@@ -392,10 +392,9 @@ const SingleCandidatePageContent = ({
   //   console.log(error)
   // }
 
-  const updateCandidateStg = async (candidate, selectedWorkflowStageId) => {
+  const updateCandidateStg = async (candidate, selectedStageId) => {
     const selectedStageName =
-      candidate?.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId)?.stage
-        ?.name || ""
+      candidate?.job?.workflow?.stages?.find((ws) => ws.id === selectedStageId)?.stage?.name || ""
 
     const toastId = toast.loading(() => (
       <span>
@@ -408,7 +407,7 @@ const SingleCandidatePageContent = ({
     try {
       await updateCandidateStageMutation({
         where: { id: candidate?.id },
-        data: { workflowStageId: selectedWorkflowStageId },
+        data: { stageId: selectedStageId },
       })
       invalidateQuery(getCandidate)
       toast.success(
@@ -461,9 +460,9 @@ const SingleCandidatePageContent = ({
 
   const candidateStageAndInterviewerDiv = (
     <div className="px-3 py-1 rounded-lg border-2 border-theme-600 text-theme-700 font-semibold flex items-center justify-center space-x-2">
-      <span>{candidate?.workflowStage?.stage?.name}</span>
+      <span>{candidate?.stage?.name}</span>
       <ArrowRightIcon className="w-4 h-4" />
-      <span>{interviewDetail?.interviewer?.name}</span>
+      <span>{candidate?.stage?.interviewer?.name}</span>
     </div>
   )
 
@@ -523,15 +522,12 @@ const SingleCandidatePageContent = ({
           onClick={async (e) => {
             e.preventDefault()
 
-            if (
-              (candidate?.workflowStage?.order || 0) ===
-              (candidate?.job?.workflow?.stages?.length || 0)
-            ) {
+            if ((candidate?.stage?.order || 0) === (candidate?.job?.stages?.length || 0)) {
               toast.error("The candidate is already in the last stage")
               return
             } else {
               setCandidateToMove(candidate)
-              setMoveToWorkflowStage(null)
+              setMoveToStage(null)
               setOpenCandidateMoveConfirm(true)
             }
           }}
@@ -564,7 +560,7 @@ const SingleCandidatePageContent = ({
           </DropdownMenu.Trigger>
           <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
             <DropdownMenu.Arrow className="fill-current" offset={10} />
-            {candidate?.job?.workflow?.stages?.length === 0 && (
+            {candidate?.job?.stages?.length === 0 && (
               <DropdownMenu.Item
                 disabled={true}
                 onSelect={(e) => {
@@ -575,26 +571,24 @@ const SingleCandidatePageContent = ({
                 No stages
               </DropdownMenu.Item>
             )}
-            {candidate?.job?.workflow?.stages.map((ws) => {
+            {candidate?.job?.stages.map((stage) => {
               return (
                 <DropdownMenu.Item
-                  key={ws.id}
+                  key={stage.id}
                   onSelect={async (e) => {
                     e.preventDefault()
 
-                    if (candidate?.workflowStage?.id === ws?.id) {
-                      toast.error(`The candidate is already in the ${ws?.stage?.name} stage`)
+                    if (candidate?.stage?.id === stage?.id) {
+                      toast.error(`The candidate is already in the ${candidate?.stage?.name} stage`)
                     } else {
                       setCandidateToMove(candidate)
-                      setMoveToWorkflowStage(ws)
+                      setMoveToStage(stage)
                       setOpenCandidateMoveConfirm(true)
                     }
                   }}
                   className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
                 >
-                  {ws.stage?.name?.length > 30
-                    ? `${ws.stage?.name?.substring(0, 30)}...`
-                    : ws.stage?.name}
+                  {stage?.name?.length > 30 ? `${stage?.name?.substring(0, 30)}...` : stage?.name}
                 </DropdownMenu.Item>
               )
             })}
@@ -623,7 +617,7 @@ const SingleCandidatePageContent = ({
           <button
             className="flex px-2 py-1 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             disabled={
-              // selectedWorkflowStage?.interviewDetails?.find(
+              // selectedStage?.interviewDetails?.find(
               //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
               // )?.interviewerId !== user?.id &&
               // interviewDetail?.interviewer?.id !== user?.id &&
@@ -776,7 +770,7 @@ const SingleCandidatePageContent = ({
         open={openCandidateMoveConfirm}
         setOpen={setOpenCandidateMoveConfirm}
         header={`Move Candidate - ${candidateToMove?.name} - to ${
-          moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"
+          moveToStage ? moveToStage?.name : "next"
         } stage`}
         onSuccess={async () => {
           // const toastId = toast.loading(
@@ -790,27 +784,27 @@ const SingleCandidatePageContent = ({
             //   rejected: !candidateToMove?.rejected,
             // })
 
-            const workflowStages = candidate?.job?.workflow?.stages
+            const stages = candidate?.job?.stages
             const currentStageOrder =
-              workflowStages?.find((ws) => ws.id === candidateToMove.workflowStageId)?.order || 0
-            const nextStage = workflowStages?.find((ws) => ws.order === currentStageOrder + 1)
-            await updateCandidateStg(candidateToMove, moveToWorkflowStage?.id || nextStage?.id)
-            setSelectedWorkflowStage(moveToWorkflowStage || nextStage)
+              stages?.find((stage) => stage.id === candidateToMove.stageId)?.order || 0
+            const nextStage = stages?.find((stage) => stage.order === currentStageOrder + 1)
+            await updateCandidateStg(candidateToMove, moveToStage?.id || nextStage?.id)
+            setSelectedStage(moveToStage || nextStage)
             invalidateQuery(getCandidateInterviewsByStage)
             setOpenCandidateMoveConfirm(false)
             setCandidateToMove(null)
-            setMoveToWorkflowStage(null)
+            setMoveToStage(null)
           } catch (error) {
             toast.error(
               `Moving candidate to ${
-                moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"
+                moveToStage ? moveToStage?.name : "next"
               } stage failed - ${error.toString()}`
             )
           }
         }}
       >
-        Are you sure you want to move the candidate to{" "}
-        {moveToWorkflowStage ? moveToWorkflowStage.stage?.name : "next"} stage?
+        Are you sure you want to move the candidate to {moveToStage ? moveToStage?.name : "next"}{" "}
+        stage?
       </Confirm>
 
       {/* Mobile Menu */}
@@ -936,26 +930,26 @@ const SingleCandidatePageContent = ({
             >
               <div className="w-full h-full rounded-2xl">
                 <div className="z-10 flex w-full max-w-full overflow-auto bg-theme-50 justify-between sticky top-0">
-                  {candidate?.job?.workflow?.stages?.map((ws, index) => {
+                  {candidate?.job?.stages?.map((stage, index) => {
                     return (
                       <div
-                        key={`${ws.stage?.name}${index}`}
+                        key={`${stage?.name}${index}`}
                         className={`${index > 0 ? "border-l-2 rounded-bl-md" : ""} ${
-                          index < (candidate?.job?.workflow?.stages?.length || 0) - 1
+                          index < (candidate?.job?.stages?.length || 0) - 1
                             ? "border-r-2 rounded-br-md"
                             : ""
                         } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
-                          selectedWorkflowStage?.id === ws.id ? "!bg-theme-500 !text-white" : ""
+                          selectedStage?.id === stage.id ? "!bg-theme-500 !text-white" : ""
                         } whitespace-nowrap`}
                         onClick={() => {
-                          setSelectedWorkflowStage(ws)
+                          setSelectedStage(stage)
                           invalidateQuery(getCandidateInterviewsByStage)
                           // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
                         }}
                       >
-                        {ws.stage?.name?.length > 20
-                          ? `${ws.stage?.name?.substring(0, 20)}...`
-                          : ws?.stage?.name}
+                        {stage?.name?.length > 20
+                          ? `${stage?.name?.substring(0, 20)}...`
+                          : stage?.name}
                       </div>
                     )
                   })}
@@ -982,34 +976,34 @@ const SingleCandidatePageContent = ({
                     <ScoreCard
                       // submitDisabled={
                       //   interviewDetail?.interviewer?.id !== user?.id
-                      //   // selectedWorkflowStage?.interviewDetails?.find(
+                      //   // selectedStage?.interviewDetails?.find(
                       //   //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                       //   // )?.interviewerId !== user?.id
                       // }
-                      key={selectedWorkflowStage?.id}
+                      key={selectedStage?.id}
                       candidate={candidate}
                       header="Score Card"
                       // subHeader={`${
                       //   candidate?.job?.workflow?.stages?.find(
-                      //     (ws) => ws.id === selectedWorkflowStage?.id
+                      //     (ws) => ws.id === selectedStage?.id
                       //   )?.stage?.name
                       // } Stage`}
-                      scoreCardId={scoreCardId}
-                      companyId={session.companyId || "0"}
+                      // scoreCardId={scoreCardId}
+                      // companyId={session.companyId || "0"}
                       preview={false}
                       userId={user?.id || "0"}
-                      workflowStage={selectedWorkflowStage as any}
+                      stageId={selectedStage?.id || "0"}
                       onSubmit={async (values) => {
                         const toastId = toast.loading(() => <span>Updating Candidate</span>)
                         try {
-                          let linkedScoreCard: ExtendedScoreCard | null = null
-                          if (candidate && !scoreCardId) {
-                            linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
-                              jobId: candidate?.jobId || "0",
-                              workflowStageId:
-                                selectedWorkflowStage?.id || candidate?.workflowStageId || "0",
-                            })
-                          }
+                          // let linkedScoreCard: ExtendedScoreCard | null = null
+                          // if (candidate && !scoreCardId) {
+                          //   linkedScoreCard = await linkScoreCardWithJobWorkflowStageMutation({
+                          //     jobId: candidate?.jobId || "0",
+                          //     workflowStageId:
+                          //       selectedStage?.id || candidate?.workflowStageId || "0",
+                          //   })
+                          // }
                           await updateCandidateScoresMutation({
                             where: { id: candidate?.id },
                             data: {
@@ -1021,28 +1015,21 @@ const SingleCandidatePageContent = ({
                               resume: candidate?.resume || undefined,
                               answers: (candidate?.answers || ([] as any)) as any,
                               scores:
-                                (
-                                  candidate?.job?.scoreCards?.find(
-                                    (sc) => sc.workflowStageId === selectedWorkflowStage?.id
-                                  )?.scoreCard || linkedScoreCard
-                                )?.cardQuestions
-                                  ?.map((sq) => {
-                                    const rating = values[sq.cardQuestion?.name] || 0
-                                    const note = values[`${sq.cardQuestion?.name} Note`]
-                                    const scoreId = values[`${sq.cardQuestion?.name} ScoreId`]
+                                selectedStage?.scoreCardQuestions
+                                  ?.map((question) => {
+                                    const rating = values[question?.name] || 0
+                                    const note = values[`${question?.name} Note`]
+                                    const scoreId = values[`${question?.name} ScoreId`]
 
                                     return {
-                                      scoreCardQuestionId: sq.id,
+                                      scoreCardQuestionId: question?.id,
                                       rating: rating ? parseInt(rating) : 0,
                                       note: note,
                                       id: scoreId || null,
-                                      workflowStageId:
-                                        selectedWorkflowStage?.id ||
-                                        candidate?.workflowStageId ||
-                                        "0",
+                                      stageId: selectedStage?.id || candidate?.stageId || "0",
                                     }
                                   })
-                                  ?.filter((score) => score.rating > 0) || ([] as any),
+                                  ?.filter((score) => score?.rating > 0) || ([] as any),
                             },
                           })
                           // Stop resume from reloading by assigning previous value since resume won't be changed by this mutation
@@ -1051,8 +1038,7 @@ const SingleCandidatePageContent = ({
                           toast.success(
                             () => (
                               <span>
-                                Candidate Score Card Updated for stage{" "}
-                                {selectedWorkflowStage?.stage?.name}
+                                Candidate Score Card Updated for stage {selectedStage?.name}
                               </span>
                             ),
                             { id: toastId }
@@ -1072,23 +1058,19 @@ const SingleCandidatePageContent = ({
                   {candidateToggleView === CandidateToggleView.Interviews && (
                     <Interviews
                       user={user}
-                      selectedWorkflowStage={selectedWorkflowStage}
+                      stageId={selectedStage?.id || "0"}
                       candidate={candidate}
                     />
                   )}
                   {candidateToggleView === CandidateToggleView.Comments && (
                     <Comments
                       user={user}
-                      selectedWorkflowStage={selectedWorkflowStage}
+                      stageId={selectedStage?.id || "0"}
                       candidate={candidate}
                     />
                   )}
                   {candidateToggleView === CandidateToggleView.Emails && (
-                    <Emails
-                      user={user}
-                      selectedWorkflowStage={selectedWorkflowStage}
-                      candidate={candidate}
-                    />
+                    <Emails user={user} stageId={selectedStage?.id || "0"} candidate={candidate} />
                   )}
                 </Suspense>
               </div>

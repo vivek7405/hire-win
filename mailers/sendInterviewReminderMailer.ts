@@ -6,7 +6,7 @@
  */
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
-import db, { Interview, InterviewDetail, User } from "db"
+import db, { Interview, User } from "db"
 
 type SendInterviewReminderMailerInput = {
   to: string

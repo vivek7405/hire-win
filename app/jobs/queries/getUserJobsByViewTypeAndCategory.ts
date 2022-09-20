@@ -63,7 +63,8 @@ async function getUserJobsByViewTypeAndCategory(
             include: {
               category: true,
               candidates: true,
-              workflow: { include: { stages: { include: { stage: true } } } },
+              stages: true,
+              // workflow: { include: { stages: { include: { stage: true } } } },
             },
           },
         },
