@@ -20,7 +20,7 @@ async function assignCalendarToJobStage(
 
   const user = await db.user.findFirst({
     where: { id: ctx.session.userId },
-    include: { defaultCalendars: true, schedules: true, calendars: true },
+    include: { defaultCalendars: true, defaultSchedules: true, calendars: true },
   })
 
   const existingScheduleCalendar = await db.stageUserScheduleCalendar.findUnique({
@@ -41,7 +41,8 @@ async function assignCalendarToJobStage(
 
     return updatedScheduleCalendar
   } else {
-    const defaultScheduleId = user?.schedules.find((sch) => sch.name === "Default")?.id || "0"
+    const defaultScheduleId =
+      user?.defaultSchedules?.find((sch) => sch.userId === user.id)?.scheduleId || "0"
     const calId =
       user?.calendars?.find((cal) => cal.userId === user.id && cal.id === calendarId)?.id || null
     const defaultCalendarId =

@@ -12,6 +12,7 @@ import stripe from "app/core/utils/stripe"
 import { Currency, PlanName } from "types"
 import provideTrail from "app/core/utils/provideTrial"
 import createFactoryItems from "./createFactoryItems"
+import updateDefaultSchedule from "app/scheduling/schedules/mutations/updateDefaultSchedule"
 
 type signupProps = {
   name: string
@@ -86,15 +87,16 @@ export default async function signup(
     currency && (await provideTrail(user?.id, compId, currency))
   }
 
-  await addSchedule(
+  const schedule = await addSchedule(
     {
-      name: "Default",
+      name: "Weekdays",
       timezone: timezone || "UTC",
       schedule: initialSchedule,
-      factory: true,
     },
     ctx
   )
+
+  await updateDefaultSchedule(schedule.id || "0", ctx)
 
   return user
 }

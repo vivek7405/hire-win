@@ -23,6 +23,10 @@ import AddScheduleForm from "./AddScheduleForm"
 import AddScheduleModal from "./AddScheduleModal"
 import { z } from "zod"
 import updateSchedule from "../mutations/updateSchedule"
+import Form from "app/core/components/Form"
+import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
+import getDefaultScheduleByUser from "../queries/getDefaultScheduleByUser"
+import updateDefaultSchedule from "../mutations/updateDefaultSchedule"
 
 const Schedules = ({ user }) => {
   const [deleteScheduleMutation] = useMutation(deleteSchedule)
@@ -35,6 +39,8 @@ const Schedules = ({ user }) => {
   const [openAddSchedule, setOpenAddSchedule] = useState(false)
   const [addScheduleMutation] = useMutation(addSchedule)
   const [updateScheduleMutation] = useMutation(updateSchedule)
+  const [defaultSchedule] = useQuery(getDefaultScheduleByUser, null)
+  const [updateDefaultScheduleMutation] = useMutation(updateDefaultSchedule)
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -129,7 +135,7 @@ const Schedules = ({ user }) => {
       >
         <AddScheduleForm
           header={`${scheduleToEdit ? "Edit" : "Add a new"} Schedule`}
-          isDefaultEdit={scheduleToEdit?.name?.toLowerCase() === "default" ? true : false}
+          // isDefaultEdit={scheduleToEdit?.name?.toLowerCase() === "default" ? true : false}
           subHeader=""
           initialValues={
             scheduleToEdit
@@ -216,19 +222,84 @@ const Schedules = ({ user }) => {
         Are you sure you want to delete the schedule?
       </Confirm>
 
-      <div className="flex w-full justify-between">
+      <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 flex-wrap items-center justify-between">
         <input
           placeholder="Search"
           type="text"
           defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+          className={`border border-gray-300 w-full lg:mr-2 lg:w-1/4 px-2 py-2 rounded`}
           onChange={(e) => {
             execDebouncer(e)
           }}
         />
-        <div className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+
+        <div className="flex items-center flex-nowrap">
+          {schedules?.length > 0 && (
+            <div className="float-right flex items-center flex-nowrap">
+              <span className="text-lg text-neutral-600">Default</span>
+              <div className="w-40 ml-2 mr-5">
+                <Form
+                  noFormatting={true}
+                  onSubmit={async () => {
+                    return
+                  }}
+                >
+                  <LabeledReactSelectField
+                    name="defaultSchedule"
+                    options={schedules?.map((schedule) => {
+                      return { label: schedule?.name || "", value: schedule?.id?.toString() || "" }
+                    })}
+                    defaultValue={defaultSchedule?.scheduleId?.toString()}
+                    onChange={async (value) => {
+                      const selectedScheduleId: string = value as any
+                      const selectedScheduleName = schedules?.find(
+                        (sch) => sch.id === selectedScheduleId
+                      )?.name
+
+                      const toastId = toast.loading(() => (
+                        <span>
+                          <b>
+                            Setting default schedule to
+                            <br />
+                            {'"'}
+                            {selectedScheduleName}
+                            {'"'}
+                          </b>
+                        </span>
+                      ))
+                      try {
+                        await updateDefaultScheduleMutation(selectedScheduleId)
+                        await invalidateQuery(getDefaultScheduleByUser)
+                        toast.success(
+                          () => (
+                            <span>
+                              <b>
+                                Default Schedule changed to
+                                <br />
+                                {'"'}
+                                {selectedScheduleName}
+                                {'"'}
+                              </b>
+                            </span>
+                          ),
+                          { id: toastId }
+                        )
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString(),
+                          { id: toastId }
+                        )
+                      }
+                    }}
+                  />
+                </Form>
+              </div>
+            </div>
+          )}
+
           <button
-            className="whitespace-nowrap"
+            className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
             onClick={(e) => {
               e.preventDefault()
               setScheduleToEdit(null)
@@ -256,23 +327,21 @@ const Schedules = ({ user }) => {
                     {s.name}
                   </a>
                 </div>
-                {s.name !== "Default" && (
-                  <div className="absolute top-0.5 right-0">
-                    <button
-                      id={"delete-" + s.name}
-                      className="float-right text-red-600 hover:text-red-800"
-                      title="Delete Schedule"
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setScheduleToDelete(s)
-                        setOpenConfirm(true)
-                      }}
-                    >
-                      <TrashIcon className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
-                    </button>
-                  </div>
-                )}
+                <div className="absolute top-0.5 right-0">
+                  <button
+                    id={"delete-" + s.name}
+                    className="float-right text-red-600 hover:text-red-800"
+                    title="Delete Schedule"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setScheduleToDelete(s)
+                      setOpenConfirm(true)
+                    }}
+                  >
+                    <TrashIcon className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
+                  </button>
+                </div>
               </div>
               <div className="border-b-2 border-gray-50 w-full"></div>
               <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">

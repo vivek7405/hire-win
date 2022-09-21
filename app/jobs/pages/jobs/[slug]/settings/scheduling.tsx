@@ -43,6 +43,7 @@ import assignScheduleToJobStage from "app/jobs/mutations/assignScheduleToJobStag
 import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStage"
 import getCompany from "app/companies/queries/getCompany"
 import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
+import getDefaultScheduleByUser from "app/scheduling/schedules/queries/getDefaultScheduleByUser"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -150,6 +151,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
   const [schedules] = useQuery(getSchedulesWOPagination, { where: { userId: user?.id } })
   const [calendars] = useQuery(getCalendars, { where: { userId: user?.id } })
   const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
+  const [defaultSchedule] = useQuery(getDefaultScheduleByUser, null)
 
   return (
     <>
@@ -470,8 +472,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                         name={`schedules.${index}.id`}
                         placeholder={`Select Schedule`}
                         defaultValue={
-                          existingScheduleCalendar?.scheduleId ||
-                          schedules?.find((schedule) => schedule.name === "Default")?.id
+                          existingScheduleCalendar?.scheduleId || defaultSchedule?.scheduleId
                         }
                         onChange={async (e) => {
                           const selectedScheduleId = e.target.value

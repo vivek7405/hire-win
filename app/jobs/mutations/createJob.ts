@@ -32,7 +32,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
 
   const user = await db.user.findFirst({
     where: { id: ctx.session.userId! },
-    include: { defaultCalendars: true, schedules: true },
+    include: { defaultCalendars: true, defaultSchedules: true },
   })
   if (!user) throw new AuthenticationError()
 
@@ -266,7 +266,8 @@ async function createJob(data: JobInputType, ctx: Ctx) {
           userId: user.id || "0",
           calendarId:
             user.defaultCalendars?.find((cal) => cal.userId === user.id)?.calendarId || null,
-          scheduleId: user.schedules?.find((sch) => sch.name === "Default")?.id || "0",
+          scheduleId:
+            user.defaultSchedules?.find((sch) => sch.userId === user.id)?.scheduleId || "0",
         }
       }) || [],
   })

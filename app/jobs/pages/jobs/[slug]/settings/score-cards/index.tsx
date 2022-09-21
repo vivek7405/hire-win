@@ -11,6 +11,7 @@ import {
   useMutation,
   invalidateQuery,
   invokeWithMiddleware,
+  getSession,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -42,10 +43,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
 
   const user = await getCurrentUserServer({ ...context })
+  const session = await getSession(context.req, context.res)
+
   const job = await invokeWithMiddleware(
     getJob,
     {
-      where: { slug: context?.params?.slug || "0" },
+      where: { slug: context?.params?.slug || "0", companyId: session?.companyId || "0" },
     },
     { ...context }
   )
