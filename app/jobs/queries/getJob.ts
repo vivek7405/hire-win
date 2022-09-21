@@ -10,6 +10,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
     include: {
       category: true,
       candidates: true,
+      formQuestions: { include: { options: true }, orderBy: { order: "asc" } },
       stages: {
         include: {
           scoreCardQuestions: true,
@@ -36,18 +37,18 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
       //     },
       //   },
       // },
-      form: {
-        include: {
-          questions: {
-            include: {
-              question: true,
-            },
-            orderBy: {
-              order: "asc",
-            },
-          },
-        },
-      },
+      // form: {
+      //   include: {
+      //     questions: {
+      //       include: {
+      //         question: true,
+      //       },
+      //       orderBy: {
+      //         order: "asc",
+      //       },
+      //     },
+      //   },
+      // },
       users: {
         include: {
           user: {

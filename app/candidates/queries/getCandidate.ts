@@ -10,9 +10,10 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
     include: {
       job: {
         include: {
-          form: {
-            include: { questions: { include: { question: { include: { options: true } } } } },
-          },
+          // form: {
+          //   include: { questions: { include: { question: { include: { options: true } } } } },
+          // },
+          formQuestions: { include: { options: true }, orderBy: { order: "asc" } },
           stages: {
             include: { interviewer: true, scoreCardQuestions: true, scores: true },
             orderBy: { order: "asc" },
@@ -20,7 +21,9 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
         },
       },
       stage: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
-      answers: { include: { question: { include: { options: true } } } },
+      answers: {
+        include: { formQuestion: { include: { options: true } } },
+      },
       scores: true,
     },
   })

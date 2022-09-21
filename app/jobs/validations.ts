@@ -29,6 +29,6 @@ export const Job = z.object({
   stages: z.array(StageObj).optional(),
   // scoreCards: z.array(ScoreCardJobWorkflowStageObj).optional(),
 
-  formId: z.string().optional(),
+  // formId: z.string().optional(),
 })
 export type JobInputType = z.infer<typeof Job>

@@ -50,9 +50,10 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
     include: {
       job: {
         include: {
-          form: {
-            include: { questions: { include: { question: { include: { options: true } } } } },
-          },
+          // form: {
+          //   include: { questions: { include: { question: { include: { options: true } } } } },
+          // },
+          formQuestions: { include: { options: true }, orderBy: { order: "asc" } },
           stages: {
             include: { interviewer: true, scoreCardQuestions: true, scores: true },
             orderBy: { order: "asc" },
@@ -79,7 +80,7 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
       scores: true,
       stage: { include: { interviewer: true } },
       // workflowStage: { include: { stage: true, interviewDetails: true } },
-      answers: { include: { question: { include: { options: true } } } },
+      answers: { include: { formQuestion: { include: { options: true } } } },
     },
   })
 

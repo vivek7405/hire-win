@@ -1,5 +1,5 @@
 import { CandidateSource } from "@prisma/client"
-import { Answer } from "app/questions/validations"
+import { AnswerObj } from "app/form-questions/validations"
 import { Score } from "app/score-cards/validations"
 import { z } from "zod"
 
@@ -16,7 +16,7 @@ export const Candidate = z.object({
   email: z.string(),
   resume: AttachmentZodObj,
   slug: z.string().optional(),
-  answers: z.array(Answer),
+  answers: z.array(AnswerObj),
   scores: z.array(Score).optional(),
   jobId: z.string().optional(),
   source: z.nativeEnum(CandidateSource),

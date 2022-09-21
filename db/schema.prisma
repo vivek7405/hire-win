@@ -48,8 +48,7 @@ model User {
   createdCategories         Category[]
   createdStages             Stage[]             @relation(name: "createdBy")
   interviewingStage         Stage[]             @relation(name: "interviewer")
-  createdForms              Form[]
-  createdQuestions          Question[]
+  createdFormQuestions      FormQuestion[]
   createdScoreCardQuestions ScoreCardQuestion[]
   createdCandidates         Candidate[]
   createdEmailTemplates     EmailTemplate[]
@@ -167,8 +166,8 @@ model Company {
   users CompanyUser[]
   jobs  Job[]
 
-  forms     Form[]
-  questions Question[]
+  // forms     Form[]
+  // questions Question[]
 
   categories     Category[]
   emailTemplates EmailTemplate[]
@@ -215,9 +214,10 @@ model Job {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?
 
-  stages Stage[]
+  stages        Stage[]
+  formQuestions FormQuestion[]
 
-  form   Form?   @relation(fields: [formId], references: [id])
+  // form   Form?   @relation(fields: [formId], references: [id])
   formId String?
 
   // scoreCards ScoreCardJobStage[]
@@ -348,7 +348,28 @@ model Stage {
   @@unique([jobId, name])
 }
 
-model Form {
+// model Form {
+//   id          String   @id @default(cuid())
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   createdBy   User?    @relation(fields: [createdById], references: [id])
+//   createdById String?
+
+//   name String
+//   slug String
+
+//   questions FormQuestion[]
+//   jobs      Job[]
+
+//   company   Company @relation(fields: [companyId], references: [id])
+//   companyId String
+
+//   factory Boolean @default(false)
+
+//   @@unique([companyId, slug])
+// }
+
+model FormQuestion {
   id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -358,41 +379,22 @@ model Form {
   name String
   slug String
 
-  questions FormQuestion[]
-  jobs      Job[]
+  order              Int
+  allowEdit          Boolean   @default(true)
+  behaviour          Behaviour @default(OPTIONAL)
+  allowBehaviourEdit Boolean   @default(true)
 
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
+  placeholder   String               @default("")
+  type          FormQuestionType     @default(Single_line_text)
+  options       FormQuestionOption[]
+  acceptedFiles String               @default("")
 
-  factory Boolean @default(false)
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
 
-  @@unique([companyId, slug])
-}
-
-model Question {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
-
-  name String
-  slug String
-
-  placeholder   String           @default("")
-  type          QuestionType     @default(Single_line_text)
-  options       QuestionOption[]
-  acceptedFiles String           @default("")
-
-  factory Boolean @default(false)
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-
-  forms   FormQuestion[]
   answers Answer[]
 
-  @@unique([companyId, slug])
+  @@unique([jobId, slug])
 }
 
 model ScoreCardQuestion {
@@ -404,7 +406,7 @@ model ScoreCardQuestion {
 
   name      String
   slug      String
-  allowEdit Boolean @default(false)
+  allowEdit Boolean @default(true)
 
   order Int
 
@@ -439,18 +441,18 @@ model Score {
   @@unique([candidateId, scoreCardQuestionId, stageId])
 }
 
-model QuestionOption {
+model FormQuestionOption {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   text String
 
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id])
+  formQuestionId String
 }
 
-enum QuestionType {
+enum FormQuestionType {
   Single_line_text
   Long_text
   Attachment
@@ -465,24 +467,24 @@ enum QuestionType {
   Rating
 }
 
-model FormQuestion {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// model FormQuestion {
+//   id        String   @id @default(cuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-  order              Int
-  behaviour          Behaviour @default(OPTIONAL)
-  allowBehaviourEdit Boolean   @default(true)
+//   order              Int
+//   behaviour          Behaviour @default(OPTIONAL)
+//   allowBehaviourEdit Boolean   @default(true)
 
-  form   Form   @relation(fields: [formId], references: [id])
-  formId String
+//   job   Job    @relation(fields: [jobId], references: [id])
+//   jobId String
 
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+//   question   Question @relation(fields: [questionId], references: [id])
+//   questionId String
 
-  @@unique([formId, questionId])
-  @@unique([formId, questionId, order])
-}
+//   @@unique([jobId, questionId])
+//   @@unique([jobId, questionId, order])
+// }
 
 enum Behaviour {
   REQUIRED
@@ -497,14 +499,14 @@ model Answer {
 
   value String
 
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id])
+  formQuestionId String
 
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  @@unique([candidateId, questionId])
-  @@unique([candidateId, questionId, value])
+  @@unique([candidateId, formQuestionId])
+  @@unique([candidateId, formQuestionId, value])
 }
 
 model CandidateStageInterviewer {

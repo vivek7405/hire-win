@@ -4,7 +4,7 @@ import slugify from "slugify"
 import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { CompanyUserRole, JobUserRole } from "@prisma/client"
+import { Behaviour, CompanyUserRole, FormQuestionType, JobUserRole } from "@prisma/client"
 import moment from "moment"
 
 async function createJob(data: JobInputType, ctx: Ctx) {
@@ -15,7 +15,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     description,
     categoryId,
     // workflowId,
-    formId,
+    // formId,
     country,
     state,
     city,
@@ -60,7 +60,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       description,
       categoryId: categoryId || null,
       // workflowId: workflowId || null,
-      formId: formId || null,
+      // formId: formId || null,
       country,
       state,
       city,
@@ -141,10 +141,54 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     },
   })
 
+  await db.formQuestion.createMany({
+    data: [
+      {
+        jobId: job?.id || "0",
+        order: 1,
+        allowEdit: false,
+        behaviour: Behaviour.REQUIRED,
+        allowBehaviourEdit: false,
+        name: "Name",
+        slug: "name",
+        placeholder: "Enter your name",
+        type: FormQuestionType.Single_line_text,
+        acceptedFiles: "",
+        createdById: ctx.session.userId || "0",
+      },
+      {
+        jobId: job?.id || "0",
+        order: 2,
+        allowEdit: false,
+        behaviour: Behaviour.REQUIRED,
+        allowBehaviourEdit: false,
+        name: "Email",
+        slug: "email",
+        placeholder: "Enter your email",
+        type: FormQuestionType.Email,
+        acceptedFiles: "",
+        createdById: ctx.session.userId || "0",
+      },
+      {
+        jobId: job?.id || "0",
+        order: 3,
+        allowEdit: false,
+        behaviour: Behaviour.REQUIRED,
+        allowBehaviourEdit: true,
+        name: "Resume",
+        slug: "resume",
+        placeholder: "",
+        type: FormQuestionType.Attachment,
+        acceptedFiles: "application/pdf",
+        createdById: ctx.session.userId || "0",
+      },
+    ],
+  })
+
   await db.stage.createMany({
     data: [
       {
-        jobId: job?.id,
+        jobId: job?.id || "0",
         name: "Sourced",
         slug: "sourced",
         order: 1,
@@ -154,7 +198,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         duration: 30,
       },
       {
-        jobId: job?.id,
+        jobId: job?.id || "0",
         name: "Screen",
         slug: "screen",
         order: 2,
@@ -164,7 +208,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         duration: 30,
       },
       {
-        jobId: job?.id,
+        jobId: job?.id || "0",
         name: "Interview",
         slug: "interview",
         order: 3,
@@ -174,7 +218,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         duration: 30,
       },
       {
-        jobId: job?.id,
+        jobId: job?.id || "0",
         name: "Hired",
         slug: "hired",
         order: 4,
@@ -186,7 +230,10 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     ],
   })
 
-  const stages = await db.stage.findMany({ where: { jobId: job?.id }, orderBy: { order: "asc" } })
+  const stages = await db.stage.findMany({
+    where: { jobId: job?.id || "0" },
+    orderBy: { order: "asc" },
+  })
 
   // await db.interviewDetail.createMany({
   //   data:

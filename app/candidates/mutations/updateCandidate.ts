@@ -6,9 +6,7 @@ import Guard from "app/guard/ability"
 import { ExtendedCandidate } from "types"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
-type UpdateCandidateInput = Pick<Prisma.CandidateUpdateArgs, "where" | "data"> & {
-  initial: ExtendedCandidate
-}
+type UpdateCandidateInput = Pick<Prisma.CandidateUpdateArgs, "where" | "data">
 
 export const config = {
   api: {
@@ -18,7 +16,7 @@ export const config = {
   },
 }
 
-async function updateCandidate({ where, data, initial }: UpdateCandidateInput, ctx: Ctx) {
+async function updateCandidate({ where, data }: UpdateCandidateInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { id, name, email, resume, answers, jobId } = Candidate.parse(data)
@@ -38,18 +36,18 @@ async function updateCandidate({ where, data, initial }: UpdateCandidateInput, c
       upsert: answers?.map((answer) => {
         return {
           where: {
-            candidateId_questionId: {
+            candidateId_formQuestionId: {
               candidateId: id!,
-              questionId: answer.questionId!,
+              formQuestionId: answer.formQuestionId!,
             },
           },
           create: {
             value: answer.value,
-            questionId: answer.questionId!,
+            formQuestionId: answer.formQuestionId!,
           },
           update: {
             value: answer.value,
-            questionId: answer.questionId!,
+            formQuestionId: answer.formQuestionId!,
           },
         }
       }),

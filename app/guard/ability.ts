@@ -780,99 +780,101 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       can("create", "question")
       can("read", "question", async (args) => {
-        const question = await db.question.findFirst({
+        const formQuestion = await db.formQuestion.findFirst({
           where: args.where,
+          include: { job: { select: { companyId: true } } },
         })
 
-        return question?.companyId === ctx.session.companyId
+        return formQuestion?.job?.companyId === ctx.session.companyId
       })
       can("update", "question", async (args) => {
-        const question = await db.question.findUnique({
+        const formQuestion = await db.formQuestion.findUnique({
           where: args.where,
+          include: { job: { select: { companyId: true } } },
         })
 
-        return !question?.factory && question?.companyId === ctx.session.companyId
+        return !formQuestion?.allowEdit && formQuestion?.job?.companyId === ctx.session.companyId
       })
       can("readAll", "question", async (args) => {
-        const questions = await db.question.findMany({
+        const questions = await db.formQuestion.findMany({
           where: args.where,
+          include: { job: { select: { companyId: true } } },
         })
 
-        return questions.every((p) => p.companyId === ctx.session.companyId) === true
+        return (
+          questions.every((question) => question?.job?.companyId === ctx.session.companyId) === true
+        )
       })
 
       can("create", "formQuestion")
       can("read", "formQuestion", async (args) => {
         const formQuestion = await db.formQuestion.findFirst({
           where: args.where,
-          include: {
-            form: true,
-          },
+          include: { job: { select: { companyId: true } } },
         })
 
-        return formQuestion?.form.companyId === ctx.session.companyId
+        return formQuestion?.job?.companyId === ctx.session.companyId
       })
       can("readAll", "formQuestion", async (args) => {
         const formQuestions = await db.formQuestion.findMany({
           where: args.where,
-          include: {
-            form: true,
-          },
+          include: { job: { select: { companyId: true } } },
         })
 
-        return formQuestions.every((p) => p.form.companyId === ctx.session.companyId) === true
+        return (
+          formQuestions.every((question) => question?.job?.companyId === ctx.session.companyId) ===
+          true
+        )
       })
       can("update", "formQuestion", async (args) => {
         const formQuestion = await db.formQuestion.findUnique({
           where: args.where,
-          include: {
-            form: true,
-          },
+          include: { job: { select: { companyId: true } } },
         })
 
-        return formQuestion?.form.companyId === ctx.session.companyId
+        return formQuestion?.job?.companyId === ctx.session.companyId
       })
 
-      can("create", "form")
-      can("update", "form")
-      can("read", "form", async (args) => {
-        const companyUser = await db.companyUser.findUnique({
-          where: {
-            userId_companyId: {
-              userId: ctx.session.userId || "0",
-              companyId: ctx.session.companyId || "0",
-            },
-          },
-        })
-        if (companyUser?.role === CompanyUserRole.USER) {
-          return false
-        }
+      // can("create", "form")
+      // can("update", "form")
+      // can("read", "form", async (args) => {
+      //   const companyUser = await db.companyUser.findUnique({
+      //     where: {
+      //       userId_companyId: {
+      //         userId: ctx.session.userId || "0",
+      //         companyId: ctx.session.companyId || "0",
+      //       },
+      //     },
+      //   })
+      //   if (companyUser?.role === CompanyUserRole.USER) {
+      //     return false
+      //   }
 
-        const form = await db.form.findFirst({
-          where: args.where,
-        })
+      //   const form = await db.form.findFirst({
+      //     where: args.where,
+      //   })
 
-        return form?.companyId === ctx.session.companyId
-      })
-      can("readAll", "form", async (args) => {
-        const companyUser = await db.companyUser.findUnique({
-          where: {
-            userId_companyId: {
-              userId: ctx.session.userId || "0",
-              companyId: ctx.session.companyId || "0",
-            },
-          },
-        })
-        if (companyUser?.role === CompanyUserRole.USER) {
-          return false
-        }
+      //   return form?.companyId === ctx.session.companyId
+      // })
+      // can("readAll", "form", async (args) => {
+      //   const companyUser = await db.companyUser.findUnique({
+      //     where: {
+      //       userId_companyId: {
+      //         userId: ctx.session.userId || "0",
+      //         companyId: ctx.session.companyId || "0",
+      //       },
+      //     },
+      //   })
+      //   if (companyUser?.role === CompanyUserRole.USER) {
+      //     return false
+      //   }
 
-        const forms = await db.form.findMany({
-          where: args.where,
-        })
+      //   const forms = await db.form.findMany({
+      //     where: args.where,
+      //   })
 
-        return forms.every((p) => p.companyId === ctx.session.companyId) === true
-      })
+      //   return forms.every((p) => p.companyId === ctx.session.companyId) === true
+      // })
 
       can("update", "candidate", async (args) => {
         const candidate = await db.candidate.findUnique({

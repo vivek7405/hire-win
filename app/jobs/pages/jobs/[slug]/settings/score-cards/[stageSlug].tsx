@@ -34,7 +34,7 @@ import removeCardQuestionFromScoreCard from "app/score-cards/mutations/removeCar
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField"
 import Form from "app/core/components/Form"
-import updateScoreCardQuestionOrderBehaviour from "app/score-cards/mutations/updateScoreCardQuestionOrderBehaviour"
+import updateScoreCardQuestionBehaviour from "app/score-cards/mutations/updateScoreCardQuestionBehaviour"
 // import getScoreCardQuestions from "app/score-cards/queries/getScoreCardQuestions"
 import CardQuestionForm from "app/score-cards/components/ScoreCardQuestionForm"
 import addNewCardQuestionToScoreCard from "app/score-cards/mutations/addNewCardQuestionToScoreCard"
@@ -140,9 +140,7 @@ export const CardQuestions = ({
   const [data, setData] = useState<ExtendedScoreCardQuestion[]>([])
   const [query, setQuery] = useState({})
   const [shiftScoreCardQuestionMutation] = useMutation(shiftScoreCardQuestion)
-  const [updateScoreCardQuestionOrderBehaviourMutation] = useMutation(
-    updateScoreCardQuestionOrderBehaviour
-  )
+  const [updateScoreCardQuestionBehaviourMutation] = useMutation(updateScoreCardQuestionBehaviour)
   const [removeCardQuestionFromScoreCardMutation] = useMutation(removeCardQuestionFromScoreCard)
   const [openConfirm, setOpenConfirm] = React.useState(false)
   const [scoreCardQuestionToRemove, setScoreCardQuestionToRemove] = React.useState(
@@ -279,11 +277,10 @@ export const CardQuestions = ({
                             </span>
                           ))
                           try {
-                            await updateScoreCardQuestionOrderBehaviourMutation({
+                            await updateScoreCardQuestionBehaviourMutation({
                               where: { id: question?.id },
                               data: {
                                 name: question.name,
-                                order: question.order,
                                 behaviour: value,
                               },
                             })
@@ -319,7 +316,7 @@ export const CardQuestions = ({
         }
       }) as CardType[]
     },
-    [updateScoreCardQuestionOrderBehaviourMutation]
+    [updateScoreCardQuestionBehaviourMutation]
   )
 
   const [cards, setCards] = useState(getCards(data))

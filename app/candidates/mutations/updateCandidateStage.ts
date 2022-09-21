@@ -21,14 +21,12 @@ async function updateCandidateStage({ where, data }: UpdateCandidateStageInput, 
     include: {
       job: {
         include: {
-          form: {
-            include: { questions: { include: { question: { include: { options: true } } } } },
-          },
+          formQuestions: { include: { options: true } },
           stages: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
         },
       },
       stage: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
-      answers: { include: { question: { include: { options: true } } } },
+      answers: { include: { formQuestion: { include: { options: true } } } },
       scores: true,
     },
   })
@@ -36,4 +34,4 @@ async function updateCandidateStage({ where, data }: UpdateCandidateStageInput, 
   return candidate
 }
 
-export default Guard.authorize("update", "candidate", updateCandidateStage)
+export default updateCandidateStage

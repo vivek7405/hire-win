@@ -2,9 +2,8 @@ import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Job } from "app/jobs/validations"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { useQuery } from "blitz"
-import { Category, Form, SalaryType, EmploymentType } from "@prisma/client"
+import { Category, SalaryType, EmploymentType } from "@prisma/client"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
-import getFormsWOPagination from "app/forms/queries/getFormsWOPagination"
 import { Suspense, useEffect, useState } from "react"
 import { Country, State, City } from "country-state-city"
 import CheckboxField from "app/core/components/CheckboxField"
@@ -12,14 +11,13 @@ import { titleCase } from "app/core/utils/titleCase"
 import LabeledTextValidatedField from "app/core/components/LabeledTextValidatedField"
 import ApplicationForm from "../../candidates/components/ApplicationForm"
 import toast from "react-hot-toast"
-import getFormQuestionsWOPaginationWOAbility from "app/forms/queries/getFormQuestionsWOPaginationWOAbility"
+import getFormQuestionsWOPaginationWOAbility from "app/form-questions/queries/getJobApplicationFormQuestions"
 import MultiStepForm from "app/core/components/MultiStepForm"
 import { FormStep } from "types"
 import { z } from "zod"
 import { ArrowSmDownIcon } from "@heroicons/react/outline"
 import { useFormContext } from "react-hook-form"
 import getCategoriesWOPaginationWOAbility from "app/categories/queries/getCategoriesWOPaginationWOAbility"
-import getFormsWOPaginationWOAbility from "app/forms/queries/getFormsWOPaginationWOAbility"
 import getSalaryIntervalFromSalaryType from "../utils/getSalaryIntervalFromSalaryType"
 
 const Step1Basic = () => {
@@ -395,82 +393,82 @@ const Step4Salary = () => {
 //   )
 // }
 
-type Step6FormProps = {
-  initialValues?: any
-  // user: any
-  category?: Category // Need to be provided while editing the form
-  // workflow?: ExtendedWorkflow // Need to be provided while editing the form
-  form?: Form // Need to be provided while editing the form
-  jobId?: string // Need to be provided while editing the form
-  companyId: string
-}
-const Step6Form = (props: Step6FormProps) => {
-  const [forms] = useQuery(getFormsWOPaginationWOAbility, { where: { companyId: props.companyId } })
-  const [selectedFormId, setSelectedFormId] = useState(
-    props.form?.id || forms.find((f) => f.name === "Default")?.id
-  )
-  const [formQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
-    where: { formId: selectedFormId! },
-    orderBy: { order: "asc" },
-  })
+// type Step6FormProps = {
+//   initialValues?: any
+//   // user: any
+//   category?: Category // Need to be provided while editing the form
+//   // workflow?: ExtendedWorkflow // Need to be provided while editing the form
+//   // form?: Form // Need to be provided while editing the form
+//   jobId?: string // Need to be provided while editing the form
+//   companyId: string
+// }
+// const Step6Form = (props: Step6FormProps) => {
+//   const [forms] = useQuery(getFormsWOPaginationWOAbility, { where: { companyId: props.companyId } })
+//   const [selectedFormId, setSelectedFormId] = useState(
+//     props.form?.id || forms.find((f) => f.name === "Default")?.id
+//   )
+//   const [formQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
+//     where: { formId: selectedFormId! },
+//     orderBy: { order: "asc" },
+//   })
 
-  return (
-    <div>
-      <div className="flex flex-col space-y-6 w-full items-center">
-        <div className="w-full md:w-1/2 lg:w-1/2">
-          <div className="invisible w-0 h-0 overflow-hidden">
-            <Step1Basic />
-            <Step2Extra companyId={props.companyId} category={props.category} />
-            <Step3Location initialValues={props.initialValues} />
-            <Step4Salary />
-            {/* <Step5Workflow
-              companyId={props.companyId}
-              workflow={props.workflow}
-              jobId={props.jobId}
-            /> */}
-          </div>
-          <LabeledReactSelectField
-            name="formId"
-            // label="Application Form"
-            placeholder="Job Application Form"
-            testid="jobForm"
-            disabled={props.form && !forms.find((f) => f.id === props.form?.id)}
-            options={
-              !props.form || forms.find((f) => f.id === props.form?.id)
-                ? [
-                    ...forms.map((f) => {
-                      return { label: f.name!, value: f.id! }
-                    }),
-                  ]
-                : [{ label: props.form?.name!, value: props.form?.id! }]
-            }
-            defaultValue={selectedFormId}
-            onChange={(value) => {
-              setSelectedFormId(value as any)
-            }}
-          />
-        </div>
-        <div className="w-full md:w-1/2 lg:w-1/2">
-          <div className="w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl relative top-0">
-            <div className="w-full h-full rounded-2xl">
-              <ApplicationForm
-                header="Job Application Form (Preview)"
-                subHeader="This is how the Application Form will look for this job"
-                formId={selectedFormId!}
-                preview={true}
-                onSubmit={async (values) => {
-                  toast.error("Can't submit the form in preview mode")
-                }}
-                submitDisabled={true}
-                formQuestions={formQuestions}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+//   return (
+//     <div>
+//       <div className="flex flex-col space-y-6 w-full items-center">
+//         <div className="w-full md:w-1/2 lg:w-1/2">
+//           <div className="invisible w-0 h-0 overflow-hidden">
+//             <Step1Basic />
+//             <Step2Extra companyId={props.companyId} category={props.category} />
+//             <Step3Location initialValues={props.initialValues} />
+//             <Step4Salary />
+//             {/* <Step5Workflow
+//               companyId={props.companyId}
+//               workflow={props.workflow}
+//               jobId={props.jobId}
+//             /> */}
+//           </div>
+//           <LabeledReactSelectField
+//             name="formId"
+//             // label="Application Form"
+//             placeholder="Job Application Form"
+//             testid="jobForm"
+//             disabled={props.form && !forms.find((f) => f.id === props.form?.id)}
+//             options={
+//               !props.form || forms.find((f) => f.id === props.form?.id)
+//                 ? [
+//                     ...forms.map((f) => {
+//                       return { label: f.name!, value: f.id! }
+//                     }),
+//                   ]
+//                 : [{ label: props.form?.name!, value: props.form?.id! }]
+//             }
+//             defaultValue={selectedFormId}
+//             onChange={(value) => {
+//               setSelectedFormId(value as any)
+//             }}
+//           />
+//         </div>
+//         <div className="w-full md:w-1/2 lg:w-1/2">
+//           <div className="w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl relative top-0">
+//             <div className="w-full h-full rounded-2xl">
+//               <ApplicationForm
+//                 header="Job Application Form (Preview)"
+//                 subHeader="This is how the Application Form will look for this job"
+//                 formId={selectedFormId!}
+//                 preview={true}
+//                 onSubmit={async (values) => {
+//                   toast.error("Can't submit the form in preview mode")
+//                 }}
+//                 submitDisabled={true}
+//                 formQuestions={formQuestions}
+//               />
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
 
 type JobFormProps = {
   onSuccess?: () => void
@@ -481,7 +479,7 @@ type JobFormProps = {
   user: any
   category?: Category // Need to be provided while editing the form
   // workflow?: ExtendedWorkflow // Need to be provided while editing the form
-  form?: Form // Need to be provided while editing the form
+  // form?: Form // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
   companyId: string
 }
@@ -523,14 +521,15 @@ export const JobForm = (props: JobFormProps) => {
   const stp4: FormStep = {
     name: "Salary",
     renderComponent: <Step4Salary />,
-    validationSchema: z.object({
-      id: z.string().optional(),
-      slug: z.string().optional(),
-      currency: z.string(),
-      minSalary: z.number(),
-      maxSalary: z.number(),
-      salaryType: z.nativeEnum(SalaryType),
-    }),
+    validationSchema: Job,
+    // validationSchema: z.object({
+    //   id: z.string().optional(),
+    //   slug: z.string().optional(),
+    //   currency: z.string(),
+    //   minSalary: z.number(),
+    //   maxSalary: z.number(),
+    //   salaryType: z.nativeEnum(SalaryType),
+    // }),
   }
   // const stp5: FormStep = {
   //   name: "Workflow",
@@ -544,21 +543,21 @@ export const JobForm = (props: JobFormProps) => {
   //     scoreCards: z.array(ScoreCardJobWorkflowStageObj).optional(),
   //   }),
   // }
-  const stp6: FormStep = {
-    name: "Form",
-    renderComponent: (
-      <Step6Form
-        initialValues={props.initialValues}
-        companyId={props.companyId}
-        category={props.category}
-        // workflow={props.workflow}
-        form={props.form}
-        jobId={props.jobId}
-      />
-    ),
-    validationSchema: Job,
-  }
-  const steps = [stp1, stp2, stp3, stp4, stp6]
+  // const stp6: FormStep = {
+  //   name: "Form",
+  //   renderComponent: (
+  //     <Step6Form
+  //       initialValues={props.initialValues}
+  //       companyId={props.companyId}
+  //       category={props.category}
+  //       // workflow={props.workflow}
+  //       form={props.form}
+  //       jobId={props.jobId}
+  //     />
+  //   ),
+  //   validationSchema: Job,
+  // }
+  const steps = [stp1, stp2, stp3, stp4]
 
   return (
     <Suspense fallback="Loading...">

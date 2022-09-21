@@ -38,7 +38,7 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
       create: answers?.map((answer) => {
         return {
           value: answer.value,
-          questionId: answer.questionId!,
+          formQuestionId: answer.formQuestionId!,
         }
       }),
     },

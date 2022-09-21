@@ -128,29 +128,29 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
       //     ),
       //   },
       // },
-      {
-        name: "Forms",
-        href: Routes.FormsHome().pathname,
-        focus:
-          router.route.includes(Routes.FormsHome().pathname) ||
-          router.route.includes(Routes.QuestionsHome().pathname),
-        introStep: {
-          element: "#selectorFormsMenuStep",
-          title: "Forms",
-          intro: (
-            <span>
-              <p>
-                Forms are the <b>application forms through which the candidate applies to a job</b>.
-              </p>
-              <br />
-              <p>
-                Create and assign forms to jobs so that you have all the{" "}
-                <b>information you need from a candidate for a particular job</b>.
-              </p>
-            </span>
-          ),
-        },
-      },
+      // {
+      //   name: "Forms",
+      //   href: Routes.FormsHome().pathname,
+      //   focus:
+      //     router.route.includes(Routes.FormsHome().pathname) ||
+      //     router.route.includes(Routes.QuestionsHome().pathname),
+      //   introStep: {
+      //     element: "#selectorFormsMenuStep",
+      //     title: "Forms",
+      //     intro: (
+      //       <span>
+      //         <p>
+      //           Forms are the <b>application forms through which the candidate applies to a job</b>.
+      //         </p>
+      //         <br />
+      //         <p>
+      //           Create and assign forms to jobs so that you have all the{" "}
+      //           <b>information you need from a candidate for a particular job</b>.
+      //         </p>
+      //       </span>
+      //     ),
+      //   },
+      // },
       // {
       //   name: "Score Cards",
       //   href: Routes.ScoreCardsHome().pathname,

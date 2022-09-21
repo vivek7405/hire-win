@@ -4,21 +4,21 @@ import Guard from "app/guard/ability"
 import { ShiftDirection } from "types"
 import range from "app/core/utils/range"
 
-type ShiftScoreCardQuestionInput = {
-  stageId: string
+type ShiftFormQuestionInput = {
+  jobId: string
   sourceOrder: number
   destOrder: number
 }
 
-async function shiftScoreCardQuestion(
-  { stageId, sourceOrder, destOrder }: ShiftScoreCardQuestionInput,
+async function shiftFormQuestion(
+  { jobId, sourceOrder, destOrder }: ShiftFormQuestionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const scoreCardQuestions = await db.scoreCardQuestion.findMany({
+  const formQuestions = await db.formQuestion.findMany({
     where: {
-      stageId,
+      jobId,
       order: {
         in:
           sourceOrder < destOrder
@@ -30,8 +30,8 @@ async function shiftScoreCardQuestion(
   })
 
   const shiftDirection = sourceOrder < destOrder ? ShiftDirection.DOWN : ShiftDirection.UP
-  if (scoreCardQuestions?.length === Math.abs(sourceOrder - destOrder) + 1) {
-    scoreCardQuestions.forEach((fq) => {
+  if (formQuestions?.length === Math.abs(sourceOrder - destOrder) + 1) {
+    formQuestions.forEach((fq) => {
       if (fq.order === sourceOrder) {
         fq.order = destOrder
       } else {
@@ -39,11 +39,11 @@ async function shiftScoreCardQuestion(
       }
     })
 
-    const updateScoreCardQuestionOrderBehaviours = await db.stage.update({
-      where: { id: stageId },
+    const updateFormQuestions = await db.job.update({
+      where: { id: jobId },
       data: {
-        scoreCardQuestions: {
-          updateMany: scoreCardQuestions?.map((question) => {
+        formQuestions: {
+          updateMany: formQuestions?.map((question) => {
             return {
               where: {
                 id: question.id,
@@ -56,10 +56,11 @@ async function shiftScoreCardQuestion(
         },
       },
     })
-    return updateScoreCardQuestionOrderBehaviours
+
+    return updateFormQuestions
   } else {
     throw new Error("Order incorrect")
   }
 }
 
-export default shiftScoreCardQuestion
+export default shiftFormQuestion

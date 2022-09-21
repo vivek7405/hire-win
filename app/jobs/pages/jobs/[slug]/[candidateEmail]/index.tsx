@@ -184,13 +184,13 @@ const getResume = async (Key) => {
 
 const getCards = (candidate: ExtendedCandidate) => {
   return (
-    candidate?.job?.form?.questions
+    candidate?.job?.formQuestions
       // ?.filter((q) => !q.question.factory)
-      ?.map((fq) => {
-        const answer = getCandidateAnswerForDisplay(fq, candidate)
+      ?.map((question) => {
+        const answer = getCandidateAnswerForDisplay(question, candidate)
         return {
-          id: fq.id,
-          title: fq.question.name,
+          id: question.id,
+          title: question.name,
           description: answer,
           // renderContent: (
           //   <>
@@ -681,7 +681,7 @@ const SingleCandidatePageContent = ({
         <ApplicationForm
           header="Update Candidate"
           subHeader=""
-          formId={candidate?.job?.formId || ""}
+          jobId={candidate?.job?.id || "0"}
           preview={false}
           initialValues={getCandidateInitialValues(candidate)}
           onSubmit={async (values) => {
@@ -689,7 +689,7 @@ const SingleCandidatePageContent = ({
             try {
               const updatedCandidate = await updateCandidateMutation({
                 where: { id: candidate?.id },
-                initial: candidate as any,
+                // initial: candidate as any,
                 data: {
                   id: candidate?.id,
                   jobId: candidate?.job?.id,
@@ -698,10 +698,10 @@ const SingleCandidatePageContent = ({
                   resume: values.Resume,
                   source: candidate?.source,
                   answers:
-                    (candidate?.job?.form?.questions?.map((fq) => {
-                      const val = values[fq.question?.name] || ""
+                    (candidate?.job?.formQuestions?.map((formQuestion) => {
+                      const val = values[formQuestion?.name] || ""
                       return {
-                        questionId: fq.questionId,
+                        formQuestionId: formQuestion.id,
                         value: typeof val === "string" ? val : JSON.stringify(val),
                       }
                     }) as any) || ([] as any),
@@ -899,19 +899,19 @@ const SingleCandidatePageContent = ({
                 {file && <PDFViewer file={file} scale={1.29} />}
               </div>
               <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
-                {candidate?.job?.form?.questions?.map((fq) => {
-                  const answer = getCandidateAnswerForDisplay(fq, candidate)
+                {candidate?.job?.formQuestions?.map((question) => {
+                  const answer = getCandidateAnswerForDisplay(question, candidate)
                   // if (fq?.question?.name === "Resume") {
                   //   console.log("RESUME RESUME RESUME")
                   //   console.log(answer)
                   // }
 
                   return (
-                    <Card key={fq.id}>
+                    <Card key={question.id}>
                       <div className="space-y-2">
                         <div className="w-full relative">
                           <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                            <span className="truncate">{fq.question.name}</span>
+                            <span className="truncate">{question.name}</span>
                           </div>
                         </div>
                         <div className="border-b-2 border-gray-50 w-full"></div>

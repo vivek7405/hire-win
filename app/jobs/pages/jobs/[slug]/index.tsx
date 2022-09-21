@@ -37,14 +37,15 @@ import {
   CandidateSource,
   Company,
   CompanyUser,
-  Form as FormDB,
-  FormQuestion,
+  // Form as FormDB,
+  // FormQuestion,
   Job,
   JobUser,
   JobUserRole,
-  Question,
-  QuestionType,
+  FormQuestion,
+  FormQuestionType,
   User,
+  FormQuestionOption,
 } from "@prisma/client"
 
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
@@ -543,8 +544,8 @@ const Candidates = (props: CandidateProps) => {
       },
     },
   ]
-  props.job?.form?.questions
-    ?.filter((q) => !q.question.factory)
+  props.job?.formQuestions
+    ?.filter((question) => !question.allowEdit)
     ?.forEach((formQuestion) => {
       columns.push(getDynamicColumn(formQuestion))
     })
@@ -839,10 +840,10 @@ const SingleJobPageContent = ({
     null as
       | (Candidate & {
           job: Job & {
-            form: FormDB & { questions: (FormQuestion & { question: Question })[] }
+            formQuestions: FormQuestion[]
           }
         } & {
-          answers: (Answer & { question: Question })[]
+          answers: (Answer & { formQuestion: FormQuestion })[]
         })
       | null
   )
@@ -1044,7 +1045,7 @@ const SingleJobPageContent = ({
         <ApplicationForm
           header={`${candidateToEdit ? "Update" : "Create"} Candidate`}
           subHeader=""
-          formId={job?.formId || ""}
+          jobId={job?.id || "0"}
           preview={false}
           initialValues={candidateToEdit ? getCandidateInitialValues(candidateToEdit) : {}}
           onSubmit={async (values) => {
@@ -1062,10 +1063,10 @@ const SingleJobPageContent = ({
                       resume: values.Resume,
                       source: candidateToEdit?.source,
                       answers:
-                        (candidateToEdit?.job?.form?.questions?.map((fq) => {
-                          const val = values[fq.question?.name] || ""
+                        (candidateToEdit?.job?.formQuestions?.map((formQuestion) => {
+                          const val = values[formQuestion?.name] || ""
                           return {
-                            questionId: fq.questionId,
+                            formQuestionId: formQuestion.id,
                             value: typeof val === "string" ? val : JSON.stringify(val),
                           }
                         }) as any) || ([] as any),
@@ -1078,10 +1079,10 @@ const SingleJobPageContent = ({
                     resume: values.Resume,
                     source: CandidateSource.Manual,
                     answers:
-                      job?.form?.questions?.map((fq) => {
-                        const val = values[fq.question?.name] || ""
+                      job?.formQuestions?.map((formQuestion) => {
+                        const val = values[formQuestion?.name] || ""
                         return {
-                          questionId: fq.questionId,
+                          formQuestionId: formQuestion.id,
                           value: typeof val === "string" ? val : JSON.stringify(val),
                         }
                       }) || [],

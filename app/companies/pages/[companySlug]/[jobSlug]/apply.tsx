@@ -160,7 +160,7 @@ const ApplyToJob = ({
         <ApplicationForm
           header="Job Application Form"
           subHeader={`Apply to the job - ${job?.title}`}
-          formId={job?.formId || ""}
+          jobId={job?.id || "0"}
           preview={false}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Applying to job</span>)
@@ -172,10 +172,10 @@ const ApplyToJob = ({
                 resume: values.Resume,
                 source: CandidateSource.Careers_Page,
                 answers:
-                  job?.form?.questions?.map((fq) => {
-                    const val = values[fq.question?.name] || ""
+                  job?.formQuestions?.map((formQuestion) => {
+                    const val = values[formQuestion?.name] || ""
                     return {
-                      questionId: fq.questionId,
+                      formQuestionId: formQuestion.id,
                       value: typeof val === "string" ? val : JSON.stringify(val),
                     }
                   }) || [],

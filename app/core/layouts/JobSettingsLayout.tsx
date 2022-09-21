@@ -5,6 +5,7 @@ import {
   CollectionIcon,
   DatabaseIcon,
   HomeIcon,
+  IdentificationIcon,
   StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/outline"
@@ -31,6 +32,15 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
           href: `/jobs/${job?.slug}/settings`,
           current: router.route === `/jobs/[slug]/settings`,
           icon: DatabaseIcon,
+          canView: true,
+        }
+      : null,
+    jobUser?.role !== JobUserRole.USER
+      ? {
+          name: "Application Form",
+          href: `/jobs/${job?.slug}/settings/application-form`,
+          current: router.route === `/jobs/[slug]/settings/application-form`,
+          icon: IdentificationIcon,
           canView: true,
         }
       : null,
