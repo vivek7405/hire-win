@@ -1054,7 +1054,7 @@ const SingleJobPageContent = ({
               candidateToEdit
                 ? await updateCandidateMutation({
                     where: { id: candidateToEdit?.id },
-                    initial: candidateToEdit as any,
+                    // initial: candidateToEdit as any,
                     data: {
                       id: candidateToEdit?.id,
                       jobId: candidateToEdit?.job?.id,

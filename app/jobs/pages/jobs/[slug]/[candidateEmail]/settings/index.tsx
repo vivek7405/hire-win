@@ -139,7 +139,7 @@ const CandidateSettingsPage = ({
           try {
             await updateCandidateMutation({
               where: { id: candidate?.id },
-              initial: candidate as any,
+              // initial: candidate as any,
               data: {
                 id: candidate?.id,
                 jobId: candidate?.job?.id,
