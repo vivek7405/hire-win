@@ -12,11 +12,19 @@ interface GetStageInput extends Pick<Prisma.StageFindFirstArgs, "where"> {}
 
 const getStage = resolver.pipe(resolver.authorize(), async ({ where }: GetStageInput, ctx) => {
   // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-  const stage = await db.stage.findFirst({ where, include: { workflows: true } })
+  const stage = await db.stage.findFirst({
+    where,
+    include: {
+      scoreCardQuestions: { include: { scores: { include: { candidate: true } }, stage: true } },
+      scores: true,
+      interviewer: { include: { calendars: true } },
+      stageUserScheduleCalendars: { include: { schedule: true, calendar: true } },
+    },
+  })
 
   if (!stage) throw new NotFoundError()
 
   return stage
 })
 
-export default Guard.authorize("read", "stage", getStage)
+export default getStage

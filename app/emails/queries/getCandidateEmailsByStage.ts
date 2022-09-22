@@ -2,14 +2,14 @@ import db from "db"
 
 type GetCandidateEmailsByStageInput = {
   candidateId: string
-  workflowStageId: string
+  stageId: string
 }
 export default async function getCandidateEmailsByStage({
   candidateId,
-  workflowStageId,
+  stageId,
 }: GetCandidateEmailsByStageInput) {
   const candidateStageEmails = await db.email.findMany({
-    where: { candidateId, workflowStageId },
+    where: { candidateId, stageId },
     include: { sender: true, candidate: true, templateUsed: true },
     orderBy: { createdAt: "asc" },
   })

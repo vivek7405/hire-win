@@ -5,50 +5,33 @@ import Guard from "app/guard/ability"
 import { ExtendedCandidate } from "types"
 
 type UpdateCandidateStageInput = Pick<Prisma.CandidateUpdateArgs, "where"> & {
-  data: { workflowStageId: string }
+  data: { stageId: string }
 }
 
 async function updateCandidateStage({ where, data }: UpdateCandidateStageInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { workflowStageId } = data
+  const { stageId } = data
 
   const candidate = await db.candidate.update({
     where,
     data: {
-      workflowStageId,
+      stageId,
     },
     include: {
       job: {
         include: {
-          form: {
-            include: { questions: { include: { question: { include: { options: true } } } } },
-          },
-          workflow: { include: { stages: { include: { stage: true, interviewDetails: true } } } },
-          scoreCards: {
-            include: {
-              scoreCard: {
-                include: {
-                  cardQuestions: { include: { cardQuestion: true, scores: true } },
-                  jobWorkflowStages: {
-                    include: {
-                      scoreCard: {
-                        include: { cardQuestions: { include: { cardQuestion: true } } },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          formQuestions: { include: { options: true } },
+          stages: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
         },
       },
-      workflowStage: { include: { stage: true, interviewDetails: true } },
-      answers: { include: { question: { include: { options: true } } } },
+      stage: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
+      answers: { include: { formQuestion: { include: { options: true } } } },
+      scores: true,
     },
   })
 
   return candidate
 }
 
-export default Guard.authorize("update", "candidate", updateCandidateStage)
+export default updateCandidateStage

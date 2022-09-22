@@ -8,31 +8,19 @@ import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
 type UpdateCandidateWorkflowStageInterviewerInput = {
   candidateId: string
-  workflowStageId: string
+  stageId: string
   interviewerId: string
 }
 
 async function setCandidateInterviewer(
-  { candidateId, workflowStageId, interviewerId }: UpdateCandidateWorkflowStageInterviewerInput,
+  { candidateId, stageId, interviewerId }: UpdateCandidateWorkflowStageInterviewerInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const candidate = await db.candidateWorkflowStageInterviewer.upsert({
-    where: {
-      candidateId_workflowStageId: {
-        candidateId,
-        workflowStageId,
-      },
-    },
-    create: {
-      candidateId,
-      workflowStageId,
-      interviewerId,
-    },
-    update: {
-      interviewerId,
-    },
+  const candidate = await db.stage.update({
+    where: { id: stageId || "0" },
+    data: { interviewerId },
   })
 
   return candidate

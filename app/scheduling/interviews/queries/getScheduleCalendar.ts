@@ -3,13 +3,12 @@ import { resolver } from "blitz"
 import * as z from "zod"
 
 export default resolver.pipe(
-  resolver.zod(z.object({ jobId: z.string(), workflowStageId: z.string(), userId: z.string() })),
-  async ({ jobId, workflowStageId, userId }) => {
-    const scheduleInterview = await db.jobUserScheduleCalendar.findUnique({
+  resolver.zod(z.object({ stageId: z.string(), userId: z.string() })),
+  async ({ stageId, userId }) => {
+    const scheduleInterview = await db.stageUserScheduleCalendar.findUnique({
       where: {
-        jobId_workflowStageId_userId: {
-          jobId,
-          workflowStageId,
+        stageId_userId: {
+          stageId,
           userId,
         },
       },

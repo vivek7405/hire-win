@@ -1,34 +1,34 @@
-import { Answer, Candidate, Question, QuestionType } from "@prisma/client"
+import { Answer, Candidate, FormQuestion, FormQuestionType } from "@prisma/client"
 import { AttachmentObject } from "types"
 
 function getCandidateInitialValues(
-  candidate: Candidate & { answers: (Answer & { question: Question })[] }
+  candidate: Candidate & { answers: (Answer & { formQuestion: FormQuestion })[] }
 ) {
   const initialValues: any = {}
 
   candidate?.answers?.forEach((answer) => {
     if (answer) {
       const val = answer.value
-      const type = answer?.question?.type
+      const type = answer?.formQuestion?.type
 
       switch (type) {
-        case QuestionType.Multiple_select:
+        case FormQuestionType.Multiple_select:
           const selectedOptionIds: String[] = JSON.parse(val || "[]")
-          initialValues[answer?.question?.name] = selectedOptionIds
+          initialValues[answer?.formQuestion?.name] = selectedOptionIds
           break
-        case QuestionType.Attachment:
+        case FormQuestionType.Attachment:
           const attachmentObj: AttachmentObject = JSON.parse(val)
-          initialValues[answer?.question?.name] = attachmentObj
+          initialValues[answer?.formQuestion?.name] = attachmentObj
           break
-        case QuestionType.Checkbox:
+        case FormQuestionType.Checkbox:
           const isChecked: boolean = val === "true"
-          initialValues[answer?.question?.name] = isChecked
+          initialValues[answer?.formQuestion?.name] = isChecked
           break
-        case QuestionType.Rating:
-          initialValues[answer?.question?.name] = val ? parseInt(val) : 0
+        case FormQuestionType.Rating:
+          initialValues[answer?.formQuestion?.name] = val ? parseInt(val) : 0
           break
         default:
-          initialValues[answer?.question?.name] = val
+          initialValues[answer?.formQuestion?.name] = val
           break
       }
     }

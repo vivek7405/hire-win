@@ -1,5 +1,4 @@
-import { Interview, Calendar, InterviewDetail, Prisma, User, Candidate, Job } from "db"
-import { InterviewDetailType } from "types"
+import { Calendar, User, Candidate, Job } from "db"
 import { CaldavService } from "./caldav"
 import { GoogleCalendarService } from "./googlecalendar/googlecalendar"
 import { OutlookCalendarService } from "./outlookcalendar/outlookcalendar"

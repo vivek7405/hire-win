@@ -32,7 +32,6 @@ import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon, XIcon } from "@heroicon
 import { JobUserRole, User } from "db"
 import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/companies/utils/checkPlan"
-import getWorkflowsWOPagination from "app/workflows/queries/getWorkflowsWOPagination"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import Form from "app/core/components/Form"
 import assignInterviewerToJobStage from "app/jobs/mutations/assignInterviewerToJobStage"
@@ -386,22 +385,22 @@ const JobSettingsMembersPage = ({
                   Timings & Interviewers
                 </h3>
                 <div className="flex flex-col space-y-20 md:flex-row md:space-y-0 lg:flex-row lg:space-y-0 mt-6 items-center md:justify-center lg:justify-center">
-                  {jobData?.workflow?.stages?.map((ws, index) => {
-                    const existingInterviewDetail = ws.interviewDetails?.find(
-                      (int) => int.workflowStageId === ws.id && int.jobId === jobData.id
-                    )
-                    const existingInterviewer: User | null | undefined = jobData?.users?.find(
-                      (member) => member?.userId === existingInterviewDetail?.interviewerId
-                    )?.user
+                  {jobData?.stages?.map((stage, index) => {
+                    // const existingInterviewDetail = stage.interviewDetails?.find(
+                    //   (int) => int.stageId === stage.id && int.jobId === jobData.id
+                    // )
+                    // const existingInterviewer: User | null | undefined = jobData?.users?.find(
+                    //   (member) => member?.userId === existingInterviewDetail?.interviewerId
+                    // )?.user
 
                     return (
                       <div
-                        key={ws.id}
+                        key={stage.id}
                         className="bg-white w-32 flex flex-col space-y-2 items-center justify-center p-1"
                       >
                         <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-full flex flex-col items-center justify-center">
                           <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
-                            {ws.stage?.name}
+                            {stage?.name}
                           </div>
                         </div>
 
@@ -410,7 +409,7 @@ const JobSettingsMembersPage = ({
                         <select
                           className="border border-neutral-300 px-2 py-1 md:py-2 lg:py-2 block w-full sm:text-sm rounded truncate pr-6"
                           name={`timeIntervals.${index}.intervalId`}
-                          placeholder={`Time interval for ${ws.stage?.name}`}
+                          placeholder={`Time interval for ${stage?.name}`}
                           // disabled={existingInterviewDetail && !existingInterviewer}
                           defaultValue="30"
                         >
@@ -425,10 +424,10 @@ const JobSettingsMembersPage = ({
                         <select
                           className="border border-neutral-300 px-2 py-1 md:py-2 lg:py-2 block w-full sm:text-sm rounded truncate pr-6"
                           name={`interviewers.${index}.interviewerId`}
-                          placeholder={`Interviewer for ${ws.stage?.name}`}
-                          disabled={existingInterviewDetail && !existingInterviewer}
+                          placeholder={`Interviewer for ${stage?.name}`}
+                          disabled={!stage.interviewerId}
                           defaultValue={
-                            existingInterviewDetail?.interviewerId?.toString() ||
+                            stage?.interviewerId?.toString() ||
                             jobData?.users
                               ?.find((member) => member?.role === "OWNER")
                               ?.userId?.toString()
@@ -439,14 +438,12 @@ const JobSettingsMembersPage = ({
                             try {
                               const assignedInterviewer = await assignInterviewerToJobStageMutation(
                                 {
-                                  jobId: jobData?.id,
-                                  workflowStageId: ws.id,
+                                  stageId: stage.id,
                                   interviewerId: selectedInterviewerId || "0",
                                 }
                               )
-                              if (existingInterviewDetail && assignedInterviewer) {
-                                existingInterviewDetail.interviewerId =
-                                  assignedInterviewer.interviewerId
+                              if (stage.interviewerId && assignedInterviewer) {
+                                stage.interviewerId = assignedInterviewer.interviewerId
                                 setJobData(jobData)
                               }
 
@@ -461,7 +458,8 @@ const JobSettingsMembersPage = ({
                             }
                           }}
                         >
-                          {!existingInterviewDetail || existingInterviewer ? (
+                          {
+                            // !stage.interviewerId ? (
                             jobData?.users?.map((member) => {
                               return (
                                 <option
@@ -472,18 +470,17 @@ const JobSettingsMembersPage = ({
                                 </option>
                               )
                             })
-                          ) : (
-                            <option
-                              key={
-                                (existingInterviewer as User | null | undefined)?.id?.toString()!
-                              }
-                              value={
-                                (existingInterviewer as User | null | undefined)?.id?.toString()!
-                              }
-                            >
-                              {(existingInterviewer as User | null | undefined)?.email!}
-                            </option>
-                          )}
+                            // ) : (
+                            //   <option
+                            //     key={(stage.interviewer as User | null | undefined)?.id?.toString()!}
+                            //     value={
+                            //       (stage.interviewer as User | null | undefined)?.id?.toString()!
+                            //     }
+                            //   >
+                            //     {(stage.interviewer as User | null | undefined)?.name!}
+                            //   </option>
+                            // )
+                          }
                         </select>
                       </div>
                     )

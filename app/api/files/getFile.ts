@@ -8,7 +8,7 @@ const getFile = async (req, res) => {
   const secretAccessKey = process.env.S3_SECRET_KEY
   const s3 = new AWS.S3({ region, accessKeyId, secretAccessKey })
   const params = {
-    Key: body.Key,
+    Key: body.key,
     Bucket: process.env.S3_BUCKET ? process.env.S3_BUCKET : "hire.win",
   }
 

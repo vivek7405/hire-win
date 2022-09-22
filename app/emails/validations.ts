@@ -7,7 +7,7 @@ export const EmailObj = z.object({
   slug: z.string().optional(),
   body: z.any(),
   candidateId: z.string().optional(),
-  workflowStageId: z.string().optional(),
+  stageId: z.string().optional(),
   senderId: z.string().optional(),
   templateId: z.string().optional(),
 })

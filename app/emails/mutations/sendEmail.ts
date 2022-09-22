@@ -9,7 +9,7 @@ import draftToHtml from "draftjs-to-html"
 export default resolver.pipe(
   resolver.zod(EmailObj),
   resolver.authorize(),
-  async ({ subject, body, cc, candidateId, workflowStageId, templateId }, ctx: Ctx) => {
+  async ({ subject, body, cc, candidateId, stageId, templateId }, ctx: Ctx) => {
     if (!body) {
       throw new Error("Email body can't be empty")
     }
@@ -36,7 +36,7 @@ export default resolver.pipe(
         cc,
         body,
         candidateId: candidateId || "0",
-        workflowStageId: workflowStageId || "0",
+        stageId: stageId || "0",
         senderId: ctx.session.userId || "0",
         templateId,
       },

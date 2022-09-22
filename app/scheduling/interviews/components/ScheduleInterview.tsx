@@ -21,23 +21,23 @@ import { DatePickerCalendar } from "react-nice-dates"
 import { InterviewDetailType } from "types"
 import scheduleInterview from "../mutations/scheduleInterview"
 import getCandidateInterviewsByStage from "../queries/getCandidateInterviewsByStage"
-import getInterviewDetail from "../queries/getInterviewDetail"
 import getTimeSlots from "../queries/getTimeSlots"
 import { TimeSlot } from "../types"
 import { areDatesOnSameDay } from "../utils/comparison"
 // import { InterviewInput } from "../validations"
 import AvailableTimeSlotsSelection from "./AvailableTimeSlotsSelection"
+import getStage from "app/stages/queries/getStage"
 
 type ScheduleInterviewProps = {
-  interviewDetail: InterviewDetailType
+  interviewer: User
   candidateId: string
-  workflowStageId: string
+  stageId: string
   setOpenScheduleInterviewModal: any
 }
 export default function ScheduleInterview({
-  interviewDetail,
+  interviewer,
   candidateId,
-  workflowStageId,
+  stageId,
   setOpenScheduleInterviewModal,
 }: ScheduleInterviewProps) {
   //   const [meeting] = useQuery(getMeeting, { username: username, slug: meetingSlug })
@@ -45,13 +45,14 @@ export default function ScheduleInterview({
   const session = useSession()
   const [organizer] = useQuery(getUser, { where: { id: session?.userId! } })
   const [candidate] = useQuery(getCandidate, { where: { id: candidateId } })
+  // const [stage] = useQuery(getStage, { where: { id: stageId } })
 
   return (
     <>
       <div className="bg-white text-center p-10 w-full md:w-96 lg:w-96 space-y-5">
         <h3 className="font-semibold text-xl">Schedule Interview</h3>
         <div>
-          {organizer?.id === interviewDetail?.interviewer?.id ? (
+          {organizer?.id === interviewer?.id ? (
             <>
               <h5>
                 Organizer & Interviewer:{" "}
@@ -62,10 +63,7 @@ export default function ScheduleInterview({
             <>
               <h5>Organizer: {organizer?.id === session?.userId ? "You" : organizer?.name}</h5>
               <h5>
-                Interviewer:{" "}
-                {interviewDetail?.interviewer?.id === session?.userId
-                  ? "You"
-                  : interviewDetail?.interviewer?.name}
+                Interviewer: {interviewer?.id === session?.userId ? "You" : interviewer?.name}
               </h5>
             </>
           )}
@@ -73,10 +71,11 @@ export default function ScheduleInterview({
         </div>
         <Suspense fallback={<p className="mt-8 font-semibold">Loading Schedule...</p>}>
           <PickAndSchedule
-            interviewDetail={interviewDetail}
+            // interviewDetail={interviewDetail}
+            interviewer={interviewer}
             candidate={candidate}
             organizer={organizer}
-            workflowStageId={workflowStageId}
+            stageId={stageId}
             candidateId={candidateId}
             setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
           />
@@ -87,10 +86,11 @@ export default function ScheduleInterview({
 }
 
 const PickAndSchedule = ({
-  interviewDetail,
+  // interviewDetail,
+  interviewer,
   candidate,
   organizer,
-  workflowStageId,
+  stageId,
   candidateId,
   setOpenScheduleInterviewModal,
 }) => {
@@ -99,11 +99,14 @@ const PickAndSchedule = ({
   const [scheduleInterviewMutation] = useMutation(scheduleInterview)
   const [job] = useQuery(getJob, { where: { id: candidate?.jobId } })
   const [otherAttendees, setOtherAttendees] = useState([] as string[])
+  const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
 
   const [slots] = useQuery(getTimeSlots, {
-    interviewerId: interviewDetail?.interviewer?.id,
-    scheduleId: interviewDetail?.schedule?.id,
-    duration: interviewDetail?.duration,
+    interviewerId: interviewer?.id,
+    scheduleId:
+      stage?.stageUserScheduleCalendars?.find((sc) => sc.userId === interviewer?.id || "0")
+        ?.schedule?.id || "0",
+    duration: stage?.duration,
     otherAttendees,
     startDateUTC: new Date(moment(selectedDay)?.startOf("month")?.format("YYYY-MM-DD")),
     endDateUTC: new Date(moment(selectedDay)?.endOf("month")?.format("YYYY-MM-DD")),
@@ -133,13 +136,13 @@ const PickAndSchedule = ({
     setSelectedTimeSlot(undefined)
   }, [otherAttendees])
 
-  if (!interviewDetail) {
-    return (
-      <h2 className="text-center p-10 bg-white">
-        No interview details are available for scheduling an interview.
-      </h2>
-    )
-  }
+  // if (!interviewDetail) {
+  //   return (
+  //     <h2 className="text-center p-10 bg-white">
+  //       No interview details are available for scheduling an interview.
+  //     </h2>
+  //   )
+  // }
 
   if ((organizer?.calendars?.length || 0) === 0) {
     return (
@@ -150,11 +153,11 @@ const PickAndSchedule = ({
     )
   }
 
-  if ((interviewDetail?.interviewer?.calendars?.length || 0) === 0) {
+  if ((interviewer?.calendars?.length || 0) === 0) {
     return (
       <h2 className="text-center p-10 bg-white">
-        You cannot schedule an interview since the interviewer ({interviewDetail?.interviewer?.name}
-        ) has no calendars connected.
+        You cannot schedule an interview since the interviewer ({interviewer?.name}) has no
+        calendars connected.
       </h2>
     )
   }
@@ -190,7 +193,7 @@ const PickAndSchedule = ({
     try {
       await scheduleInterviewMutation({
         jobId: candidate?.jobId,
-        workflowStageId,
+        stageId,
         candidateId,
         startDate: selectedTimeSlot.start,
         otherAttendees,
@@ -218,9 +221,7 @@ const PickAndSchedule = ({
           placeholder="Select members to invite"
           isMulti={true}
           options={job?.users
-            ?.filter(
-              (m) => m.userId !== organizer?.id && m.userId !== interviewDetail?.interviewer?.id
-            )
+            ?.filter((m) => m.userId !== organizer?.id && m.userId !== interviewer?.id)
             ?.map((m) => {
               return { label: m.user.name, value: m.userId.toString() }
             })}

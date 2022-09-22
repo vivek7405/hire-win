@@ -3,8 +3,8 @@ import { z } from "zod"
 export const UserObj = z.object({
   // logo: z
   //   .object({
-  //     Location: z.string().optional(),
-  //     Key: z.string().optional(),
+  //     location: z.string().optional(),
+  //     key: z.string().optional(),
   //   })
   //   .nullable(),
   name: z.string().nonempty({ message: "Required" }),

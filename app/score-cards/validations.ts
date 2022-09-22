@@ -1,42 +1,25 @@
-import { ScoreCardQuestionBehaviour } from "@prisma/client"
 import { z } from "zod"
+import { Behaviour } from "@prisma/client"
 
-export const ScoreCardObj = z.object({
+export const ScoreCardQuestionObj = z.object({
   id: z.string().optional(),
   name: z.string().nonempty({ message: "Name can't be empty" }),
   slug: z.string().optional(),
-})
-export type ScoreCardInputType = z.infer<typeof ScoreCardObj>
-
-export const ScoreCardQuestion = z.object({
-  id: z.string().optional(),
+  stageId: z.string().optional(),
+  allowEdit: z.boolean().optional(),
   order: z.number().optional(),
-  scoreCardId: z.string().optional(),
-  cardQuestionId: z.string().optional(),
-  behaviour: z.nativeEnum(ScoreCardQuestionBehaviour).optional(),
+  behaviour: z.nativeEnum(Behaviour).optional(),
   allowBehaviourEdit: z.boolean().optional(),
 })
-export type ScoreCardQuestionInputType = z.infer<typeof ScoreCardQuestion>
+export type ScoreCardQuestionInputType = z.infer<typeof ScoreCardQuestionObj>
 
-export const ScoreCardQuestions = z.object({
-  scoreCardId: z.string().optional(),
-  cardQuestionIds: z.string().array(),
-})
-export type ScoreCardQuestionsInputType = z.infer<typeof ScoreCardQuestions>
+export const ScoreCardQuestions = z.array(ScoreCardQuestionObj)
 
 export const Score = z.object({
   id: z.string().nullable().optional(),
   rating: z.number(),
   note: z.string().nullable().optional(),
   scoreCardQuestionId: z.string(),
-  workflowStageId: z.string(),
+  stageId: z.string(),
 })
 export type ScoreInputType = z.infer<typeof Score>
-
-export const ScoreCardJobWorkflowStageObj = z.object({
-  id: z.string().nullable().optional(),
-  scoreCardId: z.string(),
-  jobId: z.string().optional(),
-  workflowStageId: z.string(),
-})
-export type ScoreCardJobWorkflowStageObjInputType = z.infer<typeof ScoreCardJobWorkflowStageObj>

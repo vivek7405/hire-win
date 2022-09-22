@@ -11,12 +11,14 @@ async function getCandidatesWOPagination({ where, orderBy }: GetCandidateInput, 
     include: {
       job: {
         include: {
-          form: { include: { questions: true } },
-          workflow: { include: { stages: { include: { stage: true } } } },
+          formQuestions: { include: { options: true } },
+          stages: true,
+          // workflow: { include: { stages: { include: { stage: true } } } },
         },
       },
-      workflowStage: { include: { stage: true } },
-      answers: { include: { question: { include: { options: true } } } },
+      stage: true,
+      // workflowStage: { include: { stage: true } },
+      answers: { include: { formQuestion: { include: { options: true } } } },
     },
   })
 

@@ -29,32 +29,32 @@ model User {
 
   calendars        Calendar[]
   defaultCalendars DefaultCalendar[]
-  schedules        Schedule[]
 
-  interviewDetails         InterviewDetail[]
-  organizerInterviews      Interview[]       @relation(name: "organizerInterviews")
-  interviewerInterviews    Interview[]       @relation(name: "interviewerInterviews")
-  otherAttendeeInterview   Interview?        @relation(fields: [otherAttendeeInterviewId], references: [id])
+  schedules        Schedule[]
+  defaultSchedules DefaultSchedule[]
+
+  // interviewDetails         InterviewDetail[]
+  organizerInterviews      Interview[] @relation(name: "organizerInterviews")
+  interviewerInterviews    Interview[] @relation(name: "interviewerInterviews")
+  otherAttendeeInterview   Interview?  @relation(fields: [otherAttendeeInterviewId], references: [id])
   otherAttendeeInterviewId String?
 
-  interviewCandidates CandidateWorkflowStageInterviewer[]
+  interviewCandidates CandidateStageInterviewer[]
 
   comments Comment[]
   emails   Email[]
 
-  jobUserScheduleCalendars JobUserScheduleCalendar[]
+  stageUserScheduleCalendars StageUserScheduleCalendar[]
 
-  createdJobs           Job[]
-  createdCategories     Category[]
-  createdWorkflows      Workflow[]
-  createdStages         Stage[]
-  createdForms          Form[]
-  createdQuestions      Question[]
-  createdScoreCards     ScoreCard[]
-  createdCardQuestions  CardQuestion[]
-  createdCandidates     Candidate[]
-  createdEmailTemplates EmailTemplate[]
-  createdCandidatePools CandidatePool[]
+  createdJobs               Job[]
+  createdCategories         Category[]
+  createdStages             Stage[]             @relation(name: "createdBy")
+  interviewingStage         Stage[]             @relation(name: "interviewer")
+  createdFormQuestions      FormQuestion[]
+  createdScoreCardQuestions ScoreCardQuestion[]
+  createdCandidates         Candidate[]
+  createdEmailTemplates     EmailTemplate[]
+  createdCandidatePools     CandidatePool[]
 }
 
 enum UserRole {
@@ -168,17 +168,10 @@ model Company {
   users CompanyUser[]
   jobs  Job[]
 
-  categories Category[]
+  // forms     Form[]
+  // questions Question[]
 
-  workflows Workflow[]
-  stages    Stage[]
-
-  forms     Form[]
-  questions Question[]
-
-  scoreCards    ScoreCard[]
-  cardQuestions CardQuestion[]
-
+  categories     Category[]
   emailTemplates EmailTemplate[]
   candidatePools CandidatePool[]
 
@@ -223,18 +216,18 @@ model Job {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?
 
-  workflow   Workflow? @relation(fields: [workflowId], references: [id])
-  workflowId String?
+  stages        Stage[]
+  formQuestions FormQuestion[]
 
-  form   Form?   @relation(fields: [formId], references: [id])
+  // form   Form?   @relation(fields: [formId], references: [id])
   formId String?
 
-  scoreCards ScoreCardJobWorkflowStage[]
+  // scoreCards ScoreCardJobStage[]
 
-  interviews               Interview[]
-  interviewDetails         InterviewDetail[]
-  jobUserScheduleCalendars JobUserScheduleCalendar[]
-  candidates               Candidate[]
+  interviews Interview[]
+  // interviewDetails         InterviewDetail[]
+  // jobUserScheduleCalendars JobUserScheduleCalendar[]
+  candidates Candidate[]
 
   archived Boolean @default(false)
 
@@ -244,26 +237,26 @@ model Job {
   @@unique([companyId, slug])
 }
 
-model InterviewDetail {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// model InterviewDetail {
+//   id        String   @id @default(cuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-  interviewer   User   @relation(fields: [interviewerId], references: [id])
-  interviewerId String
+//   interviewer   User   @relation(fields: [interviewerId], references: [id])
+//   interviewerId String
 
-  duration Int
+//   duration Int
 
-  job   Job    @relation(fields: [jobId], references: [id])
-  jobId String
+//   job   Job    @relation(fields: [jobId], references: [id])
+//   jobId String
 
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
+//   stage   Stage  @relation(fields: [stageId], references: [id])
+//   stageId String
 
-  @@unique([jobId, workflowStageId])
-}
+//   @@unique([jobId, stageId])
+// }
 
-model JobUserScheduleCalendar {
+model StageUserScheduleCalendar {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -274,16 +267,13 @@ model JobUserScheduleCalendar {
   calendar   Calendar? @relation(fields: [calendarId], references: [id])
   calendarId String?
 
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
+
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  job   Job    @relation(fields: [jobId], references: [id])
-  jobId String
-
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
-
-  @@unique([jobId, workflowStageId, userId])
+  @@unique([stageId, userId])
 }
 
 enum JobUserRole {
@@ -326,209 +316,111 @@ model Category {
   @@unique([companyId, slug])
 }
 
-model Workflow {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
-
-  name String
-  slug String
-
-  stages WorkflowStage[]
-  jobs   Job[]
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-
-  factory Boolean @default(false)
-
-  @@unique([companyId, slug])
-}
-
 model Stage {
   id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdBy   User?    @relation(fields: [createdById], references: [id], name: "createdBy")
   createdById String?
 
-  name String
-  slug String
-
+  name      String
+  slug      String
+  order     Int
   allowEdit Boolean @default(true)
-
-  workflows WorkflowStage[]
-
-  // user   User @relation(fields: [userId], references: [id])
-  // userId Int
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-
-  @@unique([companyId, slug])
-}
-
-model WorkflowStage {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  order Int
-
-  workflow   Workflow @relation(fields: [workflowId], references: [id])
-  workflowId String
-
-  stage   Stage  @relation(fields: [stageId], references: [id])
-  stageId String
-
-  scoreCards ScoreCardJobWorkflowStage[]
-  scores     Score[]
-
-  interviewers CandidateWorkflowStageInterviewer[]
-
-  interviews               Interview[]
-  interviewDetails         InterviewDetail[]
-  jobUserScheduleCalendars JobUserScheduleCalendar[]
-  candidates               Candidate[]
-  comments                 Comment[]
-  emails                   Email[]
-
-  @@unique([workflowId, stageId])
-  @@unique([workflowId, stageId, order])
-}
-
-model Form {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
-
-  name String
-  slug String
-
-  questions FormQuestion[]
-  jobs      Job[]
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-
-  factory Boolean @default(false)
-
-  @@unique([companyId, slug])
-}
-
-model Question {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
-
-  name String
-  slug String
-
-  placeholder   String           @default("")
-  type          QuestionType     @default(Single_line_text)
-  options       QuestionOption[]
-  acceptedFiles String           @default("")
-
-  factory Boolean @default(false)
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-
-  forms   FormQuestion[]
-  answers Answer[]
-
-  @@unique([companyId, slug])
-}
-
-model ScoreCard {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
-
-  name String
-  slug String
-
-  cardQuestions ScoreCardQuestion[]
-
-  jobWorkflowStages ScoreCardJobWorkflowStage[]
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-
-  factory Boolean @default(false)
-
-  @@unique([companyId, slug])
-}
-
-model CardQuestion {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation(fields: [createdById], references: [id])
-  createdById String?
-
-  name    String
-  slug    String
-  factory Boolean @default(false)
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
-
-  scoreCards ScoreCardQuestion[]
-
-  @@unique([companyId, slug])
-}
-
-model ScoreCardQuestion {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  order              Int
-  behaviour          ScoreCardQuestionBehaviour @default(OPTIONAL)
-  allowBehaviourEdit Boolean                    @default(true)
-
-  scoreCard   ScoreCard @relation(fields: [scoreCardId], references: [id])
-  scoreCardId String
-
-  cardQuestion   CardQuestion @relation(fields: [cardQuestionId], references: [id])
-  cardQuestionId String
-
-  scores Score[]
-
-  @@unique([scoreCardId, cardQuestionId])
-  @@unique([scoreCardId, cardQuestionId, order])
-}
-
-enum ScoreCardQuestionBehaviour {
-  REQUIRED
-  OPTIONAL
-  OFF
-}
-
-model ScoreCardJobWorkflowStage {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  scoreCard   ScoreCard @relation(fields: [scoreCardId], references: [id])
-  scoreCardId String
 
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
+  scoreCardQuestions ScoreCardQuestion[]
+  scores             Score[]
 
-  @@unique([scoreCardId, jobId, workflowStageId])
+  // interviewDetails         InterviewDetail[]
+  interviewer   User   @relation(fields: [interviewerId], references: [id], name: "interviewer")
+  interviewerId String
+  duration      Int
+
+  candidateStageInterviewers CandidateStageInterviewer[]
+  interviews                 Interview[]
+  stageUserScheduleCalendars StageUserScheduleCalendar[]
+  candidates                 Candidate[]
+  comments                   Comment[]
+  emails                     Email[]
+
+  @@unique([jobId, slug])
+  @@unique([jobId, name])
+}
+
+// model Form {
+//   id          String   @id @default(cuid())
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   createdBy   User?    @relation(fields: [createdById], references: [id])
+//   createdById String?
+
+//   name String
+//   slug String
+
+//   questions FormQuestion[]
+//   jobs      Job[]
+
+//   company   Company @relation(fields: [companyId], references: [id])
+//   companyId String
+
+//   factory Boolean @default(false)
+
+//   @@unique([companyId, slug])
+// }
+
+model FormQuestion {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
+
+  name String
+  slug String
+
+  order              Int
+  allowEdit          Boolean   @default(true)
+  behaviour          Behaviour @default(OPTIONAL)
+  allowBehaviourEdit Boolean   @default(true)
+
+  placeholder   String               @default("")
+  type          FormQuestionType     @default(Single_line_text)
+  options       FormQuestionOption[]
+  acceptedFiles String               @default("")
+
+  job   Job    @relation(fields: [jobId], references: [id])
+  jobId String
+
+  answers Answer[]
+
+  @@unique([jobId, slug])
+}
+
+model ScoreCardQuestion {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdById String?
+
+  name      String
+  slug      String
+  allowEdit Boolean @default(true)
+
+  order Int
+
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
+
+  behaviour          Behaviour @default(OPTIONAL)
+  allowBehaviourEdit Boolean   @default(true)
+
+  scores Score[]
+
+  @@unique([stageId, slug])
 }
 
 model Score {
@@ -545,24 +437,24 @@ model Score {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
 
-  @@unique([candidateId, scoreCardQuestionId, workflowStageId])
+  @@unique([candidateId, scoreCardQuestionId, stageId])
 }
 
-model QuestionOption {
+model FormQuestionOption {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   text String
 
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id])
+  formQuestionId String
 }
 
-enum QuestionType {
+enum FormQuestionType {
   Single_line_text
   Long_text
   Attachment
@@ -577,26 +469,26 @@ enum QuestionType {
   Rating
 }
 
-model FormQuestion {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// model FormQuestion {
+//   id        String   @id @default(cuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
 
-  order              Int
-  behaviour          FormQuestionBehaviour @default(OPTIONAL)
-  allowBehaviourEdit Boolean               @default(true)
+//   order              Int
+//   behaviour          Behaviour @default(OPTIONAL)
+//   allowBehaviourEdit Boolean   @default(true)
 
-  form   Form   @relation(fields: [formId], references: [id])
-  formId String
+//   job   Job    @relation(fields: [jobId], references: [id])
+//   jobId String
 
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+//   question   Question @relation(fields: [questionId], references: [id])
+//   questionId String
 
-  @@unique([formId, questionId])
-  @@unique([formId, questionId, order])
-}
+//   @@unique([jobId, questionId])
+//   @@unique([jobId, questionId, order])
+// }
 
-enum FormQuestionBehaviour {
+enum Behaviour {
   REQUIRED
   OPTIONAL
   OFF
@@ -609,17 +501,17 @@ model Answer {
 
   value String
 
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId String
+  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id])
+  formQuestionId String
 
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  @@unique([candidateId, questionId])
-  @@unique([candidateId, questionId, value])
+  @@unique([candidateId, formQuestionId])
+  @@unique([candidateId, formQuestionId, value])
 }
 
-model CandidateWorkflowStageInterviewer {
+model CandidateStageInterviewer {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -627,13 +519,13 @@ model CandidateWorkflowStageInterviewer {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
 
   interviewer   User   @relation(fields: [interviewerId], references: [id])
   interviewerId String
 
-  @@unique([candidateId, workflowStageId])
+  @@unique([candidateId, stageId])
 }
 
 model Candidate {
@@ -647,8 +539,8 @@ model Candidate {
   email  String
   resume Json?
 
-  workflowStage   WorkflowStage? @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String?
+  stage   Stage?  @relation(fields: [stageId], references: [id])
+  stageId String?
 
   answers Answer[]
   scores  Score[]
@@ -658,7 +550,7 @@ model Candidate {
   job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
-  interviewers CandidateWorkflowStageInterviewer[]
+  interviewers CandidateStageInterviewer[]
 
   interviews     Interview[]
   comments       Comment[]
@@ -710,9 +602,9 @@ model Calendar {
   encryptedPassword String?
   refreshToken      String?
 
-  type                     CalendarType
-  defaultCalendars         DefaultCalendar[]
-  jobUserScheduleCalendars JobUserScheduleCalendar[]
+  type                       CalendarType
+  defaultCalendars           DefaultCalendar[]
+  stageUserScheduleCalendars StageUserScheduleCalendar[]
 
   @@unique([userId, slug])
 }
@@ -739,14 +631,27 @@ model Schedule {
   name String
   slug String
 
-  timezone                 String
-  dailySchedules           DailySchedule[]
-  user                     User                      @relation(fields: [userId], references: [id])
-  userId                   String
-  jobUserScheduleCalendars JobUserScheduleCalendar[]
-  factory                  Boolean                   @default(false)
+  timezone                   String
+  dailySchedules             DailySchedule[]
+  user                       User                        @relation(fields: [userId], references: [id])
+  userId                     String
+  stageUserScheduleCalendars StageUserScheduleCalendar[]
+
+  defaultSchedules DefaultSchedule[]
 
   @@unique([userId, slug])
+}
+
+model DefaultSchedule {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId String
 }
 
 model Interview {
@@ -754,12 +659,12 @@ model Interview {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  candidate       Candidate     @relation(fields: [candidateId], references: [id])
-  candidateId     String
-  job             Job           @relation(fields: [jobId], references: [id])
-  jobId           String
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+  job         Job       @relation(fields: [jobId], references: [id])
+  jobId       String
+  stage       Stage     @relation(fields: [stageId], references: [id])
+  stageId     String
 
   organizer      User     @relation(fields: [organizerId], references: [id], name: "organizerInterviews")
   organizerId    String
@@ -791,8 +696,8 @@ model Comment {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
 
   parentComment   Comment?  @relation(fields: [parentCommentId], references: [id], name: "childComments", onDelete: Cascade)
   parentCommentId String?
@@ -835,8 +740,8 @@ model Email {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  workflowStage   WorkflowStage @relation(fields: [workflowStageId], references: [id])
-  workflowStageId String
+  stage   Stage  @relation(fields: [stageId], references: [id])
+  stageId String
 
   sender   User   @relation(fields: [senderId], references: [id])
   senderId String

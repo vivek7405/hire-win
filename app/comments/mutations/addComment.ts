@@ -3,7 +3,7 @@ import db from "db"
 import { CommentsInputType, CommentsObj } from "../validations"
 
 async function addComment(data: CommentsInputType, ctx: Ctx) {
-  const { text, parentCommentId, candidateId, workflowStageId } = CommentsObj.parse(data)
+  const { text, parentCommentId, candidateId, stageId } = CommentsObj.parse(data)
 
   const comment = await db.comment.create({
     data: {
@@ -11,7 +11,7 @@ async function addComment(data: CommentsInputType, ctx: Ctx) {
       creatorId: ctx.session.userId || "0",
       parentCommentId,
       candidateId,
-      workflowStageId,
+      stageId,
     },
   })
 

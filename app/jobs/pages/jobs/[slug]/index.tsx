@@ -27,7 +27,6 @@ import {
   ExtendedAnswer,
   ExtendedCandidate,
   ExtendedJob,
-  ExtendedWorkflowStage,
   KanbanBoardType,
   CardType,
   KanbanColumnType,
@@ -38,14 +37,15 @@ import {
   CandidateSource,
   Company,
   CompanyUser,
-  Form as FormDB,
-  FormQuestion,
+  // Form as FormDB,
+  // FormQuestion,
   Job,
   JobUser,
   JobUserRole,
-  Question,
-  QuestionType,
+  FormQuestion,
+  FormQuestionType,
   User,
+  FormQuestionOption,
 } from "@prisma/client"
 
 import getJobWithGuard from "app/jobs/queries/getJobWithGuard"
@@ -219,12 +219,12 @@ const getBoard = (
   setOpenModal
 ) => {
   return {
-    columns: job?.workflow?.stages?.map((ws) => {
+    columns: job?.stages?.map((stage) => {
       return {
-        id: ws.id,
-        title: ws.stage?.name,
+        id: stage.id,
+        title: stage?.name,
         cards: candidates
-          ?.filter((c) => c.workflowStageId === ws.id)
+          ?.filter((c) => c.stageId === stage.id)
           .map((c) => {
             return {
               id: c.id,
@@ -321,7 +321,7 @@ const getBoard = (
                               className="float-right text-theme-600 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Move to next stage"
                               type="button"
-                              disabled={c.workflowStage?.order === job?.workflow?.stages?.length}
+                              disabled={c.stage?.order === job?.stages?.length}
                               onClick={(e) => {
                                 e.preventDefault()
                                 setCandidateToMove(c)
@@ -457,14 +457,14 @@ const Candidates = (props: CandidateProps) => {
     },
     {
       Header: "Stage",
-      accessor: "workflowStage.stage.name",
+      accessor: "stage.name",
       // Cell: (props) => {
       //   const candidate = props.cell.row.original as ExtendedCandidate
       //   const stages =
-      //     candidate?.job.workflow?.stages?.sort((a, b) => {
+      //     candidate?.job?.stages?.sort((a, b) => {
       //       return a.order - b.order
       //     }) || []
-      //   const workflowStage = props.value as ExtendedWorkflowStage
+      //   const stage = props.value as ExtendedStage
       //   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
 
       //   return (
@@ -472,13 +472,13 @@ const Candidates = (props: CandidateProps) => {
       //       <LabeledSelectField
       //         name={`candidate-${candidate?.id}-stage`}
       //         defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
-      //         value={workflowStage?.id}
+      //         value={stage?.id}
       //         options={stages.map((ws) => {
       //           return { label: ws?.stage?.name, value: ws?.id }
       //         })}
       //         onChange={async (e) => {
-      //           const selectedWorkflowStageId = e.target.value || ("" as string)
-      //           updateCandidateStg(candidate, selectedWorkflowStageId)
+      //           const selectedStageId = e.target.value || ("" as string)
+      //           updateCandidateStg(candidate, selectedStageId)
       //         }}
       //       />
       //     </Form>
@@ -487,14 +487,14 @@ const Candidates = (props: CandidateProps) => {
     },
     // {
     //   Header: "Stage",
-    //   accessor: "workflowStage",
+    //   accessor: "stage",
     //   Cell: (props) => {
     //     const candidate = props.cell.row.original as ExtendedCandidate
     //     const stages =
-    //       candidate?.job.workflow?.stages?.sort((a, b) => {
+    //       candidate?.job.stages?.sort((a, b) => {
     //         return a.order - b.order
     //       }) || []
-    //     const workflowStage = props.value as ExtendedWorkflowStage
+    //     const stage = props.value as ExtendedStage
     //     const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
 
     //     return (
@@ -502,13 +502,13 @@ const Candidates = (props: CandidateProps) => {
     //         <LabeledSelectField
     //           name={`candidate-${candidate?.id}-stage`}
     //           defaultValue={stages?.find((ws) => ws?.stage?.name === "Sourced")?.id || ""}
-    //           value={workflowStage?.id}
+    //           value={stage?.id}
     //           options={stages.map((ws) => {
     //             return { label: ws?.stage?.name, value: ws?.id }
     //           })}
     //           onChange={async (e) => {
-    //             const selectedWorkflowStageId = e.target.value || ("" as string)
-    //             updateCandidateStg(candidate, selectedWorkflowStageId)
+    //             const selectedStageId = e.target.value || ("" as string)
+    //             updateCandidateStg(candidate, selectedStageId)
     //           }}
     //         />
     //       </Form>
@@ -530,22 +530,22 @@ const Candidates = (props: CandidateProps) => {
       Header: "Resume",
       accessor: "resume",
       Cell: (props) => {
-        const attachmentObj = props.value
+        const attachmentObj: AttachmentObject = props.value
         return (
           <a
-            href={attachmentObj.Location}
+            href={attachmentObj.location}
             className="text-theme-600 hover:text-theme-500"
             target="_blank"
             rel="noreferrer"
           >
-            {attachmentObj.Key}
+            {attachmentObj.name}
           </a>
         )
       },
     },
   ]
-  props.job?.form?.questions
-    ?.filter((q) => !q.question.factory)
+  props.job?.formQuestions
+    ?.filter((question) => !question.allowEdit)
     ?.forEach((formQuestion) => {
       columns.push(getDynamicColumn(formQuestion))
     })
@@ -618,10 +618,9 @@ const Candidates = (props: CandidateProps) => {
     props.setOpenModal,
   ])
 
-  const updateCandidateStg = async (candidate, selectedWorkflowStageId) => {
+  const updateCandidateStg = async (candidate, selectedStageId) => {
     const selectedStageName =
-      props.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId)?.stage?.name ||
-      ""
+      props.job?.stages?.find((stage) => stage.id === selectedStageId)?.name || ""
 
     const toastId = toast.loading(() => (
       <span>
@@ -634,7 +633,7 @@ const Candidates = (props: CandidateProps) => {
     try {
       const updatedCandidate: ExtendedCandidate = await updateCandidateStageMutation({
         where: { id: candidate?.id },
-        data: { workflowStageId: selectedWorkflowStageId },
+        data: { stageId: selectedStageId },
       })
       // const candidateDataIndex = data.findIndex((c) => c.id === candidate?.id)
       // if (candidateDataIndex >= 0) {
@@ -645,9 +644,9 @@ const Candidates = (props: CandidateProps) => {
       invalidateQuery(getCandidates)
       // const candidateData = data.find((c) => c.id === candidate?.id)
       // if (candidateData) {
-      //   candidateData.workflowStageId = selectedWorkflowStageId
-      //   candidateData.workflowStage =
-      //     props.job?.workflow?.stages?.find((ws) => ws.id === selectedWorkflowStageId) || null
+      //   candidateData.stageId = selectedStageId
+      //   candidateData.stage =
+      //     props.job?.stages?.find((ws) => ws.id === selectedStageId) || null
       //   setData([...data])
       // }
       toast.success(
@@ -670,8 +669,8 @@ const Candidates = (props: CandidateProps) => {
   const updateCandidate = async (source, destination, candidateId) => {
     if (source?.droppableId !== destination?.droppableId) {
       const candidate = candidates.find((c) => c.id === candidateId)
-      const selectedWorkflowStageId = destination?.droppableId || ("" as string)
-      updateCandidateStg(candidate, selectedWorkflowStageId)
+      const selectedStageId = destination?.droppableId || ("" as string)
+      updateCandidateStg(candidate, selectedStageId)
     }
   }
 
@@ -722,13 +721,11 @@ const Candidates = (props: CandidateProps) => {
             //   rejected: !candidateToMove?.rejected,
             // })
 
-            const workflowStages = props.job?.workflow?.stages
+            const stages = props.job?.stages
             const currentStageOrder =
-              workflowStages?.find((ws) => ws.id === candidateToMove.workflowStageId)?.order || 0
-            const moveToWorkflowStageId = workflowStages?.find(
-              (ws) => ws.order === currentStageOrder + 1
-            )?.id
-            await updateCandidateStg(candidateToMove, moveToWorkflowStageId)
+              stages?.find((ws) => ws.id === candidateToMove.stageId)?.order || 0
+            const moveToStageId = stages?.find((ws) => ws.order === currentStageOrder + 1)?.id
+            await updateCandidateStg(candidateToMove, moveToStageId)
             toast.success(`Candidate moved to next stage`, {
               id: toastId,
             })
@@ -843,10 +840,10 @@ const SingleJobPageContent = ({
     null as
       | (Candidate & {
           job: Job & {
-            form: FormDB & { questions: (FormQuestion & { question: Question })[] }
+            formQuestions: FormQuestion[]
           }
         } & {
-          answers: (Answer & { question: Question })[]
+          answers: (Answer & { formQuestion: FormQuestion })[]
         })
       | null
   )
@@ -1048,7 +1045,7 @@ const SingleJobPageContent = ({
         <ApplicationForm
           header={`${candidateToEdit ? "Update" : "Create"} Candidate`}
           subHeader=""
-          formId={job?.formId || ""}
+          jobId={job?.id || "0"}
           preview={false}
           initialValues={candidateToEdit ? getCandidateInitialValues(candidateToEdit) : {}}
           onSubmit={async (values) => {
@@ -1057,7 +1054,7 @@ const SingleJobPageContent = ({
               candidateToEdit
                 ? await updateCandidateMutation({
                     where: { id: candidateToEdit?.id },
-                    initial: candidateToEdit as any,
+                    // initial: candidateToEdit as any,
                     data: {
                       id: candidateToEdit?.id,
                       jobId: candidateToEdit?.job?.id,
@@ -1066,10 +1063,10 @@ const SingleJobPageContent = ({
                       resume: values.Resume,
                       source: candidateToEdit?.source,
                       answers:
-                        (candidateToEdit?.job?.form?.questions?.map((fq) => {
-                          const val = values[fq.question?.name] || ""
+                        (candidateToEdit?.job?.formQuestions?.map((formQuestion) => {
+                          const val = values[formQuestion?.name] || ""
                           return {
-                            questionId: fq.questionId,
+                            formQuestionId: formQuestion.id,
                             value: typeof val === "string" ? val : JSON.stringify(val),
                           }
                         }) as any) || ([] as any),
@@ -1082,10 +1079,10 @@ const SingleJobPageContent = ({
                     resume: values.Resume,
                     source: CandidateSource.Manual,
                     answers:
-                      job?.form?.questions?.map((fq) => {
-                        const val = values[fq.question?.name] || ""
+                      job?.formQuestions?.map((formQuestion) => {
+                        const val = values[formQuestion?.name] || ""
                         return {
-                          questionId: fq.questionId,
+                          formQuestionId: formQuestion.id,
                           value: typeof val === "string" ? val : JSON.stringify(val),
                         }
                       }) || [],

@@ -26,7 +26,6 @@ export default resolver.pipe(
             })
           ),
         },
-        factory: scheduleCreate.factory || false,
       },
     })
 

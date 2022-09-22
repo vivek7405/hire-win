@@ -105,76 +105,76 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
           ),
         },
       },
-      {
-        name: "Workflows",
-        href: Routes.WorkflowsHome().pathname,
-        focus:
-          router.route.includes(Routes.WorkflowsHome().pathname) ||
-          router.route.includes(Routes.StagesHome().pathname),
-        introStep: {
-          element: "#selectorWorkflowsMenuStep",
-          title: "Workflows",
-          intro: (
-            <span>
-              <p>
-                Workflows are the <b>interviewing stages</b>.
-              </p>
-              <br />
-              <p>
-                Typically a company has different workflows for different jobs. You may{" "}
-                <b>create and assign worklows to jobs</b> as per your requirement.
-              </p>
-            </span>
-          ),
-        },
-      },
-      {
-        name: "Forms",
-        href: Routes.FormsHome().pathname,
-        focus:
-          router.route.includes(Routes.FormsHome().pathname) ||
-          router.route.includes(Routes.QuestionsHome().pathname),
-        introStep: {
-          element: "#selectorFormsMenuStep",
-          title: "Forms",
-          intro: (
-            <span>
-              <p>
-                Forms are the <b>application forms through which the candidate applies to a job</b>.
-              </p>
-              <br />
-              <p>
-                Create and assign forms to jobs so that you have all the{" "}
-                <b>information you need from a candidate for a particular job</b>.
-              </p>
-            </span>
-          ),
-        },
-      },
-      {
-        name: "Score Cards",
-        href: Routes.ScoreCardsHome().pathname,
-        focus:
-          router.route.includes(Routes.ScoreCardsHome().pathname) ||
-          router.route.includes(Routes.CardQuestionsHome().pathname),
-        introStep: {
-          element: "#selectorScoreCardsMenuStep",
-          title: "Score Cards",
-          intro: (
-            <span>
-              <p>
-                Score cards are used by interviewers to{" "}
-                <b>rate the {`candidate's`} performance in a particular interview stage</b>.
-              </p>
-              <br />
-              <p>
-                Create score cards and{" "}
-                <b>assign them to the workflow (interviewing stages) while creating a job</b>.
-              </p>
-            </span>
-          ),
-        },
-      },
+      // {
+      //   name: "Workflows",
+      //   href: Routes.WorkflowsHome().pathname,
+      //   focus:
+      //     router.route.includes(Routes.WorkflowsHome().pathname) ||
+      //     router.route.includes(Routes.StagesHome().pathname),
+      //   introStep: {
+      //     element: "#selectorWorkflowsMenuStep",
+      //     title: "Workflows",
+      //     intro: (
+      //       <span>
+      //         <p>
+      //           Workflows are the <b>interviewing stages</b>.
+      //         </p>
+      //         <br />
+      //         <p>
+      //           Typically a company has different workflows for different jobs. You may{" "}
+      //           <b>create and assign worklows to jobs</b> as per your requirement.
+      //         </p>
+      //       </span>
+      //     ),
+      //   },
+      // },
+      // {
+      //   name: "Forms",
+      //   href: Routes.FormsHome().pathname,
+      //   focus:
+      //     router.route.includes(Routes.FormsHome().pathname) ||
+      //     router.route.includes(Routes.QuestionsHome().pathname),
+      //   introStep: {
+      //     element: "#selectorFormsMenuStep",
+      //     title: "Forms",
+      //     intro: (
+      //       <span>
+      //         <p>
+      //           Forms are the <b>application forms through which the candidate applies to a job</b>.
+      //         </p>
+      //         <br />
+      //         <p>
+      //           Create and assign forms to jobs so that you have all the{" "}
+      //           <b>information you need from a candidate for a particular job</b>.
+      //         </p>
+      //       </span>
+      //     ),
+      //   },
+      // },
+      // {
+      //   name: "Score Cards",
+      //   href: Routes.ScoreCardsHome().pathname,
+      //   focus:
+      //     router.route.includes(Routes.ScoreCardsHome().pathname) ||
+      //     router.route.includes(Routes.CardQuestionsHome().pathname),
+      //   introStep: {
+      //     element: "#selectorScoreCardsMenuStep",
+      //     title: "Score Cards",
+      //     intro: (
+      //       <span>
+      //         <p>
+      //           Score cards are used by interviewers to{" "}
+      //           <b>rate the {`candidate's`} performance in a particular interview stage</b>.
+      //         </p>
+      //         <br />
+      //         <p>
+      //           Create score cards and{" "}
+      //           <b>assign them to the workflow (interviewing stages) while creating a job</b>.
+      //         </p>
+      //       </span>
+      //     ),
+      //   },
+      // },
       {
         name: "Email Templates",
         href: Routes.EmailTemplatesHome().pathname,

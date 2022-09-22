@@ -1,7 +1,7 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "app/core/components/LabeledTextAreaField"
 import { Form } from "app/core/components/Form"
-import { CardQuestionInputType } from "app/card-questions/validations"
+// import { CardQuestionInputType } from "app/card-questions/validations"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useEffect, useMemo, useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
@@ -12,17 +12,12 @@ import LabeledSelectField from "app/core/components/LabeledSelectField"
 import LabeledPhoneNumberField from "app/core/components/LabeledPhoneNumberField"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
-import getScoreCardQuestionsWOPaginationWOAbility from "app/score-cards/queries/getScoreCardQuestionsWOPaginationWOAbility"
-import {
-  ExtendedScoreCardQuestion,
-  ExtendedCardQuestion,
-  ExtendedCandidate,
-  ExtendedWorkflowStage,
-} from "types"
+import getScoreCardQuestions from "app/score-cards/queries/getScoreCardQuestions"
+import { ExtendedScoreCardQuestion, ExtendedCandidate } from "types"
 import { PlusCircleIcon, XCircleIcon } from "@heroicons/react/outline"
-import getScoreCard from "../queries/getScoreCard"
-import { Candidate } from "@prisma/client"
-import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
+import { Candidate, Stage, User } from "@prisma/client"
+import getStage from "app/stages/queries/getStage"
+import getCandidateInterviewer from "app/candidates/queries/getCandidateInterviewer"
 
 type ScoreCardProps = {
   onSuccess?: () => void
@@ -31,40 +26,46 @@ type ScoreCardProps = {
   // submitDisabled?: boolean
   header: string
   subHeader?: string
-  scoreCardId: string
+  // scoreCardId: string
   preview: boolean
-  scoreCardQuestions?: ExtendedScoreCardQuestion[]
+  // scoreCardQuestions?: ExtendedScoreCardQuestion[]
   onChange?: any
   userId: string
-  companyId: string
+  // companyId: string
   candidate?: ExtendedCandidate
-  workflowStage?: ExtendedWorkflowStage
+  stageId?: string
 }
 
 export const ScoreCard = (props: ScoreCardProps) => {
-  const [defaultScoreCard] = useQuery(getScoreCard, {
-    where: { companyId: props.companyId, name: "Default" },
-  })
+  // const [defaultScoreCard] = useQuery(getScoreCard, {
+  //   where: { companyId: props.companyId, name: "Default" },
+  // })
 
-  const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
-    workflowStageId: props?.workflowStage?.id || "0", // selectedWorkflowStage?.id!,
+  // const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
+  //   stageId: props?.stageId || "0", // selectedWorkflowStage?.id!,
+  //   candidateId: props.candidate?.id || "0",
+  //   jobId: props.candidate?.jobId || "0",
+  // })
+
+  const [stage] = useQuery(getStage, { where: { id: props.stageId || "0" } })
+
+  const [interviewer] = useQuery(getCandidateInterviewer, {
     candidateId: props.candidate?.id || "0",
-    jobId: props.candidate?.jobId || "0",
+    stageId: props.stageId || "0",
   })
 
-  const isScoreDisabled = interviewDetail?.interviewer?.id !== props.userId
+  const isScoreDisabled = interviewer?.id !== props.userId
   const disabled = !props.preview && isScoreDisabled
 
-  const [queryScoreCardQuestions] = useQuery(getScoreCardQuestionsWOPaginationWOAbility, {
-    where: { scoreCardId: props.scoreCardId || defaultScoreCard?.id },
-  })
+  // const [queryScoreCardQuestions] = useQuery(getScoreCardQuestions, {
+  //   where: { stageId: props.stage || defaultScoreCard?.id },
+  // })
 
   const [data, setData] = useState<ExtendedScoreCardQuestion[]>([])
 
-  const scoreCardQuestions = (props.scoreCardQuestions ||
-    queryScoreCardQuestions.sort((a, b) => {
-      return a?.order - b?.order
-    })) as any as ExtendedScoreCardQuestion[]
+  const scoreCardQuestions = stage?.scoreCardQuestions?.sort((a, b) => {
+    return a?.order - b?.order
+  }) as any as ExtendedScoreCardQuestion[]
 
   useMemo(async () => {
     let data: ExtendedScoreCardQuestion[] = []
@@ -75,20 +76,19 @@ export const ScoreCard = (props: ScoreCardProps) => {
     })
   }, [scoreCardQuestions])
 
-  const getZodType = (sq: ExtendedScoreCardQuestion, zodType) => {
-    return sq.behaviour === "REQUIRED"
+  const getZodType = (question: ExtendedScoreCardQuestion, zodType) => {
+    return question.behaviour === "REQUIRED"
       ? zodType.nonempty
         ? zodType.nonempty({ message: "Required" })
         : zodType
       : zodType.optional()
   }
 
-  const getValidationObj = (sq: ExtendedScoreCardQuestion) => {
-    const q = sq.cardQuestion
+  const getValidationObj = (question: ExtendedScoreCardQuestion) => {
     return {
-      [q.name]: getZodType(sq, z.number()),
-      [`${q.name} Note`]: z.string().optional(),
-      [`${q.name} ScoreId`]: z.string().optional(),
+      [question.name]: getZodType(question, z.number()),
+      [`${question.name} Note`]: z.string().optional(),
+      [`${question.name} ScoreId`]: z.string().optional(),
     }
   }
 
@@ -103,6 +103,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
       <Form
         submitText="Submit"
         submitDisabled={disabled}
+        submitHidden={props.preview}
         isSubmitTop={true}
         schema={zodObj}
         initialValues={props.initialValues}
@@ -111,34 +112,25 @@ export const ScoreCard = (props: ScoreCardProps) => {
         header={props.header}
         subHeader={props.subHeader}
       >
-        {data.map((sq) => {
-          if (sq.behaviour === "OFF") {
+        {data.map((question) => {
+          if (question.behaviour === "OFF") {
             return
           }
 
-          const q = sq.cardQuestion
-
-          const existingScore = sq.scores.find(
+          const existingScore = question?.scores?.find(
             (score) =>
               score.candidateId === props.candidate?.id &&
-              score.workflowStageId ===
-                (props.workflowStage?.id || props.candidate?.workflowStageId || "0") &&
-              sq.scoreCard.jobWorkflowStages.findIndex(
-                (jws) =>
-                  jws.workflowStageId ===
-                    (props.workflowStage?.id || props.candidate?.workflowStageId || "0") &&
-                  jws.jobId === (props.candidate?.jobId || "0")
-              ) >= 0
+              score.stageId === (props.stageId || props.candidate?.stageId || "0")
           )
 
           return (
-            <div key={q.id}>
-              {!(sq.showNote || existingScore?.note) && (
+            <div key={question.id}>
+              {!(question.showNote || existingScore?.note) && (
                 <button
                   disabled={disabled}
                   title="Add Note"
                   onClick={() => {
-                    sq.showNote = true
+                    question.showNote = true
                     setData([...data])
                   }}
                   className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
@@ -146,12 +138,12 @@ export const ScoreCard = (props: ScoreCardProps) => {
                   <PlusCircleIcon className="h-5 w-auto text-theme-600" />
                 </button>
               )}
-              {!existingScore?.note && sq.showNote && (
+              {!existingScore?.note && question.showNote && (
                 <button
                   disabled={disabled}
                   title="Hide Note"
                   onClick={() => {
-                    sq.showNote = false
+                    question.showNote = false
                     setData([...data])
                   }}
                   className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
@@ -163,22 +155,22 @@ export const ScoreCard = (props: ScoreCardProps) => {
               <LabeledRatingField
                 disabled={disabled}
                 defaultValue={existingScore?.rating}
-                name={`${q.name}`}
-                label={q.name}
+                name={`${question.name}`}
+                label={question.name}
                 onChange={props.onChange}
               />
 
-              {(sq.showNote || existingScore?.note) && (
+              {(question.showNote || existingScore?.note) && (
                 <LabeledTextAreaField
                   disabled={disabled}
                   defaultValue={existingScore?.note || ""}
-                  name={`${q.name} Note`}
+                  name={`${question.name} Note`}
                 />
               )}
 
               <LabeledTextField
                 type="hidden"
-                name={`${q.name} ScoreId`}
+                name={`${question.name} ScoreId`}
                 value={existingScore?.id}
               />
             </div>

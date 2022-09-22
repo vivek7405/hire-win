@@ -26,15 +26,15 @@ const getCandidatesWOAbility = resolver.pipe(
           include: {
             job: {
               include: {
-                form: {
-                  include: { questions: { include: { question: { include: { options: true } } } } },
-                },
-                workflow: { include: { stages: { include: { stage: true } } } },
+                formQuestions: { include: { options: true } },
+                stages: true,
+                // workflow: { include: { stages: { include: { stage: true } } } },
               },
             },
             scores: true,
-            workflowStage: { include: { stage: true } },
-            answers: { include: { question: { include: { options: true } } } },
+            stage: true,
+            // workflowStage: { include: { stage: true } },
+            answers: { include: { formQuestion: { include: { options: true } } } },
           },
         }),
     })

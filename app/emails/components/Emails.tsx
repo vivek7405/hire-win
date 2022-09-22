@@ -15,15 +15,15 @@ import sendEmail from "../mutations/sendEmail"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import getEmailTemplatesWOPagination from "app/email-templates/queries/getEmailTemplatesWOPagination"
 import { EmailTemplatePlaceholders } from "types"
-import getInterviewDetail from "app/scheduling/interviews/queries/getInterviewDetail"
 import { JsonValue } from "aws-sdk/clients/glue"
-import getCandidateInterviewDetail from "app/candidates/queries/getCandidateInterviewDetail"
+import getCandidateInterviewer from "app/candidates/queries/getCandidateInterviewer"
+import getStage from "app/stages/queries/getStage"
 
 interface ETValues {
   [key: string]: string
 }
 
-const Emails = ({ user, selectedWorkflowStage, candidate }) => {
+const Emails = ({ user, stageId, candidate }) => {
   const session = useSession()
   const [openModal, setOpenModal] = useState(false)
   const [deleteEmailMutation] = useMutation(deleteEmail)
@@ -32,8 +32,10 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
   const [openConfirm, setOpenConfirm] = useState(false)
   const [candidateStageEmails] = useQuery(getCandidateEmailsByStage, {
     candidateId: candidate?.id || "0",
-    workflowStageId: selectedWorkflowStage?.id || "0",
+    stageId,
   })
+  // const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
+
   const [sendEmailMutation] = useMutation(sendEmail)
   const [emailTemplatesOpen, setEmailTemplatesOpen] = useState(false)
   const [emailTemplates] = useQuery(getEmailTemplatesWOPagination, {
@@ -44,11 +46,9 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
   //   selectedWorkflowStage?.interviewDetails?.find((int) => int.jobId === candidate?.jobId)?.id ||
   //   "0"
   // const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
-
-  const [interviewDetail] = useQuery(getCandidateInterviewDetail, {
-    workflowStageId: selectedWorkflowStage?.id,
-    candidateId: candidate?.id,
-    jobId: candidate?.jobId,
+  const [interviewer] = useQuery(getCandidateInterviewer, {
+    candidateId: candidate?.id || "0",
+    stageId: stageId || "0",
   })
 
   const replaceEmailTemplatePlaceHolders = (body: JSON) => {
@@ -67,7 +67,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
             )?.company?.name
             break
           case EmailTemplatePlaceholders.Interviewer_Name:
-            etValues[etPlaceholder] = interviewDetail?.interviewer?.name || ""
+            etValues[etPlaceholder] = interviewer?.name || ""
             break
           case EmailTemplatePlaceholders.Job_Title:
             etValues[etPlaceholder] = candidate?.job?.title
@@ -131,7 +131,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
                 ...values,
                 templateId: selectedEmailTemplate?.id,
                 candidateId: candidate?.id,
-                workflowStageId: selectedWorkflowStage?.id,
+                stageId,
               })
               invalidateQuery(getCandidateEmailsByStage)
               setEmailToView(null as any)
@@ -193,7 +193,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
                 // selectedWorkflowStage?.interviewDetails?.find(
                 //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                 // )?.interviewerId !== user?.id &&
-                interviewDetail?.interviewer?.id !== user?.id &&
+                interviewer?.id !== user?.id &&
                 user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
                   "OWNER" &&
                 user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
@@ -220,7 +220,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
                   // selectedWorkflowStage?.interviewDetails?.find(
                   //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                   // )?.interviewerId !== user?.id &&
-                  interviewDetail?.interviewer?.id !== user?.id &&
+                  interviewer?.id !== user?.id &&
                   user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
                     "OWNER" &&
                   user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
@@ -236,7 +236,7 @@ const Emails = ({ user, selectedWorkflowStage, candidate }) => {
                     // selectedWorkflowStage?.interviewDetails?.find(
                     //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                     // )?.interviewerId !== user?.id &&
-                    interviewDetail?.interviewer?.id !== user?.id &&
+                    interviewer?.id !== user?.id &&
                     user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
                       "OWNER" &&
                     user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==

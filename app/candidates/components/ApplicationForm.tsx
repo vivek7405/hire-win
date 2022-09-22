@@ -1,8 +1,7 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "app/core/components/LabeledTextAreaField"
 import { Form } from "app/core/components/Form"
-import { QuestionInputType, QuestionOption } from "app/questions/validations"
-import { Job, QuestionType } from "@prisma/client"
+import { Job, FormQuestionType } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useEffect, useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
@@ -13,9 +12,10 @@ import LabeledSelectField from "app/core/components/LabeledSelectField"
 import LabeledPhoneNumberField from "app/core/components/LabeledPhoneNumberField"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import { z } from "zod"
-import getFormQuestionsWOPaginationWOAbility from "app/forms/queries/getFormQuestionsWOPaginationWOAbility"
-import { ExtendedFormQuestion, ExtendedQuestion } from "types"
+import getFormQuestionsWOPaginationWOAbility from "app/form-questions/queries/getJobApplicationFormQuestions"
+import { ExtendedFormQuestion } from "types"
 import { AttachmentZodObj } from "../validations"
+import getJobApplicationFormQuestions from "app/form-questions/queries/getJobApplicationFormQuestions"
 
 type ApplicationFormProps = {
   onSuccess?: () => void
@@ -24,17 +24,17 @@ type ApplicationFormProps = {
   submitDisabled?: boolean
   header: string
   subHeader: string
-  formId: string
+  jobId: string
   preview: boolean
-  formQuestions?: ExtendedFormQuestion[]
+  // formQuestions?: ExtendedFormQuestion[]
 }
 
 export const ApplicationForm = (props: ApplicationFormProps) => {
-  const [queryFormQuestions] = useQuery(getFormQuestionsWOPaginationWOAbility, {
-    where: { formId: props.formId },
+  const [formQuestions] = useQuery(getJobApplicationFormQuestions, {
+    where: { jobId: props.jobId },
   })
 
-  const formQuestions = props.formQuestions || queryFormQuestions
+  // const formQuestions = props.formQuestions || queryFormQuestions
 
   const getZodType = (fq: ExtendedFormQuestion, zodType) => {
     const type = zodType?._def?.typeName as string
@@ -52,156 +52,159 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
     }
   }
 
-  const getValidationObj = (fq: ExtendedFormQuestion) => {
-    const q = fq.question
-
-    switch (q.type) {
-      case QuestionType.Attachment:
+  const getValidationObj = (question: ExtendedFormQuestion) => {
+    switch (question.type) {
+      case FormQuestionType.Attachment:
         return {
-          [q.name]:
-            fq.behaviour === "REQUIRED"
+          [question.name]:
+            question.behaviour === "REQUIRED"
               ? AttachmentZodObj.refine(
-                  (obj) => obj !== null && obj.Key !== "" && obj.Location !== "",
+                  (obj) => obj !== null && obj.key !== "" && obj.location !== "",
                   {
                     message: "Required",
                   }
                 )
               : AttachmentZodObj,
         }
-      case QuestionType.Checkbox:
-        return { [q.name]: getZodType(fq, z.boolean()) }
-      case QuestionType.Multiple_select:
-        return { [q.name]: getZodType(fq, z.array(z.string())) }
-      case QuestionType.Rating:
-        return { [q.name]: getZodType(fq, z.number()) }
+      case FormQuestionType.Checkbox:
+        return { [question.name]: getZodType(question, z.boolean()) }
+      case FormQuestionType.Multiple_select:
+        return { [question.name]: getZodType(question, z.array(z.string())) }
+      case FormQuestionType.Rating:
+        return { [question.name]: getZodType(question, z.number()) }
       default:
-        return { [q.name]: getZodType(fq, z.string()) }
+        return { [question.name]: getZodType(question, z.string()) }
     }
   }
 
-  const getQuestionField = (q: ExtendedQuestion) => {
-    switch (q.type) {
-      case QuestionType.Single_line_text:
+  const getQuestionField = (question: ExtendedFormQuestion) => {
+    switch (question.type) {
+      case FormQuestionType.Single_line_text:
         return (
           <LabeledTextField
-            key={q.id}
+            key={question.id}
             type="text"
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Long_text:
+      case FormQuestionType.Long_text:
         return (
           <LabeledTextAreaField
-            key={q.id}
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            key={question.id}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Attachment:
+      case FormQuestionType.Attachment:
         return (
-          <SingleFileUploadField key={q.id} accept={q.acceptedFiles} name={q.name} label={q.name} />
+          <SingleFileUploadField
+            key={question.id}
+            accept={question.acceptedFiles}
+            name={question.name}
+            label={question.name}
+          />
         )
 
-      case QuestionType.Checkbox:
-        return <CheckboxField key={q.id} name={q.name} label={q.name} />
+      case FormQuestionType.Checkbox:
+        return <CheckboxField key={question.id} name={question.name} label={question.name} />
 
-      case QuestionType.Multiple_select:
+      case FormQuestionType.Multiple_select:
         return (
           <LabeledReactSelectField
-            key={q.id}
+            key={question.id}
             isMulti={true}
-            options={q.options?.map((op) => {
+            options={question.options?.map((op) => {
               return { label: op.text, value: op.id }
             })}
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Single_select:
+      case FormQuestionType.Single_select:
         return (
           <LabeledReactSelectField
-            key={q.id}
-            options={q.options?.map((op) => {
+            key={question.id}
+            options={question.options?.map((op) => {
               return { label: op.text, value: op.id }
             })}
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Date:
+      case FormQuestionType.Date:
         return (
           <LabeledTextField
-            key={q.id}
+            key={question.id}
             type="date"
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Phone_number:
+      case FormQuestionType.Phone_number:
         return (
           <LabeledPhoneNumberField
-            key={q.id}
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            key={question.id}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Email:
+      case FormQuestionType.Email:
         return (
           <LabeledTextField
-            key={q.id}
+            key={question.id}
             type="email"
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.URL:
+      case FormQuestionType.URL:
         return (
           <LabeledTextField
-            key={q.id}
+            key={question.id}
             type="url"
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Number:
+      case FormQuestionType.Number:
         return (
           <LabeledTextField
-            key={q.id}
+            key={question.id}
             type="number"
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
 
-      case QuestionType.Rating:
-        return <LabeledRatingField key={q.id} name={q.name} label={q.name} />
+      case FormQuestionType.Rating:
+        return <LabeledRatingField key={question.id} name={question.name} label={question.name} />
 
       default:
         return (
           <LabeledTextField
-            key={q.id}
+            key={question.id}
             type="text"
-            name={q.name}
-            label={q.name}
-            placeholder={q.placeholder}
+            name={question.name}
+            label={question.name}
+            placeholder={question.placeholder}
           />
         )
     }
@@ -218,7 +221,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
       <Form
         submitText="Submit"
         submitDisabled={props.submitDisabled}
-        // submitDisabled={props.preview}
+        submitHidden={props.preview}
         schema={zodObj}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
@@ -226,12 +229,11 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
         header={props.header}
         subHeader={props.subHeader}
       >
-        {formQuestions.map((fq) => {
-          const q = fq.question
-          if (fq.behaviour === "OFF") {
+        {formQuestions.map((question) => {
+          if (question.behaviour === "OFF") {
             return
           }
-          return getQuestionField(q as any)
+          return getQuestionField(question as any)
         })}
       </Form>
     </>

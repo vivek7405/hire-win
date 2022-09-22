@@ -10,33 +10,45 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
     include: {
       category: true,
       candidates: true,
-      workflow: {
+      formQuestions: { include: { options: true }, orderBy: { order: "asc" } },
+      stages: {
         include: {
-          stages: {
-            include: {
-              stage: true,
-              scoreCards: { include: { scoreCard: true } },
-              interviewDetails: true,
-              jobUserScheduleCalendars: true,
-            },
-            orderBy: {
-              order: "asc",
-            },
-          },
+          scoreCardQuestions: true,
+          interviewer: true,
+          // interviewDetails: true,
+          stageUserScheduleCalendars: true,
+        },
+        orderBy: {
+          order: "asc",
         },
       },
-      form: {
-        include: {
-          questions: {
-            include: {
-              question: true,
-            },
-            orderBy: {
-              order: "asc",
-            },
-          },
-        },
-      },
+      // workflow: {
+      //   include: {
+      //     stages: {
+      //       include: {
+      //         stage: true,
+      //         scoreCards: { include: { scoreCard: true } },
+      //         interviewDetails: true,
+      //         jobUserScheduleCalendars: true,
+      //       },
+      //       orderBy: {
+      //         order: "asc",
+      //       },
+      //     },
+      //   },
+      // },
+      // form: {
+      //   include: {
+      //     questions: {
+      //       include: {
+      //         question: true,
+      //       },
+      //       orderBy: {
+      //         order: "asc",
+      //       },
+      //     },
+      //   },
+      // },
       users: {
         include: {
           user: {
@@ -48,8 +60,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
           },
         },
       },
-      scoreCards: { include: { scoreCard: true } },
-      interviewDetails: true,
+      // interviewDetails: true,
     },
   })
 

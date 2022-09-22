@@ -25,7 +25,7 @@ function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
       "@type": "Organization",
       name: company?.name,
       sameAs: company?.website,
-      logo: (company?.logo as AttachmentObject)?.Location,
+      logo: (company?.logo as AttachmentObject)?.location,
     },
     jobLocation: {
       "@type": "Place",
@@ -108,8 +108,8 @@ const JobApplicationLayout = ({
             <span className="self-center cursor-pointer">
               {company?.slug && (
                 <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug })}>
-                  {logo?.Location ? (
-                    <img src={logo?.Location} alt={`${company?.name} logo`} width={200} />
+                  {logo?.location ? (
+                    <img src={logo?.location} alt={`${company?.name} logo`} width={200} />
                   ) : (
                     <h1 className="text-3xl font-bold">{company?.name}</h1>
                   )}

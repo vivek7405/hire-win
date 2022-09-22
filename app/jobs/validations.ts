@@ -1,5 +1,5 @@
 import { EmploymentType, SalaryType } from "@prisma/client"
-import { ScoreCardJobWorkflowStageObj } from "app/score-cards/validations"
+import { StageObj } from "app/stages/validations"
 import { z } from "zod"
 
 export const Job = z.object({
@@ -25,9 +25,10 @@ export const Job = z.object({
   maxSalary: z.number(),
   salaryType: z.nativeEnum(SalaryType),
 
-  workflowId: z.string().optional(),
-  scoreCards: z.array(ScoreCardJobWorkflowStageObj).optional(),
+  // workflowId: z.string().optional(),
+  stages: z.array(StageObj).optional(),
+  // scoreCards: z.array(ScoreCardJobWorkflowStageObj).optional(),
 
-  formId: z.string().optional(),
+  // formId: z.string().optional(),
 })
 export type JobInputType = z.infer<typeof Job>

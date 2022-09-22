@@ -18,11 +18,16 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
   const jobUser = await db.jobUser.findFirst({
     where: { jobId },
     include: {
-      job: { include: { workflow: { include: { stages: { include: { stage: true } } } } } },
+      job: {
+        include: {
+          // workflow: { include: { stages: { include: { stage: true } } } },
+          stages: true,
+        },
+      },
     },
   })
-  const defaultWorkflowStage = jobUser?.job?.workflow?.stages?.find(
-    (ws) => ws.stage.name === "Sourced"
+  const defaultStage = jobUser?.job?.stages?.find(
+    (stage) => stage.jobId === jobId && stage.name === "Sourced"
   )
 
   let candidateData = {
@@ -33,13 +38,13 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
       create: answers?.map((answer) => {
         return {
           value: answer.value,
-          questionId: answer.questionId!,
+          formQuestionId: answer.formQuestionId!,
         }
       }),
     },
     jobId: jobId!,
     source,
-    workflowStageId: defaultWorkflowStage?.id,
+    stageId: defaultStage?.id,
   }
 
   if (resume) {

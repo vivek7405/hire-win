@@ -5,7 +5,7 @@ export const StageObj = z.object({
   name: z.string().nonempty({ message: "Name can't be empty" }),
   slug: z.string().optional(),
   order: z.number().optional(),
-  workflowId: z.string().optional(),
+  jobId: z.string().optional(),
   allowEdit: z.boolean().optional(),
 })
 

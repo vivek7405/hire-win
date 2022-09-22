@@ -1,6 +1,7 @@
 import Confirm from "app/core/components/Confirm"
 import Form from "app/core/components/Form"
 import LabeledTextField from "app/core/components/LabeledTextField"
+import getStage from "app/stages/queries/getStage"
 import { invalidateQuery, useMutation, useQuery } from "blitz"
 import moment, { invalid } from "moment"
 import { useState } from "react"
@@ -11,14 +12,15 @@ import editComment from "../mutations/editComment"
 import getCandidateStageComments from "../queries/getCandidateStageComments"
 import getChildComments from "../queries/getChildComments"
 
-const Comments = ({ user, selectedWorkflowStage, candidate }) => {
+const Comments = ({ user, stageId, candidate }) => {
   const [showNewText, setShowNewText] = useState(false)
   const [commentText, setCommentText] = useState("")
   const [addCommentMutation] = useMutation(addComment)
   const [comments] = useQuery(getCandidateStageComments, {
     candidateId: candidate?.id,
-    workflowStageId: selectedWorkflowStage?.id,
+    stageId,
   })
+  const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
 
   return (
     <>
@@ -52,7 +54,7 @@ const Comments = ({ user, selectedWorkflowStage, candidate }) => {
                   await addCommentMutation({
                     text: commentText,
                     candidateId: candidate?.id,
-                    workflowStageId: selectedWorkflowStage?.id,
+                    stageId,
                   })
                   invalidateQuery(getCandidateStageComments)
                   toast.success("Comment added", { id: toastId })
@@ -96,7 +98,7 @@ const Comments = ({ user, selectedWorkflowStage, candidate }) => {
             user={user}
             candidate={candidate}
             comments={comments}
-            selectedWorkflowStage={selectedWorkflowStage}
+            stage={stage}
           />
         </div>
       </div>
@@ -107,17 +109,11 @@ const Comments = ({ user, selectedWorkflowStage, candidate }) => {
 type CommentsListProps = {
   user: any
   candidate: any
-  selectedWorkflowStage: any
+  stage: any
   comments: any
   isChild?: boolean
 }
-const CommentsList = ({
-  user,
-  candidate,
-  selectedWorkflowStage,
-  comments,
-  isChild,
-}: CommentsListProps) => {
+const CommentsList = ({ user, candidate, stage, comments, isChild }: CommentsListProps) => {
   return (
     <>
       {comments?.map((comment) => {
@@ -126,7 +122,7 @@ const CommentsList = ({
             <CommentWithChildren
               comment={comment}
               candidate={candidate}
-              selectedWorkflowStage={selectedWorkflowStage}
+              stage={stage}
               user={user}
             />
           </div>
@@ -140,14 +136,9 @@ type CommentWithChildrenProps = {
   comment: any
   user: any
   candidate: any
-  selectedWorkflowStage: any
+  stage: any
 }
-const CommentWithChildren = ({
-  comment,
-  user,
-  candidate,
-  selectedWorkflowStage,
-}: CommentWithChildrenProps) => {
+const CommentWithChildren = ({ comment, user, candidate, stage }: CommentWithChildrenProps) => {
   const [replyCommentText, setReplyCommentText] = useState("")
   const [showReplyCommentId, setShowReplyCommentId] = useState("0")
   const [editCommentText, setEditCommentText] = useState("")
@@ -310,7 +301,7 @@ const CommentWithChildren = ({
                   await addCommentMutation({
                     text: replyCommentText,
                     candidateId: candidate?.id,
-                    workflowStageId: selectedWorkflowStage?.id,
+                    stageId: stage?.id || "0",
                     parentCommentId: comment.id,
                   })
                   invalidateQuery(getCandidateStageComments)
@@ -357,7 +348,7 @@ const CommentWithChildren = ({
             comments={childComments}
             user={user}
             candidate={candidate}
-            selectedWorkflowStage={selectedWorkflowStage}
+            stage={stage}
             isChild={true}
           />
         )}

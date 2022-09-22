@@ -6,7 +6,7 @@
  */
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
-import db, { Candidate, Interview, InterviewDetail, Job, User } from "db"
+import db, { Candidate, Interview, Job, User } from "db"
 
 type SendInterviewCancellationMailerInput = {
   interview: Interview & { interviewer: User } & { organizer: User } & { job: Job } & {

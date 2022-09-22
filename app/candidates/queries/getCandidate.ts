@@ -10,51 +10,21 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
     include: {
       job: {
         include: {
-          form: {
-            include: {
-              questions: {
-                include: { question: { include: { options: true } } },
-                orderBy: { order: "asc" },
-              },
-            },
-          },
-          workflow: {
-            include: {
-              stages: {
-                include: { stage: true, interviewDetails: true },
-                orderBy: { order: "asc" },
-              },
-            },
-          },
-          scoreCards: {
-            include: {
-              scoreCard: {
-                include: {
-                  cardQuestions: {
-                    include: { cardQuestion: true, scores: true },
-                    orderBy: { order: "asc" },
-                  },
-                  jobWorkflowStages: {
-                    include: {
-                      scoreCard: {
-                        include: {
-                          cardQuestions: {
-                            include: { cardQuestion: true },
-                            orderBy: { order: "asc" },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+          // form: {
+          //   include: { questions: { include: { question: { include: { options: true } } } } },
+          // },
+          formQuestions: { include: { options: true }, orderBy: { order: "asc" } },
+          stages: {
+            include: { interviewer: true, scoreCardQuestions: true, scores: true },
+            orderBy: { order: "asc" },
           },
         },
       },
+      stage: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
+      answers: {
+        include: { formQuestion: { include: { options: true } } },
+      },
       scores: true,
-      workflowStage: { include: { stage: true, interviewDetails: true } },
-      answers: { include: { question: { include: { options: true } } } },
     },
   })
 

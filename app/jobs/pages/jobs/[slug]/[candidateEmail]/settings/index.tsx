@@ -23,7 +23,6 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import updateCandidate from "app/candidates/mutations/updateCandidate"
 import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, ExtendedAnswer } from "types"
-import { QuestionType } from "@prisma/client"
 import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
 import getJob from "app/jobs/queries/getJob"
 
@@ -130,7 +129,7 @@ const CandidateSettingsPage = ({
       <Breadcrumbs ignore={[{ breadcrumb: "Candidates", href: "/candidates" }]} />
       <br />
       <ApplicationForm
-        formId={candidate?.job?.formId!}
+        jobId={candidate?.job?.id || "0"}
         preview={false}
         header="Candidate Details"
         subHeader="Update candidate details"
@@ -140,7 +139,7 @@ const CandidateSettingsPage = ({
           try {
             await updateCandidateMutation({
               where: { id: candidate?.id },
-              initial: candidate as any,
+              // initial: candidate as any,
               data: {
                 id: candidate?.id,
                 jobId: candidate?.job?.id,
@@ -149,10 +148,10 @@ const CandidateSettingsPage = ({
                 resume: values.Resume,
                 source: candidate?.source,
                 answers:
-                  candidate?.job?.form?.questions?.map((fq) => {
-                    const val = values[fq.question?.name] || ""
+                  candidate?.job?.formQuestions?.map((formQuestion) => {
+                    const val = values[formQuestion?.name] || ""
                     return {
-                      questionId: fq.questionId,
+                      formQuestionId: formQuestion.id,
                       value: typeof val === "string" ? val : JSON.stringify(val),
                     }
                   }) || ([] as any),
