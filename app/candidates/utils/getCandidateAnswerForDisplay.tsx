@@ -15,7 +15,7 @@ const getCandidateAnswerForDisplay = (
 
     switch (type) {
       case FormQuestionType.URL:
-        return (
+        return val ? (
           <a
             href={val}
             className="text-theme-600 hover:text-theme-500"
@@ -24,7 +24,7 @@ const getCandidateAnswerForDisplay = (
           >
             {val}
           </a>
-        )
+        ) : null
       case FormQuestionType.Multiple_select:
         const answerSelectedOptionIds: String[] = JSON.parse(val || "[]")
         const selectedOptions = answer?.formQuestion?.options
@@ -48,7 +48,7 @@ const getCandidateAnswerForDisplay = (
           </a>
         ) : null
       case FormQuestionType.Long_text:
-        return <p className="max-w-md overflow-auto">{val}</p>
+        return val ? <p className="max-w-md overflow-auto">{val}</p> : null
       default:
         return val
     }
