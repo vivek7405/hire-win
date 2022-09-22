@@ -44,8 +44,8 @@ import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStag
 import getCompany from "app/companies/queries/getCompany"
 import { titleCase } from "app/core/utils/titleCase"
 import addUserToJob from "app/jobs/mutations/addUserToJob"
-import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
 import { SubscriptionStatus } from "types"
+import { checkSubscription } from "app/companies/utils/checkSubscription"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -65,11 +65,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   )
 
   // const currentPlan = checkPlan(company)
-  const subscriptionStatus = await invokeWithMiddleware(
-    getCompanySubscriptionStatus,
-    { companyId: company?.id || "0" },
-    { ...context }
-  )
 
   const { can: canUpdate } = await Guard.can(
     "update",
@@ -105,10 +100,10 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
         return {
           props: {
-            user: user,
-            job: job,
+            user,
+            job,
+            company,
             canUpdate,
-            subscriptionStatus,
             isOwner,
           },
         }
@@ -150,8 +145,8 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const JobSettingsMembersPage = ({
   user,
   job,
+  company,
   canUpdate,
-  subscriptionStatus,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -235,10 +230,7 @@ const JobSettingsMembersPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
-                  if (
-                    subscriptionStatus === SubscriptionStatus.ACTIVE ||
-                    subscriptionStatus === SubscriptionStatus.TRIALING
-                  ) {
+                  if (checkSubscription(company)) {
                     setOpenInvite(true)
                   } else {
                     setOpenConfirmBilling(true)

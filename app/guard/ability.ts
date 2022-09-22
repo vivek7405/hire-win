@@ -2,8 +2,8 @@ import db, { CompanyUserRole, JobUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import moment from "moment"
-import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
 import { SubscriptionStatus } from "types"
+import { checkSubscription } from "app/companies/utils/checkSubscription"
 
 type ExtendedResourceTypes =
   | "job"
@@ -59,16 +59,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       if (!job || !job?.company) return false
 
       // const currentPlan = checkPlan(job.company)
-      const subscriptionStatus = await getCompanySubscriptionStatus(
-        { companyId: job.companyId },
-        ctx
-      )
-      if (
-        !(
-          subscriptionStatus === SubscriptionStatus.ACTIVE ||
-          subscriptionStatus === SubscriptionStatus.TRIALING
-        )
-      ) {
+      // const subscriptionStatus = await getCompanySubscriptionStatus(
+      //   { companyId: job.companyId },
+      //   ctx
+      // )
+      if (!checkSubscription(job.company)) {
         if (job._count.candidates >= 25) {
           return false
         }
@@ -141,16 +136,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         if (allUserJobsLength >= 1) {
           // const currentPlan = checkPlan(company)
           // if (!currentPlan) return false
-          const subscriptionStatus = await getCompanySubscriptionStatus(
-            { companyId: company?.id || "0" },
-            ctx
-          )
-          if (
-            !(
-              subscriptionStatus === SubscriptionStatus.ACTIVE ||
-              subscriptionStatus === SubscriptionStatus.TRIALING
-            )
-          ) {
+          // const subscriptionStatus = await getCompanySubscriptionStatus(
+          //   { companyId: company?.id || "0" },
+          //   ctx
+          // )
+          if (!checkSubscription(company)) {
             return false
           }
         }
@@ -194,16 +184,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         if (allCompanyJobsLength > 1) {
           // const currentPlan = checkPlan(company)
           // if (!currentPlan) return false
-          const subscriptionStatus = await getCompanySubscriptionStatus(
-            { companyId: company?.id || "0" },
-            ctx
-          )
-          if (
-            !(
-              subscriptionStatus === SubscriptionStatus.ACTIVE ||
-              subscriptionStatus === SubscriptionStatus.TRIALING
-            )
-          ) {
+          // const subscriptionStatus = await getCompanySubscriptionStatus(
+          //   { companyId: company?.id || "0" },
+          //   ctx
+          // )
+          if (!checkSubscription(company)) {
             return false
           }
         }
@@ -242,16 +227,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         if (allCompanyJobsLength > 1) {
           // const currentPlan = checkPlan(company)
           // if (!currentPlan) return false
-          const subscriptionStatus = await getCompanySubscriptionStatus(
-            { companyId: company?.id || "0" },
-            ctx
-          )
-          if (
-            !(
-              subscriptionStatus === SubscriptionStatus.ACTIVE ||
-              subscriptionStatus === SubscriptionStatus.TRIALING
-            )
-          ) {
+          // const subscriptionStatus = await getCompanySubscriptionStatus(
+          //   { companyId: company?.id || "0" },
+          //   ctx
+          // )
+          if (!checkSubscription(company)) {
             return false
           }
         }
@@ -283,16 +263,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
         // const currentPlan = checkPlan(company)
         // if (!currentPlan) return false
-        const subscriptionStatus = await getCompanySubscriptionStatus(
-          { companyId: company?.id || "0" },
-          ctx
-        )
-        if (
-          !(
-            subscriptionStatus === SubscriptionStatus.ACTIVE ||
-            subscriptionStatus === SubscriptionStatus.TRIALING
-          )
-        ) {
+        // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   { companyId: company?.id || "0" },
+        //   ctx
+        // )
+        if (!checkSubscription(company)) {
           return false
         }
 
@@ -381,21 +356,24 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
         if (companyUsers && companyUsers.length >= 1) {
           // const allCompaniesOnProPlan = companyUsers.every((cu) => checkPlan(cu.company))
-          let allCompaniesOnProPlan = true
-          for (const cu of companyUsers) {
-            const subscriptionStatus = await getCompanySubscriptionStatus(
-              { companyId: cu.companyId },
-              ctx
-            )
-            if (
-              !(
-                subscriptionStatus === SubscriptionStatus.ACTIVE ||
-                subscriptionStatus === SubscriptionStatus.TRIALING
-              )
-            ) {
-              allCompaniesOnProPlan = false
-            }
-          }
+
+          // let allCompaniesOnProPlan = true
+          // for (const cu of companyUsers) {
+          //   const subscriptionStatus = await getCompanySubscriptionStatus(
+          //     { companyId: cu.companyId },
+          //     ctx
+          //   )
+          //   if (
+          //     !(
+          //       subscriptionStatus === SubscriptionStatus.ACTIVE ||
+          //       subscriptionStatus === SubscriptionStatus.TRIALING
+          //     )
+          //   ) {
+          //     allCompaniesOnProPlan = false
+          //   }
+          // }
+
+          const allCompaniesOnProPlan = companyUsers.every((cu) => checkSubscription(cu.company))
           return allCompaniesOnProPlan
         } else {
           // User with no company can create one
@@ -422,16 +400,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
         // const currentPlan = checkPlan(company)
         // if (!currentPlan) return false
-        const subscriptionStatus = await getCompanySubscriptionStatus(
-          { companyId: company?.id || "0" },
-          ctx
-        )
-        if (
-          !(
-            subscriptionStatus === SubscriptionStatus.ACTIVE ||
-            subscriptionStatus === SubscriptionStatus.TRIALING
-          )
-        ) {
+        // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   { companyId: company?.id || "0" },
+        //   ctx
+        // )
+        if (!checkSubscription) {
           return false
         }
 

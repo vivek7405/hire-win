@@ -47,8 +47,8 @@ import inviteToCompany from "app/companies/mutations/inviteToCompany"
 import updateCompanyUserRole from "app/companies/mutations/updateCompanyUserRole"
 import removeFromCompany from "app/companies/mutations/removeFromCompany"
 import { titleCase } from "app/core/utils/titleCase"
-import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
 import { SubscriptionStatus } from "types"
+import { checkSubscription } from "app/companies/utils/checkSubscription"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -93,18 +93,12 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         )
 
         // const currentPlan = checkPlan(company)
-        const subscriptionStatus = await invokeWithMiddleware(
-          getCompanySubscriptionStatus,
-          { companyId: company?.id || "0" },
-          { ...context }
-        )
 
         return {
           props: {
             user: user,
             company,
             canUpdate,
-            subscriptionStatus,
             isOwner,
           },
         }
@@ -147,7 +141,6 @@ const UserSettingsMembersPage = ({
   user,
   company,
   canUpdate,
-  subscriptionStatus,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -214,10 +207,7 @@ const UserSettingsMembersPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
-                  if (
-                    subscriptionStatus === SubscriptionStatus.ACTIVE ||
-                    subscriptionStatus === SubscriptionStatus.TRIALING
-                  ) {
+                  if (checkSubscription(company)) {
                     setOpenInvite(true)
                   } else {
                     setOpenConfirmBilling(true)

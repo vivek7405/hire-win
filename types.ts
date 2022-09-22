@@ -210,6 +210,11 @@ export type AttachmentObject = {
   location: string
 }
 
+export type SubscriptionObject = {
+  status: SubscriptionStatus
+  daysLeft: string
+}
+
 export type InterviewDetailType = {
   interviewer: User & { calendars: Calendar[] } & {
     schedules: (Schedule & {

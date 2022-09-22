@@ -2,9 +2,9 @@ import Guard from "app/guard/ability"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import { Ctx, NotFoundError } from "blitz"
 import db, { Company, CompanyUser, Prisma, User } from "db"
-import { Plan } from "types"
-import getCompanySubscriptionStatus from "./getCompanySubscriptionStatus"
+import { Plan, SubscriptionObject } from "types"
 import Stripe from "stripe"
+import { checkSubscription } from "../utils/checkSubscription"
 
 interface GetCompanyUserInput extends Pick<Prisma.CompanyUserFindFirstArgs, "where"> {}
 
@@ -16,10 +16,11 @@ async function getCompanyUser({ where }: GetCompanyUserInput, ctx: Ctx) {
 
   if (companyUser && companyUser.company) {
     // companyUser.currentPlan = checkPlan(companyUser.company)
-    companyUser.subscriptionStatus = await getCompanySubscriptionStatus(
-      { companyId: companyUser?.companyId },
-      ctx
-    )
+    // companyUser.subscriptionStatus = await getCompanySubscriptionStatus(
+    //   { companyId: companyUser?.companyId },
+    //   ctx
+    // )
+    companyUser.subscription = checkSubscription(companyUser.company)
   }
 
   // if (!companyUser) throw new NotFoundError()
@@ -27,7 +28,7 @@ async function getCompanyUser({ where }: GetCompanyUserInput, ctx: Ctx) {
   return companyUser as CompanyUser & {
     user: User
     company: Company
-    subscriptionStatus: Stripe.Subscription.Status | null
+    subscription: SubscriptionObject | null
   }
 }
 

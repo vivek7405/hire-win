@@ -42,7 +42,6 @@ import getDefaultCalendarByUser from "app/scheduling/calendars/queries/getDefaul
 import assignScheduleToJobStage from "app/jobs/mutations/assignScheduleToJobStage"
 import assignCalendarToJobStage from "app/jobs/mutations/assignCalendarToJobStage"
 import getCompany from "app/companies/queries/getCompany"
-import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
 import getDefaultScheduleByUser from "app/scheduling/schedules/queries/getDefaultScheduleByUser"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
@@ -54,20 +53,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   // End anti-tree-shaking
   const user = await getCurrentUserServer({ ...context })
   const session = await getSession(context.req, context.res)
-  const company = await invokeWithMiddleware(
-    getCompany,
-    {
-      where: { id: session.companyId || "0" },
-    },
-    { ...context }
-  )
+  // const company = await invokeWithMiddleware(
+  //   getCompany,
+  //   {
+  //     where: { id: session.companyId || "0" },
+  //   },
+  //   { ...context }
+  // )
 
   // const currentPlan = checkPlan(company)
-  const subscriptionStatus = await invokeWithMiddleware(
-    getCompanySubscriptionStatus,
-    { companyId: company?.id || "0" },
-    { ...context }
-  )
 
   const { can: canUpdate } = await Guard.can(
     "update",
@@ -103,10 +97,9 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
       return {
         props: {
-          user: user,
-          job: job,
+          user,
+          job,
           canUpdate,
-          subscriptionStatus,
           isOwner,
         },
       }
@@ -572,7 +565,6 @@ const JobSettingsSchedulingPage = ({
   user,
   job,
   canUpdate,
-  subscriptionStatus,
   isOwner,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
