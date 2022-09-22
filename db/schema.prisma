@@ -179,6 +179,8 @@ model Company {
   stripeSubscriptionId   String?   @unique
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
+  stripeTrialStart       DateTime?
+  stripeTrialEnd         DateTime?
 }
 
 model Job {

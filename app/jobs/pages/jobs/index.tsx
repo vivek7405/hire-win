@@ -67,7 +67,7 @@ import { StepsProps } from "intro.js-react"
 import usePreviousValue from "app/core/hooks/usePreviousValue"
 import { jobs } from "googleapis/build/src/apis/jobs"
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
-import getCompanySubscription from "app/companies/queries/getCompanySubscription"
+import { checkSubscription } from "app/companies/utils/checkSubscription"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -129,12 +129,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   if (user && companyUser) {
     const { can: canCreate } = await Guard.can("create", "job", { session }, {})
 
-    const subscription = await invokeWithMiddleware(
-      getCompanySubscription,
-      { companyId: companyUser.companyId },
-      { ...context }
-    )
-
     return {
       props: {
         user,
@@ -142,7 +136,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         company: companyUser.company,
         companyUsersLength: companyUsers?.length || 0,
         canCreate,
-        subscription,
       },
     }
   } else {
@@ -707,7 +700,6 @@ const JobsHome = ({
   companyUserRole,
   company,
   canCreate,
-  subscription,
   companyUsersLength,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -785,6 +777,7 @@ const JobsHome = ({
     />
   )
 
+  const subscription = checkSubscription(company)
   const subscriptionLink =
     companyUserRole === CompanyUserRole.OWNER ? (
       <>
@@ -794,9 +787,9 @@ const JobsHome = ({
           passHref
         >
           <a className="flex items-center py-2 whitespace-nowrap">
-            {subscription?.status === SubscriptionStatus.TRIALING && subscription?.trial_end ? (
+            {subscription?.status === SubscriptionStatus.TRIALING ? (
               <span className="text-yellow-600 hover:underline py-1 px-3 border-2 rounded-full border-yellow-500">
-                Trial ends {moment.unix(subscription?.trial_end)?.local()?.fromNow()}
+                Trial ends {subscription?.daysLeft}
               </span>
             ) : subscription?.status !== SubscriptionStatus.ACTIVE ? (
               <span className="text-red-600 flex items-center hover:underline py-1 px-3 border-2 rounded-full border-red-500">

@@ -318,14 +318,8 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                       </DropdownMenu.ItemIndicator>
                       <p className="ml-2 flex flex-nowrap space-x-1 items-center">
                         <div className="flex">
-                          {(cu.subscriptionStatus === SubscriptionStatus.ACTIVE ||
-                            cu.subscriptionStatus === SubscriptionStatus.TRIALING) && (
-                            <BadgeCheckIcon width={18} height={18} />
-                          )}
-                          {!(
-                            cu.subscriptionStatus === SubscriptionStatus.ACTIVE ||
-                            cu.subscriptionStatus === SubscriptionStatus.TRIALING
-                          ) && <MinusCircleIcon width={18} height={18} />}
+                          {cu.subscription && <BadgeCheckIcon width={18} height={18} />}
+                          {!cu.subscription && <MinusCircleIcon width={18} height={18} />}
                         </div>
                         <div>{cu.company?.name}</div>
                         <div className="lowercase">({cu.role})</div>

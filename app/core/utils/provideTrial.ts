@@ -2,6 +2,7 @@ import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
 import db from "db"
 import { Currency, PlanFrequency } from "types"
 import stripe from "./stripe"
+import moment from "moment"
 
 async function provideTrail(userId: string, companyId: string, currency: Currency) {
   const companyUser = await db.companyUser.findFirst({
@@ -29,6 +30,7 @@ async function provideTrail(userId: string, companyId: string, currency: Currenc
           quantity: 1,
         },
       ],
+      metadata: { companyId },
       trial_period_days: 30,
     })
 
@@ -39,6 +41,12 @@ async function provideTrail(userId: string, companyId: string, currency: Currenc
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: customer.id,
         stripePriceId: subscription.items.data[0]?.price.id,
+        stripeTrialStart: subscription.trial_start
+          ? moment.unix(subscription.trial_start)?.utc()?.toDate()
+          : null,
+        stripeTrialEnd: subscription.trial_end
+          ? moment.unix(subscription.trial_end)?.utc()?.toDate()
+          : null,
       },
     })
   } else {
@@ -62,6 +70,12 @@ async function provideTrail(userId: string, companyId: string, currency: Currenc
         stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
         stripeSubscriptionId: subscription.id,
         stripePriceId: subscription.items.data[0]?.price.id,
+        stripeTrialStart: subscription.trial_start
+          ? moment.unix(subscription.trial_start)?.utc()?.toDate()
+          : null,
+        stripeTrialEnd: subscription.trial_end
+          ? moment.unix(subscription.trial_end)?.utc()?.toDate()
+          : null,
       },
     })
   }

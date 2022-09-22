@@ -35,7 +35,7 @@ import JobApplicationLayout from "app/core/layouts/JobApplicationLayout"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import getCompany from "app/companies/queries/getCompany"
 import Guard from "app/guard/ability"
-import getCompanySubscriptionStatus from "app/companies/queries/getCompanySubscriptionStatus"
+import { checkSubscription } from "app/companies/utils/checkSubscription"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -57,11 +57,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   if (company) {
     // const currentPlan = checkPlan(company)
-    const subscriptionStatus = await invokeWithMiddleware(
-      getCompanySubscriptionStatus,
-      { companyId: company.id },
-      { ...context }
-    )
 
     const job = await invokeWithMiddleware(
       getJob,
@@ -84,7 +79,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           props: {
             company,
             job,
-            subscriptionStatus,
           },
         }
       } else {
@@ -120,7 +114,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const ApplyToJob = ({
   company,
   job,
-  subscriptionStatus,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -135,11 +128,7 @@ const ApplyToJob = ({
     <JobApplicationLayout
       job={job}
       company={company}
-      addGoogleJobPostingScript={
-        (subscriptionStatus === SubscriptionStatus.ACTIVE ||
-          subscriptionStatus === SubscriptionStatus.TRIALING) &&
-        (job?.postToGoogle || false)
-      }
+      addGoogleJobPostingScript={!!checkSubscription(company) && (job?.postToGoogle || false)}
     >
       <Suspense fallback="Loading...">
         <button
