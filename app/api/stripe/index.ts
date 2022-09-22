@@ -4,6 +4,7 @@ import db from "db"
 import moment from "moment"
 
 interface ISession {
+  id: string
   customer: string
   metadata: {
     companyId: string
@@ -52,7 +53,7 @@ export default async (req, res) => {
     event.type === "customer.subscription.pending_update_expired" ||
     event.type === "customer.subscription.trial_will_end"
   ) {
-    const subscription = await stripe.subscriptions.retrieve(session.subscription)
+    const subscription = await stripe.subscriptions.retrieve(session.subscription || session.id)
 
     await db.company.update({
       where: {
@@ -74,7 +75,7 @@ export default async (req, res) => {
   }
 
   if (event.type === "invoice.payment_succeeded") {
-    const subscription = await stripe.subscriptions.retrieve(session.subscription)
+    const subscription = await stripe.subscriptions.retrieve(session.subscription || session.id)
 
     await db.company.update({
       where: {
