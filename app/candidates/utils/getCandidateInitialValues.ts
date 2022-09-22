@@ -14,21 +14,21 @@ function getCandidateInitialValues(
       switch (type) {
         case FormQuestionType.Multiple_select:
           const selectedOptionIds: String[] = JSON.parse(val || "[]")
-          initialValues[answer?.formQuestion?.name] = selectedOptionIds
+          initialValues[answer?.formQuestion?.title] = selectedOptionIds
           break
         case FormQuestionType.Attachment:
           const attachmentObj: AttachmentObject = JSON.parse(val)
-          initialValues[answer?.formQuestion?.name] = attachmentObj
+          initialValues[answer?.formQuestion?.title] = attachmentObj
           break
         case FormQuestionType.Checkbox:
           const isChecked: boolean = val === "true"
-          initialValues[answer?.formQuestion?.name] = isChecked
+          initialValues[answer?.formQuestion?.title] = isChecked
           break
         case FormQuestionType.Rating:
-          initialValues[answer?.formQuestion?.name] = val ? parseInt(val) : 0
+          initialValues[answer?.formQuestion?.title] = val ? parseInt(val) : 0
           break
         default:
-          initialValues[answer?.formQuestion?.name] = val
+          initialValues[answer?.formQuestion?.title] = val
           break
       }
     }

@@ -43,7 +43,7 @@ async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
     data: [
       {
         stageId: stage?.id || "0",
-        name: "Overall Score",
+        title: "Overall Score",
         slug: "overall-score",
         order: 1,
       },

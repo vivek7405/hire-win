@@ -24,9 +24,9 @@ export const ScoreCardQuestionForm = (props: CardQuestionFormProps) => {
         subHeader={props.subHeader}
       >
         <LabeledTextField
-          name="name"
-          label="Name"
-          placeholder="Question Name"
+          name="title"
+          label="Title"
+          placeholder="Question Title"
           testid="cardQuestionName"
         />
       </Form>

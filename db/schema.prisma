@@ -380,7 +380,7 @@ model FormQuestion {
   createdBy   User?    @relation(fields: [createdById], references: [id])
   createdById String?
 
-  name String
+  title String
   slug String
 
   order              Int
@@ -408,7 +408,7 @@ model ScoreCardQuestion {
   createdBy   User?    @relation(fields: [createdById], references: [id])
   createdById String?
 
-  name      String
+  title      String
   slug      String
   allowEdit Boolean @default(true)
 

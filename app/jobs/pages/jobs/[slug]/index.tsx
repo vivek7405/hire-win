@@ -30,6 +30,7 @@ import {
   KanbanBoardType,
   CardType,
   KanbanColumnType,
+  ExtendedFormQuestion,
 } from "types"
 import {
   Answer,
@@ -420,9 +421,9 @@ const Candidates = (props: CandidateProps) => {
   //   })
   // }, [candidates])
 
-  const getDynamicColumn = (formQuestion) => {
+  const getDynamicColumn = (formQuestion: ExtendedFormQuestion) => {
     return {
-      Header: formQuestion?.question?.name,
+      Header: formQuestion?.title,
       Cell: (props) => {
         return getCandidateAnswerForDisplay(formQuestion, props.cell.row.original)
       },
@@ -1064,7 +1065,7 @@ const SingleJobPageContent = ({
                       source: candidateToEdit?.source,
                       answers:
                         (candidateToEdit?.job?.formQuestions?.map((formQuestion) => {
-                          const val = values[formQuestion?.name] || ""
+                          const val = values[formQuestion?.title] || ""
                           return {
                             formQuestionId: formQuestion.id,
                             value: typeof val === "string" ? val : JSON.stringify(val),
@@ -1080,7 +1081,7 @@ const SingleJobPageContent = ({
                     source: CandidateSource.Manual,
                     answers:
                       job?.formQuestions?.map((formQuestion) => {
-                        const val = values[formQuestion?.name] || ""
+                        const val = values[formQuestion?.title] || ""
                         return {
                           formQuestionId: formQuestion.id,
                           value: typeof val === "string" ? val : JSON.stringify(val),

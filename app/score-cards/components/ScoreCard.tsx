@@ -86,9 +86,9 @@ export const ScoreCard = (props: ScoreCardProps) => {
 
   const getValidationObj = (question: ExtendedScoreCardQuestion) => {
     return {
-      [question.name]: getZodType(question, z.number()),
-      [`${question.name} Note`]: z.string().optional(),
-      [`${question.name} ScoreId`]: z.string().optional(),
+      [question.title]: getZodType(question, z.number()),
+      [`${question.title} Note`]: z.string().optional(),
+      [`${question.title} ScoreId`]: z.string().optional(),
     }
   }
 
@@ -155,8 +155,8 @@ export const ScoreCard = (props: ScoreCardProps) => {
               <LabeledRatingField
                 disabled={disabled}
                 defaultValue={existingScore?.rating}
-                name={`${question.name}`}
-                label={question.name}
+                name={`${question.title}`}
+                label={question.title}
                 onChange={props.onChange}
               />
 
@@ -164,13 +164,13 @@ export const ScoreCard = (props: ScoreCardProps) => {
                 <LabeledTextAreaField
                   disabled={disabled}
                   defaultValue={existingScore?.note || ""}
-                  name={`${question.name} Note`}
+                  name={`${question.title} Note`}
                 />
               )}
 
               <LabeledTextField
                 type="hidden"
-                name={`${question.name} ScoreId`}
+                name={`${question.title} ScoreId`}
                 value={existingScore?.id}
               />
             </div>

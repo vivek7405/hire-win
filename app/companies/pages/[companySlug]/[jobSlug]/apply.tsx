@@ -162,7 +162,7 @@ const ApplyToJob = ({
                 source: CandidateSource.Careers_Page,
                 answers:
                   job?.formQuestions?.map((formQuestion) => {
-                    const val = values[formQuestion?.name] || ""
+                    const val = values[formQuestion?.title] || ""
                     return {
                       formQuestionId: formQuestion.id,
                       value: typeof val === "string" ? val : JSON.stringify(val),

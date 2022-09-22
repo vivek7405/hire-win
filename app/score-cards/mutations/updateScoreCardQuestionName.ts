@@ -16,14 +16,14 @@ async function updateScoreCardQuestionName(
 ) {
   ctx.session.$authorize()
 
-  const { name } = ScoreCardQuestionObj.parse(data)
+  const { title } = ScoreCardQuestionObj.parse(data)
 
-  const slug = slugify(name, { strict: true, lower: true })
+  const slug = slugify(title, { strict: true, lower: true })
 
   const updateScoreCardQuestionName = await db.scoreCardQuestion.update({
     where,
     data: {
-      name,
+      title,
       slug,
     },
   })

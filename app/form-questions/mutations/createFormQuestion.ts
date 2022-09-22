@@ -7,14 +7,14 @@ import slugify from "slugify"
 async function createFormQuestion(data: FormQuestionInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, placeholder, type, options, acceptedFiles, jobId } = FormQuestionObj.parse(data)
-  const slug = slugify(name, { strict: true, lower: true })
+  const { title, placeholder, type, options, acceptedFiles, jobId } = FormQuestionObj.parse(data)
+  const slug = slugify(title, { strict: true, lower: true })
 
   const order = (await db.formQuestion.count({ where: { jobId } })) + 1
 
   const formQuestion = await db.formQuestion.create({
     data: {
-      name,
+      title,
       placeholder,
       type,
       options: {

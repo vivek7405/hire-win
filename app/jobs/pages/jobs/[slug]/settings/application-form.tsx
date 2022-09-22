@@ -187,7 +187,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
       return formQuestions?.map((question) => {
         return {
           id: question?.id,
-          title: question?.name,
+          title: question?.title,
           description: "",
           renderContent: (
             <>
@@ -211,10 +211,10 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
                           setOpenAddNewQuestion(true)
                         }}
                       >
-                        {question.name}
+                        {question.title}
                       </a>
                     ) : (
-                      question.name
+                      question.title
                     )}
                   </div>
                   {question.allowEdit && (
@@ -259,14 +259,14 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
                             <span>
                               <b>Setting behaviour as {value}</b>
                               <br />
-                              for question - {question.name}
+                              for question - {question.title}
                             </span>
                           ))
                           try {
                             await updateFormQuestionBehaviourMutation({
                               where: { id: question?.id },
                               data: {
-                                name: question?.name,
+                                title: question?.title,
                                 type: question?.type,
                                 behaviour: value,
                               },
@@ -277,7 +277,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
                                 <span>
                                   <b>Behaviour changed successfully</b>
                                   <br />
-                                  for question - {question?.name}
+                                  for question - {question?.title}
                                 </span>
                               ),
                               { id: toastId }
@@ -345,12 +345,12 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
         setOpen={setOpenConfirm}
         header={
           formQuestionToRemove
-            ? `Remove Question - ${formQuestionToRemove?.name}?`
+            ? `Remove Question - ${formQuestionToRemove?.title}?`
             : "Remove Question?"
         }
         onSuccess={async () => {
           const toastId = toast.loading(() => (
-            <span>Removing Question {formQuestionToRemove?.name}</span>
+            <span>Removing Question {formQuestionToRemove?.title}</span>
           ))
           try {
             if (!formQuestionToRemove) {
@@ -361,7 +361,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
               order: formQuestionToRemove.order,
             })
             invalidateQuery(getJobApplicationFormQuestions)
-            toast.success(() => <span>Question removed - {formQuestionToRemove?.name}</span>, {
+            toast.success(() => <span>Question removed - {formQuestionToRemove?.title}</span>, {
               id: toastId,
             })
           } catch (error) {
@@ -403,7 +403,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
               setData([...data])
 
               const toastId = toast.loading(() => (
-                <span>Changing question order for {formQuestion?.name}</span>
+                <span>Changing question order for {formQuestion?.title}</span>
               ))
               try {
                 await shiftFormQuestionMutation({
@@ -416,7 +416,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
                   () => (
                     <span>
                       Order changed from {source?.index + 1} to {destination?.index + 1} for
-                      Question {formQuestion?.name}
+                      Question {formQuestion?.title}
                     </span>
                   ),
                   { id: toastId }
@@ -515,7 +515,7 @@ const JobSettingsApplicationFormPage = ({
                   initialValues={
                     questionToEdit
                       ? {
-                          name: questionToEdit?.name,
+                          name: questionToEdit?.title,
                           type: questionToEdit?.type,
                           placeholder: questionToEdit?.placeholder,
                           acceptedFiles: questionToEdit?.acceptedFiles,

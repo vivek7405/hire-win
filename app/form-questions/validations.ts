@@ -12,7 +12,7 @@ export const FormQuestionObj = z.object({
   id: z.string().optional(),
 
   jobId: z.string().optional(),
-  name: z.string().nonempty({ message: "Name can't be empty" }),
+  title: z.string().nonempty({ message: "Title can't be empty" }),
   slug: z.string().optional(),
   order: z.number().optional(),
   allowEdit: z.boolean().optional(),

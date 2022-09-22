@@ -6,7 +6,7 @@ const getCandidateAnswerForDisplay = (
   candidate: ExtendedCandidate
 ) => {
   const answer: ExtendedAnswer = candidate?.answers?.find(
-    (ans) => ans.formQuestion?.name === formQuestion?.name
+    (ans) => ans.formQuestion?.title === formQuestion?.title
   )!
 
   if (answer) {
