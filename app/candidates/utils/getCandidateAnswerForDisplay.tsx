@@ -37,14 +37,14 @@ const getCandidateAnswerForDisplay = (
         return answer?.formQuestion?.options?.find((op) => val === op.id)?.text
       case FormQuestionType.Attachment:
         const attachmentObj: AttachmentObject = JSON.parse(val || "{}")
-        return attachmentObj && attachmentObj?.Key?.trim() !== "" ? (
+        return attachmentObj && attachmentObj?.location?.trim() !== "" ? (
           <a
-            href={attachmentObj.Location}
+            href={attachmentObj.location}
             className="text-theme-600 hover:text-theme-500"
             target="_blank"
             rel="noreferrer"
           >
-            {attachmentObj.Key}
+            {attachmentObj.name}
           </a>
         ) : null
       case FormQuestionType.Long_text:

@@ -530,15 +530,15 @@ const Candidates = (props: CandidateProps) => {
       Header: "Resume",
       accessor: "resume",
       Cell: (props) => {
-        const attachmentObj = props.value
+        const attachmentObj: AttachmentObject = props.value
         return (
           <a
-            href={attachmentObj.Location}
+            href={attachmentObj.location}
             className="text-theme-600 hover:text-theme-500"
             target="_blank"
             rel="noreferrer"
           >
-            {attachmentObj.Key}
+            {attachmentObj.name}
           </a>
         )
       },

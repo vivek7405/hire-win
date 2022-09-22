@@ -205,8 +205,9 @@ export type ExtendedScoreCardQuestion = Prisma.ScoreCardQuestionGetPayload<{
 }> & { showNote: boolean }
 
 export type AttachmentObject = {
-  Key: string
-  Location: string
+  name: string
+  key: string
+  location: string
 }
 
 export type InterviewDetailType = {

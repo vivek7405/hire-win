@@ -76,7 +76,15 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
 
         if (rejectionCount === 0 && errorCount === 0) {
           const resp = await fileUpload(droppedFiles[0])
-          setValue(`${name}` as const, resp.data, { shouldValidate: true })
+          setValue(
+            `${name}` as const,
+            {
+              name: droppedFiles[0]?.name || "",
+              key: resp.data?.Key,
+              location: resp.data?.Location,
+            },
+            { shouldValidate: true }
+          )
         }
 
         setIsUploading(false)
@@ -127,10 +135,10 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
         <Controller
           name={`${name}` as const}
           control={control}
-          defaultValue={defaultValue || { Key: "", Location: "" }}
+          defaultValue={defaultValue || { name: "", key: "", location: "" }}
           render={() => (
             <>
-              {file && file.Key && file.Key !== "" ? (
+              {file && file.key && file.key !== "" ? (
                 <div className="w-full">
                   <label className="block text-sm font-medium text-gray-700">{label}</label>
                   {!isRemoving && (
@@ -138,7 +146,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                       {props.showImage && (
                         <div className="flex">
                           <img
-                            src={file?.Location}
+                            src={file?.location}
                             alt="logo"
                             width={200}
                             className="self-center"
@@ -162,11 +170,11 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                           <div>
                             <a
                               className="text-theme-600 hover:text-theme-500"
-                              href={file.Location}
+                              href={file.location}
                               target="_blank"
                               rel="noreferrer"
                             >
-                              {file.Key}
+                              {file.name}
                             </a>
                             <button
                               title="remove"

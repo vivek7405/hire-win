@@ -59,7 +59,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           [question.name]:
             question.behaviour === "REQUIRED"
               ? AttachmentZodObj.refine(
-                  (obj) => obj !== null && obj.Key !== "" && obj.Location !== "",
+                  (obj) => obj !== null && obj.key !== "" && obj.location !== "",
                   {
                     message: "Required",
                   }

@@ -167,15 +167,15 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 //   }
 // }
 
-const getResume = async (Key) => {
-  if (Key) {
+const getResume = async (key) => {
+  if (key) {
     const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/files/getFile`
     const config = {
       headers: {
         "content-type": "application/json",
       },
     }
-    const response = await axios.post(url, { Key }, config)
+    const response = await axios.post(url, { key }, config)
     return response
   } else {
     return null
@@ -321,13 +321,13 @@ const SingleCandidatePageContent = ({
 
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
-    if (resume?.Key) {
-      getResume(resume?.Key).then((response) => {
+    if (resume?.key) {
+      getResume(resume?.key).then((response) => {
         const file = response?.data?.Body
         setFile(file)
       })
     }
-  }, [resume.Key])
+  }, [resume.key])
 
   const [candidateToReject, setCandidateToReject] = useState(null as any)
   const [openCandidateRejectConfirm, setOpenCandidateRejectConfirm] = useState(false)

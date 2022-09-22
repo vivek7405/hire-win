@@ -5,8 +5,9 @@ import { z } from "zod"
 
 export const AttachmentZodObj = z
   .object({
-    Key: z.string().optional(),
-    Location: z.string().optional(),
+    name: z.string().optional(),
+    key: z.string().optional(),
+    location: z.string().optional(),
   })
   .nullable()
 
