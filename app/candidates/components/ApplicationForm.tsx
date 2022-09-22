@@ -56,7 +56,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
     switch (question.type) {
       case FormQuestionType.Attachment:
         return {
-          [question.name]:
+          [question.title]:
             question.behaviour === "REQUIRED"
               ? AttachmentZodObj.refine(
                   (obj) => obj !== null && obj.key !== "" && obj.location !== "",
@@ -67,13 +67,13 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
               : AttachmentZodObj,
         }
       case FormQuestionType.Checkbox:
-        return { [question.name]: getZodType(question, z.boolean()) }
+        return { [question.title]: getZodType(question, z.boolean()) }
       case FormQuestionType.Multiple_select:
-        return { [question.name]: getZodType(question, z.array(z.string())) }
+        return { [question.title]: getZodType(question, z.array(z.string())) }
       case FormQuestionType.Rating:
-        return { [question.name]: getZodType(question, z.number()) }
+        return { [question.title]: getZodType(question, z.number()) }
       default:
-        return { [question.name]: getZodType(question, z.string()) }
+        return { [question.title]: getZodType(question, z.string()) }
     }
   }
 
@@ -84,8 +84,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           <LabeledTextField
             key={question.id}
             type="text"
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -94,8 +94,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
         return (
           <LabeledTextAreaField
             key={question.id}
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -105,13 +105,13 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           <SingleFileUploadField
             key={question.id}
             accept={question.acceptedFiles}
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
           />
         )
 
       case FormQuestionType.Checkbox:
-        return <CheckboxField key={question.id} name={question.name} label={question.name} />
+        return <CheckboxField key={question.id} name={question.title} label={question.title} />
 
       case FormQuestionType.Multiple_select:
         return (
@@ -121,8 +121,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             options={question.options?.map((op) => {
               return { label: op.text, value: op.id }
             })}
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -134,8 +134,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             options={question.options?.map((op) => {
               return { label: op.text, value: op.id }
             })}
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -145,8 +145,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           <LabeledTextField
             key={question.id}
             type="date"
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -155,8 +155,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
         return (
           <LabeledPhoneNumberField
             key={question.id}
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -166,8 +166,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           <LabeledTextField
             key={question.id}
             type="email"
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -177,8 +177,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           <LabeledTextField
             key={question.id}
             type="url"
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
@@ -188,22 +188,22 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           <LabeledTextField
             key={question.id}
             type="number"
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )
 
       case FormQuestionType.Rating:
-        return <LabeledRatingField key={question.id} name={question.name} label={question.name} />
+        return <LabeledRatingField key={question.id} name={question.title} label={question.title} />
 
       default:
         return (
           <LabeledTextField
             key={question.id}
             type="text"
-            name={question.name}
-            label={question.name}
+            name={question.title}
+            label={question.title}
             placeholder={question.placeholder}
           />
         )

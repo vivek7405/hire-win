@@ -10,10 +10,10 @@ type UpdateFormQuestionInput = Pick<Prisma.FormQuestionUpdateArgs, "where" | "da
 async function updateFormQuestion({ where, data }: UpdateFormQuestionInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { order, behaviour, name, placeholder, options, acceptedFiles } =
+  const { order, behaviour, title, placeholder, options, acceptedFiles } =
     FormQuestionObj.parse(data)
 
-  const slug = slugify(name, { strict: true, lower: true })
+  const slug = slugify(title, { strict: true, lower: true })
 
   const currentFormQuestion = await db.formQuestion.findFirst({
     where,
@@ -32,7 +32,7 @@ async function updateFormQuestion({ where, data }: UpdateFormQuestionInput, ctx:
   const updatedFormQuestion = await db.formQuestion.update({
     where,
     data: {
-      name,
+      title,
       slug,
       order,
       behaviour,

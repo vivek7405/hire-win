@@ -201,7 +201,7 @@ export const CardQuestions = ({
       return scoreCardQuestions?.map((question: ExtendedScoreCardQuestion) => {
         return {
           id: question?.id,
-          title: question?.name,
+          title: question?.title,
           description: "",
           renderContent: (
             <>
@@ -217,7 +217,7 @@ export const CardQuestions = ({
                           setOpenAddNewCardQuestion(true)
                         }}
                       >
-                        {question.name}
+                        {question.title}
                       </a>
                     ) : (
                       // <Link prefetch={true}
@@ -231,7 +231,7 @@ export const CardQuestions = ({
                       //     {question.name}
                       //   </a>
                       // </Link>
-                      question.name
+                      question.title
                     )}
                   </div>
                   {!question.allowEdit && scoreCardQuestions?.length > 1 && (
@@ -273,14 +273,14 @@ export const CardQuestions = ({
                             <span>
                               <b>Setting behaviour as {value}</b>
                               <br />
-                              for question - {question.name}
+                              for question - {question.title}
                             </span>
                           ))
                           try {
                             await updateScoreCardQuestionBehaviourMutation({
                               where: { id: question?.id },
                               data: {
-                                name: question.name,
+                                title: question.title,
                                 behaviour: value,
                               },
                             })
@@ -289,7 +289,7 @@ export const CardQuestions = ({
                                 <span>
                                   <b>Behaviour changed successfully</b>
                                   <br />
-                                  for question - {question?.name}
+                                  for question - {question?.title}
                                 </span>
                               ),
                               { id: toastId }
@@ -359,12 +359,12 @@ export const CardQuestions = ({
         setOpen={setOpenConfirm}
         header={
           scoreCardQuestionToRemove
-            ? `Remove Question - ${scoreCardQuestionToRemove?.name}?`
+            ? `Remove Question - ${scoreCardQuestionToRemove?.title}?`
             : "Remove Question?"
         }
         onSuccess={async () => {
           const toastId = toast.loading(() => (
-            <span>Removing Question {scoreCardQuestionToRemove?.name}</span>
+            <span>Removing Question {scoreCardQuestionToRemove?.title}</span>
           ))
           try {
             if (!scoreCardQuestionToRemove) {
@@ -376,9 +376,12 @@ export const CardQuestions = ({
             })
             invalidateQuery(getScoreCardQuestions)
             invalidateQuery(getStage)
-            toast.success(() => <span>Question removed - {scoreCardQuestionToRemove?.name}</span>, {
-              id: toastId,
-            })
+            toast.success(
+              () => <span>Question removed - {scoreCardQuestionToRemove?.title}</span>,
+              {
+                id: toastId,
+              }
+            )
           } catch (error) {
             toast.error(
               "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
@@ -421,7 +424,7 @@ export const CardQuestions = ({
               // setData([...data])
 
               const toastId = toast.loading(() => (
-                <span>Changing cardQuestion order for {scoreCardQuestion?.name}</span>
+                <span>Changing cardQuestion order for {scoreCardQuestion?.title}</span>
               ))
               try {
                 await shiftScoreCardQuestionMutation({
@@ -434,7 +437,7 @@ export const CardQuestions = ({
                   () => (
                     <span>
                       Order changed from {source?.index + 1} to {destination?.index + 1} for
-                      Question {scoreCardQuestion?.name}
+                      Question {scoreCardQuestion?.title}
                     </span>
                   ),
                   { id: toastId }
@@ -622,7 +625,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                   header={`${scoreCardQuestionToEdit ? "Update" : "Add New"} Question`}
                   subHeader="Enter Question details"
                   initialValues={
-                    scoreCardQuestionToEdit ? { name: scoreCardQuestionToEdit?.name } : {}
+                    scoreCardQuestionToEdit ? { name: scoreCardQuestionToEdit?.title } : {}
                   }
                   onSubmit={async (values) => {
                     const isEdit = scoreCardQuestionToEdit ? true : false

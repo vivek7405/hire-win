@@ -3,7 +3,7 @@ import { Behaviour } from "@prisma/client"
 
 export const ScoreCardQuestionObj = z.object({
   id: z.string().optional(),
-  name: z.string().nonempty({ message: "Name can't be empty" }),
+  title: z.string().nonempty({ message: "Title can't be empty" }),
   slug: z.string().optional(),
   stageId: z.string().optional(),
   allowEdit: z.boolean().optional(),

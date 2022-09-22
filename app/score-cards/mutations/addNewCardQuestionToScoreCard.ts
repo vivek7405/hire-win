@@ -11,11 +11,11 @@ import { ShiftDirection } from "types"
 async function addNewCardQuestionToScoreCard(data: ScoreCardQuestionInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { stageId, name } = ScoreCardQuestionObj.parse(data)
+  const { stageId, title } = ScoreCardQuestionObj.parse(data)
   // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
   // if (!user) throw new AuthenticationError()
 
-  const slug = slugify(name, { strict: true, lower: true })
+  const slug = slugify(title, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
   //   slug,
   //   async (e) => await db.cardQuestion.findFirst({ where: { slug: e } })
@@ -30,7 +30,7 @@ async function addNewCardQuestionToScoreCard(data: ScoreCardQuestionInputType, c
   const scoreCardQuestion = await db.scoreCardQuestion.create({
     data: {
       stageId: stageId || "0",
-      name,
+      title,
       slug,
       order,
       createdById: ctx.session.userId || "0",

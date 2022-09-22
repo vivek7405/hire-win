@@ -312,7 +312,7 @@ const ScoreCards = ({ jobId, jobSlug }) => {
                             className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
                           >
                             <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
-                              {question?.name}
+                              {question?.title}
                             </div>
                           </div>
                         )

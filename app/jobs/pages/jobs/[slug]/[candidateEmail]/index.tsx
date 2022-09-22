@@ -190,7 +190,7 @@ const getCards = (candidate: ExtendedCandidate) => {
         const answer = getCandidateAnswerForDisplay(question, candidate)
         return {
           id: question.id,
-          title: question.name,
+          title: question.title,
           description: answer,
           // renderContent: (
           //   <>
@@ -699,7 +699,7 @@ const SingleCandidatePageContent = ({
                   source: candidate?.source,
                   answers:
                     (candidate?.job?.formQuestions?.map((formQuestion) => {
-                      const val = values[formQuestion?.name] || ""
+                      const val = values[formQuestion?.title] || ""
                       return {
                         formQuestionId: formQuestion.id,
                         value: typeof val === "string" ? val : JSON.stringify(val),
@@ -911,7 +911,7 @@ const SingleCandidatePageContent = ({
                       <div className="space-y-2">
                         <div className="w-full relative">
                           <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                            <span className="truncate">{question.name}</span>
+                            <span className="truncate">{question.title}</span>
                           </div>
                         </div>
                         <div className="border-b-2 border-gray-50 w-full"></div>
@@ -1020,9 +1020,9 @@ const SingleCandidatePageContent = ({
                               scores:
                                 selectedStage?.scoreCardQuestions
                                   ?.map((question) => {
-                                    const rating = values[question?.name] || 0
-                                    const note = values[`${question?.name} Note`]
-                                    const scoreId = values[`${question?.name} ScoreId`]
+                                    const rating = values[question?.title] || 0
+                                    const note = values[`${question?.title} Note`]
+                                    const scoreId = values[`${question?.title} ScoreId`]
 
                                     return {
                                       scoreCardQuestionId: question?.id,

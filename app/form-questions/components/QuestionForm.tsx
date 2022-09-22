@@ -43,9 +43,9 @@ export const QuestionForm = (props: QuestionFormProps) => {
         subHeader={props.subHeader}
       >
         <LabeledTextField
-          name="name"
-          label="Name"
-          placeholder="Question Name"
+          name="title"
+          label="Title"
+          placeholder="Question Title"
           testid="questionName"
         />
         <LabeledReactSelectField

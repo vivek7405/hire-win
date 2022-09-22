@@ -149,7 +149,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         allowEdit: false,
         behaviour: Behaviour.REQUIRED,
         allowBehaviourEdit: false,
-        name: "Name",
+        title: "Name",
         slug: "name",
         placeholder: "Enter your name",
         type: FormQuestionType.Single_line_text,
@@ -162,7 +162,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         allowEdit: false,
         behaviour: Behaviour.REQUIRED,
         allowBehaviourEdit: false,
-        name: "Email",
+        title: "Email",
         slug: "email",
         placeholder: "Enter your email",
         type: FormQuestionType.Email,
@@ -175,7 +175,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         allowEdit: false,
         behaviour: Behaviour.REQUIRED,
         allowBehaviourEdit: true,
-        name: "Resume",
+        title: "Resume",
         slug: "resume",
         placeholder: "",
         type: FormQuestionType.Attachment,
@@ -251,7 +251,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     data: stages?.map((stage) => {
       return {
         stageId: stage.id,
-        name: "Overall Score",
+        title: "Overall Score",
         slug: "overall-score",
         order: 1,
       }
