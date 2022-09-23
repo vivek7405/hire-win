@@ -67,7 +67,7 @@ import canCreateNewCandidate from "app/candidates/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
-import { ArrowRightIcon, BanIcon, PencilIcon, RefreshIcon } from "@heroicons/react/outline"
+import { ArrowRightIcon, BanIcon, RefreshIcon } from "@heroicons/react/outline"
 import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
 import Modal from "app/core/components/Modal"
 import ApplicationForm from "app/candidates/components/ApplicationForm"
@@ -75,6 +75,7 @@ import createCandidate from "app/candidates/mutations/createCandidate"
 import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialValues"
 import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswerForDisplay"
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
+import { PencilIcon } from "@heroicons/react/solid"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

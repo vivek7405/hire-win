@@ -29,9 +29,10 @@ import updateCandidatePool from "app/candidate-pools/mutations/updateCandidatePo
 import deleteCandidatePool from "app/candidate-pools/mutations/deleteCandidatePool"
 import Confirm from "app/core/components/Confirm"
 import Card from "app/core/components/Card"
-import { PencilIcon, TrashIcon } from "@heroicons/react/outline"
+import { TrashIcon } from "@heroicons/react/outline"
 import getCandidatePools from "app/candidate-pools/queries/getCandidatePools"
 import Pagination from "app/core/components/Pagination"
+import { PencilIcon } from "@heroicons/react/solid"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -246,7 +247,7 @@ const CandidatePools = () => {
                         <TrashIcon className="w-5 h-5" />
                       </button>
                     </div>
-                    <div className="absolute top-0.5 right-5">
+                    <div className="absolute top-0.5 right-6">
                       <button
                         id={"edit-" + cp.id}
                         className="float-right text-indigo-600 hover:text-indigo-800"

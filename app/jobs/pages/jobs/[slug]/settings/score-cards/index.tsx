@@ -291,15 +291,6 @@ const ScoreCards = ({ jobId, jobSlug }) => {
                     )} */}
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
-                  {/* <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                    {`${stage.scoreCardQuestions?.length} ${
-                      stage.scoreCardQuestions?.length === 1 ? "Question" : "Questions"
-                    } · ${Object.keys(groupByKey(stage.jobWorkflowStages, "jobId"))?.length} ${
-                      Object.keys(groupByKey(stage.jobWorkflowStages, "jobId"))?.length === 1
-                        ? "Job"
-                        : "Jobs"
-                    }`}
-                  </div> */}
                   <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                     {stage.scoreCardQuestions
                       // ?.sort((a, b) => {
