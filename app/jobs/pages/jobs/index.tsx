@@ -529,7 +529,7 @@ const Jobs = ({
                               />
                             </Form>
 
-                            <Form
+                            {/* <Form
                               noFormatting={true}
                               onSubmit={(value) => {
                                 return value
@@ -589,7 +589,7 @@ const Jobs = ({
                                   }
                                 }}
                               />
-                            </Form>
+                            </Form> */}
 
                             <button
                               id={"archive-" + job?.id}
