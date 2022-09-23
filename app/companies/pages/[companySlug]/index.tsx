@@ -284,12 +284,15 @@ const Jobs = ({ company }: JobsProps) => {
                         </p>
                       </div>
                       <div className="px-6 py-4">
-                        {job.showSalary && (
+                        {job.showSalary && (job.minSalary > 0 || job.maxSalary > 0) && (
                           <p className="text-gray-500 text-sm">
-                            {getSymbolFromCurrency(job.currency)}
-                            {job.minSalary} - {getSymbolFromCurrency(job.currency)}
-                            {job.maxSalary}{" "}
-                            {getSalaryIntervalFromSalaryType(job.salaryType)?.toLowerCase()}
+                            {job.currency && getSymbolFromCurrency(job.currency)}
+                            {job.minSalary > 0 && job.minSalary}
+                            {job.maxSalary > 0 &&
+                              ` - ${job.currency && getSymbolFromCurrency(job.currency)}${
+                                job.maxSalary
+                              }`}
+                            {` ${getSalaryIntervalFromSalaryType(job.salaryType)?.toLowerCase()}`}
                           </p>
                         )}
                       </div>

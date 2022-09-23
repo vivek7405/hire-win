@@ -1,5 +1,5 @@
 import { AuthenticationError, Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db, { Prisma, SalaryType } from "db"
 import { Job } from "app/jobs/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
@@ -30,6 +30,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     minSalary,
     maxSalary,
     salaryType,
+    showSalary,
     employmentType,
     validThrough,
     // scoreCards,
@@ -60,10 +61,11 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
       city,
       remote,
       postToGoogle,
-      currency,
-      minSalary,
-      maxSalary,
-      salaryType,
+      currency: currency || "",
+      minSalary: minSalary || 0,
+      maxSalary: maxSalary || 0,
+      salaryType: salaryType || SalaryType.YEAR,
+      showSalary,
       employmentType,
       validThrough: moment(validThrough || undefined)
         .utc()

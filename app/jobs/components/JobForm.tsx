@@ -196,6 +196,7 @@ const Step4Salary = () => {
             placeholder="Currency for salary"
             testid="jobCurrency"
             options={[
+              { label: "Select Currency", value: "" },
               ...Country.getAllCountries().map((c) => {
                 return { label: c.currency, value: c.currency }
               }),
@@ -237,6 +238,10 @@ const Step4Salary = () => {
               return { label: type, value: salaryType }
             })}
           />
+        </div>
+
+        <div className="w-full md:w-1/3 lg:w-1/3">
+          <CheckboxField name="showSalary" label="Show salary on careers page" />
         </div>
       </div>
     </>
