@@ -208,7 +208,7 @@ export const CardQuestions = ({
               <div className="flex flex-col space-y-2">
                 <div className="w-full relative">
                   <div className="font-bold flex justify-between">
-                    {!question.allowEdit ? (
+                    {question.allowEdit ? (
                       <a
                         className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                         onClick={(e) => {
@@ -234,7 +234,7 @@ export const CardQuestions = ({
                       question.title
                     )}
                   </div>
-                  {!question.allowEdit && scoreCardQuestions?.length > 1 && (
+                  {question.allowEdit && scoreCardQuestions?.length > 1 && (
                     <div className="absolute top-0.5 right-0">
                       <button
                         className="float-right text-red-600 hover:text-red-800"
