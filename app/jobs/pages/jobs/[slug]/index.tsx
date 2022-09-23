@@ -546,7 +546,7 @@ const Candidates = (props: CandidateProps) => {
     },
   ]
   props.job?.formQuestions
-    ?.filter((question) => !question.allowEdit)
+    ?.filter((question) => question.allowEdit)
     ?.forEach((formQuestion) => {
       columns.push(getDynamicColumn(formQuestion))
     })

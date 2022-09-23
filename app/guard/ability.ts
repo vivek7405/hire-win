@@ -766,7 +766,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           include: { job: { select: { companyId: true } } },
         })
 
-        return !formQuestion?.allowEdit && formQuestion?.job?.companyId === ctx.session.companyId
+        return !!formQuestion?.allowEdit && formQuestion?.job?.companyId === ctx.session.companyId
       })
       can("readAll", "question", async (args) => {
         const questions = await db.formQuestion.findMany({
