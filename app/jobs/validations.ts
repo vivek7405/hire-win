@@ -20,10 +20,11 @@ export const Job = z.object({
   state: z.string(),
   city: z.string(),
 
-  currency: z.string(),
-  minSalary: z.number(),
-  maxSalary: z.number(),
-  salaryType: z.nativeEnum(SalaryType),
+  showSalary: z.boolean().optional(),
+  currency: z.string().optional(),
+  minSalary: z.number().optional(),
+  maxSalary: z.number().optional(),
+  salaryType: z.nativeEnum(SalaryType).optional(),
 
   // workflowId: z.string().optional(),
   stages: z.array(StageObj).optional(),

@@ -4,7 +4,13 @@ import slugify from "slugify"
 import { Job, JobInputType } from "app/jobs/validations"
 import Guard from "app/guard/ability"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { Behaviour, CompanyUserRole, FormQuestionType, JobUserRole } from "@prisma/client"
+import {
+  Behaviour,
+  CompanyUserRole,
+  FormQuestionType,
+  JobUserRole,
+  SalaryType,
+} from "@prisma/client"
 import moment from "moment"
 
 async function createJob(data: JobInputType, ctx: Ctx) {
@@ -25,6 +31,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     minSalary,
     maxSalary,
     salaryType,
+    showSalary,
     employmentType,
     validThrough,
     // scoreCards,
@@ -66,10 +73,11 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       city,
       remote,
       postToGoogle,
-      currency,
-      minSalary,
-      maxSalary,
-      salaryType,
+      currency: currency || "",
+      minSalary: minSalary || 0,
+      maxSalary: maxSalary || 0,
+      salaryType: SalaryType.YEAR,
+      showSalary,
       employmentType,
       validThrough: moment(validThrough || undefined)
         .utc()

@@ -201,10 +201,10 @@ model Job {
   hidden     Boolean @default(false)
   showSalary Boolean @default(false)
 
-  currency   String
-  minSalary  Int
-  maxSalary  Int
-  salaryType SalaryType
+  currency   String     @default("")
+  minSalary  Int        @default(0)
+  maxSalary  Int        @default(0)
+  salaryType SalaryType @default(YEAR)
 
   employmentType EmploymentType[]
   validThrough   DateTime?
@@ -381,7 +381,7 @@ model FormQuestion {
   createdById String?
 
   title String
-  slug String
+  slug  String
 
   order              Int
   allowEdit          Boolean   @default(true)
@@ -408,7 +408,7 @@ model ScoreCardQuestion {
   createdBy   User?    @relation(fields: [createdById], references: [id])
   createdById String?
 
-  title      String
+  title     String
   slug      String
   allowEdit Boolean @default(true)
 

@@ -146,6 +146,7 @@ const JobSettingsPage = ({
             minSalary: job?.minSalary,
             maxSalary: job?.maxSalary,
             salaryType: job?.salaryType,
+            showSalary: job?.showSalary,
             employmentType: job?.employmentType,
             validThrough: moment(job?.validThrough).local().toDate(),
             description: job?.description
