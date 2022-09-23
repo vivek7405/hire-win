@@ -872,12 +872,12 @@ const JobsHome = ({
   const [introStepsEnabled, setIntroStepsEnabled] = useState(false)
   // const [introHintsEnabled, setIntroHintsEnabled] = useState(false)
   const [isIntroFirstLoad, setIsIntroFirstLoad] = useState(true)
-  useEffect(() => {
-    setTimeout(() => {
-      setIntroStepsEnabled(true)
-      // setIntroHintsEnabled(true)
-    }, 1000)
-  }, [])
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setIntroStepsEnabled(true)
+  //     // setIntroHintsEnabled(true)
+  //   }, 1000)
+  // }, [])
 
   const [introSteps, setIntroSteps] = useState([] as IntroStep[])
   const [introHints, setIntroHints] = useState([] as IntroHint[])
