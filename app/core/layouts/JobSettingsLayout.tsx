@@ -46,22 +46,24 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
       : null,
     jobUser?.role !== JobUserRole.USER
       ? {
-          name: "Stages",
+          name: "Stages & Score Cards",
           href: `/jobs/${job?.slug}/settings/stages`,
-          current: router.route === `/jobs/[slug]/settings/stages`,
+          current:
+            router.route === `/jobs/[slug]/settings/stages` ||
+            router.route.includes(`/jobs/[slug]/settings/score-cards`),
           icon: CollectionIcon,
           canView: true,
         }
       : null,
-    jobUser?.role !== JobUserRole.USER
-      ? {
-          name: "Score Cards",
-          href: `/jobs/${job?.slug}/settings/score-cards`,
-          current: router.route.includes(`/jobs/[slug]/settings/score-cards`),
-          icon: StarIcon,
-          canView: true,
-        }
-      : null,
+    // jobUser?.role !== JobUserRole.USER
+    //   ? {
+    //       name: "Score Cards",
+    //       href: `/jobs/${job?.slug}/settings/score-cards`,
+    //       current: router.route.includes(`/jobs/[slug]/settings/score-cards`),
+    //       icon: StarIcon,
+    //       canView: true,
+    //     }
+    //   : null,
     jobUser?.role !== JobUserRole.USER
       ? {
           name: "Members",

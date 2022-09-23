@@ -515,7 +515,7 @@ const JobSettingsApplicationFormPage = ({
                   initialValues={
                     questionToEdit
                       ? {
-                          name: questionToEdit?.title,
+                          title: questionToEdit?.title,
                           type: questionToEdit?.type,
                           placeholder: questionToEdit?.placeholder,
                           acceptedFiles: questionToEdit?.acceptedFiles,

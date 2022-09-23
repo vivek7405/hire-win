@@ -27,7 +27,7 @@ import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import toast from "react-hot-toast"
 
-import { XIcon } from "@heroicons/react/outline"
+import { CreditCardIcon, StarIcon, TrashIcon } from "@heroicons/react/outline"
 import { CardType, DragDirection, ExtendedStage, ShiftDirection } from "types"
 import shiftJobStage from "app/stages/mutations/shiftJobStage"
 import Confirm from "app/core/components/Confirm"
@@ -41,6 +41,7 @@ import { Stage } from "@prisma/client"
 import updateStage from "app/stages/mutations/updateStage"
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
+import { PencilIcon } from "@heroicons/react/solid"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -114,7 +115,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, jobId }) => {
+export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -144,7 +145,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, jobId }) => {
 
   const [stages] = useQuery(getJobStages, {
     where: {
-      jobId,
+      jobId: job?.id || "0",
       ...query,
     },
     orderBy: { order: "asc" },
@@ -176,7 +177,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, jobId }) => {
     return debouncer.execute(e)
   }
 
-  const getCards = (stages) => {
+  const getCards = (stages, jobSlug) => {
     return stages?.map((stage) => {
       return {
         id: stage?.id,
@@ -185,50 +186,96 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, jobId }) => {
         isDragDisabled: !stage.allowEdit,
         renderContent: (
           <>
-            <div className="flex flex-col space-y-2">
+            <div className="space-y-2">
               <div className="w-full relative">
-                <div className="font-bold flex justify-between">
-                  {stage.allowEdit ? (
+                <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
+                  {stage.name}
+                  {/* <Link
+                    prefetch={true}
+                    href={Routes.JobSettingsSingleScoreCardPage({
+                      slug: jobSlug,
+                      stageSlug: stage.slug,
+                    })}
+                    passHref
+                  >
                     <a
-                      className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setStageToEdit(stage)
-                        setOpenAddNewStage(true)
-                      }}
+                      data-testid={`categorylink`}
+                      className="text-theme-600 hover:text-theme-800 pr-12 md:px-12 lg:px-12 truncate"
                     >
                       {stage.name}
                     </a>
-                  ) : (
-                    // <Link prefetch={true} href={Routes.SingleStagePage({ slug: ws.stage.slug })} passHref>
-                    //   <a data-testid={`stagelink`} className="text-theme-600 hover:text-theme-900">
-                    //     {ws.stage.name}
-                    //   </a>
-                    // </Link>
-                    stage.name
-                  )}
+                  </Link> */}
+                </div>
+                <div className="absolute top-0.5 right-0">
+                  <button
+                    id={"edit-" + stage.id}
+                    className="float-right text-indigo-600 hover:text-indigo-800"
+                    title="Configure Score Card"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      router.push(
+                        Routes.JobSettingsSingleScoreCardPage({
+                          slug: jobSlug,
+                          stageSlug: stage.slug,
+                        })
+                      )
+                    }}
+                  >
+                    <CreditCardIcon className="w-5 h-5" />
+                  </button>
                 </div>
                 {stage.allowEdit && (
-                  <div className="absolute top-0.5 right-0">
-                    {/* <Link prefetch={true} href={Routes.FormSettingsPage({ slug: fq.slug })} passHref>
-                      <a className="float-right text-red-600 hover:text-red-800">
+                  <>
+                    <div className="absolute top-0.5 right-7">
+                      <button
+                        id={"edit-" + stage.id}
+                        className="float-right text-indigo-600 hover:text-indigo-800"
+                        title="Edit Stage Name"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setStageToEdit(stage)
+                          setOpenAddNewStage(true)
+                        }}
+                      >
+                        <PencilIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="absolute top-0.5 right-14">
+                      <button
+                        className="float-right text-red-600 hover:text-red-800"
+                        title="Delete Stage"
+                        onClick={async (e) => {
+                          e.preventDefault()
+                          setWorkflowStageToRemove(stage)
+                          setOpenConfirm(true)
+                        }}
+                      >
                         <TrashIcon className="h-5 w-5" />
-                      </a>
-                    </Link> */}
-                    <button
-                      className="float-right text-red-600 hover:text-red-800"
-                      title="Remove Question"
-                      onClick={async (e) => {
-                        e.preventDefault()
-
-                        setWorkflowStageToRemove(stage)
-                        setOpenConfirm(true)
-                      }}
-                    >
-                      <XIcon className="h-5 w-5" />
-                    </button>
-                  </div>
+                      </button>
+                    </div>
+                  </>
                 )}
+              </div>
+              <div className="border-b-2 border-gray-50 w-full"></div>
+              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                {stage.scoreCardQuestions
+                  // ?.sort((a, b) => {
+                  //   return a.order - b.order
+                  // })
+                  .map((question) => {
+                    return (
+                      <div
+                        key={question.id}
+                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
+                      >
+                        <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
+                          {question?.title}
+                        </div>
+                      </div>
+                    )
+                  })}
               </div>
             </div>
           </>
@@ -237,9 +284,9 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, jobId }) => {
     }) as CardType[]
   }
 
-  const [cards, setCards] = useState(getCards(data))
+  const [cards, setCards] = useState(getCards(data, job?.slug || "0"))
   useEffect(() => {
-    setCards(getCards(data))
+    setCards(getCards(data, job?.slug || "0"))
   }, [data])
 
   return (
@@ -307,7 +354,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, jobId }) => {
         })}
       </div>
       <div className="w-full flex items-center justify-center">
-        <div className="w-full md:w-1/2 lg:w-1/2 p-3 border-2 border-neutral-300 rounded">
+        <div className="w-full p-3 border-2 border-theme-400 rounded">
           <Cards
             noSearch={true}
             cards={cards}
@@ -518,7 +565,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
 
           <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <Stages
-              jobId={job?.id || "0"}
+              job={job}
               user={user}
               setStageToEdit={setStageToEdit}
               setOpenAddNewStage={setOpenAddNewStage}

@@ -625,7 +625,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                   header={`${scoreCardQuestionToEdit ? "Update" : "Add New"} Question`}
                   subHeader="Enter Question details"
                   initialValues={
-                    scoreCardQuestionToEdit ? { name: scoreCardQuestionToEdit?.title } : {}
+                    scoreCardQuestionToEdit ? { title: scoreCardQuestionToEdit?.title } : {}
                   }
                   onSubmit={async (values) => {
                     const isEdit = scoreCardQuestionToEdit ? true : false
