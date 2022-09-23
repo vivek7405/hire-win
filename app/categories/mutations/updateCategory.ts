@@ -6,11 +6,9 @@ import { ExtendedCategory } from "types"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 
-type UpdateCategoryInput = Pick<Prisma.CategoryUpdateArgs, "where" | "data"> & {
-  initial: Category
-}
+type UpdateCategoryInput = Pick<Prisma.CategoryUpdateArgs, "where" | "data">
 
-async function updateCategory({ where, data, initial }: UpdateCategoryInput, ctx: Ctx) {
+async function updateCategory({ where, data }: UpdateCategoryInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { name } = CategoryObj.parse(data)
