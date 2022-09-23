@@ -157,7 +157,6 @@ const Categories = () => {
                 ? await updateCategoryMutation({
                     where: { id: categoryToEdit.id },
                     data: { ...values },
-                    initial: categoryToEdit,
                   })
                 : await createCategoryMutation({ ...values })
               await invalidateQuery(getCategories)

@@ -68,6 +68,10 @@ import usePreviousValue from "app/core/hooks/usePreviousValue"
 import { jobs } from "googleapis/build/src/apis/jobs"
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
 import { checkSubscription } from "app/companies/utils/checkSubscription"
+import Modal from "app/core/components/Modal"
+import LabeledTextField from "app/core/components/LabeledTextField"
+import getJobs from "app/jobs/queries/getJobs"
+import createJobWithTitleAndValidThrough from "app/jobs/mutations/createJobWithTitleAndValidThrough"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -383,7 +387,7 @@ const Jobs = ({
         </Suspense>
       )}
 
-      <div>
+      <div className="space-y-5 mt-5">
         {jobUsers
           .map((jobUser) => {
             return {
@@ -829,7 +833,8 @@ const JobsHome = ({
       onClick={(e) => {
         e.preventDefault()
         if (canCreate) {
-          return router.push(Routes.NewJob())
+          // return router.push(Routes.NewJob())
+          setOpenModal(true)
         } else {
           if (companyUserRole === CompanyUserRole.USER) {
             setConfirmHeader("No Permission")
@@ -867,12 +872,12 @@ const JobsHome = ({
   const [introStepsEnabled, setIntroStepsEnabled] = useState(false)
   // const [introHintsEnabled, setIntroHintsEnabled] = useState(false)
   const [isIntroFirstLoad, setIsIntroFirstLoad] = useState(true)
-  useEffect(() => {
-    setTimeout(() => {
-      setIntroStepsEnabled(true)
-      // setIntroHintsEnabled(true)
-    }, 1000)
-  }, [])
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setIntroStepsEnabled(true)
+  //     // setIntroHintsEnabled(true)
+  //   }, 1000)
+  // }, [])
 
   const [introSteps, setIntroSteps] = useState([] as IntroStep[])
   const [introHints, setIntroHints] = useState([] as IntroHint[])
@@ -925,6 +930,9 @@ const JobsHome = ({
   //   ssr: false,
   // }) as any
 
+  const [openModal, setOpenModal] = useState(false)
+  const [createJobWithTitleAndValidThroughMutation] = useMutation(createJobWithTitleAndValidThrough)
+
   return (
     <AuthLayout
       title="Jobs | hire-win"
@@ -944,6 +952,31 @@ const JobsHome = ({
       >
         {confirmMessage}
       </Confirm>
+
+      <Modal header="New Job" open={openModal} setOpen={setOpenModal}>
+        <Form
+          header={`New Job`}
+          subHeader=""
+          submitText="Create"
+          onSubmit={async (values) => {
+            const toastId = toast.loading("Creating Job")
+            try {
+              values["validThrough"] = new Date(moment().add(1, "months").toISOString())
+              const job = await createJobWithTitleAndValidThroughMutation({
+                ...values,
+              })
+              router.push(Routes.JobSettingsPage({ slug: job.slug }))
+              invalidateQuery(getJobs)
+              toast.success("Job created successfully", { id: toastId })
+            } catch (error) {
+              toast.error(`Failed to create new job - ${error.toString()}`, { id: toastId })
+            }
+            setOpenModal(false)
+          }}
+        >
+          <LabeledTextField name="title" label="Title" placeholder="Enter Job Title" />
+        </Form>
+      </Modal>
 
       {/* Mobile Menu */}
       <div className="flex flex-col space-y-4 md:hidden lg:hidden">

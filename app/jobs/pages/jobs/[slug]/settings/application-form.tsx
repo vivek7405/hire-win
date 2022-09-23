@@ -457,8 +457,8 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
             {/* <div className="border-2 border-neutral-400 rounded-2xl h-2 w-1/3 absolute left-1/3 top-2" /> */}
             <div className="w-full h-full rounded-2xl">
               <ApplicationForm
-                header="Job Application Form"
-                subHeader="Preview"
+                header="Job Application Form (Preview)"
+                subHeader=""
                 jobId={job?.id!}
                 preview={true}
                 onSubmit={async (values) => {

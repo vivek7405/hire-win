@@ -20,8 +20,6 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     title,
     description,
     categoryId,
-    // workflowId,
-    // formId,
     country,
     state,
     city,
@@ -34,7 +32,6 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     showSalary,
     employmentType,
     validThrough,
-    // scoreCards,
   } = Job.parse(data)
 
   const user = await db.user.findFirst({
@@ -66,8 +63,6 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       slug: newSlug,
       description,
       categoryId: categoryId || null,
-      // workflowId: workflowId || null,
-      // formId: formId || null,
       country,
       state,
       city,
@@ -76,7 +71,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       currency: currency || "",
       minSalary: minSalary || 0,
       maxSalary: maxSalary || 0,
-      salaryType: SalaryType.YEAR,
+      salaryType: salaryType || SalaryType.YEAR,
       showSalary,
       employmentType,
       validThrough: moment(validThrough || undefined)

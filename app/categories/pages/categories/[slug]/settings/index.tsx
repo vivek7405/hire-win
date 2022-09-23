@@ -123,7 +123,6 @@ const CategorySettingsPage = ({
                 },
               },
               data: { ...values },
-              initial: category!,
             })
             toast.success(() => <span>Category Updated</span>, { id: toastId })
             router.push(Routes.CategoriesHome())

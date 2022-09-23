@@ -479,7 +479,7 @@ export const CardQuestions = ({
             <div className="w-full h-full rounded-2xl">
               <ScoreCard
                 header="Score Card (Preview)"
-                // subHeader="This is how the Score Card will appear"
+                subHeader=""
                 stageId={stageId!}
                 preview={true}
                 onSubmit={async (values) => {
