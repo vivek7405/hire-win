@@ -58,6 +58,19 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     )
 
     if (job) {
+      if ((job?.description as any)?.blocks && !(job?.description as any)?.blocks[0]?.text) {
+        return {
+          redirect: {
+            destination: Routes.ApplyToJob({
+              companySlug: context?.params?.companySlug as string,
+              jobSlug: context?.params?.jobSlug as string,
+            }),
+            permanent: false,
+          },
+          props: {},
+        }
+      }
+
       const { can: canAccess } = await Guard.can(
         "access",
         "jobListing",

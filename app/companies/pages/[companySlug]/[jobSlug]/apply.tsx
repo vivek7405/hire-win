@@ -131,20 +131,27 @@ const ApplyToJob = ({
       addGoogleJobPostingScript={!!checkSubscription(company) && (job?.postToGoogle || false)}
     >
       <Suspense fallback="Loading...">
-        <button
-          type="button"
-          className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
-          onClick={() => {
-            router.push(
-              Routes.JobDescriptionPage({ companySlug: company?.slug || "", jobSlug: job?.slug! })
-            )
-          }}
-        >
-          View Job Description
-        </button>
+        {(job?.description as any)?.blocks && (job?.description as any)?.blocks[0]?.text && (
+          <>
+            <button
+              type="button"
+              className="w-full text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
+              onClick={() => {
+                router.push(
+                  Routes.JobDescriptionPage({
+                    companySlug: company?.slug || "",
+                    jobSlug: job?.slug!,
+                  })
+                )
+              }}
+            >
+              View Job Description
+            </button>
 
-        <br />
-        <br />
+            <br />
+            <br />
+          </>
+        )}
 
         <ApplicationForm
           header="Job Application Form"
