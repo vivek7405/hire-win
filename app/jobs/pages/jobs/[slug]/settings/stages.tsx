@@ -27,7 +27,7 @@ import Modal from "app/core/components/Modal"
 import Table from "app/core/components/Table"
 import toast from "react-hot-toast"
 
-import { CreditCardIcon, StarIcon, TrashIcon } from "@heroicons/react/outline"
+import { CreditCardIcon, StarIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
 import { CardType, DragDirection, ExtendedStage, ShiftDirection } from "types"
 import shiftJobStage from "app/stages/mutations/shiftJobStage"
 import Confirm from "app/core/components/Confirm"
@@ -189,8 +189,8 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
             <div className="space-y-2">
               <div className="w-full relative">
                 <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                  {stage.name}
-                  {/* <Link
+                  {/* {stage.name} */}
+                  <Link
                     prefetch={true}
                     href={Routes.JobSettingsSingleScoreCardPage({
                       slug: jobSlug,
@@ -204,9 +204,9 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
                     >
                       {stage.name}
                     </a>
-                  </Link> */}
+                  </Link>
                 </div>
-                <div className="absolute top-0.5 right-0">
+                {/* <div className="absolute top-0.5 right-0">
                   <button
                     id={"edit-" + stage.id}
                     className="float-right text-indigo-600 hover:text-indigo-800"
@@ -224,9 +224,22 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
                   >
                     <CreditCardIcon className="w-5 h-5" />
                   </button>
-                </div>
+                </div> */}
                 {stage.allowEdit && (
                   <>
+                    <div className="absolute top-0.5 right-0">
+                      <button
+                        className="float-right text-red-600 hover:text-red-800"
+                        title="Delete Stage"
+                        onClick={async (e) => {
+                          e.preventDefault()
+                          setWorkflowStageToRemove(stage)
+                          setOpenConfirm(true)
+                        }}
+                      >
+                        <XIcon className="h-5 w-5" />
+                      </button>
+                    </div>
                     <div className="absolute top-0.5 right-7">
                       <button
                         id={"edit-" + stage.id}
@@ -240,19 +253,6 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
                         }}
                       >
                         <PencilIcon className="w-5 h-5" />
-                      </button>
-                    </div>
-                    <div className="absolute top-0.5 right-14">
-                      <button
-                        className="float-right text-red-600 hover:text-red-800"
-                        title="Delete Stage"
-                        onClick={async (e) => {
-                          e.preventDefault()
-                          setWorkflowStageToRemove(stage)
-                          setOpenConfirm(true)
-                        }}
-                      >
-                        <TrashIcon className="h-5 w-5" />
                       </button>
                     </div>
                   </>
