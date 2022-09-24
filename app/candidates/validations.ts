@@ -10,6 +10,7 @@ export const AttachmentZodObj = z
     location: z.string().optional(),
   })
   .nullable()
+  .optional()
 
 export const Candidate = z.object({
   id: z.string().optional(),

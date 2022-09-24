@@ -1,7 +1,7 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "app/core/components/LabeledTextAreaField"
 import { Form } from "app/core/components/Form"
-import { Job, FormQuestionType } from "@prisma/client"
+import { Job, FormQuestionType, Behaviour } from "@prisma/client"
 import CheckboxField from "app/core/components/CheckboxField"
 import { useEffect, useState } from "react"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
@@ -26,6 +26,7 @@ type ApplicationFormProps = {
   subHeader: string
   jobId: string
   preview: boolean
+  careersPage?: boolean
   // formQuestions?: ExtendedFormQuestion[]
 }
 
@@ -59,7 +60,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           [question.title]:
             question.behaviour === "REQUIRED"
               ? AttachmentZodObj.refine(
-                  (obj) => obj !== null && obj.key !== "" && obj.location !== "",
+                  (obj) =>
+                    obj !== null && obj?.name !== "" && obj?.key !== "" && obj?.location !== "",
                   {
                     message: "Required",
                   }
@@ -208,6 +210,19 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           />
         )
     }
+  }
+
+  // If candidate is being added internally (not being added from careers page),
+  // let the user add them by just entering the name and email,
+  // other fields can be optionally added irrespective of the form configuration
+  if (!props.careersPage && !props.preview) {
+    formQuestions.map((question) => {
+      if (question.title !== "Name" && question.title !== "Email") {
+        if (question.behaviour === Behaviour.REQUIRED) {
+          question.behaviour = Behaviour.OPTIONAL
+        }
+      }
+    })
   }
 
   let validationObj = {}

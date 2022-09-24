@@ -151,6 +151,7 @@ const ApplyToJob = ({
           subHeader={`Apply to the job - ${job?.title}`}
           jobId={job?.id || "0"}
           preview={false}
+          careersPage={true}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Applying to job</span>)
             try {
