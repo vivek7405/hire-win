@@ -30,3 +30,11 @@
 .introjs-button {
   @apply w-fit;
 }
+
+/* editor */
+.rdw-link-modal {
+  height: auto !important;
+}
+.rdw-embedded-modal {
+  height: auto !important;
+}
