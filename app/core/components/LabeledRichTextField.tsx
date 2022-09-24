@@ -94,6 +94,13 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
                       <></>
                     ),
                   ]}
+                  toolbar={{
+                    inline: { inDropdown: true },
+                    list: { inDropdown: true },
+                    textAlign: { inDropdown: true },
+                    // link: { inDropdown: true },
+                    // history: { inDropdown: true },
+                  }}
                 />
               ) : (
                 <></>
