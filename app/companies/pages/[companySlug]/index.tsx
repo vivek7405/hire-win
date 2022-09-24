@@ -244,6 +244,16 @@ const Jobs = ({ company }: JobsProps) => {
         </div>
       </div>
 
+      <Pagination
+        endPage={endPage}
+        hasNext={hasMore}
+        hasPrevious={tablePage !== 0}
+        pageIndex={tablePage}
+        startPage={startPage}
+        totalCount={count}
+        resultName="job opening"
+      />
+
       <div>
         {jobs?.map((job) => {
           // Filter jobs whose free candidate limit has reached
@@ -335,16 +345,6 @@ const Jobs = ({ company }: JobsProps) => {
           )
         })}
       </div>
-
-      <Pagination
-        endPage={endPage}
-        hasNext={hasMore}
-        hasPrevious={tablePage !== 0}
-        pageIndex={tablePage}
-        startPage={startPage}
-        totalCount={count}
-        resultName="job"
-      />
     </>
   )
 }
