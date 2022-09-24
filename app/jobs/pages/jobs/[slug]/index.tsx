@@ -535,12 +535,12 @@ const Candidates = (props: CandidateProps) => {
         const attachmentObj: AttachmentObject = props.value
         return (
           <a
-            href={attachmentObj.location}
+            href={attachmentObj?.location}
             className="text-theme-600 hover:text-theme-500"
             target="_blank"
             rel="noreferrer"
           >
-            {attachmentObj.name}
+            {attachmentObj?.name}
           </a>
         )
       },
