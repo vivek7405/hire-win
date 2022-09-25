@@ -349,15 +349,24 @@ const Jobs = ({
           "This will also expire the job and set the expiry date to current date time."}
       </Confirm>
 
-      <Pagination
-        endPage={endPage}
-        hasNext={hasMore}
-        hasPrevious={tablePage !== 0}
-        pageIndex={tablePage}
-        startPage={startPage}
-        totalCount={count}
-        resultName="job"
-      />
+      {jobUsers?.length > 0 && (
+        <Pagination
+          endPage={endPage}
+          hasNext={hasMore}
+          hasPrevious={tablePage !== 0}
+          pageIndex={tablePage}
+          startPage={startPage}
+          totalCount={count}
+          resultName="job"
+        />
+      )}
+
+      {!jobUsers ||
+        (jobUsers?.length === 0 && (
+          <div className="mt-10 w-full border-2 rounded-xl border-neutral-400 py-10 flex flex-col items-center justify-center space-y-5 text-neutral-700">
+            <p>No Jobs</p>
+          </div>
+        ))}
 
       {jobUsers?.length > 0 && (
         <Suspense

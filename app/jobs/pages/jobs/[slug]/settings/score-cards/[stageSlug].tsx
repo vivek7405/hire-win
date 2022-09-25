@@ -151,7 +151,7 @@ export const CardQuestions = ({
     const search = router.query.search
       ? {
           AND: {
-            name: {
+            title: {
               contains: JSON.parse(router.query.search as string),
               mode: "insensitive",
             },

@@ -210,9 +210,7 @@ const Categories = () => {
         resultName="category"
       />
 
-      {categories?.length === 0 ? (
-        <div className="text-xl font-semibold text-neutral-500">No Categories found</div>
-      ) : (
+      {categories?.length > 0 && (
         <div className="flex flex-wrap justify-center">
           {categories.map((c) => {
             return (
