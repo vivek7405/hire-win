@@ -12,7 +12,7 @@ export const checkSubscription = (
     ) {
       return {
         status: SubscriptionStatus.TRIALING,
-        daysLeft: moment(company.stripeTrialEnd).local().fromNow(),
+        daysLeft: moment(company.stripeTrialEnd).local().diff(moment(), "days"),
       }
     }
 
@@ -22,7 +22,7 @@ export const checkSubscription = (
     ) {
       return {
         status: SubscriptionStatus.ACTIVE,
-        daysLeft: moment(company.stripeCurrentPeriodEnd).local().fromNow(),
+        daysLeft: moment(company.stripeCurrentPeriodEnd).local().diff(moment(), "days"),
       }
     }
   }
