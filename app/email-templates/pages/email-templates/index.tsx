@@ -219,9 +219,7 @@ const EmailTemplates = () => {
         resultName="email template"
       />
 
-      {emailTemplates?.length === 0 ? (
-        <div className="text-xl font-semibold text-neutral-500">No templates found.</div>
-      ) : (
+      {emailTemplates?.length > 0 && (
         <div className="flex flex-wrap justify-center">
           {emailTemplates.map((et) => {
             return (

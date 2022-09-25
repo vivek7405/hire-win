@@ -137,7 +137,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
     const search = router.query.search
       ? {
           AND: {
-            name: {
+            title: {
               contains: JSON.parse(router.query.search as string),
               mode: "insensitive",
             },

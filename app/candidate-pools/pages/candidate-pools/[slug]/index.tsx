@@ -189,18 +189,22 @@ export const Candidates = ({ slug }) => {
         />
       </div>
 
-      <Pagination
-        endPage={endPage}
-        hasNext={hasMore}
-        hasPrevious={tablePage !== 0}
-        pageIndex={tablePage}
-        startPage={startPage}
-        totalCount={count}
-        resultName="candidate"
-      />
+      {candidates?.length > 0 && (
+        <Pagination
+          endPage={endPage}
+          hasNext={hasMore}
+          hasPrevious={tablePage !== 0}
+          pageIndex={tablePage}
+          startPage={startPage}
+          totalCount={count}
+          resultName="candidate"
+        />
+      )}
 
       {candidates?.length === 0 ? (
-        <div className="text-xl font-semibold text-neutral-500">No candidates found</div>
+        <div className="mt-10 w-full border-2 rounded-xl border-neutral-400 py-10 flex flex-col items-center justify-center space-y-5 text-neutral-700">
+          <p>No Candidates</p>
+        </div>
       ) : (
         <div className="flex flex-wrap justify-center">
           {candidates.map((candidate) => {

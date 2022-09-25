@@ -296,7 +296,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
           placeholder="Search"
           type="text"
           defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+          className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
           onChange={(e) => {
             execDebouncer(e)
           }}
@@ -457,111 +457,54 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
       <JobSettingsLayout job={job!}>
         <br className="block md:hidden lg:hidden" />
 
-        {/* {canUpdate && ( */}
+        <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
+          <StageForm
+            header={`${stageToEdit ? "Update" : "Add New"} Stage`}
+            subHeader="Enter stage details"
+            initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
+            onSubmit={async (values) => {
+              const isEdit = stageToEdit ? true : false
+
+              const toastId = toast.loading(isEdit ? "Updating Stage" : "Creating Stage")
+              try {
+                isEdit
+                  ? await updateStageMutation({
+                      where: { id: stageToEdit.id },
+                      data: { ...values },
+                      initial: stageToEdit,
+                    })
+                  : await addNewStageToJobMutation({
+                      jobId: job?.id || "0",
+                      ...values,
+                    })
+                await invalidateQuery(getJobStages)
+                toast.success(isEdit ? "Stage updated successfully" : "Stage added successfully", {
+                  id: toastId,
+                })
+                setStageToEdit(null as any)
+                setOpenAddNewStage(false)
+              } catch (error) {
+                toast.error(
+                  `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                  { id: toastId }
+                )
+              }
+            }}
+          />
+        </Modal>
+
         <div className="space-y-6">
-          <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
-            {/* <div className="space-x-8 flex flex-row justify-center">
-              <Link prefetch={true} href={Routes.StagesHome()} passHref>
-                <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
-                  Stage Pool
-                </a>
-              </Link>
-            </div> */}
-
-            <div className="flex flex-row justify-between space-x-3">
-              {/* <Modal
-              header="Add Stages from Pool"
-              open={openAddExistingStage}
-              setOpen={setOpenAddExistingStage}
-              noOverflow={true}
-            >
-              <AddExistingStagesForm
-                schema={WorkflowStages}
-                companyId={session.companyId || "0"}
-                // workflowId={workflow?.id!}
-                onSubmit={async (values) => {
-                  const toastId = toast.loading(() => <span>Adding Stage(s)</span>)
-                  try {
-                    await addExistingWorkflowStagesMutation({
-                      workflowId: workflow?.id as string,
-                      stageIds: values.stageIds,
-                    })
-                    invalidateQuery(getJobStages)
-                    toast.success(() => <span>Stage(s) added</span>, {
-                      id: toastId,
-                    })
-                  } catch (error) {
-                    toast.error(
-                      "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                      { id: toastId }
-                    )
-                  }
-                  setOpenAddExistingStage(false)
-                }}
-              />
-            </Modal>
-            <button
-              onClick={(e) => {
-                e.preventDefault()
-                setOpenAddExistingStage(true)
-              }}
-              data-testid={`open-addStage-modal`}
-              className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-            >
-              Add Stages from Pool
-            </button> */}
-
-              <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
-                <StageForm
-                  header={`${stageToEdit ? "Update" : "Add New"} Stage`}
-                  subHeader="Enter stage details"
-                  initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
-                  onSubmit={async (values) => {
-                    const isEdit = stageToEdit ? true : false
-
-                    const toastId = toast.loading(isEdit ? "Updating Stage" : "Creating Stage")
-                    try {
-                      isEdit
-                        ? await updateStageMutation({
-                            where: { id: stageToEdit.id },
-                            data: { ...values },
-                            initial: stageToEdit,
-                          })
-                        : await addNewStageToJobMutation({
-                            jobId: job?.id || "0",
-                            ...values,
-                          })
-                      await invalidateQuery(getJobStages)
-                      toast.success(
-                        isEdit ? "Stage updated successfully" : "Stage added successfully",
-                        {
-                          id: toastId,
-                        }
-                      )
-                      setStageToEdit(null as any)
-                      setOpenAddNewStage(false)
-                    } catch (error) {
-                      toast.error(
-                        `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
-                        { id: toastId }
-                      )
-                    }
-                  }}
-                />
-              </Modal>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  setStageToEdit(null as any)
-                  setOpenAddNewStage(true)
-                }}
-                data-testid={`open-addStage-modal`}
-                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-              >
-                Add New Stage
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              setStageToEdit(null as any)
+              setOpenAddNewStage(true)
+            }}
+            data-testid={`open-addStage-modal`}
+            className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+          >
+            Add New Stage
+          </button>
 
           <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <Stages
@@ -572,7 +515,6 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
             />
           </Suspense>
         </div>
-        {/* )} */}
       </JobSettingsLayout>
     </AuthLayout>
   )

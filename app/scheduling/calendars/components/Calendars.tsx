@@ -281,11 +281,8 @@ const Calendars = ({ user }: CalendarProps) => {
           })}
         </div>
       ) : (
-        <div className="text-lg text-neutral-500 font-semibold">
-          No Calendars found!
-          <br />
-          <br />
-          Add one to start scheduling interviews.
+        <div className="mt-10 w-full border-2 rounded-xl border-neutral-400 py-10 flex flex-col items-center justify-center space-y-5 text-neutral-700">
+          <p>No Calendars</p>
         </div>
       )}
     </>

@@ -212,9 +212,7 @@ const CandidatePools = () => {
         resultName="candidate pool"
       />
 
-      {candidatePools?.length === 0 ? (
-        <div className="text-xl font-semibold text-neutral-500">No Candidate Pools found</div>
-      ) : (
+      {candidatePools?.length > 0 && (
         <div className="flex flex-wrap justify-center">
           {candidatePools.map((cp) => {
             return (
