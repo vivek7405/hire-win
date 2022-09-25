@@ -793,7 +793,8 @@ const JobsHome = ({
           <a className="flex items-center py-2 whitespace-nowrap">
             {subscription?.status === SubscriptionStatus.TRIALING ? (
               <span className="text-yellow-600 hover:underline py-1 px-3 border-2 rounded-full border-yellow-500">
-                Trial ends {subscription?.daysLeft}
+                Trial ends in {subscription?.daysLeft}{" "}
+                {subscription?.daysLeft === 1 ? "day" : "days"}
               </span>
             ) : subscription?.status !== SubscriptionStatus.ACTIVE ? (
               <span className="text-red-600 flex items-center hover:underline py-1 px-3 border-2 rounded-full border-red-500">

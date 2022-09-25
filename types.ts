@@ -212,7 +212,7 @@ export type AttachmentObject = {
 
 export type SubscriptionObject = {
   status: SubscriptionStatus
-  daysLeft: string
+  daysLeft: number
 }
 
 export type InterviewDetailType = {
