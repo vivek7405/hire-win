@@ -6,6 +6,7 @@ import { useState } from "react"
 import SingleTimeSlot from "./SingleTimeSlot"
 import Form from "app/core/components/Form"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
+import moment from "moment"
 
 interface AvailableSlotsProps {
   slots: TimeSlot[]
@@ -18,7 +19,11 @@ const AvailableTimeSlotsSelection = (props: AvailableSlotsProps) => {
   const [timeZone, setTimeZone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone)
   const { slots, selectedDay } = props
   const selectedSlots = selectedDay
-    ? slots.filter((slot) => areDatesOnSameDay(slot.start, selectedDay) && slot.start > new Date())
+    ? slots.filter(
+        (slot) =>
+          areDatesOnSameDay(slot.start, selectedDay) &&
+          moment(slot.start).utc().toDate() > moment().utc().toDate()
+      )
     : []
 
   return (
