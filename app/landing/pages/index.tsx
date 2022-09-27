@@ -19,6 +19,7 @@ import { Currency, PlanFrequency } from "types"
 import LocaleCurrency from "locale-currency"
 import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
 import getCurrencySymbol from "app/plans/utils/getCurrencySymbol"
+import { getCalApi } from "@calcom/embed-react"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
@@ -73,6 +74,23 @@ const Plans = ({ selectedCurrency, selectedFrequency }) => {
         )
       })}
     </>
+  )
+}
+
+function BookADemoButton({}) {
+  useEffect(() => {
+    ;(async function () {
+      const cal = await getCalApi()
+      cal && cal("ui", { theme: "light", styles: { branding: { brandColor: "#4f46e5" } } })
+    })()
+  }, [])
+  return (
+    <button
+      data-cal-link="hire-win/demo"
+      className="px-6 py-3 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 text-xl font-semibold"
+    >
+      Book a Demo
+    </button>
   )
 }
 
@@ -204,7 +222,11 @@ export default function Home() {
             </Link>
           </h1> */}
 
-          <div className="flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-3 md:space-y-0 lg:space-y-0 md:space-x-3 lg:space-x-3">
+          <Suspense fallback="Loading...">
+            <BookADemoButton />
+          </Suspense>
+
+          <div className="mt-8 flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-3 md:space-y-0 lg:space-y-0 md:space-x-3 lg:space-x-3">
             {/* <a
               href="https://www.producthunt.com/posts/hire-win?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-hire&#0045;win"
               target="_blank"
@@ -649,6 +671,10 @@ export default function Home() {
                   </a>
                 </Link>
               </div>
+              <div className="mb-4">OR</div>
+              <Suspense fallback="Loading...">
+                <BookADemoButton />
+              </Suspense>
             </div>
           </div>
         </section>

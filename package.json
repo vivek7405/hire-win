@@ -42,6 +42,7 @@
   "dependencies": {
     "@badrap/bar-of-progress": "0.1.2",
     "@blitz-guard/core": "0.4.1",
+    "@calcom/embed-react": "1.0.9",
     "@heroicons/react": "v1",
     "@hookform/resolvers": "2.8.3",
     "@prisma/client": "3.12.0",
