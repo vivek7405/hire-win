@@ -7,51 +7,47 @@ import provideTrail from "app/core/utils/provideTrial"
 import Guard from "app/guard/ability"
 import createFactoryItems from "app/auth/mutations/createFactoryItems"
 
-export default Guard.authorize(
-  "create",
-  "company",
-  resolver.pipe(
-    resolver.zod(CompanyObj),
-    async ({ name, logo, website, theme, info }, ctx: Ctx) => {
-      const slug = slugify(name, { strict: true, lower: true })
-      const newSlug = await findFreeSlug(
-        slug,
-        async (e) => await db.company.findFirst({ where: { slug: e } })
-      )
+export default resolver.pipe(
+  resolver.zod(CompanyObj),
+  async ({ name, logo, website, theme, info }, ctx: Ctx) => {
+    const slug = slugify(name, { strict: true, lower: true })
+    const newSlug = await findFreeSlug(
+      slug,
+      async (e) => await db.company.findFirst({ where: { slug: e } })
+    )
 
-      let data = {
-        name,
-        info,
-        website,
-        theme,
-        slug: newSlug,
-      }
+    let data = {
+      name,
+      info,
+      website,
+      theme,
+      slug: newSlug,
+    }
 
-      if (logo) {
-        data["logo"] = logo
-      }
+    if (logo) {
+      data["logo"] = logo
+    }
 
-      const company = await db.company.create({
-        data: {
-          ...data,
-          users: {
-            create: {
-              userId: ctx?.session?.userId || "0",
-              role: CompanyUserRole.OWNER,
-            },
+    const company = await db.company.create({
+      data: {
+        ...data,
+        users: {
+          create: {
+            userId: ctx?.session?.userId || "0",
+            role: CompanyUserRole.OWNER,
           },
         },
-      })
+      },
+    })
 
-      const companyId = company?.id || "0"
+    const companyId = company?.id || "0"
 
-      await ctx.session.$setPublicData({ companyId: company.id || "0" })
+    await ctx.session.$setPublicData({ companyId: company.id || "0" })
 
-      await createFactoryItems({ companyId }, ctx)
+    await createFactoryItems({ companyId }, ctx)
 
-      // await provideTrail(ctx?.session?.userId || "0", company.id || "0")
+    // await provideTrail(ctx?.session?.userId || "0", company.id || "0")
 
-      return company
-    }
-  )
+    return company
+  }
 )

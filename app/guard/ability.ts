@@ -348,38 +348,39 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return args.where.id === ctx.session.userId
       })
 
-      can("create", "company", async (args) => {
-        const companyUsers = await db.companyUser.findMany({
-          where: { userId: ctx.session.userId || "0" },
-          include: { company: true },
-        })
+      can("create", "company")
+      // can("create", "company", async (args) => {
+      //   const companyUsers = await db.companyUser.findMany({
+      //     where: { userId: ctx.session.userId || "0" },
+      //     include: { company: true },
+      //   })
 
-        if (companyUsers && companyUsers.length >= 1) {
-          // const allCompaniesOnProPlan = companyUsers.every((cu) => checkPlan(cu.company))
+      //   if (companyUsers && companyUsers.length >= 1) {
+      //     // const allCompaniesOnProPlan = companyUsers.every((cu) => checkPlan(cu.company))
 
-          // let allCompaniesOnProPlan = true
-          // for (const cu of companyUsers) {
-          //   const subscriptionStatus = await getCompanySubscriptionStatus(
-          //     { companyId: cu.companyId },
-          //     ctx
-          //   )
-          //   if (
-          //     !(
-          //       subscriptionStatus === SubscriptionStatus.ACTIVE ||
-          //       subscriptionStatus === SubscriptionStatus.TRIALING
-          //     )
-          //   ) {
-          //     allCompaniesOnProPlan = false
-          //   }
-          // }
+      //     // let allCompaniesOnProPlan = true
+      //     // for (const cu of companyUsers) {
+      //     //   const subscriptionStatus = await getCompanySubscriptionStatus(
+      //     //     { companyId: cu.companyId },
+      //     //     ctx
+      //     //   )
+      //     //   if (
+      //     //     !(
+      //     //       subscriptionStatus === SubscriptionStatus.ACTIVE ||
+      //     //       subscriptionStatus === SubscriptionStatus.TRIALING
+      //     //     )
+      //     //   ) {
+      //     //     allCompaniesOnProPlan = false
+      //     //   }
+      //     // }
 
-          const allCompaniesOnProPlan = companyUsers.every((cu) => checkSubscription(cu.company))
-          return allCompaniesOnProPlan
-        } else {
-          // User with no company can create one
-          return true
-        }
-      })
+      //     const allCompaniesOnProPlan = companyUsers.every((cu) => checkSubscription(cu.company))
+      //     return allCompaniesOnProPlan
+      //   } else {
+      //     // User with no company can create one
+      //     return true
+      //   }
+      // })
 
       can("inviteUser", "company", async (args) => {
         // const company = await db.company.findFirst({

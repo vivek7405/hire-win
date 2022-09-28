@@ -38,7 +38,7 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
   })
-  const [canCreateCompany] = useQuery(canCreateNewCompany, null)
+  // const [canCreateCompany] = useQuery(canCreateNewCompany, null)
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState(companyUser)
   useEffect(() => {
@@ -479,11 +479,11 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                       <DropdownMenu.Item
                         onSelect={(e) => {
                           e.preventDefault()
-                          if (canCreateCompany) {
-                            router.push(Routes.NewCompany())
-                          } else {
-                            setOpenConfirm(true)
-                          }
+                          // if (canCreateCompany) {
+                          router.push(Routes.NewCompany())
+                          // } else {
+                          //   setOpenConfirm(true)
+                          // }
                         }}
                         className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
                       >
