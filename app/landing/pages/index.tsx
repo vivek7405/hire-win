@@ -20,6 +20,7 @@ import LocaleCurrency from "locale-currency"
 import getPlansByCurrency from "app/plans/queries/getPlansByCurrency"
 import getCurrencySymbol from "app/plans/utils/getCurrencySymbol"
 import { getCalApi } from "@calcom/embed-react"
+import { CheckIcon, XIcon } from "@heroicons/react/outline"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
@@ -209,12 +210,26 @@ export default function Home() {
     <LandingLayout>
       <div className="h-full mt-3">
         <div className="text-center">
-          <h1 className="my-4 text-3xl lg:text-5xl font-black leading-tight">
-            Interviewing Kit with Careers Page
+          <h1 className="mt-4 mb-8 text-3xl lg:text-5xl font-black leading-tight">
+            Applicant Tracking System for SMB Companies
+            {/* Interviewing Kit with Careers Page */}
           </h1>
-          <p className="leading-normal text-neutral-800 text-xl lg:text-3xl mb-8">
-            Applicant Tracking, Collaborating, Interviewing & more!
+          <p className="leading-normal text-neutral-800 text-xl md:text-2xl lg:text-3xl">
+            {/* Applicant Tracking, Collaborating, Interviewing & more! */}
+            <span className="font-bold">One single platform</span> for your Hiring Managers &
+            Interviewers
           </p>
+
+          <div className="flex items-center justify-center">
+            <XIcon className="hidden lg:block w-14 h-14 text-red-600" />
+            <p className="text-md md:text-lg lg:text-2xl line-through">
+              Excel Sheets + Google Forms + Microsoft Teams + Calendly + Emails
+            </p>
+          </div>
+          {/* <div className="flex items-center justify-center">
+            <CheckIcon className="w-10 h-10 text-green-600" />
+            <p className="text-2xl">hire.win</p>
+          </div> */}
 
           {/* <h1 className="my-4 text-2xl lg:text-4xl font-black leading-tight">
             <Link href={Routes.Beta()}>
@@ -222,9 +237,11 @@ export default function Home() {
             </Link>
           </h1> */}
 
-          <Suspense fallback="Loading...">
-            <BookADemoButton />
-          </Suspense>
+          <div className="mt-8">
+            <Suspense fallback="Loading...">
+              <BookADemoButton />
+            </Suspense>
+          </div>
 
           <div className="mt-8 flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-3 md:space-y-0 lg:space-y-0 md:space-x-3 lg:space-x-3">
             {/* <a
