@@ -133,7 +133,7 @@ const subscription = await stripe.subscriptions.create({
       quantity: workspace?.memberships.length,
     },
   ],
-  trial_period_days: 7,
+  trial_period_days: 14,
 })
 ```
 

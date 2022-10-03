@@ -289,7 +289,7 @@ export default function Home() {
             <Link prefetch={true} href={Routes.SignupPage()}>
               <a>
                 <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 hover:underline text-white font-extrabold rounded py-4 px-8 shadow-lg w-72 text-xl">
-                  Start a free 30 day trial
+                  Start 14 days free trial
                 </button>
               </a>
             </Link>
@@ -693,7 +693,7 @@ export default function Home() {
                 <Link prefetch={true} href={Routes.SignupPage()}>
                   <a>
                     <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white hover:shadow-indigo-500 shadow-lg rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
-                      <span className="font-extrabold text-xl">Start a free 30 day trial</span>
+                      <span className="font-extrabold text-xl">Start 14 days free trial</span>
                       <br />
                       <span className="font-light hidden md:block lg:block">
                         no credit card required, cancel any time
