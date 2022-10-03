@@ -210,22 +210,39 @@ export default function Home() {
     <LandingLayout>
       <div className="h-full mt-3">
         <div className="text-center">
-          <h1 className="mt-4 mb-8 text-3xl lg:text-5xl font-black leading-tight">
+          <h1 className="text-2xl md:text-3xl lg:text-5xl font-black leading-tight">
             Applicant Tracking System for SMB Companies
             {/* Interviewing Kit with Careers Page */}
           </h1>
-          <p className="leading-normal text-neutral-800 text-xl md:text-2xl lg:text-3xl">
+          <p className="leading-normal text-neutral-800 text-sm md:text-xl lg:text-2xl mt-4">
+            <span className="whitespace-nowrap">🔥 Careers page</span>{" "}
+            <span className="whitespace-nowrap">🚀 Interview Scheduling</span>{" "}
+            <span className="whitespace-nowrap">👨🏻‍💻 Applicant tracking</span>{" "}
+            <span className="whitespace-nowrap">📧 Emails</span>{" "}
+            <span className="whitespace-nowrap">✍🏻 Comments</span>{" "}
+            <span className="whitespace-nowrap">⭐️ Score Cards</span>{" "}
+            {/* <span className="whitespace-nowrap">💰 Flat pricing</span> */}
             {/* Applicant Tracking, Collaborating, Interviewing & more! */}
-            <span className="font-bold">One single platform</span> for your Hiring Managers &
-            Interviewers
+            {/* <span className="font-bold">One single platform</span> for Hiring Managers and
+            Interviewers */}
           </p>
 
-          <div className="flex items-center justify-center">
-            <XIcon className="hidden lg:block w-14 h-14 text-red-600" />
-            <p className="text-md md:text-lg lg:text-2xl line-through">
-              Excel Sheets + Google Forms + Microsoft Teams + Calendly + Emails
+          <div className="mt-10">
+            <p className="leading-normal text-neutral-800 text-xl md:text-2xl lg:text-3xl">
+              <span className="font-bold">One single platform</span> for Hiring Managers and
+              Interviewers
             </p>
+            <div className="flex items-center justify-center mt-1">
+              <XIcon className="w-12 h-12 text-red-600" />
+              <p className="text-md md:text-lg lg:text-2xl line-through">
+                Excel Sheets + Google Forms + Microsoft Teams + Calendly + Emails
+              </p>
+            </div>
           </div>
+
+          <p className="text-md md:text-lg lg:text-2xl font-bold mt-10">
+            Bring the power of ATS to your company
+          </p>
           {/* <div className="flex items-center justify-center">
             <CheckIcon className="w-10 h-10 text-green-600" />
             <p className="text-2xl">hire.win</p>
