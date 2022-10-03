@@ -53,7 +53,7 @@ async function updateCompany({ where, data, initial }: UpdateCompanyInput, ctx: 
             quantity: company?.users.length,
           },
         ],
-        trial_period_days: 7,
+        trial_period_days: 14,
       })
 
       await db.company.update({

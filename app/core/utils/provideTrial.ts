@@ -31,7 +31,7 @@ async function provideTrail(userId: string, companyId: string, currency: Currenc
         },
       ],
       metadata: { companyId },
-      trial_period_days: 30,
+      trial_period_days: 14,
     })
 
     await db.company.update({
