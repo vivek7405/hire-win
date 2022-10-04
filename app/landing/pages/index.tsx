@@ -96,113 +96,113 @@ function BookADemoButton({}) {
 }
 
 export default function Home() {
-  const screenshotsBucketURL = "https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots"
+  // const screenshotsBucketURL = "https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots"
 
   const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
   const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
 
-  const [imageIndex, setImageIndex] = useState(0)
-  const imageArray = [
-    <Image
-      priority={true}
-      layout="fill"
-      objectFit="contain"
-      key="jobs"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Jobs.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="kanban board"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Kanban-Board.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="candidates table"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Candidates-Table.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="job edit"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Job-Edit.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="job members"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Job-Members.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="candidate detail"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Candidate-Detail.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="form"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Form.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="workflows"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Workflows.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="workflow"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Workflow.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="score card"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Score-Card.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="interview scheduling"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Interview-Scheduling.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="company settings"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Company-Settings.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="schedules"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Schedules.webp`}
-    />,
-    <Image
-      layout="fill"
-      objectFit="contain"
-      key="calendars"
-      alt="Dashboard Job Listing"
-      src={`${screenshotsBucketURL}/Calendars.webp`}
-    />,
-  ]
+  // const [imageIndex, setImageIndex] = useState(0)
+  // const imageArray = [
+  //   <Image
+  //     priority={true}
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="jobs"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Jobs.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="kanban board"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Kanban-Board.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="candidates table"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Candidates-Table.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="job edit"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Job-Edit.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="job members"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Job-Members.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="candidate detail"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Candidate-Detail.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="form"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Form.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="workflows"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Workflows.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="workflow"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Workflow.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="score card"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Score-Card.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="interview scheduling"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Interview-Scheduling.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="company settings"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Company-Settings.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="schedules"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Schedules.webp`}
+  //   />,
+  //   <Image
+  //     layout="fill"
+  //     objectFit="contain"
+  //     key="calendars"
+  //     alt="Dashboard Job Listing"
+  //     src={`${screenshotsBucketURL}/Calendars.webp`}
+  //   />,
+  // ]
 
   const [selectedFrequency, setSelectedFrequency] = useState(PlanFrequency.YEARLY)
 
@@ -214,14 +214,16 @@ export default function Home() {
             Applicant Tracking System for SMB Companies
             {/* Interviewing Kit with Careers Page */}
           </h1>
-          <p className="leading-normal text-neutral-800 text-sm md:text-xl lg:text-2xl mt-4">
-            <span className="whitespace-nowrap">🔥 Careers page</span>{" "}
-            <span className="whitespace-nowrap">🚀 Interview Scheduling</span>{" "}
-            <span className="whitespace-nowrap">👨🏻‍💻 Applicant tracking</span>{" "}
-            <span className="whitespace-nowrap">📧 Emails</span>{" "}
-            <span className="whitespace-nowrap">✍🏻 Comments</span>{" "}
-            <span className="whitespace-nowrap">⭐️ Score Cards</span>{" "}
-            {/* <span className="whitespace-nowrap">💰 Flat pricing</span> */}
+          <p className="leading-normal text-neutral-800 text-sm md:text-xl lg:text-2xl mt-4 flex justify-center flex-wrap space-x-2">
+            <span className="whitespace-nowrap">🔥 Careers page</span>
+            <span className="whitespace-nowrap">🚀 Interview Scheduling</span>
+            {/* <span className="whitespace-nowrap">👨🏻‍💻 Hiring Stages</span> */}
+            <span className="whitespace-nowrap">📧 Emails</span>
+            <span className="whitespace-nowrap">✍🏻 Comments</span>
+            <span className="whitespace-nowrap">⭐️ Score Cards</span>
+            <span className="whitespace-nowrap">💼 & much more...</span>
+            {/* <span className="whitespace-nowrap">👨🏻‍🎓 Candidate Pools</span>{" "} */}
+            {/* <span className="whitespace-nowrap">💰 Flat pricing</span>{" "} */}
             {/* Applicant Tracking, Collaborating, Interviewing & more! */}
             {/* <span className="font-bold">One single platform</span> for Hiring Managers and
             Interviewers */}
@@ -429,7 +431,7 @@ export default function Home() {
                 </Link>
               </h1> */}
 
-              <span className="text-2xl lg:text-3xl font-bold">
+              <span className="text-2xl lg:text-3xl">
                 <span className="bg-yellow-300">No nonsense</span> per user per job pricing, instead
                 we offer Flat Pricing!
               </span>
@@ -563,31 +565,32 @@ export default function Home() {
             </div>
 
             <div className="w-full flex flex-row items-center justify-center text-center">
-              <div className="flex flex-col space-y-5 w-full md:w-2/3 lg:w-2/3 text-lg md:text-2xl lg:text-3xl font-semibold">
-                <span>Create jobs, invite admins & interviewers,</span>
-                <span>Keep a track of candidates,</span>
+              <div className="flex flex-col space-y-2 w-full md:w-2/3 lg:w-2/3 text-lg md:text-2xl lg:text-xl font-medium">
+                <span>Create jobs, invite admins & interviewers, keep a track of candidates,</span>
+                <span>Conduct interviews & gather feedback,</span>
                 <span>
                   All with <span className="bg-yellow-300">flat pricing!</span>
                 </span>
-                <span className="px-6 text-center">
-                  <span className="font-normal text-base">
-                    You may review our{" "}
-                    <Link href={Routes.Refunds()}>
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-indigo-600 hover:text-indigo-700 hover:underline"
-                      >
-                        cancellation and refund policy
-                      </a>
-                    </Link>
-                    {/* We would be happy to provide you{" "}
+              </div>
+            </div>
+
+            <div className="mt-8 px-6 text-center">
+              {/* <span className="font-normal text-base"> */}
+              You may review our{" "}
+              <Link href={Routes.Refunds()}>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-indigo-600 hover:text-indigo-700 hover:underline"
+                >
+                  cancellation and refund policy
+                </a>
+              </Link>
+              {/* We would be happy to provide you{" "}
                     <span className="bg-yellow-300 font-semibold">refunds on yearly plan</span>{" "}
                     should you wish to cancel{" "}
                     <span className="bg-yellow-300 font-semibold">after 1 month of usage</span> */}
-                  </span>
-                </span>
-              </div>
+              {/* </span> */}
             </div>
 
             {/* <div className="w-full mt-10">
@@ -654,7 +657,7 @@ export default function Home() {
 
             <div className="w-full text-center pt-2">
               <div className="mt-1">
-                <span className="text-2xl md:text-3xl lg:text-3xl font-bold px-2">
+                <span className="text-2xl md:text-3xl lg:text-3xl px-2">
                   Write us to <span className="bg-yellow-300">support@hire.win</span> for any
                   queries
                 </span>
@@ -684,9 +687,11 @@ export default function Home() {
 
             <div className="w-full text-center pt-4">
               <div className="mt-1">
-                <span className="text-2xl md:text-3xl lg:text-3xl font-bold">
-                  Get your <span className="bg-yellow-300">interviewing kit</span> with{" "}
-                  <span className="bg-yellow-300">careers page</span> up and running now
+                <span className="text-2xl md:text-3xl lg:text-3xl">
+                  Empower your company with the <span className="bg-yellow-300">power of ATS</span>{" "}
+                  now!
+                  {/* Get your <span className="bg-yellow-300">interviewing kit</span> with{" "}
+                  <span className="bg-yellow-300">careers page</span> up and running now */}
                 </span>
               </div>
               <div className="mt-6">
