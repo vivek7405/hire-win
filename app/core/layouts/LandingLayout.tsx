@@ -90,7 +90,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
                 >
                   <ul className="list-reset lg:flex justify-end flex-1 items-center">
-                    <li className="mr-3 hidden lg:block">
+                    <li className="mr-3">
                       <Link href={`${Routes.Home().pathname}/#screenshots`}>
                         <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
                           Screenshots
@@ -115,6 +115,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                       <Link href={`${Routes.Home().pathname}/#support`}>
                         <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
                           Support
+                        </a>
+                      </Link>
+                    </li>
+                    <li className="mr-3">
+                      <Link href={`${Routes.OurStory().pathname}`}>
+                        <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
+                          Our Story
                         </a>
                       </Link>
                     </li>
