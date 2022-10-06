@@ -36,6 +36,7 @@ async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
       slug,
       interviewerId: ctx.session.userId,
       duration: 30,
+      createdById: ctx.session.userId,
     },
   })
 
@@ -46,6 +47,7 @@ async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
         title: "Overall Score",
         slug: "overall-score",
         order: 1,
+        createdById: ctx.session.userId,
       },
     ],
   })
