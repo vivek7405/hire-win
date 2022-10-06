@@ -119,6 +119,7 @@ export enum ShiftDirection {
 
 export type ExtendedJob = Prisma.JobGetPayload<{
   include: {
+    company: true
     users: true
     category: true
     stages: {

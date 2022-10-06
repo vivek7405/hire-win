@@ -258,7 +258,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
                   </>
                 )}
               </div>
-              <div className="border-b-2 border-gray-50 w-full"></div>
+              <div className="hidden md:block lg:block border-b-2 border-gray-50 w-full"></div>
               <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {stage.scoreCardQuestions
                   // ?.sort((a, b) => {
@@ -453,7 +453,6 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
 
   return (
     <AuthLayout title="Hiring Stages | hire.win" user={user}>
-      <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <JobSettingsLayout job={job!}>
         <br className="block md:hidden lg:hidden" />
 

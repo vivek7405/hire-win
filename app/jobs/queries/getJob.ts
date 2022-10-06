@@ -8,6 +8,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
   const job = await db.job.findFirst({
     where,
     include: {
+      company: true,
       category: true,
       candidates: true,
       formQuestions: { include: { options: true }, orderBy: { order: "asc" } },

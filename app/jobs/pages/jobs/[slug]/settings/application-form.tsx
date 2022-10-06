@@ -497,7 +497,6 @@ const JobSettingsApplicationFormPage = ({
 
   return (
     <AuthLayout title="Application Form | hire.win" user={user}>
-      <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <JobSettingsLayout job={job!}>
         <br className="block md:hidden lg:hidden" />
         <div className="space-y-6">
