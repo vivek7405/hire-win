@@ -67,7 +67,7 @@ import canCreateNewCandidate from "app/candidates/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
-import { ArrowRightIcon, BanIcon, RefreshIcon } from "@heroicons/react/outline"
+import { ArrowRightIcon, BanIcon, ExternalLinkIcon, RefreshIcon } from "@heroicons/react/outline"
 import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
 import Modal from "app/core/components/Modal"
 import ApplicationForm from "app/candidates/components/ApplicationForm"
@@ -76,6 +76,7 @@ import getCandidateInitialValues from "app/candidates/utils/getCandidateInitialV
 import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswerForDisplay"
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
 import { PencilIcon } from "@heroicons/react/solid"
+import ViewJobListingButton from "app/jobs/components/ViewJobListingButton"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -954,36 +955,6 @@ const SingleJobPageContent = ({
     </div>
   )
 
-  const viewJobListingLink = (
-    <Link
-      prefetch={true}
-      href={Routes.JobDescriptionPage({ companySlug: company?.slug!, jobSlug: job?.slug! })}
-      passHref
-    >
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex whitespace-nowrap items-center underline text-theme-600 py-2 hover:text-theme-800"
-      >
-        <span className="mr-1">View Job Listing</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-          />
-        </svg>
-      </a>
-    </Link>
-  )
-
   const jobSettingsLink = (
     <Link
       prefetch={true}
@@ -1116,7 +1087,7 @@ const SingleJobPageContent = ({
         </div>
 
         <div className="flex w-full justify-between">
-          {viewJobListingLink}
+          <ViewJobListingButton companySlug={company?.slug || "0"} jobSlug={job?.slug || "0"} />
           {jobSettingsLink}
         </div>
 
@@ -1132,7 +1103,7 @@ const SingleJobPageContent = ({
           <div className="w-1/6">{searchInput}</div>
 
           <div className="flex w-5/6 space-x-3 flex-nowrap justify-end">
-            {viewJobListingLink}
+            <ViewJobListingButton companySlug={company?.slug || "0"} jobSlug={job?.slug || "0"} />
             {jobSettingsLink}
             {newCandidateButton}
           </div>
@@ -1153,7 +1124,7 @@ const SingleJobPageContent = ({
           {enableDragToggle}
           {viewRejectedToggle}
           {tableViewToggle}
-          {viewJobListingLink}
+          <ViewJobListingButton companySlug={company?.slug || "0"} jobSlug={job?.slug || "0"} />
           {jobSettingsLink}
           {newCandidateButton}
         </div>
