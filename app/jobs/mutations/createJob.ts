@@ -257,6 +257,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         title: "Overall Score",
         slug: "overall-score",
         order: 1,
+        createdById: user.id,
       }
     }),
   })
