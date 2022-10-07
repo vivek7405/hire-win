@@ -10,8 +10,11 @@ async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
   const { jobId, name } = StageObj.parse(data)
-  // const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
-  // if (!user) throw new AuthenticationError()
+  const user = await db.user.findFirst({
+    where: { id: ctx.session.userId || "0" },
+    include: { defaultCalendars: true, defaultSchedules: true },
+  })
+  if (!user) throw new AuthenticationError()
 
   const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
@@ -37,6 +40,15 @@ async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
       interviewerId: ctx.session.userId,
       duration: 30,
       createdById: ctx.session.userId,
+    },
+  })
+
+  await db.stageUserScheduleCalendar.create({
+    data: {
+      stageId: stage.id || "0",
+      userId: user.id || "0",
+      calendarId: user.defaultCalendars?.find((cal) => cal.userId === user.id)?.calendarId || null,
+      scheduleId: user.defaultSchedules?.find((sch) => sch.userId === user.id)?.scheduleId || "0",
     },
   })
 

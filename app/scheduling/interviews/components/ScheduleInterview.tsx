@@ -105,7 +105,9 @@ const PickAndSchedule = ({
     interviewerId: interviewer?.id,
     scheduleId:
       stage?.stageUserScheduleCalendars?.find((sc) => sc.userId === interviewer?.id || "0")
-        ?.schedule?.id || "0",
+        ?.scheduleId ||
+      interviewer?.defaultSchedules?.find((sc) => sc.userId === interviewer?.id)?.scheduleId ||
+      "0",
     duration: stage?.duration,
     otherAttendees,
     startDateUTC: new Date(moment(selectedDay)?.startOf("month")?.format("YYYY-MM-DD")),
