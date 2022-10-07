@@ -12,12 +12,16 @@ async function getCandidateInterviewer(
 ) {
   const candidateInterviewer = await db.candidateStageInterviewer.findFirst({
     where: { stageId, candidateId },
-    include: { interviewer: { include: { calendars: true } } },
+    include: {
+      interviewer: { include: { calendars: true, defaultCalendars: true, defaultSchedules: true } },
+    },
   })
 
   const stageInterviewer = await db.stage.findFirst({
     where: { id: stageId },
-    include: { interviewer: { include: { calendars: true } } },
+    include: {
+      interviewer: { include: { calendars: true, defaultCalendars: true, defaultSchedules: true } },
+    },
   })
 
   const interviewer = candidateInterviewer?.interviewer || stageInterviewer?.interviewer
