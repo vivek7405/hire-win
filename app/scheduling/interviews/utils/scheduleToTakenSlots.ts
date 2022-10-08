@@ -58,7 +58,7 @@ export function scheduleToTakenSlots(
     cursor = addDays(slot.end, 1)
 
     if (cursor?.getTime() === prevCursor?.getTime()) {
-      break
+      cursor = addDays(cursor, 1)
     } else {
       prevCursor = cursor
     }
