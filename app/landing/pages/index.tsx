@@ -231,12 +231,11 @@ export default function Home() {
 
           <div className="mt-10">
             <p className="leading-normal text-neutral-800 text-xl md:text-2xl lg:text-3xl">
-              <span className="font-bold">One single platform</span> for Hiring Managers and
-              Interviewers
+              <span className="font-bold">One single platform</span> for your entire Hiring Team
             </p>
-            <div className="flex items-center justify-center mt-1">
+            <div className="flex items-center justify-center">
               <XIcon className="w-12 h-12 text-red-600" />
-              <p className="text-md md:text-lg lg:text-2xl line-through">
+              <p className="text-neutral-700 text-md md:text-lg lg:text-2xl line-through">
                 Excel Sheets + Google Forms + Microsoft Teams + Calendly + Emails
               </p>
             </div>
