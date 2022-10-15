@@ -185,7 +185,8 @@ const KanbanBoard = ({
                             <h1 className="pb-2.5 font-bold focus:outline-none">
                               {column.title?.length > 25
                                 ? `${column.title?.substring(0, 25)}...`
-                                : column.title}
+                                : column.title}{" "}
+                              ({column.cards.length})
                             </h1>
                           </div>
                           <DroppableColumn key={column.id} droppableId={column.id}>
