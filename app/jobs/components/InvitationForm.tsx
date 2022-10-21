@@ -7,6 +7,8 @@ import { z } from "zod"
 import getJobUsers from "../queries/getJobUsers"
 import { useEffect } from "react"
 import getCompanyUsersListForInvitation from "app/companies/queries/getCompanyUsersListForInvitation"
+import { CompanyUserRole, JobUserRole } from "@prisma/client"
+import { titleCase } from "app/core/utils/titleCase"
 
 type InvitationFormProps = {
   onSuccess?: () => void
@@ -35,29 +37,61 @@ export const InvitationForm = (props: InvitationFormProps) => {
           }. An email will be sent to the user.`
         }
         submitText={props.submitText || "Invite"}
-        schema={z.object({
-          email: z.string().email().nonempty({ message: "Required" }),
-        })}
+        schema={
+          props.isJobInvitation
+            ? z.object({
+                email: z.string().email().nonempty({ message: "Required" }),
+                jobUserRole: z.nativeEnum(JobUserRole),
+              })
+            : z.object({
+                email: z.string().email().nonempty({ message: "Required" }),
+                companyUserRole: z.nativeEnum(CompanyUserRole),
+              })
+        }
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
         testid="inviteForm"
       >
         {props.isJobInvitation ? (
-          <LabeledReactSelectField
-            name="email"
-            options={companyUsers?.map((cu) => {
-              return { label: `${cu.user?.name} - ${cu.user?.email}`, value: cu.user?.email }
-            })}
-            placeholder="Select a user to add"
-          />
+          <>
+            <LabeledReactSelectField
+              name="email"
+              options={companyUsers?.map((cu) => {
+                return { label: `${cu.user?.name} - ${cu.user?.email}`, value: cu.user?.email }
+              })}
+              placeholder="Select a user to add"
+            />
+            <LabeledReactSelectField
+              name="jobUserRole"
+              label="Role"
+              placeholder="Select Job Role"
+              options={Object.values(JobUserRole)
+                ?.filter((m) => m !== "OWNER")
+                ?.map((m, i) => {
+                  return { label: titleCase(m), value: m }
+                })}
+            />
+          </>
         ) : (
-          <LabeledTextField
-            name="email"
-            type="email"
-            label="Email"
-            placeholder="partner@company.com"
-            testid="inviteEmail"
-          />
+          <>
+            <LabeledTextField
+              name="email"
+              type="email"
+              label="Email"
+              placeholder="partner@company.com"
+              testid="inviteEmail"
+            />
+            <LabeledReactSelectField
+              name="companyUserRole"
+              label="Role"
+              placeholder="Select Company Role"
+              options={Object.values(CompanyUserRole)
+                ?.filter((m) => m !== "OWNER")
+                ?.map((m, i) => {
+                  return { label: titleCase(m), value: m }
+                })}
+            />
+          </>
         )}
       </Form>
     </>

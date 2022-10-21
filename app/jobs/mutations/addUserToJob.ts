@@ -6,9 +6,10 @@ import { userAddedToJobMailer } from "mailers/userAddedToJobMailer"
 interface InviteToJobInput {
   jobId: string
   email: string
+  jobUserRole: JobUserRole
 }
 
-async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
+async function inviteToJob({ jobId, email, jobUserRole }: InviteToJobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const user = await db.user.findFirst({
@@ -48,7 +49,7 @@ async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
 
   const createdJobUser = await db.jobUser.create({
     data: {
-      role: JobUserRole.USER,
+      role: jobUserRole,
       job: {
         connect: {
           id: jobId || "0",

@@ -92,11 +92,13 @@ model Token {
   user   User?   @relation(fields: [userId], references: [id])
   userId String?
 
-  job   Job?    @relation(fields: [jobId], references: [id])
-  jobId String?
+  job         Job?         @relation(fields: [jobId], references: [id])
+  jobId       String?
+  jobUserRole JobUserRole?
 
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?
+  company         Company?         @relation(fields: [companyId], references: [id])
+  companyId       String?
+  companyUserRole CompanyUserRole?
 
   @@unique([hashedToken, type])
 }

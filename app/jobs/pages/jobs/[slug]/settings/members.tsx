@@ -201,6 +201,7 @@ const JobSettingsMembersPage = ({
                       await addUserToJobMutation({
                         jobId: jobData?.id as string,
                         email: values.email,
+                        jobUserRole: values.jobUserRole,
                       })
                       toast.success(() => <span>User added</span>, { id: toastId })
                     } catch (error) {

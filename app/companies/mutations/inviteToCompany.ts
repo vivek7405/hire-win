@@ -1,14 +1,18 @@
 import { generateToken, hash256, Ctx } from "blitz"
 import Guard from "app/guard/ability"
-import db from "db"
+import db, { CompanyUserRole } from "db"
 import { inviteToCompanyMailer } from "mailers/inviteToCompanyMailer"
 
 interface InviteToCompanyInput {
   companyId: string
   email: string
+  companyUserRole: CompanyUserRole
 }
 
-async function inviteToCompany({ companyId, email }: InviteToCompanyInput, ctx: Ctx) {
+async function inviteToCompany(
+  { companyId, email, companyUserRole }: InviteToCompanyInput,
+  ctx: Ctx
+) {
   ctx.session.$authorize()
 
   const inviter = await db.companyUser.findFirst({
@@ -42,6 +46,7 @@ async function inviteToCompany({ companyId, email }: InviteToCompanyInput, ctx: 
       hashedToken,
       sentTo: email,
       companyId: companyId || "0",
+      companyUserRole,
     },
   })
 
