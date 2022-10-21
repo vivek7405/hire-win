@@ -9,10 +9,12 @@ import LabeledToggleGroupField from "app/core/components/LabeledToggleGroupField
 import { Currency } from "types"
 import { useState } from "react"
 import LocaleCurrency from "locale-currency"
+import { CompanyUserRole } from "@prisma/client"
 
 type SignupFormProps = {
   onSuccess?: () => void
   companyId?: string | null | undefined
+  companyUserRole?: CompanyUserRole
   email?: string | null | undefined
 }
 
@@ -60,6 +62,9 @@ export const SignupForm = (props: SignupFormProps) => {
             values["timezone"] = Intl?.DateTimeFormat()
               ?.resolvedOptions()
               ?.timeZone?.replace("Calcutta", "Kolkata")
+            if (props.companyUserRole) {
+              values["companyUserRole"] = props.companyUserRole
+            }
             await signupMutation(values)
             props.onSuccess?.()
           } catch (error) {

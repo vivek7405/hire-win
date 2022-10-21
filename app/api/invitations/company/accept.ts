@@ -7,7 +7,7 @@ import { CompanyUserRole, UserRole } from "@prisma/client"
 export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
   // 1. Try to find this token in the database
   const hashedToken = hash256(req.query.token as string)
-  const possibleToken = await db.token.findFirst({
+  const savedToken = await db.token.findFirst({
     where: { hashedToken, type: "INVITE_TO_COMPANY" },
     include: {
       user: {
@@ -20,14 +20,16 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
   })
 
   // 2. If token not found, error
-  if (!possibleToken) {
-    throw new Error("No token found")
+  if (!savedToken) {
+    // throw new Error("No token found")
+    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/signup/token/${req.query.token}`)
   }
-  const savedToken = possibleToken
+  if (!savedToken) throw new Error("No Token Found")
 
   // 3. If token has expired, error
   if (savedToken.expiresAt < new Date()) {
-    throw new Error("Token has expired")
+    // throw new Error("Token has expired")
+    res.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/signup/token/${req.query.token}`)
   }
 
   // 4. Find if there is an existing user with the email
@@ -49,15 +51,15 @@ export default async (req: BlitzApiRequest, res: BlitzApiResponse) => {
   } else {
     // 6. If there is a user and companyUser does not exist, create a new membership associated with the company and user
     const companyUser = await db.companyUser.findFirst({
-      where: { companyId: possibleToken.companyId || "0", userId: existingUser.id },
+      where: { companyId: savedToken.companyId || "0", userId: existingUser.id },
     })
     if (!companyUser) {
       await db.companyUser.create({
         data: {
-          role: CompanyUserRole.USER,
+          role: savedToken.companyUserRole || CompanyUserRole.USER,
           company: {
             connect: {
-              id: possibleToken.companyId || "0",
+              id: savedToken.companyId || "0",
             },
           },
           user: {

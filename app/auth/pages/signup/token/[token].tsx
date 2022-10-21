@@ -16,6 +16,7 @@ import path from "path"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import LogoBrand from "app/assets/LogoBrand"
 import getToken from "app/tokens/queries/getToken"
+import { CompanyUserRole } from "@prisma/client"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   path.resolve("next.config.js")
@@ -38,11 +39,28 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       }
     }
 
+    if (tokenFromDB.expiresAt < new Date()) {
+      return {
+        props: {
+          error: {
+            statusCode: 404,
+            message: "Token has expired",
+          },
+        },
+      }
+    }
+
     switch (tokenFromDB.type) {
       case "CONFIRM_EMAIL":
         return { props: { email: tokenFromDB?.sentTo } }
       case "INVITE_TO_COMPANY":
-        return { props: { email: tokenFromDB?.sentTo, companyId: tokenFromDB?.companyId } }
+        return {
+          props: {
+            email: tokenFromDB?.sentTo,
+            companyId: tokenFromDB?.companyId,
+            companyUserRole: tokenFromDB?.companyUserRole || CompanyUserRole.USER,
+          },
+        }
       default:
         return { props: { email: tokenFromDB?.sentTo } }
     }
@@ -51,7 +69,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
       props: {
         error: {
           statusCode: 404,
-          message: "Invalid token",
+          message: "Invalid token or token withdrawn",
         },
       },
     }
@@ -61,6 +79,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const SignupWithEmailConfirmedPage = ({
   email,
   companyId,
+  companyUserRole,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -88,6 +107,7 @@ const SignupWithEmailConfirmedPage = ({
           <SignupForm
             email={email}
             companyId={companyId}
+            companyUserRole={companyUserRole}
             onSuccess={() => {
               if (router.query.next) {
                 let url = ""

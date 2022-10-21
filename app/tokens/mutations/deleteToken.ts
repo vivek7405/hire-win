@@ -14,4 +14,4 @@ async function deleteToken({ where }: DeleteTokenInput, ctx: Ctx) {
   return token
 }
 
-export default Guard.authorize("read", "tokens", deleteToken)
+export default deleteToken

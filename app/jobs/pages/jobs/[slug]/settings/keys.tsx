@@ -22,12 +22,12 @@ import Breadcrumbs from "app/core/components/Breadcrumbs"
 import Confirm from "app/core/components/Confirm"
 import generateInviteToJobToken from "app/jobs/mutations/generateInviteToJobToken"
 import getTokens from "app/jobs/queries/getTokens"
-import deleteToken from "app/jobs/mutations/deleteToken"
 
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
 import { XCircleIcon } from "@heroicons/react/outline"
 import toast from "react-hot-toast"
+import deleteToken from "app/tokens/mutations/deleteToken"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

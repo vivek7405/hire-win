@@ -29,7 +29,7 @@ import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
 import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon, XIcon } from "@heroicons/react/outline"
 
-import { CompanyUser, CompanyUserRole, User } from "db"
+import { CompanyUser, CompanyUserRole, Token, User } from "db"
 // import updateMemberRole from "app/jobs/mutations/updateMemberRole"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
@@ -49,6 +49,9 @@ import removeFromCompany from "app/companies/mutations/removeFromCompany"
 import { titleCase } from "app/core/utils/titleCase"
 import { SubscriptionStatus } from "types"
 import { checkSubscription } from "app/companies/utils/checkSubscription"
+import getPendingCompanyInviteTokens from "app/tokens/queries/getPendingCompanyInviteTokens"
+import updateCompanyUserRoleInToken from "app/tokens/mutations/updateCompanyUserRoleInToken"
+import deleteToken from "app/tokens/mutations/deleteToken"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -92,12 +95,21 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
           { ...context }
         )
 
+        const pendingInviteTokens = await invokeWithMiddleware(
+          getPendingCompanyInviteTokens,
+          {
+            where: { companyId: session.companyId || "0" },
+          },
+          { ...context }
+        )
+
         // const currentPlan = checkPlan(company)
 
         return {
           props: {
             user: user,
             company,
+            pendingInviteTokens,
             canUpdate,
             isOwner,
           },
@@ -140,6 +152,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 const UserSettingsMembersPage = ({
   user,
   company,
+  pendingInviteTokens,
   canUpdate,
   isOwner,
   error,
@@ -147,11 +160,17 @@ const UserSettingsMembersPage = ({
   const router = useRouter()
   const [openInvite, setOpenInvite] = useState(false)
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false)
+  const [openConfirmWithdraw, setOpenConfirmWithdraw] = useState(false)
   const [inviteToCompanyMutation] = useMutation(inviteToCompany)
   const [removeFromCompanyMutation] = useMutation(removeFromCompany)
+  const [deleteTokenMutation] = useMutation(deleteToken)
   const [changePermissionMutation] = useMutation(updateCompanyUserRole)
+  const [updateCompanyUserRoleInTokenMutation] = useMutation(updateCompanyUserRoleInToken)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
-  const [memberToDelete, setMemberToDelete] = useState(null as any as CompanyUser & { user: User })
+  const [memberToDelete, setMemberToDelete] = useState(
+    null as (CompanyUser & { user: User }) | null
+  )
+  const [tokenToDelete, setTokenToDelete] = useState(null as Token | null)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -170,7 +189,12 @@ const UserSettingsMembersPage = ({
               >
                 Members
               </h2>
-              <Modal header="Invite A User" open={openInvite} setOpen={setOpenInvite}>
+              <Modal
+                noOverflow={true}
+                header="Invite A User"
+                open={openInvite}
+                setOpen={setOpenInvite}
+              >
                 <InvitationForm
                   isJobInvitation={false}
                   initialValues={{ email: "" }}
@@ -180,9 +204,11 @@ const UserSettingsMembersPage = ({
                       await inviteToCompanyMutation({
                         companyId: company?.id || "0",
                         email: values.email,
+                        companyUserRole: values.companyUserRole,
                       })
                       setOpenInvite(false)
                       toast.success(() => <span>{values.email} invited</span>, { id: toastId })
+                      router.reload()
                     } catch (error) {
                       toast.error(
                         "Sorry, we had an unexpected error. Please try again. - " +
@@ -309,7 +335,7 @@ const UserSettingsMembersPage = ({
                                   try {
                                     await removeFromCompanyMutation({
                                       companyId: company?.id || "0",
-                                      userId: memberToDelete?.user?.id,
+                                      userId: memberToDelete?.user?.id || "0",
                                     })
                                     toast.success(`${memberToDelete?.user?.name} removed`, {
                                       id: toastId,
@@ -347,6 +373,134 @@ const UserSettingsMembersPage = ({
                 </tbody>
               </table>
             </div>
+            {(pendingInviteTokens?.length || 0) > 0 && (
+              <div>
+                <p className="mt-10 font-medium text-lg">Pending Invites</p>
+                <table className="mt-7 table min-w-full border border-gray-200">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Email
+                      </th>
+
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Role
+                      </th>
+
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingInviteTokens?.map((m) => {
+                      return (
+                        <tr className="bg-white" key={m.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200">
+                            {m.sentTo}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200">
+                            {m.companyUserRole === "OWNER" ? (
+                              titleCase(m.companyUserRole)
+                            ) : (
+                              <select
+                                defaultValue={m.companyUserRole?.toString()}
+                                className="border border-gray-300 px-2 py-2 block w-32 sm:text-sm rounded truncate pr-6"
+                                onChange={async (e) => {
+                                  const toastId = toast.loading(() => <span>Updating role</span>)
+                                  try {
+                                    await updateCompanyUserRoleInTokenMutation({
+                                      where: {
+                                        id: m.id,
+                                      },
+                                      data: {
+                                        companyUserRole: CompanyUserRole[e.target.value],
+                                      },
+                                    })
+                                    // await changePermissionMutation({
+                                    //   where: {
+                                    //     id: m.id,
+                                    //   },
+                                    //   data: {
+                                    //     role: CompanyUserRole[e.target.value],
+                                    //   },
+                                    // })
+                                    toast.success(() => <span>Role updated</span>, { id: toastId })
+                                    router.reload()
+                                  } catch (e) {
+                                    toast.error(
+                                      `Sorry, we had an unexpected error. Please try again. - ${e.toString()}`,
+                                      { id: toastId }
+                                    )
+                                  }
+                                }}
+                              >
+                                {Object.values(CompanyUserRole)
+                                  ?.filter((m) => m !== "OWNER")
+                                  ?.map((m, i) => {
+                                    return (
+                                      <option key={i} value={m}>
+                                        {titleCase(m)}
+                                      </option>
+                                    )
+                                  })}
+                              </select>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200">
+                            {user?.id !== m.id && (
+                              <>
+                                <Confirm
+                                  open={openConfirmWithdraw}
+                                  setOpen={setOpenConfirmWithdraw}
+                                  header={`Withdraw invite to ${tokenToDelete?.sentTo}?`}
+                                  onSuccess={async () => {
+                                    const toastId = toast.loading(() => (
+                                      <span>Removing {tokenToDelete?.sentTo}</span>
+                                    ))
+                                    try {
+                                      // await removeFromCompanyMutation({
+                                      //   companyId: company?.id || "0",
+                                      //   userId: memberToDelete?.user?.id,
+                                      // })
+                                      await deleteTokenMutation({ where: { id: m.id || "0" } })
+                                      toast.success(`${tokenToDelete?.sentTo} removed`, {
+                                        id: toastId,
+                                      })
+                                    } catch (error) {
+                                      toast.error(
+                                        `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
+                                        { id: toastId }
+                                      )
+                                    }
+                                    setTokenToDelete(null as any)
+                                    router.reload()
+                                  }}
+                                >
+                                  Are you sure you want to withdraw this invite?
+                                </Confirm>
+
+                                <button
+                                  title="Remove User"
+                                  className="text-red-600 hover:text-red-800"
+                                  onClick={async (e) => {
+                                    e.preventDefault()
+                                    setTokenToDelete(m)
+                                    setOpenConfirmWithdraw(true)
+                                  }}
+                                >
+                                  <XIcon className="w-5 h-5" />
+                                </button>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </UserSettingsLayout>

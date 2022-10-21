@@ -19,12 +19,22 @@ type signupProps = {
   email?: string
   companyName?: string
   companyId?: string
+  companyUserRole?: CompanyUserRole
   password: string
   timezone?: string | null | undefined
   currency?: Currency
 }
 export default async function signup(
-  { name, email, companyName, companyId, password, timezone, currency }: signupProps,
+  {
+    name,
+    email,
+    companyName,
+    companyId,
+    companyUserRole,
+    password,
+    timezone,
+    currency,
+  }: signupProps,
   ctx: Ctx
 ) {
   if (!email) {
@@ -55,7 +65,7 @@ export default async function signup(
       role: UserRole.USER,
       companies: {
         create: {
-          role: existingCompany ? CompanyUserRole.USER : CompanyUserRole.OWNER,
+          role: existingCompany ? companyUserRole || CompanyUserRole.USER : CompanyUserRole.OWNER,
           company: {
             // create: {
             //   name: companyName,
