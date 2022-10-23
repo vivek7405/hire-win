@@ -269,7 +269,12 @@ const SingleCandidatePageContent = ({
   candidateEmail,
   jobId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  enum CandidateToggleView {
+  enum CandidateDetailToggleView {
+    Info = "Info",
+    Resume = "Resume",
+  }
+
+  enum CandidateStageToggleView {
     Scores = "Scores",
     Interviews = "Interviews",
     Comments = "Comments",
@@ -277,7 +282,12 @@ const SingleCandidatePageContent = ({
   }
 
   const [candidate] = useQuery(getCandidate, { where: { email: candidateEmail, jobId } })
-  const [candidateToggleView, setCandidateToggleView] = useState(CandidateToggleView.Scores)
+  const [candidateStageToggleView, setCandidateStageToggleView] = useState(
+    CandidateStageToggleView.Scores
+  )
+  const [candidateDetailToggleView, setCandidateDetailToggleView] = useState(
+    CandidateDetailToggleView.Info
+  )
   const [selectedStage, setSelectedStage] = useState(
     candidate?.stage as ExtendedStage | null | undefined
   )
@@ -895,34 +905,55 @@ const SingleCandidatePageContent = ({
           {/* PDF Viewer and Candidate Answers */}
           <div className="w-full md:w-3/5 lg:w-2/3">
             <div className="flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg md:mr-8 lg:mr-8">
-              <div className="px-2 md:px-0 lg:px-0">
-                {file && <PDFViewer file={file} scale={1.29} />}
+              <div className="w-full flex items-center justify-center my-2">
+                <Form noFormatting={true} onSubmit={async (values) => {}}>
+                  <LabeledToggleGroupField
+                    name={`candidateDetailToggleView`}
+                    paddingX={3}
+                    paddingY={1}
+                    defaultValue={CandidateDetailToggleView.Info}
+                    value={candidateDetailToggleView}
+                    options={Object.values(CandidateDetailToggleView)?.map((toggleView) => {
+                      return { label: toggleView, value: toggleView }
+                    })}
+                    onChange={(value) => {
+                      setCandidateDetailToggleView(value)
+                    }}
+                  />
+                </Form>
               </div>
-              <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
-                {candidate?.job?.formQuestions?.map((question) => {
-                  const answer = getCandidateAnswerForDisplay(question, candidate)
-                  // if (fq?.question?.name === "Resume") {
-                  //   console.log("RESUME RESUME RESUME")
-                  //   console.log(answer)
-                  // }
+              {candidateDetailToggleView === CandidateDetailToggleView.Resume && (
+                <div className="px-2 md:px-0 lg:px-0">
+                  {file && <PDFViewer file={file} scale={1.29} />}
+                </div>
+              )}
+              {candidateDetailToggleView === CandidateDetailToggleView.Info && (
+                <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
+                  {candidate?.job?.formQuestions?.map((question) => {
+                    const answer = getCandidateAnswerForDisplay(question, candidate)
+                    // if (fq?.question?.name === "Resume") {
+                    //   console.log("RESUME RESUME RESUME")
+                    //   console.log(answer)
+                    // }
 
-                  return (
-                    <Card key={question.id}>
-                      <div className="space-y-2">
-                        <div className="w-full relative">
-                          <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                            <span className="truncate">{question.title}</span>
+                    return (
+                      <Card key={question.id}>
+                        <div className="space-y-2">
+                          <div className="w-full relative">
+                            <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                              <span className="truncate">{question.title}</span>
+                            </div>
+                          </div>
+                          <div className="border-b-2 border-gray-50 w-full"></div>
+                          <div className="flex md:justify-center lg:justify-center">
+                            <span className="truncate">{answer || "NA"}</span>
                           </div>
                         </div>
-                        <div className="border-b-2 border-gray-50 w-full"></div>
-                        <div className="flex md:justify-center lg:justify-center">
-                          <span className="truncate">{answer || "NA"}</span>
-                        </div>
-                      </div>
-                    </Card>
-                  )
-                })}
-              </div>
+                      </Card>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
@@ -960,22 +991,22 @@ const SingleCandidatePageContent = ({
                 <div className="w-full flex items-center justify-center mt-5">
                   <Form noFormatting={true} onSubmit={async (values) => {}}>
                     <LabeledToggleGroupField
-                      name={`candidateToggleView`}
+                      name={`candidateStageToggleView`}
                       paddingX={3}
                       paddingY={1}
-                      defaultValue={CandidateToggleView.Scores}
-                      value={candidateToggleView}
-                      options={Object.values(CandidateToggleView)?.map((toggleView) => {
+                      defaultValue={CandidateStageToggleView.Scores}
+                      value={candidateStageToggleView}
+                      options={Object.values(CandidateStageToggleView)?.map((toggleView) => {
                         return { label: toggleView, value: toggleView }
                       })}
                       onChange={(value) => {
-                        setCandidateToggleView(value)
+                        setCandidateStageToggleView(value)
                       }}
                     />
                   </Form>
                 </div>
                 <Suspense fallback={<p className="p-7">Loading...</p>}>
-                  {candidateToggleView === CandidateToggleView.Scores && (
+                  {candidateStageToggleView === CandidateStageToggleView.Scores && (
                     <ScoreCard
                       // submitDisabled={
                       //   interviewDetail?.interviewer?.id !== user?.id
@@ -1058,21 +1089,21 @@ const SingleCandidatePageContent = ({
                       // }
                     />
                   )}
-                  {candidateToggleView === CandidateToggleView.Interviews && (
+                  {candidateStageToggleView === CandidateStageToggleView.Interviews && (
                     <Interviews
                       user={user}
                       stageId={selectedStage?.id || "0"}
                       candidate={candidate}
                     />
                   )}
-                  {candidateToggleView === CandidateToggleView.Comments && (
+                  {candidateStageToggleView === CandidateStageToggleView.Comments && (
                     <Comments
                       user={user}
                       stageId={selectedStage?.id || "0"}
                       candidate={candidate}
                     />
                   )}
-                  {candidateToggleView === CandidateToggleView.Emails && (
+                  {candidateStageToggleView === CandidateStageToggleView.Emails && (
                     <Emails user={user} stageId={selectedStage?.id || "0"} candidate={candidate} />
                   )}
                 </Suspense>
