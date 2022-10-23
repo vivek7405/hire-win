@@ -924,7 +924,13 @@ const SingleCandidatePageContent = ({
               </div>
               {candidateDetailToggleView === CandidateDetailToggleView.Resume && (
                 <div className="px-2 md:px-0 lg:px-0">
-                  {file && <PDFViewer file={file} scale={1.29} />}
+                  {file ? (
+                    <PDFViewer file={file} scale={1.29} />
+                  ) : (
+                    <div className="text-center my-3">
+                      No Resume Uploaded. Upload one by clicking on the Update Candidate button.
+                    </div>
+                  )}
                 </div>
               )}
               {candidateDetailToggleView === CandidateDetailToggleView.Info && (
