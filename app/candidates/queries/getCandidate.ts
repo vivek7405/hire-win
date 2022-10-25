@@ -24,6 +24,7 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
       answers: {
         include: { formQuestion: { include: { options: true } } },
       },
+      files: { include: { createdBy: true } },
       scores: true,
     },
   })

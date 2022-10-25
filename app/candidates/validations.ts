@@ -12,6 +12,13 @@ export const AttachmentZodObj = z
   .nullable()
   .optional()
 
+export const CandidateFileObj = z.object({
+  id: z.string().optional(),
+  attachment: AttachmentZodObj,
+  candidateId: z.string().optional(),
+})
+export type CandidateFileInputType = z.infer<typeof CandidateFileObj>
+
 export const Candidate = z.object({
   id: z.string().optional(),
   name: z.string(),
@@ -24,5 +31,6 @@ export const Candidate = z.object({
   source: z.nativeEnum(CandidateSource),
   stageId: z.string().optional(),
   rejected: z.boolean().optional(),
+  files: z.array(CandidateFileObj).optional(),
 })
 export type CandidateInputType = z.infer<typeof Candidate>
