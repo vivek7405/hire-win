@@ -24,7 +24,7 @@ import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, CardType, ExtendedCandidate, ExtendedStage } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { JobUserRole, Stage } from "@prisma/client"
+import { CandidateFile, JobUserRole, Stage } from "@prisma/client"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
 import Form from "app/core/components/Form"
@@ -39,6 +39,7 @@ import {
   ChevronDownIcon,
   PencilAltIcon,
   RefreshIcon,
+  TrashIcon,
 } from "@heroicons/react/outline"
 import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
@@ -56,6 +57,12 @@ import Card from "app/core/components/Card"
 import getJob from "app/jobs/queries/getJob"
 import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswerForDisplay"
 import getCandidateInterviewer from "app/candidates/queries/getCandidateInterviewer"
+import moment from "moment"
+import SingleFileUploadField from "app/core/components/SingleFileUploadField"
+import { z } from "zod"
+import { AttachmentZodObj, CandidateFileObj } from "app/candidates/validations"
+import createCandidateFile from "app/candidates/mutations/createCandidateFile"
+import deleteCandidateFile from "app/candidates/mutations/deleteCandidateFile"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -272,6 +279,7 @@ const SingleCandidatePageContent = ({
   enum CandidateDetailToggleView {
     Info = "Info",
     Resume = "Resume",
+    Files = "Files",
   }
 
   enum CandidateStageToggleView {
@@ -329,6 +337,12 @@ const SingleCandidatePageContent = ({
   const [stagesOpenTablet, setStagesOpenTablet] = useState(false)
   const [stagesOpenDesktop, setStagesOpenDesktop] = useState(false)
 
+  const [uploadFileOpen, setUploadFileOpen] = useState(false)
+  const [fileToDelete, setFileToDelete] = useState(null as CandidateFile | null)
+  const [openConfirm, setOpenConfirm] = useState(false)
+
+  const [createCandidateFileMutation] = useMutation(createCandidateFile)
+
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
     if (resume?.key) {
@@ -350,6 +364,7 @@ const SingleCandidatePageContent = ({
 
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
   const [updateCandidateMutation] = useMutation(updateCandidate)
+  const [deleteCandidateFileMutation] = useMutation(deleteCandidateFile)
 
   // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
   //   where: { candidateId: candidate.id, workflowStageId: selectedStage?.id },
@@ -820,6 +835,29 @@ const SingleCandidatePageContent = ({
         stage?
       </Confirm>
 
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={`Delete File - ${(fileToDelete?.attachment as AttachmentObject | null)?.name}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Deleting File`)
+          try {
+            if (!fileToDelete) {
+              throw new Error("No file set to delete")
+            }
+            await deleteCandidateFileMutation({ candidateFileId: fileToDelete.id })
+            invalidateQuery(getCandidate)
+            toast.success("File Deleted", { id: toastId })
+          } catch (error) {
+            toast.error(`Deleting file failed - ${error.toString()}`, { id: toastId })
+          }
+          setOpenConfirm(false)
+          setFileToDelete(null)
+        }}
+      >
+        Are you sure you want to delete the file?
+      </Confirm>
+
       {/* Mobile Menu */}
       <div className="flex flex-col space-y-4 mb-2 md:hidden lg:hidden">
         <div className="flex flex-nowrap items-center justify-center space-x-4">
@@ -922,17 +960,6 @@ const SingleCandidatePageContent = ({
                   />
                 </Form>
               </div>
-              {candidateDetailToggleView === CandidateDetailToggleView.Resume && (
-                <div className="px-2 md:px-0 lg:px-0">
-                  {file ? (
-                    <PDFViewer file={file} scale={1.29} />
-                  ) : (
-                    <div className="text-center my-3">
-                      No Resume Uploaded. Upload one by clicking on the Update Candidate button.
-                    </div>
-                  )}
-                </div>
-              )}
               {candidateDetailToggleView === CandidateDetailToggleView.Info && (
                 <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
                   {candidate?.job?.formQuestions?.map((question) => {
@@ -958,6 +985,122 @@ const SingleCandidatePageContent = ({
                       </Card>
                     )
                   })}
+                </div>
+              )}
+              {candidateDetailToggleView === CandidateDetailToggleView.Resume && (
+                <div className="px-2 md:px-0 lg:px-0">
+                  {file && <PDFViewer file={file} scale={1.29} />}
+                  {!(candidate?.resume as AttachmentObject)?.key && (
+                    <div className="text-center my-3">
+                      No Resume Uploaded. Upload one by clicking on the Update Candidate button.
+                    </div>
+                  )}
+                </div>
+              )}
+              {candidateDetailToggleView === CandidateDetailToggleView.Files && (
+                <div className="flex flex-col items-center">
+                  {candidate?.files?.length === 0 ? (
+                    <div className="my-3">
+                      No files uploaded. Click on the button below to upload a file.
+                    </div>
+                  ) : (
+                    <div className="my-1 flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
+                      {candidate?.files?.map((file) => {
+                        return (
+                          <Card key={file.id}>
+                            <div className="space-y-2">
+                              {/* <div className="w-full relative">
+                                <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                                  <span className="truncate">
+                                    {
+                                      <a
+                                        href={(file.attachment as AttachmentObject).location}
+                                        className="text-theme-600 hover:text-theme-500"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        {(file.attachment as AttachmentObject).name}
+                                      </a>
+                                    }
+                                  </span>
+                                </div>
+                              </div> */}
+                              <div className="w-full relative">
+                                <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                                  <a
+                                    href={(file.attachment as AttachmentObject).location}
+                                    className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    {(file.attachment as AttachmentObject).name}
+                                  </a>
+                                </div>
+                                <div className="absolute top-0.5 right-0">
+                                  <button
+                                    id={"delete-" + file.id}
+                                    className="float-right text-red-600 hover:text-red-800"
+                                    title="Delete File"
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      setFileToDelete(file)
+                                      setOpenConfirm(true)
+                                    }}
+                                  >
+                                    <TrashIcon className="w-5 h-5" />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="border-b-2 border-gray-50 w-full"></div>
+                              <div className="flex md:justify-center lg:justify-center text-xs">
+                                <span className="truncate">
+                                  {moment(file.createdAt).local().fromNow()} by{" "}
+                                  {file.createdBy?.name}
+                                </span>
+                              </div>
+                            </div>
+                          </Card>
+                        )
+                      })}
+                    </div>
+                  )}
+                  <button
+                    className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => {
+                      setUploadFileOpen(true)
+                    }}
+                  >
+                    Upload File
+                  </button>
+                  <Modal header="Upload File" open={uploadFileOpen} setOpen={setUploadFileOpen}>
+                    <Form
+                      schema={CandidateFileObj}
+                      header="Upload File"
+                      subHeader="Select a file, then click Submit"
+                      submitText="Submit"
+                      onSubmit={async (values) => {
+                        const toastId = toast.loading(() => <span>Uploading File</span>)
+                        try {
+                          values["candidateId"] = candidate?.id
+                          await createCandidateFileMutation({
+                            attachment: values.attachment,
+                            candidateId: values.candidateId,
+                          })
+                          await invalidateQuery(getCandidate)
+                          toast.success("File uploaded", { id: toastId })
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString()
+                          )
+                        }
+                        setUploadFileOpen(false)
+                      }}
+                    >
+                      <SingleFileUploadField accept="" name="attachment" label="" />
+                    </Form>
+                  </Modal>
                 </div>
               )}
             </div>
