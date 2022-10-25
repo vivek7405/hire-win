@@ -95,7 +95,7 @@ const Emails = ({ user, stageId, candidate }) => {
 
   return (
     <>
-      <Modal header="Send Email" open={openModal} setOpen={setOpenModal}>
+      <Modal noOverflow={true} header="Send Email" open={openModal} setOpen={setOpenModal}>
         <EmailForm
           disabled={emailToView ? true : false}
           header={`${emailToView ? "" : "Send "}Email to ${candidate?.name}`}
