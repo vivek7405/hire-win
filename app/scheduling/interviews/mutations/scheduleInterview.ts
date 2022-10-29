@@ -1,5 +1,5 @@
 import { NotFoundError, resolver, invoke, Ctx, invalidateQuery } from "blitz"
-import db from "db"
+import db, { CandidateActivityType } from "db"
 import { addMinutes, subMinutes } from "date-fns"
 import * as z from "zod"
 import { getCalendarService } from "app/scheduling/calendars/calendar-service"
@@ -102,7 +102,7 @@ export default resolver.pipe(
     })
     const stage = await db.stage.findUnique({
       where: { id: props.stageId },
-      select: { id: true, interviewer: true, duration: true },
+      select: { id: true, name: true, interviewer: true, duration: true },
     })
     const organizer = await db.user.findUnique({
       where: { id: ctx.session.userId || "0" },
@@ -178,7 +178,7 @@ export default resolver.pipe(
         job: { connect: { id: job.id } },
         stage: { connect: { id: stage?.id || "0" } },
         organizer: { connect: { id: organizer.id } },
-        interviewer: { connect: { id: stage.interviewer?.id } },
+        interviewer: { connect: { id: interviewer?.id } },
         otherAttendees: {
           connect: otherAttendees?.map((attendee) => {
             return { id: attendee.id }
@@ -217,6 +217,17 @@ export default resolver.pipe(
     //   cancelLink,
     // })
     // await buildEmail.send()
+
+    await db.candidateActivity.create({
+      data: {
+        title: `Interview with ${
+          organizer?.id === interviewer?.id ? "self" : interviewer?.name
+        } scheduled by ${organizer?.name} for stage "${stage?.name}"`,
+        type: CandidateActivityType.Interview_Scheduled,
+        performedByUserId: ctx?.session?.userId || "0",
+        candidateId: candidate?.id || "0",
+      },
+    })
 
     return interview
   }

@@ -1,7 +1,7 @@
 import Guard from "app/guard/ability"
 import { getCalendarService } from "app/scheduling/calendars/calendar-service"
 import { Ctx, invoke } from "blitz"
-import db, { Interview, User } from "db"
+import db, { CandidateActivityType, Interview, User } from "db"
 import { sendInterviewCancellationMailer } from "mailers/sendInterviewCancellationMailer"
 import getCalendar from "../queries/getCalendar"
 import getScheduleCalendar from "../queries/getScheduleCalendar"
@@ -57,6 +57,7 @@ const cancelInterview = async (
       job: true,
       organizer: { include: { defaultCalendars: true } },
       candidate: true,
+      stage: true,
     },
   })
 
@@ -79,6 +80,22 @@ const cancelInterview = async (
     where: { id: interviewId },
     data: {
       cancelled: true,
+    },
+  })
+
+  let loggedInUser: User | null = null
+  if (ctx?.session?.userId) {
+    loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+  }
+
+  await db.candidateActivity.create({
+    data: {
+      title: `Interview with ${
+        loggedInUser?.id === interview?.interviewer?.id ? "self" : interview?.interviewer?.name
+      } cancelled by ${loggedInUser?.name} for stage "${interview?.stage?.name}"`,
+      type: CandidateActivityType.Interview_Cancelled,
+      performedByUserId: ctx?.session?.userId || "0",
+      candidateId: interview?.candidateId || "0",
     },
   })
 

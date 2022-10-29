@@ -18,6 +18,7 @@ import { EmailTemplatePlaceholders } from "types"
 import { JsonValue } from "aws-sdk/clients/glue"
 import getCandidateInterviewer from "app/candidates/queries/getCandidateInterviewer"
 import getStage from "app/stages/queries/getStage"
+import getCandidate from "app/candidates/queries/getCandidate"
 
 interface ETValues {
   [key: string]: string
@@ -134,6 +135,7 @@ const Emails = ({ user, stageId, candidate }) => {
                 stageId,
               })
               invalidateQuery(getCandidateEmailsByStage)
+              invalidateQuery(getCandidate)
               setEmailToView(null as any)
               setSelectedEmailTemplate(null as any)
               toast.success("Email sent successfully", { id: toastId })
@@ -156,6 +158,7 @@ const Emails = ({ user, stageId, candidate }) => {
             toast.success("Email entry deleted", { id: toastId })
             setOpenConfirm(false)
             invalidateQuery(getCandidateEmailsByStage)
+            invalidateQuery(getCandidate)
           } catch (error) {
             toast.error(`Deletion failed - ${error.toString()}`, {
               id: toastId,

@@ -1,3 +1,4 @@
+import getCandidate from "app/candidates/queries/getCandidate"
 import Confirm from "app/core/components/Confirm"
 import Form from "app/core/components/Form"
 import LabeledTextField from "app/core/components/LabeledTextField"
@@ -57,6 +58,7 @@ const Comments = ({ user, stageId, candidate }) => {
                     stageId,
                   })
                   invalidateQuery(getCandidateStageComments)
+                  invalidateQuery(getCandidate)
                   toast.success("Comment added", { id: toastId })
                 } catch (error) {
                   toast.error(`Adding comment failed - ${error.toString()}`, { id: toastId })
@@ -168,6 +170,7 @@ const CommentWithChildren = ({ comment, user, candidate, stage }: CommentWithChi
             })
             invalidateQuery(getCandidateStageComments)
             invalidateQuery(getChildComments)
+            invalidateQuery(getCandidate)
             toast.success("Comment deleted", { id: toastId })
           } catch (error) {
             toast.error(`Failed to delete comment - ${error.toString()}`, {
@@ -236,6 +239,7 @@ const CommentWithChildren = ({ comment, user, candidate, stage }: CommentWithChi
                   })
                   invalidateQuery(getCandidateStageComments)
                   invalidateQuery(getChildComments)
+                  invalidateQuery(getCandidate)
                   toast.success("Comment edited", { id: toastId })
                 } catch (error) {
                   toast.error(`Failed to edit comment - ${error.toString()}`, {
@@ -306,6 +310,7 @@ const CommentWithChildren = ({ comment, user, candidate, stage }: CommentWithChi
                   })
                   invalidateQuery(getCandidateStageComments)
                   invalidateQuery(getChildComments)
+                  invalidateQuery(getCandidate)
                   toast.success("Reply added", { id: toastId })
                 } catch (error) {
                   toast.error(`Adding reply failed - ${error.toString()}`, {

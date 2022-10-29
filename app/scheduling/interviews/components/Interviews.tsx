@@ -65,7 +65,8 @@ const Interviews = ({ user, stageId, candidate }) => {
             })
             toast.success("Interview cancelled", { id: toastId })
             setOpenConfirm(false)
-            await invalidateQuery(getCandidateInterviewsByStage)
+            invalidateQuery(getCandidateInterviewsByStage)
+            invalidateQuery(getCandidate)
           } catch (error) {
             toast.error(`Interview cancellation failed - ${error.toString()}`, {
               id: toastId,

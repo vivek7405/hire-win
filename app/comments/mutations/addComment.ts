@@ -1,5 +1,5 @@
 import { Ctx, resolver } from "blitz"
-import db from "db"
+import db, { CandidateActivityType, User } from "db"
 import { CommentsInputType, CommentsObj } from "../validations"
 
 async function addComment(data: CommentsInputType, ctx: Ctx) {
@@ -12,6 +12,25 @@ async function addComment(data: CommentsInputType, ctx: Ctx) {
       parentCommentId,
       candidateId,
       stageId,
+    },
+    include: { stage: true },
+  })
+
+  let loggedInUser: User | null = null
+  if (ctx?.session?.userId) {
+    loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+  }
+
+  await db.candidateActivity.create({
+    data: {
+      title: `Comment ${parentCommentId ? "replied" : "added"} by ${loggedInUser?.name} in stage "${
+        comment?.stage?.name
+      }"`,
+      type: parentCommentId
+        ? CandidateActivityType.Comment_Replied
+        : CandidateActivityType.Comment_Added,
+      performedByUserId: ctx?.session?.userId || "0",
+      candidateId,
     },
   })
 

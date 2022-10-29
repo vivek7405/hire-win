@@ -1,6 +1,6 @@
 import Guard from "app/guard/ability"
 import { Ctx, resolver } from "blitz"
-import db from "db"
+import db, { CandidateActivityType, User } from "db"
 import { z } from "zod"
 
 export default Guard.authorize(
@@ -14,10 +14,25 @@ export default Guard.authorize(
       })
     ),
     resolver.authorize(),
-    async ({ commentId, editText }) => {
+    async ({ commentId, editText }, ctx: Ctx) => {
       const comment = await db.comment.update({
         where: { id: commentId },
         data: { text: editText },
+        include: { stage: true },
+      })
+
+      let loggedInUser: User | null = null
+      if (ctx?.session?.userId) {
+        loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+      }
+
+      await db.candidateActivity.create({
+        data: {
+          title: `Comment edited by ${loggedInUser?.name} in stage "${comment?.stage?.name}"`,
+          type: CandidateActivityType.Comment_Edited,
+          performedByUserId: ctx?.session?.userId || "0",
+          candidateId: comment?.candidateId,
+        },
       })
 
       return comment

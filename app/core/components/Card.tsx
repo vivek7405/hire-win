@@ -6,13 +6,14 @@ type CardProps = {
   isFull?: boolean
   title?: string
   description?: string
+  noMarginY?: boolean
 }
 
-export const Card = ({ children, isFull, title, description }: CardProps) => {
+export const Card = ({ children, isFull, title, description, noMarginY }: CardProps) => {
   return (
     <>
       <div
-        className={`my-2 md:mx-2 lg:mx-2 w-full ${
+        className={`${noMarginY ? "my-0" : "my-2"} md:mx-2 lg:mx-2 w-full ${
           isFull ? "!mx-0 md:w-full lg:w-full" : "md:w-60 lg:w-60"
         }`}
       >

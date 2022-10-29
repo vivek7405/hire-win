@@ -31,6 +31,7 @@ import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import Pagination from "app/core/components/Pagination"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
 import getCandidatesWOAbility from "app/candidates/queries/getCandidatesWOAbility"
+import getCandidate from "app/candidates/queries/getCandidate"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -164,6 +165,7 @@ export const Candidates = ({ slug }) => {
               candidatePoolSlug: slug,
             })
             invalidateQuery(getCandidatesWOAbility)
+            invalidateQuery(getCandidate)
             toast.success("Candidate removed from Pool", { id: toastId })
           } catch (error) {
             toast.error(`Failed to remove candidate from pool - ${error.toString()}`, {

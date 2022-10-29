@@ -1,5 +1,5 @@
 import { AuthenticationError, Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db, { CandidateActivityType, Prisma, User } from "db"
 import { Candidate } from "app/candidates/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
@@ -20,6 +20,25 @@ async function setCandidateRejected({ where, rejected }: UpdateCandidateInput, c
     where,
     data: {
       rejected,
+    },
+    select: { id: true, stage: true },
+  })
+
+  let loggedInUser: User | null = null
+  if (ctx?.session?.userId) {
+    loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+  }
+
+  await db.candidateActivity.create({
+    data: {
+      title: `Candidate ${rejected ? "rejected" : "restored"} in stage "${
+        candidate?.stage?.name
+      }" by ${loggedInUser?.name}`,
+      type: rejected
+        ? CandidateActivityType.Candidate_Rejected
+        : CandidateActivityType.Candidate_Restored,
+      performedByUserId: ctx?.session?.userId || "0",
+      candidateId: candidate?.id || "0",
     },
   })
 

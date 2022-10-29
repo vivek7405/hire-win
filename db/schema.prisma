@@ -47,15 +47,16 @@ model User {
 
   stageUserScheduleCalendars StageUserScheduleCalendar[]
 
-  createdJobs               Job[]
-  createdCategories         Category[]
-  createdStages             Stage[]             @relation(name: "createdBy")
-  interviewingStage         Stage[]             @relation(name: "interviewer")
-  createdFormQuestions      FormQuestion[]
-  createdScoreCardQuestions ScoreCardQuestion[]
-  createdCandidates         Candidate[]
-  createdEmailTemplates     EmailTemplate[]
-  createdCandidatePools     CandidatePool[]
+  createdJobs                  Job[]
+  createdCategories            Category[]
+  createdStages                Stage[]             @relation(name: "createdBy")
+  interviewingStage            Stage[]             @relation(name: "interviewer")
+  createdFormQuestions         FormQuestion[]
+  createdScoreCardQuestions    ScoreCardQuestion[]
+  createdCandidates            Candidate[]
+  createdEmailTemplates        EmailTemplate[]
+  createdCandidatePools        CandidatePool[]
+  candidateActivitiesPerformed CandidateActivity[] @relation(name: "activityPerformedByUser")
 }
 
 enum UserRole {
@@ -445,6 +446,8 @@ model Score {
   stage   Stage  @relation(fields: [stageId], references: [id])
   stageId String
 
+  candidateActivityId String?
+
   @@unique([candidateId, scoreCardQuestionId, stageId])
 }
 
@@ -566,7 +569,45 @@ model Candidate {
 
   rejected Boolean @default(false)
 
+  activities CandidateActivity[]
+
   @@unique([jobId, email])
+}
+
+model CandidateActivity {
+  id          String   @id @default(cuid())
+  performedAt DateTime @default(now())
+
+  title String
+  type  CandidateActivityType
+
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId String
+
+  performedByUser   User?   @relation(fields: [performedByUserId], references: [id], name: "activityPerformedByUser")
+  performedByUserId String?
+}
+
+enum CandidateActivityType {
+  Candidate_Added
+  Candidate_Updated
+  Candidate_Rejected
+  Candidate_Restored
+  Score_Submitted
+  Interviewer_Changed
+  Stage_Changed
+  Interview_Scheduled
+  Interview_Cancelled
+  Comment_Added
+  Comment_Replied
+  Comment_Edited
+  Comment_Deleted
+  Email_Sent
+  Email_Deleted
+  Added_To_Pool
+  Removed_From_Pool
+  File_Added
+  File_Deleted
 }
 
 model CandidateFile {

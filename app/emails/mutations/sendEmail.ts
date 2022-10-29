@@ -1,6 +1,6 @@
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import { Ctx, resolver } from "blitz"
-import db from "db"
+import db, { CandidateActivityType, User } from "db"
 import { sendCandidateEmailMailer } from "mailers/sendCandidateEmailMailer"
 import slugify from "slugify"
 import { EmailObj } from "../validations"
@@ -39,6 +39,21 @@ export default resolver.pipe(
         stageId: stageId || "0",
         senderId: ctx.session.userId || "0",
         templateId,
+      },
+      include: { stage: true },
+    })
+
+    let loggedInUser: User | null = null
+    if (ctx?.session?.userId) {
+      loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+    }
+
+    await db.candidateActivity.create({
+      data: {
+        title: `Email sent by ${loggedInUser?.name} in stage "${email?.stage?.name}"`,
+        type: CandidateActivityType.Email_Sent,
+        performedByUserId: ctx?.session?.userId || "0",
+        candidateId: email?.candidateId,
       },
     })
 

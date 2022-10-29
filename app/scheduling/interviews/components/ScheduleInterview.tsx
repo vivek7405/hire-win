@@ -203,6 +203,7 @@ const PickAndSchedule = ({
       setOpenScheduleInterviewModal(false)
       toast.success("Interview scheduled successfully")
       invalidateQuery(getCandidateInterviewsByStage)
+      invalidateQuery(getCandidate)
     } catch (error) {
       toast.error(`Something went wrong: ${error.message}`)
     }

@@ -24,6 +24,8 @@ async function assignInterviewerToJobStage(
     })
 
     return stage
+  } else {
+    throw new Error("Invalid interviewer id provided")
   }
 }
 
