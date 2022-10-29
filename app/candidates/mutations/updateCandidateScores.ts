@@ -1,5 +1,5 @@
 import { Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db, { CandidateActivityType, Prisma, User } from "db"
 import { Candidate } from "app/candidates/validations"
 import Guard from "app/guard/ability"
 
@@ -83,6 +83,30 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
       answers: { include: { formQuestion: { include: { options: true } } } },
     },
   })
+
+  if (scores && scores.length > 0) {
+    let loggedInUser: User | null = null
+    if (ctx?.session?.userId) {
+      loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+    }
+
+    const stage = await db.stage.findFirst({
+      where: { id: scores[0]?.stageId },
+    })
+
+    await db.candidateActivity.create({
+      data: {
+        title: `Candidate score ${scores
+          ?.map((score) => score.rating)
+          ?.reduce((a, b) => a + b, 0)}/5 submitted for stage "${stage?.name}" by ${
+          loggedInUser?.name
+        }`,
+        type: CandidateActivityType.Score_Submitted,
+        performedByUserId: ctx?.session?.userId || "0",
+        candidateId: candidate?.id || "0",
+      },
+    })
+  }
 
   return candidate
 }

@@ -1,6 +1,7 @@
 import { Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db, { CandidateActivityType, Prisma, User } from "db"
 import axios from "axios"
+import { AttachmentObject } from "types"
 
 type DeleteCandidateFileInput = {
   candidateFileId: string
@@ -17,6 +18,11 @@ async function deleteCandidateFile({ candidateFileId }: DeleteCandidateFileInput
 
   if (!candidateFile) throw new Error("Incorrect Candidate File Id")
 
+  const candidate = await db.candidate.findUnique({
+    where: { id: candidateFile.candidateId },
+    include: { stage: true },
+  })
+
   try {
     const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/files/removeFile`
     const config = {
@@ -30,6 +36,22 @@ async function deleteCandidateFile({ candidateFileId }: DeleteCandidateFileInput
   const deletedCandidateFile = await db.candidateFile.delete({
     where: {
       id: candidateFileId,
+    },
+  })
+
+  let loggedInUser: User | null = null
+  if (ctx?.session?.userId) {
+    loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+  }
+
+  await db.candidateActivity.create({
+    data: {
+      title: `Candidate file "${
+        (candidateFile?.attachment as AttachmentObject)?.name
+      }" deleted by ${loggedInUser?.name} while in stage "${candidate?.stage?.name}"`,
+      type: CandidateActivityType.File_Deleted,
+      performedByUserId: ctx?.session?.userId || "0",
+      candidateId: candidate?.id || "0",
     },
   })
 

@@ -1,5 +1,5 @@
 import { Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db, { CandidateActivityType, Prisma, User } from "db"
 import { Candidate } from "app/candidates/validations"
 import slugify from "slugify"
 import Guard from "app/guard/ability"
@@ -61,6 +61,20 @@ async function updateCandidate({ where, data }: UpdateCandidateInput, ctx: Ctx) 
   const candidate = await db.candidate.update({
     where,
     data: updateData,
+  })
+
+  let loggedInUser: User | null = null
+  if (ctx?.session?.userId) {
+    loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+  }
+
+  await db.candidateActivity.create({
+    data: {
+      title: `Candidate info updated by ${loggedInUser?.name}`,
+      type: CandidateActivityType.Candidate_Updated,
+      performedByUserId: ctx?.session?.userId || "0",
+      candidateId: candidate?.id || "0",
+    },
   })
 
   return candidate

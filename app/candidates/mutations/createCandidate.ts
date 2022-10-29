@@ -1,9 +1,10 @@
 import { Ctx, resolver } from "blitz"
-import db from "db"
+import db, { CandidateActivityType, CandidateSource, User } from "db"
 import { Candidate, CandidateInputType } from "app/candidates/validations"
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import Guard from "app/guard/ability"
+import getCandidateInterviewer from "../queries/getCandidateInterviewer"
 
 // Candidate can be created without authentication
 async function createCandidate(data: CandidateInputType, ctx: Ctx) {
@@ -53,6 +54,32 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
 
   const candidate = await db.candidate.create({
     data: candidateData,
+  })
+
+  let loggedInUser: User | null = null
+  if (ctx?.session?.userId) {
+    loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+  }
+
+  const assignedCandidateInterviewer = await getCandidateInterviewer(
+    {
+      stageId: candidate?.stageId || "0",
+      candidateId: candidate?.id || "0",
+    },
+    ctx
+  )
+
+  await db.candidateActivity.create({
+    data: {
+      title: `Candidate ${
+        source === CandidateSource.Manual
+          ? `added manually by ${loggedInUser?.name}`
+          : "applied through careers page"
+      }. Interviewer ${assignedCandidateInterviewer?.name} assigned.`,
+      type: CandidateActivityType.Candidate_Added,
+      candidateId: candidate?.id || "0",
+      performedByUserId: ctx?.session?.userId || null,
+    },
   })
 
   return candidate

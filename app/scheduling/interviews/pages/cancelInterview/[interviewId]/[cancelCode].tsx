@@ -5,12 +5,14 @@ import {
   ErrorComponent,
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
+  invalidateQuery,
   useMutation,
   useParam,
   useQuery,
 } from "blitz"
 import React, { Suspense, useState } from "react"
 import path from "path"
+import getCandidate from "app/candidates/queries/getCandidate"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -70,6 +72,7 @@ const CancelInterview = ({ interviewId, cancelCode }) => {
                 interviewId: interviewId || "0",
                 cancelCode: cancelCode || "0",
               })
+              invalidateQuery(getCandidate)
               setCancelling(false)
               setFinished(true)
             }}

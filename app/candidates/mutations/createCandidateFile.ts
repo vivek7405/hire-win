@@ -1,5 +1,5 @@
 import { Ctx, resolver } from "blitz"
-import db from "db"
+import db, { CandidateActivityType, User } from "db"
 import {
   Candidate,
   CandidateFileInputType,
@@ -9,6 +9,7 @@ import {
 import slugify from "slugify"
 import { findFreeSlug } from "app/core/utils/findFreeSlug"
 import Guard from "app/guard/ability"
+import { AttachmentObject } from "types"
 
 async function createCandidateFile(data: CandidateFileInputType, ctx: Ctx) {
   const { attachment, candidateId } = CandidateFileObj.parse(data)
@@ -21,6 +22,27 @@ async function createCandidateFile(data: CandidateFileInputType, ctx: Ctx) {
       createdById: ctx.session.userId,
       attachment,
       candidateId,
+    },
+  })
+
+  const candidate = await db.candidate.findUnique({
+    where: { id: candidateId },
+    include: { stage: true },
+  })
+
+  let loggedInUser: User | null = null
+  if (ctx?.session?.userId) {
+    loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
+  }
+
+  await db.candidateActivity.create({
+    data: {
+      title: `Candidate file "${(candidateFile?.attachment as AttachmentObject)?.name}" added by ${
+        loggedInUser?.name
+      } while in stage "${candidate?.stage?.name}"`,
+      type: CandidateActivityType.File_Added,
+      performedByUserId: ctx?.session?.userId || "0",
+      candidateId: candidate?.id || "0",
     },
   })
 

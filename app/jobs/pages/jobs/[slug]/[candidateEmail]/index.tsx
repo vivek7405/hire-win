@@ -24,7 +24,7 @@ import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, CardType, ExtendedCandidate, ExtendedStage } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { CandidateFile, JobUserRole, Stage } from "@prisma/client"
+import { CandidateActivityType, CandidateFile, JobUserRole, Stage } from "@prisma/client"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
 import Form from "app/core/components/Form"
@@ -36,10 +36,26 @@ import getCandidateInterviewsByStage from "app/scheduling/interviews/queries/get
 import {
   ArrowRightIcon,
   BanIcon,
+  BookmarkIcon,
+  ChatAlt2Icon,
+  ChatAltIcon,
+  ChatIcon,
   ChevronDownIcon,
+  ClockIcon,
+  CollectionIcon,
+  ColorSwatchIcon,
+  DocumentAddIcon,
+  DocumentRemoveIcon,
+  MailIcon,
   PencilAltIcon,
+  ReceiptRefundIcon,
   RefreshIcon,
+  StarIcon,
   TrashIcon,
+  UploadIcon,
+  UsersIcon,
+  XCircleIcon,
+  XIcon,
 } from "@heroicons/react/outline"
 import Confirm from "app/core/components/Confirm"
 import Interviews from "app/scheduling/interviews/components/Interviews"
@@ -63,6 +79,7 @@ import { z } from "zod"
 import { AttachmentZodObj, CandidateFileObj } from "app/candidates/validations"
 import createCandidateFile from "app/candidates/mutations/createCandidateFile"
 import deleteCandidateFile from "app/candidates/mutations/deleteCandidateFile"
+import { TerminalIcon, UserIcon } from "@heroicons/react/outline"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -276,10 +293,14 @@ const SingleCandidatePageContent = ({
   candidateEmail,
   jobId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter()
+  const { menu, stage, view } = router.query
+
   enum CandidateDetailToggleView {
     Info = "Info",
     Resume = "Resume",
     Files = "Files",
+    Activity = "Activity",
   }
 
   enum CandidateStageToggleView {
@@ -291,14 +312,30 @@ const SingleCandidatePageContent = ({
 
   const [candidate] = useQuery(getCandidate, { where: { email: candidateEmail, jobId } })
   const [candidateStageToggleView, setCandidateStageToggleView] = useState(
-    CandidateStageToggleView.Scores
+    CandidateStageToggleView[view?.toString() || "Scores"] || CandidateStageToggleView.Scores
   )
   const [candidateDetailToggleView, setCandidateDetailToggleView] = useState(
-    CandidateDetailToggleView.Info
+    CandidateDetailToggleView[menu?.toString() || "Info"] || CandidateDetailToggleView.Info
   )
+
+  const queryStage = candidate?.job?.stages?.find((stg) => stg.name === stage)
+
   const [selectedStage, setSelectedStage] = useState(
-    candidate?.stage as ExtendedStage | null | undefined
+    (queryStage || candidate?.stage) as ExtendedStage | null | undefined
   )
+  const shiftStage = (stg) => {
+    setSelectedStage(stg)
+    router.replace({
+      query: {
+        ...router.query,
+        stage:
+          candidate?.job?.stages?.find((s) => s.name === stg.name)?.name ||
+          candidate?.stage?.name ||
+          "Sourced",
+      },
+    })
+  }
+
   // const scoreCardId = candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === selectedStage?.id)?.scoreCardId || ""
   // const [scoreCardId, setScoreCardId] = useState(
   //   candidate?.job?.scoreCards?.find((sc) => sc.workflowStageId === selectedStage?.id)
@@ -321,7 +358,6 @@ const SingleCandidatePageContent = ({
   //   setCards(getCards(candidate!))
   // }, [candidate])
 
-  const router = useRouter()
   const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [candidatePools] = useQuery(getCandidatePoolsWOPagination, {
@@ -416,6 +452,70 @@ const SingleCandidatePageContent = ({
   // } catch (error) {
   //   console.log(error)
   // }
+
+  const getCandidateActivitySymbolByType = (activityType: CandidateActivityType) => {
+    switch (activityType) {
+      case CandidateActivityType.Candidate_Added:
+        return <UserIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Candidate_Updated:
+        return <UserIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Candidate_Rejected:
+        return <BanIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Candidate_Restored:
+        return <RefreshIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Score_Submitted:
+        return <StarIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Interviewer_Changed:
+        return <UsersIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Stage_Changed:
+        return <CollectionIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Interview_Scheduled:
+        return <ClockIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Interview_Cancelled:
+        return <XCircleIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Comment_Added:
+        return <ChatAltIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Comment_Replied:
+        return <ChatAlt2Icon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Comment_Edited:
+        return (
+          <span className="flex space-x-1">
+            <ChatIcon className="text-theme-500 w-6 h-6" />
+            <PencilAltIcon className="text-theme-500 w-6 h-6" />
+          </span>
+        )
+      case CandidateActivityType.Comment_Deleted:
+        return (
+          <span className="flex space-x-1">
+            <ChatIcon className="text-theme-500 w-6 h-6" />
+            <TrashIcon className="text-theme-500 w-6 h-6" />
+          </span>
+        )
+      case CandidateActivityType.Email_Sent:
+        return <MailIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Email_Deleted:
+        return (
+          <span className="flex space-x-1">
+            <MailIcon className="text-theme-500 w-6 h-6" />
+            <TrashIcon className="text-theme-500 w-6 h-6" />
+          </span>
+        )
+      case CandidateActivityType.Added_To_Pool:
+        return <BookmarkIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.Removed_From_Pool:
+        return (
+          <span className="flex space-x-1">
+            <ReceiptRefundIcon className="text-theme-500 w-6 h-6" />
+          </span>
+        )
+      case CandidateActivityType.File_Added:
+        return <DocumentAddIcon className="text-theme-500 w-6 h-6" />
+      case CandidateActivityType.File_Deleted:
+        return <DocumentRemoveIcon className="text-theme-500 w-6 h-6" />
+      default:
+        return <TerminalIcon className="text-theme-500 w-6 h-6" />
+    }
+  }
 
   const updateCandidateStg = async (candidate, selectedStageId) => {
     const selectedStageName =
@@ -680,7 +780,8 @@ const SingleCandidatePageContent = ({
                   const toastId = toast.loading(`Adding candidate to pool - ${cp.name}`)
                   try {
                     await addCandidateToPoolMutation({ candidateId: candidate?.id, poolId: cp.id })
-                    await invalidateQuery(getCandidatePoolsWOPagination)
+                    invalidateQuery(getCandidatePoolsWOPagination)
+                    invalidateQuery(getCandidate)
                     toast.success(`Candidate added to pool - ${cp.name}`, { id: toastId })
                   } catch (error) {
                     toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
@@ -817,7 +918,7 @@ const SingleCandidatePageContent = ({
               stages?.find((stage) => stage.id === candidateToMove.stageId)?.order || 0
             const nextStage = stages?.find((stage) => stage.order === currentStageOrder + 1)
             await updateCandidateStg(candidateToMove, moveToStage?.id || nextStage?.id)
-            setSelectedStage(moveToStage || nextStage)
+            shiftStage(moveToStage || nextStage)
             invalidateQuery(getCandidateInterviewsByStage)
             setOpenCandidateMoveConfirm(false)
             setCandidateToMove(null)
@@ -949,13 +1050,22 @@ const SingleCandidatePageContent = ({
                     name={`candidateDetailToggleView`}
                     paddingX={3}
                     paddingY={1}
-                    defaultValue={CandidateDetailToggleView.Info}
+                    defaultValue={
+                      CandidateDetailToggleView[menu?.toString() || "Info"] ||
+                      CandidateDetailToggleView.Info
+                    }
                     value={candidateDetailToggleView}
                     options={Object.values(CandidateDetailToggleView)?.map((toggleView) => {
                       return { label: toggleView, value: toggleView }
                     })}
                     onChange={(value) => {
                       setCandidateDetailToggleView(value)
+                      router.replace({
+                        query: {
+                          ...router.query,
+                          menu: value,
+                        },
+                      })
                     }}
                   />
                 </Form>
@@ -964,10 +1074,6 @@ const SingleCandidatePageContent = ({
                 <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
                   {candidate?.job?.formQuestions?.map((question) => {
                     const answer = getCandidateAnswerForDisplay(question, candidate)
-                    // if (fq?.question?.name === "Resume") {
-                    //   console.log("RESUME RESUME RESUME")
-                    //   console.log(answer)
-                    // }
 
                     return (
                       <Card key={question.id}>
@@ -991,7 +1097,7 @@ const SingleCandidatePageContent = ({
                 <div className="px-2 md:px-0 lg:px-0">
                   {file && <PDFViewer file={file} scale={1.29} />}
                   {!(candidate?.resume as AttachmentObject)?.key && (
-                    <div className="text-center my-3">
+                    <div className="text-center my-3 px-2">
                       No Resume Uploaded. Upload one by clicking on the Update Candidate button.
                     </div>
                   )}
@@ -1000,7 +1106,7 @@ const SingleCandidatePageContent = ({
               {candidateDetailToggleView === CandidateDetailToggleView.Files && (
                 <div className="flex flex-col items-center">
                   {candidate?.files?.length === 0 ? (
-                    <div className="my-3">
+                    <div className="text-center my-3 px-2">
                       No files uploaded. Click on the button below to upload a file.
                     </div>
                   ) : (
@@ -1009,22 +1115,6 @@ const SingleCandidatePageContent = ({
                         return (
                           <Card key={file.id}>
                             <div className="space-y-2">
-                              {/* <div className="w-full relative">
-                                <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                                  <span className="truncate">
-                                    {
-                                      <a
-                                        href={(file.attachment as AttachmentObject).location}
-                                        className="text-theme-600 hover:text-theme-500"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                      >
-                                        {(file.attachment as AttachmentObject).name}
-                                      </a>
-                                    }
-                                  </span>
-                                </div>
-                              </div> */}
                               <div className="w-full relative">
                                 <div className="font-bold flex md:justify-center lg:justify:center items-center">
                                   <a
@@ -1087,7 +1177,7 @@ const SingleCandidatePageContent = ({
                             attachment: values.attachment,
                             candidateId: values.candidateId,
                           })
-                          await invalidateQuery(getCandidate)
+                          invalidateQuery(getCandidate)
                           toast.success("File uploaded", { id: toastId })
                         } catch (error) {
                           toast.error(
@@ -1101,6 +1191,60 @@ const SingleCandidatePageContent = ({
                       <SingleFileUploadField accept="" name="attachment" label="" />
                     </Form>
                   </Modal>
+                </div>
+              )}
+              {candidateDetailToggleView === CandidateDetailToggleView.Activity && (
+                <div className="flex flex-col items-center">
+                  {candidate?.activities?.length === 0 ? (
+                    <div className="text-center my-3 px-2">No activities yet.</div>
+                  ) : (
+                    <div className="my-2 flex flex-col justify-center px-2">
+                      {candidate?.activities?.map((activity, index) => {
+                        return (
+                          <>
+                            <Card key={activity.id} isFull={true} noMarginY={true}>
+                              <div className="space-y-2">
+                                <div className="w-full relative">
+                                  <div className="font-medium flex md:justify-center lg:justify:center md:text-center lg:text-center items-center">
+                                    {getCandidateActivitySymbolByType(activity.type)}
+                                    <span className="ml-2">
+                                      {activity.type.replaceAll("_", " ")}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="border-b-2 border-gray-50 w-full" />
+                                <div className="w-full relative">
+                                  <div className="text-sm font-medium flex md:justify-center lg:justify:center md:text-center lg:text-center items-center">
+                                    {activity.title}
+                                  </div>
+                                </div>
+                                <div className="border-b-2 border-gray-50 w-full" />
+                                <div className="flex md:justify-center lg:justify-center text-xs">
+                                  <span className="truncate">
+                                    {moment(activity.performedAt).local().fromNow()} -{" "}
+                                    {moment(activity.performedAt)
+                                      .local()
+                                      .toDate()
+                                      .toLocaleDateString()}{" "}
+                                    {moment(activity.performedAt)
+                                      .local()
+                                      .toDate()
+                                      .toLocaleTimeString()}
+                                    {/* by {activity.performedByUser?.name} */}
+                                  </span>
+                                </div>
+                              </div>
+                            </Card>
+                            {index !== candidate?.activities?.length - 1 && (
+                              <div className="flex justify-center items-center">
+                                <div className="h-10 w-1 border-2 border-neutral-300" />
+                              </div>
+                            )}
+                          </>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1125,7 +1269,7 @@ const SingleCandidatePageContent = ({
                           selectedStage?.id === stage.id ? "!bg-theme-500 !text-white" : ""
                         } whitespace-nowrap`}
                         onClick={() => {
-                          setSelectedStage(stage)
+                          shiftStage(stage)
                           invalidateQuery(getCandidateInterviewsByStage)
                           // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
                         }}
@@ -1143,13 +1287,22 @@ const SingleCandidatePageContent = ({
                       name={`candidateStageToggleView`}
                       paddingX={3}
                       paddingY={1}
-                      defaultValue={CandidateStageToggleView.Scores}
+                      defaultValue={
+                        CandidateStageToggleView[view?.toString() || "Scores"] ||
+                        CandidateStageToggleView.Scores
+                      }
                       value={candidateStageToggleView}
                       options={Object.values(CandidateStageToggleView)?.map((toggleView) => {
                         return { label: toggleView, value: toggleView }
                       })}
                       onChange={(value) => {
                         setCandidateStageToggleView(value)
+                        router.replace({
+                          query: {
+                            ...router.query,
+                            view: value,
+                          },
+                        })
                       }}
                     />
                   </Form>
