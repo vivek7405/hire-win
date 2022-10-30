@@ -56,7 +56,7 @@ model User {
   createdCandidates            Candidate[]
   createdEmailTemplates        EmailTemplate[]
   createdCandidatePools        CandidatePool[]
-  candidateActivitiesPerformed CandidateActivity[] @relation(name: "activityPerformedByUser")
+  candidateActivitiesPerformed CandidateActivity[]
 }
 
 enum UserRole {
@@ -584,7 +584,7 @@ model CandidateActivity {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  performedByUser   User?   @relation(fields: [performedByUserId], references: [id], name: "activityPerformedByUser")
+  performedByUser   User?   @relation(fields: [performedByUserId], references: [id])
   performedByUserId String?
 }
 
