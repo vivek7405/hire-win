@@ -76,10 +76,17 @@ import getCandidateInterviewer from "app/candidates/queries/getCandidateIntervie
 import moment from "moment"
 import SingleFileUploadField from "app/core/components/SingleFileUploadField"
 import { z } from "zod"
-import { AttachmentZodObj, CandidateFileObj } from "app/candidates/validations"
+import {
+  AttachmentZodObj,
+  CandidateFileObj,
+  CandidateUserNoteObj,
+} from "app/candidates/validations"
 import createCandidateFile from "app/candidates/mutations/createCandidateFile"
 import deleteCandidateFile from "app/candidates/mutations/deleteCandidateFile"
 import { TerminalIcon, UserIcon } from "@heroicons/react/outline"
+import saveCandidateUserNote from "app/candidates/mutations/saveCandidateUserNote"
+import LabeledRichTextField from "app/core/components/LabeledRichTextField"
+import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -301,6 +308,7 @@ const SingleCandidatePageContent = ({
     Resume = "Resume",
     Files = "Files",
     Activity = "Activity",
+    Notes = "Notes",
   }
 
   enum CandidateStageToggleView {
@@ -317,6 +325,8 @@ const SingleCandidatePageContent = ({
   const [candidateDetailToggleView, setCandidateDetailToggleView] = useState(
     CandidateDetailToggleView[menu?.toString() || "Info"] || CandidateDetailToggleView.Info
   )
+
+  const [saveCandidateUserNoteMutation] = useMutation(saveCandidateUserNote)
 
   const queryStage = candidate?.job?.stages?.find((stg) => stg.name === stage)
 
@@ -1245,6 +1255,48 @@ const SingleCandidatePageContent = ({
                       })}
                     </div>
                   )}
+                </div>
+              )}
+              {candidateDetailToggleView === CandidateDetailToggleView.Notes && (
+                <div className="flex flex-col items-center">
+                  <Form
+                    subHeader="These notes are private to you"
+                    submitText="Save"
+                    initialValues={{
+                      note:
+                        candidate?.candidateUserNotes &&
+                        (candidate?.candidateUserNotes?.length || 0) > 0 &&
+                        candidate?.candidateUserNotes[0]?.note
+                          ? EditorState.createWithContent(
+                              convertFromRaw(candidate?.candidateUserNotes[0]?.note || {})
+                            )
+                          : EditorState.createEmpty(),
+                    }}
+                    schema={CandidateUserNoteObj}
+                    onSubmit={async (values) => {
+                      if (values.note) {
+                        values.note = convertToRaw(values?.note?.getCurrentContent() || {})
+                      }
+
+                      const toastId = toast.loading(() => <span>Saving Note</span>)
+                      try {
+                        await saveCandidateUserNoteMutation({
+                          candidateId: candidate?.id || "0",
+                          userId: session?.userId || "0",
+                          note: values.note,
+                        })
+                        await invalidateQuery(getCandidate)
+                        toast.success(() => "Note saved", { id: toastId })
+                      } catch (error) {
+                        toast.error(
+                          "Sorry, we had an unexpected error. Please try again. - " +
+                            error.toString()
+                        )
+                      }
+                    }}
+                  >
+                    <LabeledRichTextField name="note" />
+                  </Form>
                 </div>
               )}
             </div>
