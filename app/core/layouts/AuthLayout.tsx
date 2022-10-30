@@ -35,10 +35,8 @@ const AuthLayout = ({
           />
         )}
         <main>
-          <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 bg-gray-100">
-            <div className="px-4 py-4 sm:px-0">
-              <Suspense fallback="Loading...">{children}</Suspense>
-            </div>
+          <div className="max-w-8xl mx-auto py-6 px-4 md:px-8 lg:px-8 bg-gray-100">
+            <Suspense fallback="Loading...">{children}</Suspense>
           </div>
         </main>
       </div>

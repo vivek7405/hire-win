@@ -4,7 +4,10 @@ import Guard from "app/guard/ability"
 
 interface GetJobStageInput extends Pick<Prisma.StageFindManyArgs, "where" | "orderBy"> {}
 
-async function getJobStages({ where, orderBy }: GetJobStageInput, ctx: Ctx) {
+async function getJobStages(
+  { where, orderBy, rejectedCount }: GetJobStageInput & { rejectedCount?: boolean },
+  ctx: Ctx
+) {
   ctx.session.$authorize()
 
   const workflowStages = db.stage.findMany({
@@ -14,6 +17,7 @@ async function getJobStages({ where, orderBy }: GetJobStageInput, ctx: Ctx) {
       interviewer: true,
       scoreCardQuestions: { orderBy: { order: "asc" } },
       scores: true,
+      candidates: { select: { rejected: true } },
     },
   })
 

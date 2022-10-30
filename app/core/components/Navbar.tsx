@@ -406,7 +406,7 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
       </Confirm>
 
       <nav className="bg-theme-600 py-2">
-        <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
+        <div className="max-w-8xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
           <span className="flex">
             <Link prefetch={true} href={Routes.JobsHome()}>
               <a className="w-12 h-12">
@@ -605,7 +605,7 @@ const Navbar = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: NavbarProps)
       <Suspense
         fallback={
           <nav className="bg-theme-600 py-2">
-            <div className="max-w-7xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
+            <div className="max-w-8xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">
               <Link prefetch={true} href={Routes.JobsHome()}>
                 <a className="w-12 h-12">
                   <Logo fill="white" strokeWidth={0.1} />

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react"
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -47,6 +47,7 @@ import {
   DocumentAddIcon,
   DocumentRemoveIcon,
   MailIcon,
+  MenuIcon,
   PencilAltIcon,
   ReceiptRefundIcon,
   RefreshIcon,
@@ -87,6 +88,9 @@ import { TerminalIcon, UserIcon } from "@heroicons/react/outline"
 import saveCandidateUserNote from "app/candidates/mutations/saveCandidateUserNote"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
+import CandidateSelection from "app/candidates/components/CandidateSelection"
+import getAllCandidatesByStage from "app/candidates/queries/getAllCandidatesByStage"
+import getJobStages from "app/stages/queries/getJobStages"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -141,6 +145,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             candidateEmail: candidate?.email as string,
             jobId: candidate?.jobId,
+            stageId: candidate?.stageId,
             // candidate: candidate,
           },
         }
@@ -273,7 +278,31 @@ const SingleCandidatePage = ({
   error,
   candidateEmail,
   jobId,
+  stageId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [selectedCandidateEmail, setSelectedCandidateEmail] = useState(candidateEmail)
+  const [viewCandidateSelection, setViewCandidateSelection] = useState(false)
+
+  const viewAllCandidatesRef = useRef(null)
+
+  const handleWindowSizeChange = () => {
+    setViewCandidateSelection(false)
+  }
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowSizeChange)
+    return () => window.removeEventListener("resize", handleWindowSizeChange)
+  }, [])
+
+  // const handleClick = (event) => {
+  //   if (viewAllCandidatesRef && !(viewAllCandidatesRef?.current as any)?.contains(event.target)) {
+  //     setViewCandidateSelection(false)
+  //   }
+  // }
+  // useEffect(() => {
+  //   window.addEventListener("mousedown", handleClick)
+  //   return () => window.removeEventListener("mousedown", handleClick)
+  // }, [])
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -281,13 +310,31 @@ const SingleCandidatePage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
+      {viewCandidateSelection && (
+        <div
+          ref={viewAllCandidatesRef}
+          className="md:mt-56 lg:mt-24 absolute right-7 w-1/6 md:w-2/5 lg:w-1/3 h-screen z-10"
+        >
+          <Suspense fallback="Loading...">
+            <CandidateSelection
+              jobId={jobId || "0"}
+              stageId={stageId || "0"}
+              selectedCandidateEmail={selectedCandidateEmail || "0"}
+              setViewCandidateSelection={setViewCandidateSelection}
+              setSelectedCandidateEmail={setSelectedCandidateEmail}
+            />
+          </Suspense>
+        </div>
+      )}
       <br />
       <Suspense fallback="Loading...">
         <SingleCandidatePageContent
           user={user as any}
           error={error as any}
-          candidateEmail={candidateEmail as any}
-          jobId={jobId}
+          candidateEmail={selectedCandidateEmail as any}
+          jobId={jobId as any}
+          viewCandidateSelection={viewCandidateSelection}
+          setViewCandidateSelection={setViewCandidateSelection}
         />
       </Suspense>
     </AuthLayout>
@@ -299,7 +346,12 @@ const SingleCandidatePageContent = ({
   error,
   candidateEmail,
   jobId,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  viewCandidateSelection,
+  setViewCandidateSelection,
+}: InferGetServerSidePropsType<typeof getServerSideProps> & {
+  viewCandidateSelection?: boolean
+  setViewCandidateSelection?: any
+}) => {
   const router = useRouter()
   const { menu, stage, view } = router.query
 
@@ -396,6 +448,8 @@ const SingleCandidatePageContent = ({
         const file = response?.data?.Body
         setFile(file)
       })
+    } else {
+      setFile(null)
     }
   }, [resume.key])
 
@@ -811,6 +865,26 @@ const SingleCandidatePageContent = ({
     )
   }
 
+  const OpenCloseViewAllCandidatesButton = () => {
+    return viewCandidateSelection ? (
+      <button
+        onClick={() => {
+          setViewCandidateSelection(false)
+        }}
+      >
+        <XIcon className="w-6 h-6 text-theme-600 hover:text-theme-800" />
+      </button>
+    ) : (
+      <button
+        onClick={() => {
+          setViewCandidateSelection(true)
+        }}
+      >
+        <MenuIcon className="w-6 h-6 text-theme-600 hover:text-theme-800" />
+      </button>
+    )
+  }
+
   return (
     <>
       <Modal header="Update Candidate" open={openEditModal} setOpen={setOpenEditModal}>
@@ -888,6 +962,8 @@ const SingleCandidatePageContent = ({
               //   resume: candidate?.resume!,
               // })
               invalidateQuery(getCandidate)
+              invalidateQuery(getJobStages)
+              invalidateQuery(getAllCandidatesByStage)
             }
             toast.success(`Candidate ${candidateToReject?.rejected ? "Restored" : "Rejected"}`, {
               id: toastId,
@@ -930,6 +1006,8 @@ const SingleCandidatePageContent = ({
             await updateCandidateStg(candidateToMove, moveToStage?.id || nextStage?.id)
             shiftStage(moveToStage || nextStage)
             invalidateQuery(getCandidateInterviewsByStage)
+            invalidateQuery(getAllCandidatesByStage)
+            invalidateQuery(getJobStages)
             setOpenCandidateMoveConfirm(false)
             setCandidateToMove(null)
             setMoveToStage(null)
@@ -1022,6 +1100,7 @@ const SingleCandidatePageContent = ({
             candidatePoolsOpen={candidatePoolsOpenTablet}
             setCandidatePoolsOpen={setCandidatePoolsOpenTablet}
           />
+          <OpenCloseViewAllCandidatesButton />
         </div>
       </div>
 
@@ -1044,13 +1123,12 @@ const SingleCandidatePageContent = ({
             candidatePoolsOpen={candidatePoolsOpenDesktop}
             setCandidatePoolsOpen={setCandidatePoolsOpenDesktop}
           />
+          <OpenCloseViewAllCandidatesButton />
         </div>
       </div>
 
-      <br />
-
       <Suspense fallback="Loading...">
-        <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-0 lg:space-x-0">
+        <div className="mt-8 md:mt-7 lg:mt-6 w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-0 lg:space-x-0">
           {/* PDF Viewer and Candidate Answers */}
           <div className="w-full md:w-3/5 lg:w-2/3">
             <div className="flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg md:mr-8 lg:mr-8">
@@ -1258,46 +1336,49 @@ const SingleCandidatePageContent = ({
                 </div>
               )}
               {candidateDetailToggleView === CandidateDetailToggleView.Notes && (
-                <div className="flex flex-col items-center">
-                  <Form
-                    subHeader="These notes are private to you"
-                    submitText="Save"
-                    initialValues={{
-                      note:
-                        candidate?.candidateUserNotes &&
-                        (candidate?.candidateUserNotes?.length || 0) > 0 &&
-                        candidate?.candidateUserNotes[0]?.note
-                          ? EditorState.createWithContent(
-                              convertFromRaw(candidate?.candidateUserNotes[0]?.note || {})
-                            )
-                          : EditorState.createEmpty(),
-                    }}
-                    schema={CandidateUserNoteObj}
-                    onSubmit={async (values) => {
-                      if (values.note) {
-                        values.note = convertToRaw(values?.note?.getCurrentContent() || {})
-                      }
+                <Form
+                  key={
+                    candidate?.candidateUserNotes &&
+                    (candidate?.candidateUserNotes?.length || 0) > 0
+                      ? candidate?.candidateUserNotes[0]?.id
+                      : "0"
+                  }
+                  subHeader="These notes are private to you"
+                  submitText="Save"
+                  initialValues={{
+                    note:
+                      candidate?.candidateUserNotes &&
+                      (candidate?.candidateUserNotes?.length || 0) > 0 &&
+                      candidate?.candidateUserNotes[0]?.note
+                        ? EditorState.createWithContent(
+                            convertFromRaw(candidate?.candidateUserNotes[0]?.note || {})
+                          )
+                        : EditorState.createEmpty(),
+                  }}
+                  schema={CandidateUserNoteObj}
+                  onSubmit={async (values) => {
+                    if (values.note) {
+                      values.note = convertToRaw(values?.note?.getCurrentContent() || {})
+                    }
 
-                      const toastId = toast.loading(() => <span>Saving Note</span>)
-                      try {
-                        await saveCandidateUserNoteMutation({
-                          candidateId: candidate?.id || "0",
-                          userId: session?.userId || "0",
-                          note: values.note,
-                        })
-                        await invalidateQuery(getCandidate)
-                        toast.success(() => "Note saved", { id: toastId })
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString()
-                        )
-                      }
-                    }}
-                  >
-                    <LabeledRichTextField name="note" />
-                  </Form>
-                </div>
+                    const toastId = toast.loading(() => <span>Saving Note</span>)
+                    try {
+                      await saveCandidateUserNoteMutation({
+                        candidateId: candidate?.id || "0",
+                        userId: session?.userId || "0",
+                        note: values.note,
+                      })
+                      await invalidateQuery(getCandidate)
+                      toast.success(() => "Note saved", { id: toastId })
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                      )
+                    }
+                  }}
+                >
+                  <LabeledRichTextField name="note" />
+                </Form>
               )}
             </div>
           </div>

@@ -354,7 +354,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
         })}
       </div>
       <div className="w-full flex items-center justify-center">
-        <div className="w-full p-3 border-2 border-theme-400 rounded">
+        <div className="w-full md:w-5/6 lg:w-4/5 p-3 border-2 border-theme-400 rounded">
           <Cards
             noSearch={true}
             cards={cards}
