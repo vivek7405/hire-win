@@ -12,6 +12,7 @@ import {
   useQuery,
   invalidateQuery,
   useSession,
+  Link,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -24,7 +25,13 @@ import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, CardType, ExtendedCandidate, ExtendedStage } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { CandidateActivityType, CandidateFile, JobUserRole, Stage } from "@prisma/client"
+import {
+  CandidateActivityType,
+  CandidateFile,
+  CandidateSource,
+  JobUserRole,
+  Stage,
+} from "@prisma/client"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
 import Form from "app/core/components/Form"
@@ -46,6 +53,8 @@ import {
   ColorSwatchIcon,
   DocumentAddIcon,
   DocumentRemoveIcon,
+  DotsVerticalIcon,
+  ExternalLinkIcon,
   MailIcon,
   MenuIcon,
   PencilAltIcon,
@@ -91,6 +100,7 @@ import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import CandidateSelection from "app/candidates/components/CandidateSelection"
 import getAllCandidatesByStage from "app/candidates/queries/getAllCandidatesByStage"
 import getJobStages from "app/stages/queries/getJobStages"
+import createCandidate from "app/candidates/mutations/createCandidate"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -282,6 +292,7 @@ const SingleCandidatePage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [selectedCandidateEmail, setSelectedCandidateEmail] = useState(candidateEmail)
   const [viewCandidateSelection, setViewCandidateSelection] = useState(false)
+  const [openNewCandidateModal, setOpenNewCandidateModal] = useState(false)
 
   const handleWindowSizeChange = () => {
     setViewCandidateSelection(false)
@@ -320,6 +331,7 @@ const SingleCandidatePage = ({
               stageId={stageId || "0"}
               selectedCandidateEmail={selectedCandidateEmail || "0"}
               setSelectedCandidateEmail={setSelectedCandidateEmail}
+              setOpenNewCandidateModal={setOpenNewCandidateModal}
             />
           </Suspense>
         </div>
@@ -333,6 +345,9 @@ const SingleCandidatePage = ({
           jobId={jobId as any}
           viewCandidateSelection={viewCandidateSelection}
           setViewCandidateSelection={setViewCandidateSelection}
+          openNewCandidateModal={openNewCandidateModal}
+          setOpenNewCandidateModal={setOpenNewCandidateModal}
+          setSelectedCandidateEmail={setSelectedCandidateEmail}
         />
       </Suspense>
     </AuthLayout>
@@ -343,15 +358,25 @@ const SingleCandidatePageContent = ({
   user,
   error,
   candidateEmail,
+  setSelectedCandidateEmail,
   jobId,
   viewCandidateSelection,
   setViewCandidateSelection,
+  openNewCandidateModal,
+  setOpenNewCandidateModal,
 }: InferGetServerSidePropsType<typeof getServerSideProps> & {
   viewCandidateSelection?: boolean
   setViewCandidateSelection?: any
+  openNewCandidateModal?: boolean
+  setOpenNewCandidateModal?: any
+  setSelectedCandidateEmail?: any
 }) => {
   const router = useRouter()
   const { menu, stage, view } = router.query
+  // const [selectedCandidateEmail, setSelectedCandidateEmail] = useState(candidateEmail)
+  // useEffect(() => {
+  //   setSelectedCandidateEmail(candidateEmail)
+  // }, [candidateEmail])
 
   enum CandidateDetailToggleView {
     Info = "Info",
@@ -384,8 +409,10 @@ const SingleCandidatePageContent = ({
   )
   // Change selected stage to candidate's current stage
   // when candidate is changed using candidate selection menu
+  // queryStage will be null when candidate is changed using selection menu
+  // but it will not be null otherwise
   useEffect(() => {
-    if (candidate.stageId !== selectedStage?.id) {
+    if (candidate.stageId !== queryStage?.id && candidate.stageId !== selectedStage?.id) {
       changeSelectedStage(queryStage || candidate.stage)
     }
   }, [candidate?.id])
@@ -440,6 +467,10 @@ const SingleCandidatePageContent = ({
   const [stagesOpenTablet, setStagesOpenTablet] = useState(false)
   const [stagesOpenDesktop, setStagesOpenDesktop] = useState(false)
 
+  const [ellipsesMenuOpenMobile, setEllipsesMenuOpenMobile] = useState(false)
+  const [ellipsesMenuOpenTablet, setEllipsesMenuOpenTablet] = useState(false)
+  const [ellipsesMenuOpenDesktop, setEllipsesMenuOpenDesktop] = useState(false)
+
   const [uploadFileOpen, setUploadFileOpen] = useState(false)
   const [fileToDelete, setFileToDelete] = useState(null as CandidateFile | null)
   const [openConfirm, setOpenConfirm] = useState(false)
@@ -468,6 +499,7 @@ const SingleCandidatePageContent = ({
   const [openEditModal, setOpenEditModal] = useState(false)
 
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
+  const [createCandidateMutation] = useMutation(createCandidate)
   const [updateCandidateMutation] = useMutation(updateCandidate)
   const [deleteCandidateFileMutation] = useMutation(deleteCandidateFile)
 
@@ -673,6 +705,86 @@ const SingleCandidatePageContent = ({
       </span>
     </div>
   )
+
+  const EllipsesMenu = ({ ellipsesMenuOpen, setEllipsesMenuOpen }) => {
+    return (
+      <DropdownMenu.Root modal={false} open={ellipsesMenuOpen} onOpenChange={setEllipsesMenuOpen}>
+        <DropdownMenu.Trigger
+          className="flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-theme-600 hover:text-theme-800"
+          disabled={
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.OWNER &&
+            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+              JobUserRole.ADMIN
+          }
+        >
+          <button
+            className="flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={
+              // selectedStage?.interviewDetails?.find(
+              //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
+              // )?.interviewerId !== user?.id &&
+              // interviewDetail?.interviewer?.id !== user?.id &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.OWNER &&
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+                JobUserRole.ADMIN
+            }
+          >
+            <DotsVerticalIcon className="h-6" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
+          <DropdownMenu.Arrow className="fill-current" offset={10} />
+          <DropdownMenu.Item
+            className="flex items-center text-left w-full whitespace-nowrap cursor-pointer px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+            onSelect={async (e) => {
+              e.preventDefault()
+              setEllipsesMenuOpen(false)
+            }}
+          >
+            {/* <span>View Job Listing</span>
+            <ExternalLinkIcon className="w-4 h-4 text-gray-500 ml-1" /> */}
+            <Link
+              prefetch={true}
+              href={
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                  JobUserRole.OWNER ||
+                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                  JobUserRole.ADMIN
+                  ? Routes.JobSettingsPage({ slug: candidate?.job?.slug! })
+                  : Routes.JobSettingsSchedulingPage({ slug: candidate?.job?.slug! })
+              }
+              passHref
+            >
+              <a>Go to Job Settings</a>
+            </Link>
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            className="flex text-left w-full whitespace-nowrap cursor-pointer px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+            onSelect={async (e) => {
+              e.preventDefault()
+              setEllipsesMenuOpen(false)
+            }}
+          >
+            <Link
+              prefetch={true}
+              href={Routes.JobDescriptionPage({
+                companySlug: candidate?.job?.company?.slug,
+                jobSlug: candidate?.job?.slug,
+              })}
+              passHref
+            >
+              <a target="_blank" rel="noopener noreferrer" className="flex items-center">
+                <span>View Job Listing</span>
+                <ExternalLinkIcon className="w-4 h-4 ml-1" />
+              </a>
+            </Link>
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    )
+  }
 
   const rejectCandidateButton = (
     <button
@@ -891,6 +1003,7 @@ const SingleCandidatePageContent = ({
   const OpenCloseViewAllCandidatesButton = () => {
     return viewCandidateSelection ? (
       <button
+        title="Close Candidate Selection"
         onClick={() => {
           setViewCandidateSelection(false)
         }}
@@ -899,6 +1012,7 @@ const SingleCandidatePageContent = ({
       </button>
     ) : (
       <button
+        title="Open Candidate Selection"
         onClick={() => {
           setViewCandidateSelection(true)
         }}
@@ -910,6 +1024,56 @@ const SingleCandidatePageContent = ({
 
   return (
     <>
+      <Modal
+        header={`New Candidate`}
+        open={openNewCandidateModal || false}
+        setOpen={setOpenNewCandidateModal}
+      >
+        <ApplicationForm
+          header={`New Candidate`}
+          subHeader=""
+          jobId={jobId || "0"}
+          preview={false}
+          onSubmit={async (values) => {
+            const toastId = toast.loading("Creating new Candidate")
+            try {
+              const newCandidate = await createCandidateMutation({
+                jobId: jobId || "0",
+                name: values.Name,
+                email: values.Email,
+                resume: values.Resume,
+                source: CandidateSource.Manual,
+                answers:
+                  candidate?.job?.formQuestions?.map((formQuestion) => {
+                    const val = values[formQuestion?.title] || ""
+                    return {
+                      formQuestionId: formQuestion.id,
+                      value: typeof val === "string" ? val : JSON.stringify(val),
+                    }
+                  }) || [],
+              })
+              await invalidateQuery(getJobStages)
+              await invalidateQuery(getAllCandidatesByStage)
+              setViewCandidateSelection(false)
+              router
+                .replace(
+                  Routes.SingleCandidatePage({
+                    slug: candidate?.job?.slug,
+                    candidateEmail: newCandidate?.email,
+                  })
+                )
+                .then(() => {
+                  setSelectedCandidateEmail(newCandidate.email)
+                })
+              toast.success(`New candidate created}`, { id: toastId })
+            } catch (error) {
+              toast.error("Something went wrong - " + error.toString(), { id: toastId })
+            }
+            setOpenNewCandidateModal(false)
+          }}
+        />
+      </Modal>
+
       <Modal header="Update Candidate" open={openEditModal} setOpen={setOpenEditModal}>
         <ApplicationForm
           header="Update Candidate"
@@ -1085,6 +1249,10 @@ const SingleCandidatePageContent = ({
         </div>
 
         <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {/* <EllipsesMenu
+            ellipsesMenuOpen={ellipsesMenuOpenMobile}
+            setEllipsesMenuOpen={setEllipsesMenuOpenMobile}
+          /> */}
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
         </div>
@@ -1113,6 +1281,10 @@ const SingleCandidatePageContent = ({
         </div>
 
         <div className="flex flex-nowrap items-center justify-center space-x-4">
+          {/* <EllipsesMenu
+            ellipsesMenuOpen={ellipsesMenuOpenTablet}
+            setEllipsesMenuOpen={setEllipsesMenuOpenTablet}
+          /> */}
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
           <MoveToNextStageButton
@@ -1136,6 +1308,10 @@ const SingleCandidatePageContent = ({
         </div>
 
         <div className="flex flex-nowrap items-center justify-end space-x-4">
+          {/* <EllipsesMenu
+            ellipsesMenuOpen={ellipsesMenuOpenDesktop}
+            setEllipsesMenuOpen={setEllipsesMenuOpenDesktop}
+          /> */}
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
           <MoveToNextStageButton

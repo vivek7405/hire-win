@@ -18,6 +18,7 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
             include: { interviewer: true, scoreCardQuestions: true, scores: true },
             orderBy: { order: "asc" },
           },
+          company: { select: { slug: true } },
         },
       },
       stage: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },

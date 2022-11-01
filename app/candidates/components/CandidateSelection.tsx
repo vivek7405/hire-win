@@ -142,12 +142,14 @@ type CandidateSelectionPropsType = {
   stageId: string
   selectedCandidateEmail: string
   setSelectedCandidateEmail: any
+  setOpenNewCandidateModal: any
 }
 const CandidateSelection = ({
   jobId,
   stageId,
   selectedCandidateEmail,
   setSelectedCandidateEmail,
+  setOpenNewCandidateModal,
 }: CandidateSelectionPropsType) => {
   const [selectedStageId, setSelectedStageId] = useState(stageId)
   const [viewRejected, setViewRejected] = useState(false)
@@ -156,7 +158,7 @@ const CandidateSelection = ({
 
   return (
     <div className="w-full h-full flex flex-col border-2 rounded-lg border-theme-400 bg-white">
-      <div className="w-full py-2 flex items-center justify-center border-b-2 border-theme-400">
+      <div className="w-full py-2 px-4 flex items-center justify-between border-b-2 border-theme-400">
         <Form noFormatting={true} onSubmit={async () => {}}>
           <LabeledToggleSwitch
             name="rejected"
@@ -167,6 +169,14 @@ const CandidateSelection = ({
             }}
           />
         </Form>
+        <button
+          onClick={() => {
+            setOpenNewCandidateModal(true)
+          }}
+          className="px-4 py-1 rounded-lg bg-theme-600 hover:bg-theme-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          New
+        </button>
       </div>
       <div className="w-full h-full flex">
         <div className="w-3/5 border-r-2 border-theme-400">

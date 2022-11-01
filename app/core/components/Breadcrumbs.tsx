@@ -18,8 +18,11 @@ export const Breadcrumbs = ({ ignore }: BreadcrumbsProps) => {
     linkPath.shift()
 
     const pathArray = linkPath.map((path, i) => {
+      const breadcrumbTitle = path.split("?")[0] as string
       return {
-        breadcrumb: path.split("?")[0] as string,
+        breadcrumb: breadcrumbTitle?.includes("@")
+          ? breadcrumbTitle
+          : breadcrumbTitle?.replaceAll("-", " "),
         href: "/" + linkPath.slice(0, i + 1).join("/"),
       }
     })
