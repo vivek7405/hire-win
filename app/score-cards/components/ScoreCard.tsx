@@ -111,6 +111,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
         testid="applicationScoreCard"
         header={props.header}
         subHeader={props.subHeader}
+        key={`${props.candidate?.id}-${props.stageId}`}
       >
         {data.map((question) => {
           if (question.behaviour === "OFF") {

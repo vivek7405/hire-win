@@ -8,11 +8,11 @@ interface GetCandidatePoolsWOPaginationInput
 const getCandidatePoolsWOPagination = resolver.pipe(
   resolver.authorize(),
   async ({ where }: GetCandidatePoolsWOPaginationInput) => {
-    const categories = await db.candidatePool.findMany({
+    const candidatePools = await db.candidatePool.findMany({
       where,
-      include: { _count: { select: { candidates: true } } },
+      include: { candidates: { select: { id: true } }, _count: { select: { candidates: true } } },
     })
-    return categories
+    return candidatePools
   }
 )
 

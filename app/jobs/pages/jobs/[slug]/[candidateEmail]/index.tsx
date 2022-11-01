@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react"
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -12,6 +12,7 @@ import {
   useQuery,
   invalidateQuery,
   useSession,
+  Link,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -24,7 +25,13 @@ import getCandidate from "app/candidates/queries/getCandidate"
 import { AttachmentObject, CardType, ExtendedCandidate, ExtendedStage } from "types"
 import axios from "axios"
 import PDFViewer from "app/core/components/PDFViewer"
-import { CandidateActivityType, CandidateFile, JobUserRole, Stage } from "@prisma/client"
+import {
+  CandidateActivityType,
+  CandidateFile,
+  CandidateSource,
+  JobUserRole,
+  Stage,
+} from "@prisma/client"
 import ScoreCard from "app/score-cards/components/ScoreCard"
 import toast from "react-hot-toast"
 import Form from "app/core/components/Form"
@@ -40,13 +47,18 @@ import {
   ChatAlt2Icon,
   ChatAltIcon,
   ChatIcon,
+  CheckIcon,
   ChevronDownIcon,
   ClockIcon,
+  CogIcon,
   CollectionIcon,
   ColorSwatchIcon,
   DocumentAddIcon,
   DocumentRemoveIcon,
+  DotsVerticalIcon,
+  ExternalLinkIcon,
   MailIcon,
+  MenuIcon,
   PencilAltIcon,
   ReceiptRefundIcon,
   RefreshIcon,
@@ -87,6 +99,13 @@ import { TerminalIcon, UserIcon } from "@heroicons/react/outline"
 import saveCandidateUserNote from "app/candidates/mutations/saveCandidateUserNote"
 import LabeledRichTextField from "app/core/components/LabeledRichTextField"
 import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
+import CandidateSelection from "app/candidates/components/CandidateSelection"
+import getAllCandidatesByStage from "app/candidates/queries/getAllCandidatesByStage"
+import getJobStages from "app/stages/queries/getJobStages"
+import createCandidate from "app/candidates/mutations/createCandidate"
+import { Fragment } from "react"
+import { Menu, Transition } from "@headlessui/react"
+import removeCandidateFromPool from "app/candidate-pools/mutations/removeCandidateFromPool"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -141,6 +160,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
             user: user,
             candidateEmail: candidate?.email as string,
             jobId: candidate?.jobId,
+            stageId: candidate?.stageId,
             // candidate: candidate,
           },
         }
@@ -273,7 +293,31 @@ const SingleCandidatePage = ({
   error,
   candidateEmail,
   jobId,
+  stageId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [selectedCandidateEmail, setSelectedCandidateEmail] = useState(candidateEmail)
+  const [viewCandidateSelection, setViewCandidateSelection] = useState(false)
+  const [openNewCandidateModal, setOpenNewCandidateModal] = useState(false)
+
+  const handleWindowSizeChange = () => {
+    setViewCandidateSelection(false)
+  }
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowSizeChange)
+    return () => window.removeEventListener("resize", handleWindowSizeChange)
+  }, [])
+
+  // const viewAllCandidatesRef = useRef(null)
+  // const handleClick = (event) => {
+  //   if (viewAllCandidatesRef && !(viewAllCandidatesRef?.current as any)?.contains(event.target)) {
+  //     setViewCandidateSelection(false)
+  //   }
+  // }
+  // useEffect(() => {
+  //   window.addEventListener("mousedown", handleClick)
+  //   return () => window.removeEventListener("mousedown", handleClick)
+  // }, [])
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -281,13 +325,39 @@ const SingleCandidatePage = ({
   return (
     <AuthLayout user={user}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
+      {viewCandidateSelection && (
+        <div
+          // ref={viewAllCandidatesRef}
+          className="md:mt-56 lg:mt-24 absolute right-7 w-1/6 md:w-2/5 lg:w-1/3 h-screen z-10"
+        >
+          <Suspense fallback="Loading...">
+            <CandidateSelection
+              jobId={jobId || "0"}
+              stageId={stageId || "0"}
+              selectedCandidateEmail={selectedCandidateEmail || "0"}
+              setSelectedCandidateEmail={setSelectedCandidateEmail}
+              setOpenNewCandidateModal={setOpenNewCandidateModal}
+              canAddNewCandidate={
+                user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                  JobUserRole.OWNER ||
+                user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role === JobUserRole.ADMIN
+              }
+            />
+          </Suspense>
+        </div>
+      )}
       <br />
       <Suspense fallback="Loading...">
         <SingleCandidatePageContent
           user={user as any}
           error={error as any}
-          candidateEmail={candidateEmail as any}
-          jobId={jobId}
+          candidateEmail={selectedCandidateEmail as any}
+          jobId={jobId as any}
+          viewCandidateSelection={viewCandidateSelection}
+          setViewCandidateSelection={setViewCandidateSelection}
+          openNewCandidateModal={openNewCandidateModal}
+          setOpenNewCandidateModal={setOpenNewCandidateModal}
+          setSelectedCandidateEmail={setSelectedCandidateEmail}
         />
       </Suspense>
     </AuthLayout>
@@ -298,10 +368,25 @@ const SingleCandidatePageContent = ({
   user,
   error,
   candidateEmail,
+  setSelectedCandidateEmail,
   jobId,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  viewCandidateSelection,
+  setViewCandidateSelection,
+  openNewCandidateModal,
+  setOpenNewCandidateModal,
+}: InferGetServerSidePropsType<typeof getServerSideProps> & {
+  viewCandidateSelection?: boolean
+  setViewCandidateSelection?: any
+  openNewCandidateModal?: boolean
+  setOpenNewCandidateModal?: any
+  setSelectedCandidateEmail?: any
+}) => {
   const router = useRouter()
   const { menu, stage, view } = router.query
+  // const [selectedCandidateEmail, setSelectedCandidateEmail] = useState(candidateEmail)
+  // useEffect(() => {
+  //   setSelectedCandidateEmail(candidateEmail)
+  // }, [candidateEmail])
 
   enum CandidateDetailToggleView {
     Info = "Info",
@@ -329,11 +414,20 @@ const SingleCandidatePageContent = ({
   const [saveCandidateUserNoteMutation] = useMutation(saveCandidateUserNote)
 
   const queryStage = candidate?.job?.stages?.find((stg) => stg.name === stage)
-
   const [selectedStage, setSelectedStage] = useState(
     (queryStage || candidate?.stage) as ExtendedStage | null | undefined
   )
-  const shiftStage = (stg) => {
+  // Change selected stage to candidate's current stage
+  // when candidate is changed using candidate selection menu
+  // queryStage will be null when candidate is changed using selection menu
+  // but it will not be null otherwise
+  useEffect(() => {
+    if (candidate.stageId !== queryStage?.id && candidate.stageId !== selectedStage?.id) {
+      changeSelectedStage(queryStage || candidate.stage)
+    }
+  }, [candidate?.id])
+
+  const changeSelectedStage = (stg) => {
     setSelectedStage(stg)
     router.replace({
       query: {
@@ -371,9 +465,10 @@ const SingleCandidatePageContent = ({
   const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [candidatePools] = useQuery(getCandidatePoolsWOPagination, {
-    where: { companyId: session.companyId || "0", candidates: { none: { id: candidate?.id } } },
+    where: { companyId: session.companyId || "0" },
   })
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
+  const [removeCandidateFromPoolMutation] = useMutation(removeCandidateFromPool)
 
   const [candidatePoolsOpenMobile, setCandidatePoolsOpenMobile] = useState(false)
   const [candidatePoolsOpenTablet, setCandidatePoolsOpenTablet] = useState(false)
@@ -396,6 +491,8 @@ const SingleCandidatePageContent = ({
         const file = response?.data?.Body
         setFile(file)
       })
+    } else {
+      setFile(null)
     }
   }, [resume.key])
 
@@ -409,8 +506,14 @@ const SingleCandidatePageContent = ({
   const [openEditModal, setOpenEditModal] = useState(false)
 
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
+  const [createCandidateMutation] = useMutation(createCandidate)
   const [updateCandidateMutation] = useMutation(updateCandidate)
   const [deleteCandidateFileMutation] = useMutation(deleteCandidateFile)
+
+  const [candidateInterviewer] = useQuery(getCandidateInterviewer, {
+    candidateId: candidate?.id || "0",
+    stageId: candidate?.stageId || "0",
+  })
 
   // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
   //   where: { candidateId: candidate.id, workflowStageId: selectedStage?.id },
@@ -581,13 +684,14 @@ const SingleCandidatePageContent = ({
       onSubmit={async () => {
         return
       }}
+      key={candidate.id}
     >
       <LabeledRatingField
         name="candidateAverageRating"
         ratingClass={`!flex items-center`}
         height={8}
         color={candidate?.rejected ? "red" : "theme"}
-        value={Math.round(getScoreAverage(candidate?.scores?.map((score) => score.rating) || []))}
+        value={getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])}
         disabled={true}
       />
     </Form>
@@ -595,65 +699,209 @@ const SingleCandidatePageContent = ({
 
   const candidateStageAndInterviewerDiv = (
     <div className="px-3 py-1 rounded-lg border-2 border-theme-600 text-theme-700 font-semibold flex items-center justify-center space-x-2">
-      <span>{candidate?.stage?.name}</span>
+      <span>
+        {(candidate?.stage?.name || "")?.length > 10
+          ? `${candidate?.stage?.name?.replace(/ .*/, "")?.substring(0, 10)}...`
+          : candidate?.stage?.name}
+      </span>
       <ArrowRightIcon className="w-4 h-4" />
-      <span>{candidate?.stage?.interviewer?.name}</span>
+      <span>
+        {(candidateInterviewer?.name || "")?.replace(/ .*/, "")?.length > 10
+          ? `${candidateInterviewer?.name?.replace(/ .*/, "")?.substring(0, 10)}...`
+          : candidateInterviewer?.name?.replace(/ .*/, "")}
+      </span>
     </div>
   )
 
-  const rejectCandidateButton = (
-    <button
-      title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
-      className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-      disabled={
-        // interviewDetail?.interviewer?.id !== user?.id &&
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.OWNER &&
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.ADMIN
-      }
-      onClick={(e) => {
-        e.preventDefault()
-        setCandidateToReject(candidate)
-        setOpenCandidateRejectConfirm(true)
-      }}
-    >
-      {candidate?.rejected ? <RefreshIcon className="w-6 h-6" /> : <BanIcon className="w-6 h-6" />}
-    </button>
-  )
+  function classNames(...classes) {
+    return classes.filter(Boolean).join(" ")
+  }
 
-  const updateCandidateDetailsButton = (
-    <button
-      title="Update Candidate Details"
-      className="float-right underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
-      disabled={
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.OWNER &&
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.ADMIN
-      }
-      data-testid={`${candidate?.id}-settingsLink`}
-      onClick={(e) => {
-        e.preventDefault()
-        setOpenEditModal(true)
-      }}
-    >
-      <PencilAltIcon className="h-6 w-6" />
-    </button>
-  )
+  function PopMenu() {
+    return (
+      <Menu as="div" className="relative inline-block text-left">
+        <div>
+          <Menu.Button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
+            <DotsVerticalIcon className="h-6" aria-hidden="true" />
+          </Menu.Button>
+        </div>
+
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            {(user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+              JobUserRole.OWNER ||
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                JobUserRole.ADMIN) && (
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setCandidateToReject(candidate)
+                        setOpenCandidateRejectConfirm(true)
+                      }}
+                    >
+                      {candidate?.rejected ? (
+                        <span className="flex items-center space-x-2">
+                          <RefreshIcon className="w-5 h-5 text-red-600" />
+                          <span>Restore Candidate</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center space-x-2">
+                          <BanIcon className="w-5 h-5 text-red-600" />
+                          <span>Reject Candidate</span>
+                        </span>
+                      )}
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setOpenEditModal(true)
+                      }}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <PencilAltIcon className="w-5 h-5 text-theme-600" />
+                        <span>Edit Candidate</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+            )}
+            <div className="py-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
+                    )}
+                  >
+                    <Link
+                      prefetch={true}
+                      href={Routes.JobDescriptionPage({
+                        companySlug: candidate?.job?.company?.slug,
+                        jobSlug: candidate?.job?.slug,
+                      })}
+                      passHref
+                    >
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2"
+                      >
+                        <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
+                        <span>View Job Listing</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
+                    )}
+                  >
+                    <Link
+                      prefetch={true}
+                      href={
+                        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                          JobUserRole.OWNER ||
+                        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                          JobUserRole.ADMIN
+                          ? Routes.JobSettingsPage({ slug: candidate?.job?.slug! })
+                          : Routes.JobSettingsSchedulingPage({ slug: candidate?.job?.slug! })
+                      }
+                      passHref
+                    >
+                      <a className="flex items-center space-x-2">
+                        <CogIcon className="w-5 h-5 text-neutral-500" />
+                        <span>Go to Job Settings</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+            </div>
+          </Menu.Items>
+        </Transition>
+      </Menu>
+    )
+  }
+
+  // const rejectCandidateButton = (
+  //   <button
+  //     title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
+  //     className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+  //     disabled={
+  //       // interviewDetail?.interviewer?.id !== user?.id &&
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.OWNER &&
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.ADMIN
+  //     }
+  //     onClick={(e) => {
+  //       e.preventDefault()
+  //       setCandidateToReject(candidate)
+  //       setOpenCandidateRejectConfirm(true)
+  //     }}
+  //   >
+  //     {candidate?.rejected ? <RefreshIcon className="w-6 h-6" /> : <BanIcon className="w-6 h-6" />}
+  //   </button>
+  // )
+
+  // const updateCandidateDetailsButton = (
+  //   <button
+  //     title="Update Candidate Details"
+  //     className="float-right underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+  //     disabled={
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.OWNER &&
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.ADMIN
+  //     }
+  //     data-testid={`${candidate?.id}-settingsLink`}
+  //     onClick={(e) => {
+  //       e.preventDefault()
+  //       setOpenEditModal(true)
+  //     }}
+  //   >
+  //     <PencilAltIcon className="h-6 w-6" />
+  //   </button>
+  // )
 
   const MoveToNextStageButton = ({ stagesOpen, setStagesOpen }) => {
-    return (
+    return user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+      JobUserRole.OWNER ||
+      user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+        JobUserRole.ADMIN ? (
       <div className="cursor-pointer flex justify-center">
         <button
-          className="text-white bg-theme-600 px-3 py-2 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-          disabled={
-            // interviewDetail?.interviewer?.id !== user?.id &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.OWNER &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.ADMIN
-          }
+          className="text-white bg-theme-600 px-4 py-2 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
           onClick={async (e) => {
             e.preventDefault()
 
@@ -670,29 +918,15 @@ const SingleCandidatePageContent = ({
           Move to{" "}
           {(candidate?.stage?.order || 0) === (candidate?.job?.stages?.length || 0)
             ? "Next Stage"
+            : (candidate?.job?.stages[candidate?.stage?.order || 0]?.name || "")?.length > 10
+            ? `${candidate?.job?.stages[candidate?.stage?.order || 0]?.name
+                ?.replace(/ .*/, "")
+                ?.substring(0, 10)}...`
             : candidate?.job?.stages[candidate?.stage?.order || 0]?.name}
         </button>
         <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
-          <DropdownMenu.Trigger
-            className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
-            disabled={
-              // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.OWNER &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.ADMIN
-            }
-          >
-            <button
-              className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={
-                // interviewDetail?.interviewer?.id !== user?.id &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  JobUserRole.OWNER &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  JobUserRole.ADMIN
-              }
-            >
+          <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none">
+            <button className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
               <ChevronDownIcon className="w-5 h-5" />
             </button>
           </DropdownMenu.Trigger>
@@ -724,7 +958,7 @@ const SingleCandidatePageContent = ({
                       setOpenCandidateMoveConfirm(true)
                     }
                   }}
-                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-500"
                 >
                   {stage?.name?.length > 30 ? `${stage?.name?.substring(0, 30)}...` : stage?.name}
                 </DropdownMenu.Item>
@@ -733,39 +967,24 @@ const SingleCandidatePageContent = ({
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </div>
+    ) : (
+      <></>
     )
   }
 
   const AddToPoolButton = ({ candidatePoolsOpen, setCandidatePoolsOpen }) => {
-    return (
+    return user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+      JobUserRole.OWNER ||
+      user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+        JobUserRole.ADMIN ? (
       <DropdownMenu.Root
         modal={false}
         open={candidatePoolsOpen}
         onOpenChange={setCandidatePoolsOpen}
       >
-        <DropdownMenu.Trigger
-          className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
-          disabled={
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.OWNER &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.ADMIN
-          }
-        >
-          <button
-            className="flex px-2 py-1 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            disabled={
-              // selectedStage?.interviewDetails?.find(
-              //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-              // )?.interviewerId !== user?.id &&
-              // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.OWNER &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.ADMIN
-            }
-          >
-            Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
+        <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 hover:bg-theme-700 rounded-sm flex justify-center items-center focus:outline-none">
+          <button className="flex pl-4 pr-3 py-2 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+            Pools <ChevronDownIcon className="w-5 h-5 ml-1" />
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
@@ -786,13 +1005,33 @@ const SingleCandidatePageContent = ({
               <DropdownMenu.Item
                 key={cp.id}
                 onSelect={async (e) => {
+                  const isRemove = !!cp.candidates.find((c) => c.id === candidate.id)
+
                   e.preventDefault()
-                  const toastId = toast.loading(`Adding candidate to pool - ${cp.name}`)
+                  const toastId = toast.loading(
+                    `${isRemove ? "Removing candidate from" : "Adding candidate to"} pool "${
+                      cp.name
+                    }"`
+                  )
                   try {
-                    await addCandidateToPoolMutation({ candidateId: candidate?.id, poolId: cp.id })
+                    if (isRemove) {
+                      await removeCandidateFromPoolMutation({
+                        candidateId: candidate.id,
+                        candidatePoolSlug: cp.slug,
+                      })
+                      invalidateQuery(getCandidate)
+                    } else {
+                      await addCandidateToPoolMutation({
+                        candidateId: candidate?.id,
+                        poolId: cp.id,
+                      })
+                    }
                     invalidateQuery(getCandidatePoolsWOPagination)
                     invalidateQuery(getCandidate)
-                    toast.success(`Candidate added to pool - ${cp.name}`, { id: toastId })
+                    toast.success(
+                      `Candidate ${isRemove ? "removed from" : "added to"} pool "${cp.name}"`,
+                      { id: toastId }
+                    )
                   } catch (error) {
                     toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
                       id: toastId,
@@ -800,19 +1039,98 @@ const SingleCandidatePageContent = ({
                   }
                   setCandidatePoolsOpen(false)
                 }}
-                className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-500"
               >
-                {cp.name?.length > 30 ? `${cp.name?.substring(0, 30)}...` : cp.name}
+                {cp.candidates.find((c) => c.id === candidate.id) ? (
+                  <CheckIcon className="w-5 h-5 text-theme-600" />
+                ) : (
+                  <div className="w-5 h-5"></div>
+                )}
+                <span>{cp.name?.length > 30 ? `${cp.name?.substring(0, 30)}...` : cp.name}</span>
               </DropdownMenu.Item>
             )
           })}
         </DropdownMenu.Content>
       </DropdownMenu.Root>
+    ) : (
+      <></>
+    )
+  }
+
+  const OpenCloseViewAllCandidatesButton = () => {
+    return viewCandidateSelection ? (
+      <button
+        title="Close Candidate Selection"
+        onClick={() => {
+          setViewCandidateSelection(false)
+        }}
+      >
+        <XIcon className="w-6 h-6 text-theme-600 hover:text-theme-800" />
+      </button>
+    ) : (
+      <button
+        title="Open Candidate Selection"
+        onClick={() => {
+          setViewCandidateSelection(true)
+        }}
+      >
+        <MenuIcon className="w-6 h-6 text-theme-600 hover:text-theme-800" />
+      </button>
     )
   }
 
   return (
     <>
+      <Modal
+        header={`New Candidate`}
+        open={openNewCandidateModal || false}
+        setOpen={setOpenNewCandidateModal}
+      >
+        <ApplicationForm
+          header={`New Candidate`}
+          subHeader=""
+          jobId={jobId || "0"}
+          preview={false}
+          onSubmit={async (values) => {
+            const toastId = toast.loading("Creating new Candidate")
+            try {
+              const newCandidate = await createCandidateMutation({
+                jobId: jobId || "0",
+                name: values.Name,
+                email: values.Email,
+                resume: values.Resume,
+                source: CandidateSource.Manual,
+                answers:
+                  candidate?.job?.formQuestions?.map((formQuestion) => {
+                    const val = values[formQuestion?.title] || ""
+                    return {
+                      formQuestionId: formQuestion.id,
+                      value: typeof val === "string" ? val : JSON.stringify(val),
+                    }
+                  }) || [],
+              })
+              await invalidateQuery(getJobStages)
+              await invalidateQuery(getAllCandidatesByStage)
+              setViewCandidateSelection(false)
+              router
+                .replace(
+                  Routes.SingleCandidatePage({
+                    slug: candidate?.job?.slug,
+                    candidateEmail: newCandidate?.email,
+                  })
+                )
+                .then(() => {
+                  setSelectedCandidateEmail(newCandidate.email)
+                })
+              toast.success(`New candidate created}`, { id: toastId })
+            } catch (error) {
+              toast.error("Something went wrong - " + error.toString(), { id: toastId })
+            }
+            setOpenNewCandidateModal(false)
+          }}
+        />
+      </Modal>
+
       <Modal header="Update Candidate" open={openEditModal} setOpen={setOpenEditModal}>
         <ApplicationForm
           header="Update Candidate"
@@ -844,11 +1162,9 @@ const SingleCandidatePageContent = ({
                 },
               })
               toast.success(`Candidate updated`, { id: toastId })
-              if (updatedCandidate?.email === candidate?.email) {
-                await invalidateQuery(getCandidate)
-                setOpenEditModal(false)
-              } else {
-                setOpenEditModal(false)
+              await invalidateQuery(getCandidate)
+              setOpenEditModal(false)
+              if (updatedCandidate?.email !== candidate?.email) {
                 router.replace(
                   Routes.SingleCandidatePage({
                     slug: candidate?.job?.slug,
@@ -888,6 +1204,8 @@ const SingleCandidatePageContent = ({
               //   resume: candidate?.resume!,
               // })
               invalidateQuery(getCandidate)
+              invalidateQuery(getJobStages)
+              invalidateQuery(getAllCandidatesByStage)
             }
             toast.success(`Candidate ${candidateToReject?.rejected ? "Restored" : "Rejected"}`, {
               id: toastId,
@@ -908,7 +1226,7 @@ const SingleCandidatePageContent = ({
       <Confirm
         open={openCandidateMoveConfirm}
         setOpen={setOpenCandidateMoveConfirm}
-        header={`Move Candidate - ${candidateToMove?.name} - to ${
+        header={`Move Candidate ${candidateToMove?.name} to ${
           moveToStage ? moveToStage?.name : "next"
         } stage`}
         onSuccess={async () => {
@@ -928,8 +1246,10 @@ const SingleCandidatePageContent = ({
               stages?.find((stage) => stage.id === candidateToMove.stageId)?.order || 0
             const nextStage = stages?.find((stage) => stage.order === currentStageOrder + 1)
             await updateCandidateStg(candidateToMove, moveToStage?.id || nextStage?.id)
-            shiftStage(moveToStage || nextStage)
+            changeSelectedStage(moveToStage || nextStage)
             invalidateQuery(getCandidateInterviewsByStage)
+            invalidateQuery(getAllCandidatesByStage)
+            invalidateQuery(getJobStages)
             setOpenCandidateMoveConfirm(false)
             setCandidateToMove(null)
             setMoveToStage(null)
@@ -983,12 +1303,13 @@ const SingleCandidatePageContent = ({
           {candidateStageAndInterviewerDiv}
         </div>
 
-        <div className="flex flex-nowrap items-center justify-center space-x-4">
+        {/* <div className="flex flex-nowrap items-center justify-center space-x-4">
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
-        </div>
+        </div> */}
 
         <div className="flex flex-nowrap items-center justify-center space-x-4">
+          <PopMenu />
           <MoveToNextStageButton
             stagesOpen={stagesOpenMobile}
             setStagesOpen={setStagesOpenMobile}
@@ -1012,8 +1333,9 @@ const SingleCandidatePageContent = ({
         </div>
 
         <div className="flex flex-nowrap items-center justify-center space-x-4">
-          {rejectCandidateButton}
-          {updateCandidateDetailsButton}
+          <PopMenu />
+          {/* {rejectCandidateButton}
+          {updateCandidateDetailsButton} */}
           <MoveToNextStageButton
             stagesOpen={stagesOpenTablet}
             setStagesOpen={setStagesOpenTablet}
@@ -1022,6 +1344,7 @@ const SingleCandidatePageContent = ({
             candidatePoolsOpen={candidatePoolsOpenTablet}
             setCandidatePoolsOpen={setCandidatePoolsOpenTablet}
           />
+          <OpenCloseViewAllCandidatesButton />
         </div>
       </div>
 
@@ -1034,8 +1357,9 @@ const SingleCandidatePageContent = ({
         </div>
 
         <div className="flex flex-nowrap items-center justify-end space-x-4">
-          {rejectCandidateButton}
-          {updateCandidateDetailsButton}
+          <PopMenu />
+          {/* {rejectCandidateButton}
+          {updateCandidateDetailsButton} */}
           <MoveToNextStageButton
             stagesOpen={stagesOpenDesktop}
             setStagesOpen={setStagesOpenDesktop}
@@ -1044,13 +1368,12 @@ const SingleCandidatePageContent = ({
             candidatePoolsOpen={candidatePoolsOpenDesktop}
             setCandidatePoolsOpen={setCandidatePoolsOpenDesktop}
           />
+          <OpenCloseViewAllCandidatesButton />
         </div>
       </div>
 
-      <br />
-
       <Suspense fallback="Loading...">
-        <div className="w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-0 lg:space-x-0">
+        <div className="mt-8 md:mt-7 lg:mt-6 w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-0 lg:space-x-0">
           {/* PDF Viewer and Candidate Answers */}
           <div className="w-full md:w-3/5 lg:w-2/3">
             <div className="flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg md:mr-8 lg:mr-8">
@@ -1258,46 +1581,49 @@ const SingleCandidatePageContent = ({
                 </div>
               )}
               {candidateDetailToggleView === CandidateDetailToggleView.Notes && (
-                <div className="flex flex-col items-center">
-                  <Form
-                    subHeader="These notes are private to you"
-                    submitText="Save"
-                    initialValues={{
-                      note:
-                        candidate?.candidateUserNotes &&
-                        (candidate?.candidateUserNotes?.length || 0) > 0 &&
-                        candidate?.candidateUserNotes[0]?.note
-                          ? EditorState.createWithContent(
-                              convertFromRaw(candidate?.candidateUserNotes[0]?.note || {})
-                            )
-                          : EditorState.createEmpty(),
-                    }}
-                    schema={CandidateUserNoteObj}
-                    onSubmit={async (values) => {
-                      if (values.note) {
-                        values.note = convertToRaw(values?.note?.getCurrentContent() || {})
-                      }
+                <Form
+                  key={
+                    candidate?.candidateUserNotes &&
+                    (candidate?.candidateUserNotes?.length || 0) > 0
+                      ? candidate?.candidateUserNotes[0]?.id
+                      : "0"
+                  }
+                  subHeader="These notes are private to you"
+                  submitText="Save"
+                  initialValues={{
+                    note:
+                      candidate?.candidateUserNotes &&
+                      (candidate?.candidateUserNotes?.length || 0) > 0 &&
+                      candidate?.candidateUserNotes[0]?.note
+                        ? EditorState.createWithContent(
+                            convertFromRaw(candidate?.candidateUserNotes[0]?.note || {})
+                          )
+                        : EditorState.createEmpty(),
+                  }}
+                  schema={CandidateUserNoteObj}
+                  onSubmit={async (values) => {
+                    if (values.note) {
+                      values.note = convertToRaw(values?.note?.getCurrentContent() || {})
+                    }
 
-                      const toastId = toast.loading(() => <span>Saving Note</span>)
-                      try {
-                        await saveCandidateUserNoteMutation({
-                          candidateId: candidate?.id || "0",
-                          userId: session?.userId || "0",
-                          note: values.note,
-                        })
-                        await invalidateQuery(getCandidate)
-                        toast.success(() => "Note saved", { id: toastId })
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString()
-                        )
-                      }
-                    }}
-                  >
-                    <LabeledRichTextField name="note" />
-                  </Form>
-                </div>
+                    const toastId = toast.loading(() => <span>Saving Note</span>)
+                    try {
+                      await saveCandidateUserNoteMutation({
+                        candidateId: candidate?.id || "0",
+                        userId: session?.userId || "0",
+                        note: values.note,
+                      })
+                      await invalidateQuery(getCandidate)
+                      toast.success(() => "Note saved", { id: toastId })
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                      )
+                    }
+                  }}
+                >
+                  <LabeledRichTextField name="note" />
+                </Form>
               )}
             </div>
           </div>
@@ -1321,7 +1647,7 @@ const SingleCandidatePageContent = ({
                           selectedStage?.id === stage.id ? "!bg-theme-500 !text-white" : ""
                         } whitespace-nowrap`}
                         onClick={() => {
-                          shiftStage(stage)
+                          changeSelectedStage(stage)
                           invalidateQuery(getCandidateInterviewsByStage)
                           // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
                         }}
@@ -1368,7 +1694,7 @@ const SingleCandidatePageContent = ({
                       //   //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                       //   // )?.interviewerId !== user?.id
                       // }
-                      key={selectedStage?.id}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
                       candidate={candidate}
                       header="Score Card"
                       // subHeader={`${
@@ -1448,6 +1774,7 @@ const SingleCandidatePageContent = ({
                       user={user}
                       stageId={selectedStage?.id || "0"}
                       candidate={candidate}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
                     />
                   )}
                   {candidateStageToggleView === CandidateStageToggleView.Comments && (
@@ -1455,10 +1782,16 @@ const SingleCandidatePageContent = ({
                       user={user}
                       stageId={selectedStage?.id || "0"}
                       candidate={candidate}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
                     />
                   )}
                   {candidateStageToggleView === CandidateStageToggleView.Emails && (
-                    <Emails user={user} stageId={selectedStage?.id || "0"} candidate={candidate} />
+                    <Emails
+                      user={user}
+                      stageId={selectedStage?.id || "0"}
+                      candidate={candidate}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
+                    />
                   )}
                 </Suspense>
               </div>

@@ -81,11 +81,12 @@ const Interviews = ({ user, stageId, candidate }) => {
         <div className="flex items-center justify-center space-x-2">
           <label className="text-neutral-600">Interviewer:</label>
           <select
-            className="border border-gray-300 px-2 py-1 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            className="border border-gray-300 px-2 py-1 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed truncate pr-7"
             name="interviewerId"
             placeholder={`Interviewer for ${stage?.name}`}
             disabled={
-              jobUsers?.users?.find((usr) => usr.id === session.userId)?.role === JobUserRole.USER
+              jobUsers?.users?.find((jobUser) => jobUser.userId === session.userId)?.role ===
+              JobUserRole.USER
             }
             value={interviewer?.id?.toString()}
             onChange={async (e) => {
