@@ -85,7 +85,8 @@ const Interviews = ({ user, stageId, candidate }) => {
             name="interviewerId"
             placeholder={`Interviewer for ${stage?.name}`}
             disabled={
-              jobUsers?.users?.find((usr) => usr.id === session.userId)?.role === JobUserRole.USER
+              jobUsers?.users?.find((jobUser) => jobUser.userId === session.userId)?.role ===
+              JobUserRole.USER
             }
             value={interviewer?.id?.toString()}
             onChange={async (e) => {

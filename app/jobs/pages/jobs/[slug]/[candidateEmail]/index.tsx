@@ -47,8 +47,10 @@ import {
   ChatAlt2Icon,
   ChatAltIcon,
   ChatIcon,
+  CheckIcon,
   ChevronDownIcon,
   ClockIcon,
+  CogIcon,
   CollectionIcon,
   ColorSwatchIcon,
   DocumentAddIcon,
@@ -101,6 +103,9 @@ import CandidateSelection from "app/candidates/components/CandidateSelection"
 import getAllCandidatesByStage from "app/candidates/queries/getAllCandidatesByStage"
 import getJobStages from "app/stages/queries/getJobStages"
 import createCandidate from "app/candidates/mutations/createCandidate"
+import { Fragment } from "react"
+import { Menu, Transition } from "@headlessui/react"
+import removeCandidateFromPool from "app/candidate-pools/mutations/removeCandidateFromPool"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -332,6 +337,11 @@ const SingleCandidatePage = ({
               selectedCandidateEmail={selectedCandidateEmail || "0"}
               setSelectedCandidateEmail={setSelectedCandidateEmail}
               setOpenNewCandidateModal={setOpenNewCandidateModal}
+              canAddNewCandidate={
+                user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                  JobUserRole.OWNER ||
+                user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role === JobUserRole.ADMIN
+              }
             />
           </Suspense>
         </div>
@@ -455,9 +465,10 @@ const SingleCandidatePageContent = ({
   const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
   const [candidatePools] = useQuery(getCandidatePoolsWOPagination, {
-    where: { companyId: session.companyId || "0", candidates: { none: { id: candidate?.id } } },
+    where: { companyId: session.companyId || "0" },
   })
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
+  const [removeCandidateFromPoolMutation] = useMutation(removeCandidateFromPool)
 
   const [candidatePoolsOpenMobile, setCandidatePoolsOpenMobile] = useState(false)
   const [candidatePoolsOpenTablet, setCandidatePoolsOpenTablet] = useState(false)
@@ -466,10 +477,6 @@ const SingleCandidatePageContent = ({
   const [stagesOpenMobile, setStagesOpenMobile] = useState(false)
   const [stagesOpenTablet, setStagesOpenTablet] = useState(false)
   const [stagesOpenDesktop, setStagesOpenDesktop] = useState(false)
-
-  const [ellipsesMenuOpenMobile, setEllipsesMenuOpenMobile] = useState(false)
-  const [ellipsesMenuOpenTablet, setEllipsesMenuOpenTablet] = useState(false)
-  const [ellipsesMenuOpenDesktop, setEllipsesMenuOpenDesktop] = useState(false)
 
   const [uploadFileOpen, setUploadFileOpen] = useState(false)
   const [fileToDelete, setFileToDelete] = useState(null as CandidateFile | null)
@@ -706,139 +713,195 @@ const SingleCandidatePageContent = ({
     </div>
   )
 
-  const EllipsesMenu = ({ ellipsesMenuOpen, setEllipsesMenuOpen }) => {
+  function classNames(...classes) {
+    return classes.filter(Boolean).join(" ")
+  }
+
+  function PopMenu() {
     return (
-      <DropdownMenu.Root modal={false} open={ellipsesMenuOpen} onOpenChange={setEllipsesMenuOpen}>
-        <DropdownMenu.Trigger
-          className="flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed text-theme-600 hover:text-theme-800"
-          disabled={
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.OWNER &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.ADMIN
-          }
+      <Menu as="div" className="relative inline-block text-left">
+        <div>
+          <Menu.Button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
+            <DotsVerticalIcon className="h-6" aria-hidden="true" />
+          </Menu.Button>
+        </div>
+
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
         >
-          <button
-            className="flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={
-              // selectedStage?.interviewDetails?.find(
-              //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-              // )?.interviewerId !== user?.id &&
-              // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.OWNER &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.ADMIN
-            }
-          >
-            <DotsVerticalIcon className="h-6" />
-          </button>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-          <DropdownMenu.Arrow className="fill-current" offset={10} />
-          <DropdownMenu.Item
-            className="flex items-center text-left w-full whitespace-nowrap cursor-pointer px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
-            onSelect={async (e) => {
-              e.preventDefault()
-              setEllipsesMenuOpen(false)
-            }}
-          >
-            {/* <span>View Job Listing</span>
-            <ExternalLinkIcon className="w-4 h-4 text-gray-500 ml-1" /> */}
-            <Link
-              prefetch={true}
-              href={
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-                  JobUserRole.OWNER ||
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-                  JobUserRole.ADMIN
-                  ? Routes.JobSettingsPage({ slug: candidate?.job?.slug! })
-                  : Routes.JobSettingsSchedulingPage({ slug: candidate?.job?.slug! })
-              }
-              passHref
-            >
-              <a>Go to Job Settings</a>
-            </Link>
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            className="flex text-left w-full whitespace-nowrap cursor-pointer px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
-            onSelect={async (e) => {
-              e.preventDefault()
-              setEllipsesMenuOpen(false)
-            }}
-          >
-            <Link
-              prefetch={true}
-              href={Routes.JobDescriptionPage({
-                companySlug: candidate?.job?.company?.slug,
-                jobSlug: candidate?.job?.slug,
-              })}
-              passHref
-            >
-              <a target="_blank" rel="noopener noreferrer" className="flex items-center">
-                <span>View Job Listing</span>
-                <ExternalLinkIcon className="w-4 h-4 ml-1" />
-              </a>
-            </Link>
-          </DropdownMenu.Item>
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
+          <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            {(user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+              JobUserRole.OWNER ||
+              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                JobUserRole.ADMIN) && (
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setCandidateToReject(candidate)
+                        setOpenCandidateRejectConfirm(true)
+                      }}
+                    >
+                      {candidate?.rejected ? (
+                        <span className="flex items-center space-x-2">
+                          <RefreshIcon className="w-5 h-5 text-red-600" />
+                          <span>Restore Candidate</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center space-x-2">
+                          <BanIcon className="w-5 h-5 text-red-600" />
+                          <span>Reject Candidate</span>
+                        </span>
+                      )}
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setOpenEditModal(true)
+                      }}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <PencilAltIcon className="w-5 h-5 text-theme-600" />
+                        <span>Edit Candidate</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+            )}
+            <div className="py-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
+                    )}
+                  >
+                    <Link
+                      prefetch={true}
+                      href={Routes.JobDescriptionPage({
+                        companySlug: candidate?.job?.company?.slug,
+                        jobSlug: candidate?.job?.slug,
+                      })}
+                      passHref
+                    >
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2"
+                      >
+                        <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
+                        <span>View Job Listing</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
+                    )}
+                  >
+                    <Link
+                      prefetch={true}
+                      href={
+                        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                          JobUserRole.OWNER ||
+                        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                          JobUserRole.ADMIN
+                          ? Routes.JobSettingsPage({ slug: candidate?.job?.slug! })
+                          : Routes.JobSettingsSchedulingPage({ slug: candidate?.job?.slug! })
+                      }
+                      passHref
+                    >
+                      <a className="flex items-center space-x-2">
+                        <CogIcon className="w-5 h-5 text-neutral-500" />
+                        <span>Go to Job Settings</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+            </div>
+          </Menu.Items>
+        </Transition>
+      </Menu>
     )
   }
 
-  const rejectCandidateButton = (
-    <button
-      title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
-      className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-      disabled={
-        // interviewDetail?.interviewer?.id !== user?.id &&
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.OWNER &&
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.ADMIN
-      }
-      onClick={(e) => {
-        e.preventDefault()
-        setCandidateToReject(candidate)
-        setOpenCandidateRejectConfirm(true)
-      }}
-    >
-      {candidate?.rejected ? <RefreshIcon className="w-6 h-6" /> : <BanIcon className="w-6 h-6" />}
-    </button>
-  )
+  // const rejectCandidateButton = (
+  //   <button
+  //     title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
+  //     className="cursor-pointer float-right underline text-red-600 py-2 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+  //     disabled={
+  //       // interviewDetail?.interviewer?.id !== user?.id &&
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.OWNER &&
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.ADMIN
+  //     }
+  //     onClick={(e) => {
+  //       e.preventDefault()
+  //       setCandidateToReject(candidate)
+  //       setOpenCandidateRejectConfirm(true)
+  //     }}
+  //   >
+  //     {candidate?.rejected ? <RefreshIcon className="w-6 h-6" /> : <BanIcon className="w-6 h-6" />}
+  //   </button>
+  // )
 
-  const updateCandidateDetailsButton = (
-    <button
-      title="Update Candidate Details"
-      className="float-right underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
-      disabled={
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.OWNER &&
-        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-          JobUserRole.ADMIN
-      }
-      data-testid={`${candidate?.id}-settingsLink`}
-      onClick={(e) => {
-        e.preventDefault()
-        setOpenEditModal(true)
-      }}
-    >
-      <PencilAltIcon className="h-6 w-6" />
-    </button>
-  )
+  // const updateCandidateDetailsButton = (
+  //   <button
+  //     title="Update Candidate Details"
+  //     className="float-right underline text-theme-600 py-2 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+  //     disabled={
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.OWNER &&
+  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
+  //         JobUserRole.ADMIN
+  //     }
+  //     data-testid={`${candidate?.id}-settingsLink`}
+  //     onClick={(e) => {
+  //       e.preventDefault()
+  //       setOpenEditModal(true)
+  //     }}
+  //   >
+  //     <PencilAltIcon className="h-6 w-6" />
+  //   </button>
+  // )
 
   const MoveToNextStageButton = ({ stagesOpen, setStagesOpen }) => {
-    return (
+    return user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+      JobUserRole.OWNER ||
+      user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+        JobUserRole.ADMIN ? (
       <div className="cursor-pointer flex justify-center">
         <button
-          className="text-white bg-theme-600 px-3 py-2 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-          disabled={
-            // interviewDetail?.interviewer?.id !== user?.id &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.OWNER &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.ADMIN
-          }
+          className="text-white bg-theme-600 px-4 py-2 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
           onClick={async (e) => {
             e.preventDefault()
 
@@ -862,26 +925,8 @@ const SingleCandidatePageContent = ({
             : candidate?.job?.stages[candidate?.stage?.order || 0]?.name}
         </button>
         <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
-          <DropdownMenu.Trigger
-            className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
-            disabled={
-              // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.OWNER &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.ADMIN
-            }
-          >
-            <button
-              className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={
-                // interviewDetail?.interviewer?.id !== user?.id &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  JobUserRole.OWNER &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  JobUserRole.ADMIN
-              }
-            >
+          <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none">
+            <button className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
               <ChevronDownIcon className="w-5 h-5" />
             </button>
           </DropdownMenu.Trigger>
@@ -913,7 +958,7 @@ const SingleCandidatePageContent = ({
                       setOpenCandidateMoveConfirm(true)
                     }
                   }}
-                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-500"
                 >
                   {stage?.name?.length > 30 ? `${stage?.name?.substring(0, 30)}...` : stage?.name}
                 </DropdownMenu.Item>
@@ -922,39 +967,24 @@ const SingleCandidatePageContent = ({
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </div>
+    ) : (
+      <></>
     )
   }
 
   const AddToPoolButton = ({ candidatePoolsOpen, setCandidatePoolsOpen }) => {
-    return (
+    return user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+      JobUserRole.OWNER ||
+      user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+        JobUserRole.ADMIN ? (
       <DropdownMenu.Root
         modal={false}
         open={candidatePoolsOpen}
         onOpenChange={setCandidatePoolsOpen}
       >
-        <DropdownMenu.Trigger
-          className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
-          disabled={
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.OWNER &&
-            user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-              JobUserRole.ADMIN
-          }
-        >
-          <button
-            className="flex px-2 py-1 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            disabled={
-              // selectedStage?.interviewDetails?.find(
-              //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
-              // )?.interviewerId !== user?.id &&
-              // interviewDetail?.interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.OWNER &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                JobUserRole.ADMIN
-            }
-          >
-            Add to <ChevronDownIcon className="w-5 h-5 ml-1" />
+        <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 hover:bg-theme-700 rounded-sm flex justify-center items-center focus:outline-none">
+          <button className="flex pl-4 pr-3 py-2 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+            Pools <ChevronDownIcon className="w-5 h-5 ml-1" />
           </button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
@@ -975,13 +1005,33 @@ const SingleCandidatePageContent = ({
               <DropdownMenu.Item
                 key={cp.id}
                 onSelect={async (e) => {
+                  const isRemove = !!cp.candidates.find((c) => c.id === candidate.id)
+
                   e.preventDefault()
-                  const toastId = toast.loading(`Adding candidate to pool - ${cp.name}`)
+                  const toastId = toast.loading(
+                    `${isRemove ? "Removing candidate from" : "Adding candidate to"} pool "${
+                      cp.name
+                    }"`
+                  )
                   try {
-                    await addCandidateToPoolMutation({ candidateId: candidate?.id, poolId: cp.id })
+                    if (isRemove) {
+                      await removeCandidateFromPoolMutation({
+                        candidateId: candidate.id,
+                        candidatePoolSlug: cp.slug,
+                      })
+                      invalidateQuery(getCandidate)
+                    } else {
+                      await addCandidateToPoolMutation({
+                        candidateId: candidate?.id,
+                        poolId: cp.id,
+                      })
+                    }
                     invalidateQuery(getCandidatePoolsWOPagination)
                     invalidateQuery(getCandidate)
-                    toast.success(`Candidate added to pool - ${cp.name}`, { id: toastId })
+                    toast.success(
+                      `Candidate ${isRemove ? "removed from" : "added to"} pool "${cp.name}"`,
+                      { id: toastId }
+                    )
                   } catch (error) {
                     toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
                       id: toastId,
@@ -989,14 +1039,21 @@ const SingleCandidatePageContent = ({
                   }
                   setCandidatePoolsOpen(false)
                 }}
-                className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-500"
               >
-                {cp.name?.length > 30 ? `${cp.name?.substring(0, 30)}...` : cp.name}
+                {cp.candidates.find((c) => c.id === candidate.id) ? (
+                  <CheckIcon className="w-5 h-5 text-theme-600" />
+                ) : (
+                  <div className="w-5 h-5"></div>
+                )}
+                <span>{cp.name?.length > 30 ? `${cp.name?.substring(0, 30)}...` : cp.name}</span>
               </DropdownMenu.Item>
             )
           })}
         </DropdownMenu.Content>
       </DropdownMenu.Root>
+    ) : (
+      <></>
     )
   }
 
@@ -1105,11 +1162,9 @@ const SingleCandidatePageContent = ({
                 },
               })
               toast.success(`Candidate updated`, { id: toastId })
-              if (updatedCandidate?.email === candidate?.email) {
-                await invalidateQuery(getCandidate)
-                setOpenEditModal(false)
-              } else {
-                setOpenEditModal(false)
+              await invalidateQuery(getCandidate)
+              setOpenEditModal(false)
+              if (updatedCandidate?.email !== candidate?.email) {
                 router.replace(
                   Routes.SingleCandidatePage({
                     slug: candidate?.job?.slug,
@@ -1171,7 +1226,7 @@ const SingleCandidatePageContent = ({
       <Confirm
         open={openCandidateMoveConfirm}
         setOpen={setOpenCandidateMoveConfirm}
-        header={`Move Candidate - ${candidateToMove?.name} - to ${
+        header={`Move Candidate ${candidateToMove?.name} to ${
           moveToStage ? moveToStage?.name : "next"
         } stage`}
         onSuccess={async () => {
@@ -1248,16 +1303,13 @@ const SingleCandidatePageContent = ({
           {candidateStageAndInterviewerDiv}
         </div>
 
-        <div className="flex flex-nowrap items-center justify-center space-x-4">
-          {/* <EllipsesMenu
-            ellipsesMenuOpen={ellipsesMenuOpenMobile}
-            setEllipsesMenuOpen={setEllipsesMenuOpenMobile}
-          /> */}
+        {/* <div className="flex flex-nowrap items-center justify-center space-x-4">
           {rejectCandidateButton}
           {updateCandidateDetailsButton}
-        </div>
+        </div> */}
 
         <div className="flex flex-nowrap items-center justify-center space-x-4">
+          <PopMenu />
           <MoveToNextStageButton
             stagesOpen={stagesOpenMobile}
             setStagesOpen={setStagesOpenMobile}
@@ -1281,12 +1333,9 @@ const SingleCandidatePageContent = ({
         </div>
 
         <div className="flex flex-nowrap items-center justify-center space-x-4">
-          {/* <EllipsesMenu
-            ellipsesMenuOpen={ellipsesMenuOpenTablet}
-            setEllipsesMenuOpen={setEllipsesMenuOpenTablet}
-          /> */}
-          {rejectCandidateButton}
-          {updateCandidateDetailsButton}
+          <PopMenu />
+          {/* {rejectCandidateButton}
+          {updateCandidateDetailsButton} */}
           <MoveToNextStageButton
             stagesOpen={stagesOpenTablet}
             setStagesOpen={setStagesOpenTablet}
@@ -1308,12 +1357,9 @@ const SingleCandidatePageContent = ({
         </div>
 
         <div className="flex flex-nowrap items-center justify-end space-x-4">
-          {/* <EllipsesMenu
-            ellipsesMenuOpen={ellipsesMenuOpenDesktop}
-            setEllipsesMenuOpen={setEllipsesMenuOpenDesktop}
-          /> */}
-          {rejectCandidateButton}
-          {updateCandidateDetailsButton}
+          <PopMenu />
+          {/* {rejectCandidateButton}
+          {updateCandidateDetailsButton} */}
           <MoveToNextStageButton
             stagesOpen={stagesOpenDesktop}
             setStagesOpen={setStagesOpenDesktop}
