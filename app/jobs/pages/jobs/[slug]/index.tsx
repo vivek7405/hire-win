@@ -275,9 +275,7 @@ const getBoard = (
                         ratingClass="!flex items-center"
                         height={5}
                         color={c.rejected ? "red" : "theme"}
-                        value={Math.round(
-                          getScoreAverage(c?.scores?.map((score) => score.rating) || [])
-                        )}
+                        value={getScoreAverage(c?.scores?.map((score) => score.rating) || [])}
                         disabled={true}
                       />
                     </Form>

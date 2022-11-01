@@ -283,8 +283,6 @@ const SingleCandidatePage = ({
   const [selectedCandidateEmail, setSelectedCandidateEmail] = useState(candidateEmail)
   const [viewCandidateSelection, setViewCandidateSelection] = useState(false)
 
-  const viewAllCandidatesRef = useRef(null)
-
   const handleWindowSizeChange = () => {
     setViewCandidateSelection(false)
   }
@@ -293,6 +291,7 @@ const SingleCandidatePage = ({
     return () => window.removeEventListener("resize", handleWindowSizeChange)
   }, [])
 
+  // const viewAllCandidatesRef = useRef(null)
   // const handleClick = (event) => {
   //   if (viewAllCandidatesRef && !(viewAllCandidatesRef?.current as any)?.contains(event.target)) {
   //     setViewCandidateSelection(false)
@@ -312,7 +311,7 @@ const SingleCandidatePage = ({
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
       {viewCandidateSelection && (
         <div
-          ref={viewAllCandidatesRef}
+          // ref={viewAllCandidatesRef}
           className="md:mt-56 lg:mt-24 absolute right-7 w-1/6 md:w-2/5 lg:w-1/3 h-screen z-10"
         >
           <Suspense fallback="Loading...">
@@ -320,7 +319,6 @@ const SingleCandidatePage = ({
               jobId={jobId || "0"}
               stageId={stageId || "0"}
               selectedCandidateEmail={selectedCandidateEmail || "0"}
-              setViewCandidateSelection={setViewCandidateSelection}
               setSelectedCandidateEmail={setSelectedCandidateEmail}
             />
           </Suspense>
@@ -381,11 +379,18 @@ const SingleCandidatePageContent = ({
   const [saveCandidateUserNoteMutation] = useMutation(saveCandidateUserNote)
 
   const queryStage = candidate?.job?.stages?.find((stg) => stg.name === stage)
-
   const [selectedStage, setSelectedStage] = useState(
     (queryStage || candidate?.stage) as ExtendedStage | null | undefined
   )
-  const shiftStage = (stg) => {
+  // Change selected stage to candidate's current stage
+  // when candidate is changed using candidate selection menu
+  useEffect(() => {
+    if (candidate.stageId !== selectedStage?.id) {
+      changeSelectedStage(queryStage || candidate.stage)
+    }
+  }, [candidate?.id])
+
+  const changeSelectedStage = (stg) => {
     setSelectedStage(stg)
     router.replace({
       query: {
@@ -465,6 +470,11 @@ const SingleCandidatePageContent = ({
   const [updateCandidateStageMutation] = useMutation(updateCandidateStage)
   const [updateCandidateMutation] = useMutation(updateCandidate)
   const [deleteCandidateFileMutation] = useMutation(deleteCandidateFile)
+
+  const [candidateInterviewer] = useQuery(getCandidateInterviewer, {
+    candidateId: candidate?.id || "0",
+    stageId: candidate?.stageId || "0",
+  })
 
   // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
   //   where: { candidateId: candidate.id, workflowStageId: selectedStage?.id },
@@ -635,13 +645,14 @@ const SingleCandidatePageContent = ({
       onSubmit={async () => {
         return
       }}
+      key={candidate.id}
     >
       <LabeledRatingField
         name="candidateAverageRating"
         ratingClass={`!flex items-center`}
         height={8}
         color={candidate?.rejected ? "red" : "theme"}
-        value={Math.round(getScoreAverage(candidate?.scores?.map((score) => score.rating) || []))}
+        value={getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])}
         disabled={true}
       />
     </Form>
@@ -649,9 +660,18 @@ const SingleCandidatePageContent = ({
 
   const candidateStageAndInterviewerDiv = (
     <div className="px-3 py-1 rounded-lg border-2 border-theme-600 text-theme-700 font-semibold flex items-center justify-center space-x-2">
-      <span>{candidate?.stage?.name}</span>
+      <span>
+        {(candidate?.stage?.name || "")?.replace(/ .*/, "")?.length > 10
+          ? `${candidate?.stage?.name?.replace(/ .*/, "")?.substring(0, 10)}...`
+          : candidate?.stage?.name?.replace(/ .*/, "")}
+        ...
+      </span>
       <ArrowRightIcon className="w-4 h-4" />
-      <span>{candidate?.stage?.interviewer?.name}</span>
+      <span>
+        {(candidateInterviewer?.name || "")?.replace(/ .*/, "")?.length > 10
+          ? `${candidateInterviewer?.name?.replace(/ .*/, "")?.substring(0, 10)}...`
+          : candidateInterviewer?.name?.replace(/ .*/, "")}
+      </span>
     </div>
   )
 
@@ -1004,7 +1024,7 @@ const SingleCandidatePageContent = ({
               stages?.find((stage) => stage.id === candidateToMove.stageId)?.order || 0
             const nextStage = stages?.find((stage) => stage.order === currentStageOrder + 1)
             await updateCandidateStg(candidateToMove, moveToStage?.id || nextStage?.id)
-            shiftStage(moveToStage || nextStage)
+            changeSelectedStage(moveToStage || nextStage)
             invalidateQuery(getCandidateInterviewsByStage)
             invalidateQuery(getAllCandidatesByStage)
             invalidateQuery(getJobStages)
@@ -1402,7 +1422,7 @@ const SingleCandidatePageContent = ({
                           selectedStage?.id === stage.id ? "!bg-theme-500 !text-white" : ""
                         } whitespace-nowrap`}
                         onClick={() => {
-                          shiftStage(stage)
+                          changeSelectedStage(stage)
                           invalidateQuery(getCandidateInterviewsByStage)
                           // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
                         }}
@@ -1449,7 +1469,7 @@ const SingleCandidatePageContent = ({
                       //   //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                       //   // )?.interviewerId !== user?.id
                       // }
-                      key={selectedStage?.id}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
                       candidate={candidate}
                       header="Score Card"
                       // subHeader={`${
@@ -1529,6 +1549,7 @@ const SingleCandidatePageContent = ({
                       user={user}
                       stageId={selectedStage?.id || "0"}
                       candidate={candidate}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
                     />
                   )}
                   {candidateStageToggleView === CandidateStageToggleView.Comments && (
@@ -1536,10 +1557,16 @@ const SingleCandidatePageContent = ({
                       user={user}
                       stageId={selectedStage?.id || "0"}
                       candidate={candidate}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
                     />
                   )}
                   {candidateStageToggleView === CandidateStageToggleView.Emails && (
-                    <Emails user={user} stageId={selectedStage?.id || "0"} candidate={candidate} />
+                    <Emails
+                      user={user}
+                      stageId={selectedStage?.id || "0"}
+                      candidate={candidate}
+                      key={`${candidate?.id}-${selectedStage?.id}`}
+                    />
                   )}
                 </Suspense>
               </div>

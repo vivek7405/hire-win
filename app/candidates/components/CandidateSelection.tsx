@@ -1,6 +1,8 @@
 import { BanIcon, ChevronLeftIcon, XCircleIcon } from "@heroicons/react/outline"
 import Form from "app/core/components/Form"
+import LabeledRatingField from "app/core/components/LabeledRatingField"
 import LabeledToggleSwitch from "app/core/components/LabeledToggleSwitch"
+import getScoreAverage from "app/score-cards/utils/getScoreAverage"
 import getJobStages from "app/stages/queries/getJobStages"
 import { invalidateQuery, Routes, useQuery, useRouter } from "blitz"
 import { Suspense, useState } from "react"
@@ -79,14 +81,17 @@ const Candidates = ({
         return (
           <div
             onClick={() => {
-              setSelectedCandidateEmail(candidate.email)
               if (selectedCandidateEmail !== candidate.email) {
-                router.replace(
-                  Routes.SingleCandidatePage({
-                    slug: candidate?.job?.slug,
-                    candidateEmail: candidate?.email,
+                router
+                  .replace(
+                    Routes.SingleCandidatePage({
+                      slug: candidate?.job?.slug,
+                      candidateEmail: candidate?.email,
+                    })
+                  )
+                  .then(() => {
+                    setSelectedCandidateEmail(candidate.email)
                   })
-                )
               }
             }}
             key={candidate.id}
@@ -95,16 +100,34 @@ const Candidates = ({
             } px-3 py-1 flex items-center text-neutral-600 cursor-pointer rounded hover:bg-neutral-300 m-1`}
           >
             <div className="w-full flex items-center">
-              <div className="w-5/6 flex items-center">
-                <div className="w-1/6">
+              <div className="w-3/5 flex items-center">
+                {/* <div className="w-1/6">
                   {selectedCandidateEmail === candidate.email && (
                     <ChevronLeftIcon className={`w-4 h-4`} />
                   )}
-                </div>
-                <div className="w-5/6 truncate">{candidate.name}</div>
+                </div> */}
+                <div className="w-full truncate">{candidate.name}</div>
               </div>
-              <div className="w-1/6">
-                {candidate.rejected && <BanIcon className="w-5 h-5 text-red-600" />}
+              <div className="w-2/5 flex justify-end">
+                {candidate.rejected ? (
+                  <BanIcon className="w-5 h-5 text-red-600" />
+                ) : (
+                  <Form
+                    noFormatting={true}
+                    onSubmit={async () => {
+                      return
+                    }}
+                  >
+                    <LabeledRatingField
+                      name="candidateAverageRating"
+                      ratingClass={`!flex items-center`}
+                      height={4}
+                      color={candidate?.rejected ? "red" : "theme"}
+                      value={getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])}
+                      disabled={true}
+                    />
+                  </Form>
+                )}
               </div>
             </div>
           </div>
@@ -118,14 +141,12 @@ type CandidateSelectionPropsType = {
   jobId: string
   stageId: string
   selectedCandidateEmail: string
-  setViewCandidateSelection: any
   setSelectedCandidateEmail: any
 }
 const CandidateSelection = ({
   jobId,
   stageId,
   selectedCandidateEmail,
-  setViewCandidateSelection,
   setSelectedCandidateEmail,
 }: CandidateSelectionPropsType) => {
   const [selectedStageId, setSelectedStageId] = useState(stageId)

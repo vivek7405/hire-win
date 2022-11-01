@@ -256,8 +256,8 @@ export const Candidates = ({ slug }) => {
                         name="candidateAverageRating"
                         ratingClass="!flex items-center"
                         height={6}
-                        value={Math.round(
-                          getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])
+                        value={getScoreAverage(
+                          candidate?.scores?.map((score) => score.rating) || []
                         )}
                         disabled={true}
                       />

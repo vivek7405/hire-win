@@ -9,7 +9,15 @@ async function getAllCandidatesByStage({ stageId, rejected }: GetAllCandidatesIn
   const stageCandidates = db.candidate.findMany({
     where: { stageId, rejected },
     orderBy: { createdAt: "desc" },
-    select: { id: true, name: true, email: true, rejected: true, job: { select: { slug: true } } },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      rejected: true,
+      stage: { select: { name: true } },
+      scores: { select: { rating: true } },
+      job: { select: { slug: true } },
+    },
   })
 
   return stageCandidates
