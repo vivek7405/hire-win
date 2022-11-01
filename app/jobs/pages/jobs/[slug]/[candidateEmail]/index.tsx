@@ -661,10 +661,9 @@ const SingleCandidatePageContent = ({
   const candidateStageAndInterviewerDiv = (
     <div className="px-3 py-1 rounded-lg border-2 border-theme-600 text-theme-700 font-semibold flex items-center justify-center space-x-2">
       <span>
-        {(candidate?.stage?.name || "")?.replace(/ .*/, "")?.length > 10
+        {(candidate?.stage?.name || "")?.length > 10
           ? `${candidate?.stage?.name?.replace(/ .*/, "")?.substring(0, 10)}...`
-          : candidate?.stage?.name?.replace(/ .*/, "")}
-        ...
+          : candidate?.stage?.name}
       </span>
       <ArrowRightIcon className="w-4 h-4" />
       <span>
@@ -744,6 +743,10 @@ const SingleCandidatePageContent = ({
           Move to{" "}
           {(candidate?.stage?.order || 0) === (candidate?.job?.stages?.length || 0)
             ? "Next Stage"
+            : (candidate?.job?.stages[candidate?.stage?.order || 0]?.name || "")?.length > 10
+            ? `${candidate?.job?.stages[candidate?.stage?.order || 0]?.name
+                ?.replace(/ .*/, "")
+                ?.substring(0, 10)}...`
             : candidate?.job?.stages[candidate?.stage?.order || 0]?.name}
         </button>
         <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
