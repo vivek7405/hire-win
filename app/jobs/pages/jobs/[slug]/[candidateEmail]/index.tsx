@@ -29,6 +29,8 @@ import {
   CandidateActivityType,
   CandidateFile,
   CandidateSource,
+  FormQuestion,
+  FormQuestionType,
   JobUserRole,
   Stage,
 } from "@prisma/client"
@@ -59,6 +61,7 @@ import {
   ExternalLinkIcon,
   MailIcon,
   MenuIcon,
+  PaperClipIcon,
   PencilAltIcon,
   ReceiptRefundIcon,
   RefreshIcon,
@@ -238,7 +241,7 @@ const getCards = (candidate: ExtendedCandidate) => {
     candidate?.job?.formQuestions
       // ?.filter((q) => !q.question.factory)
       ?.map((question) => {
-        const answer = getCandidateAnswerForDisplay(question, candidate)
+        const answer = getCandidateAnswerForDisplay(question, candidate, false)
         return {
           id: question.id,
           title: question.title,
@@ -1057,6 +1060,30 @@ const SingleCandidatePageContent = ({
     )
   }
 
+  type DisplayAnswerType = {
+    question: FormQuestion
+    answer: any
+  }
+  const DisplayAnswer = ({ question, answer }) => {
+    switch (question.type) {
+      case FormQuestionType.Attachment:
+        return (
+          <div className="flex items-center">
+            <PaperClipIcon className="h-5 w-5 text-gray-400" />
+            <span className="ml-2 truncate">{answer}</span>
+          </div>
+        )
+      case FormQuestionType.Long_text:
+        return (
+          <>
+            <textarea readOnly={true}>{answer}</textarea>
+          </>
+        )
+      default:
+        return answer
+    }
+  }
+
   const OpenCloseViewAllCandidatesButton = () => {
     return viewCandidateSelection ? (
       <button
@@ -1377,7 +1404,7 @@ const SingleCandidatePageContent = ({
           {/* PDF Viewer and Candidate Answers */}
           <div className="w-full md:w-3/5 lg:w-2/3">
             <div className="flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg md:mr-8 lg:mr-8">
-              <div className="w-full flex items-center justify-center my-2">
+              <div className="w-full flex items-center justify-center mt-2 mb-4">
                 <Form noFormatting={true} onSubmit={async (values) => {}}>
                   <LabeledToggleGroupField
                     name={`candidateDetailToggleView`}
@@ -1404,27 +1431,139 @@ const SingleCandidatePageContent = ({
                 </Form>
               </div>
               {candidateDetailToggleView === CandidateDetailToggleView.Info && (
-                <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
-                  {candidate?.job?.formQuestions?.map((question) => {
-                    const answer = getCandidateAnswerForDisplay(question, candidate)
+                <div key={candidate.id} className="overflow-hidden bg-white shadow">
+                  {/* <div className="px-4 py-5 sm:px-6">
+                    <h3 className="text-lg font-medium leading-6 text-gray-900">
+                      Applicant Information
+                    </h3>
+                    <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                      Personal details and application.
+                    </p>
+                  </div> */}
+                  <div className="border-t border-gray-200">
+                    <dl>
+                      {candidate?.job?.formQuestions?.map((question, index) => {
+                        const answer = getCandidateAnswerForDisplay(question, candidate, false)
 
-                    return (
-                      <Card key={question.id}>
-                        <div className="space-y-2">
-                          <div className="w-full relative">
-                            <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                              <span className="truncate">{question.title}</span>
-                            </div>
+                        return (
+                          <div
+                            key={question.id}
+                            className={`${
+                              index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                            } px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}
+                          >
+                            <dt className="text-sm font-medium text-gray-500">{question.title}</dt>
+                            <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                              {answer || "..."}
+                            </dd>
                           </div>
-                          <div className="border-b-2 border-gray-50 w-full"></div>
-                          <div className="flex md:justify-center lg:justify-center">
-                            <span className="truncate">{answer || "NA"}</span>
-                          </div>
-                        </div>
-                      </Card>
-                    )
-                  })}
+                        )
+                      })}
+                      {/* <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Full name</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                          Margot Foster
+                        </dd>
+                      </div>
+                      <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Application for</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                          Backend Developer
+                        </dd>
+                      </div>
+                      <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Email address</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                          margotfoster@example.com
+                        </dd>
+                      </div>
+                      <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Salary expectation</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                          $120,000
+                        </dd>
+                      </div>
+                      <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">About</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                          Fugiat ipsum ipsum deserunt culpa aute sint do nostrud anim incididunt
+                          cillum culpa consequat. Excepteur qui ipsum aliquip consequat sint. Sit id
+                          mollit nulla mollit nostrud in ea officia proident. Irure nostrud pariatur
+                          mollit ad adipisicing reprehenderit deserunt qui eu.
+                        </dd>
+                      </div>
+                      <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">Attachments</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                          <ul
+                            role="list"
+                            className="divide-y divide-gray-200 rounded-md border border-gray-200"
+                          >
+                            <li className="flex items-center justify-between py-3 pl-3 pr-4 text-sm">
+                              <div className="flex w-0 flex-1 items-center">
+                                <PaperClipIcon
+                                  className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                  aria-hidden="true"
+                                />
+                                <span className="ml-2 w-0 flex-1 truncate">
+                                  resume_back_end_developer.pdf
+                                </span>
+                              </div>
+                              <div className="ml-4 flex-shrink-0">
+                                <a
+                                  href="#"
+                                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                                >
+                                  Download
+                                </a>
+                              </div>
+                            </li>
+                            <li className="flex items-center justify-between py-3 pl-3 pr-4 text-sm">
+                              <div className="flex w-0 flex-1 items-center">
+                                <PaperClipIcon
+                                  className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                  aria-hidden="true"
+                                />
+                                <span className="ml-2 w-0 flex-1 truncate">
+                                  coverletter_back_end_developer.pdf
+                                </span>
+                              </div>
+                              <div className="ml-4 flex-shrink-0">
+                                <a
+                                  href="#"
+                                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                                >
+                                  Download
+                                </a>
+                              </div>
+                            </li>
+                          </ul>
+                        </dd>
+                      </div> */}
+                    </dl>
+                  </div>
                 </div>
+                // <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
+                //   {candidate?.job?.formQuestions?.map((question) => {
+                //     const answer = getCandidateAnswerForDisplay(question, candidate)
+
+                //     return (
+                //       <Card key={question.id}>
+                //         <div className="space-y-2">
+                //           <div className="w-full relative">
+                //             <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                //               <span className="truncate">{question.title}</span>
+                //             </div>
+                //           </div>
+                //           <div className="border-b-2 border-gray-50 w-full"></div>
+                //           <div className="flex md:justify-center lg:justify-center">
+                //             <span className="truncate">{answer || "NA"}</span>
+                //           </div>
+                //         </div>
+                //       </Card>
+                //     )
+                //   })}
+                // </div>
               )}
               {candidateDetailToggleView === CandidateDetailToggleView.Resume && (
                 <div className="px-2 md:px-0 lg:px-0">
