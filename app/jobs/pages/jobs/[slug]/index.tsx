@@ -425,7 +425,7 @@ const Candidates = (props: CandidateProps) => {
     return {
       Header: formQuestion?.title,
       Cell: (props) => {
-        return getCandidateAnswerForDisplay(formQuestion, props.cell.row.original)
+        return getCandidateAnswerForDisplay(formQuestion, props.cell.row.original, true)
       },
     }
   }
