@@ -245,7 +245,8 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
         subHeader={props.subHeader}
       >
         {formQuestions.map((question) => {
-          if (question.behaviour === "OFF") {
+          // Hide question only on careers page and not when adding candidate manually
+          if (props.careersPage && question.behaviour === "OFF") {
             return
           }
           return getQuestionField(question as any)
