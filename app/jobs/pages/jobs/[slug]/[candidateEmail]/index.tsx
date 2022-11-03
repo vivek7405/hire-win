@@ -109,6 +109,7 @@ import createCandidate from "app/candidates/mutations/createCandidate"
 import { Fragment } from "react"
 import { Menu, Transition } from "@headlessui/react"
 import removeCandidateFromPool from "app/candidate-pools/mutations/removeCandidateFromPool"
+import classNames from "app/core/utils/classNames"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -715,10 +716,6 @@ const SingleCandidatePageContent = ({
       </span>
     </div>
   )
-
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(" ")
-  }
 
   function PopMenu() {
     return (

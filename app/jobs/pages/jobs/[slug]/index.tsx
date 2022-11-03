@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from "react"
+import React, { Fragment, Suspense, useEffect, useMemo, useState } from "react"
 import {
   InferGetServerSidePropsType,
   GetServerSidePropsContext,
@@ -67,7 +67,18 @@ import canCreateNewCandidate from "app/candidates/queries/canCreateNewCandidate"
 import Confirm from "app/core/components/Confirm"
 import LabeledRatingField from "app/core/components/LabeledRatingField"
 import getScoreAverage from "app/score-cards/utils/getScoreAverage"
-import { ArrowRightIcon, BanIcon, ExternalLinkIcon, RefreshIcon } from "@heroicons/react/outline"
+import {
+  ArrowRightIcon,
+  BanIcon,
+  CheckIcon,
+  CogIcon,
+  DotsVerticalIcon,
+  ExternalLinkIcon,
+  RefreshIcon,
+  TableIcon,
+  ViewBoardsIcon,
+  XIcon,
+} from "@heroicons/react/outline"
 import setCandidateRejected from "app/candidates/mutations/setCandidateRejected"
 import Modal from "app/core/components/Modal"
 import ApplicationForm from "app/candidates/components/ApplicationForm"
@@ -77,6 +88,8 @@ import getCandidateAnswerForDisplay from "app/candidates/utils/getCandidateAnswe
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
 import { PencilIcon } from "@heroicons/react/solid"
 import ViewJobListingButton from "app/jobs/components/ViewJobListingButton"
+import { Menu, Transition } from "@headlessui/react"
+import classNames from "app/core/utils/classNames"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -836,7 +849,7 @@ const SingleJobPageContent = ({
   const [openConfirm, setOpenConfirm] = useState(false)
   const router = useRouter()
   const [viewRejected, setViewRejected] = useState(false)
-  const [enableDrag, setEnableDrag] = useState(false)
+  const [enableDrag, setEnableDrag] = useState(true)
   const [candidateToEdit, setCandidateToEdit] = useState(
     null as
       | (Candidate & {
@@ -851,6 +864,170 @@ const SingleJobPageContent = ({
   const [openModal, setOpenModal] = useState(false)
   const [createCandidateMutation] = useMutation(createCandidate)
   const [updateCandidateMutation] = useMutation(updateCandidate)
+
+  function PopMenu() {
+    return (
+      <Menu as="div" className="relative inline-block text-left">
+        <div>
+          <Menu.Button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
+            <DotsVerticalIcon className="h-6" aria-hidden="true" />
+          </Menu.Button>
+        </div>
+
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="py-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm cursor-pointer"
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setViewRejected(!viewRejected)
+                    }}
+                  >
+                    {viewRejected ? (
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <RefreshIcon className="w-5 h-5 text-theme-600" />
+                        <span>View Active Candidates</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <BanIcon className="w-5 h-5 text-red-600" />
+                        <span>View Rejected Candidates</span>
+                      </span>
+                    )}
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm cursor-pointer"
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setTable(!isTable)
+                    }}
+                  >
+                    {isTable ? (
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <ViewBoardsIcon className="w-5 h-5 text-theme-600" />
+                        <span>Switch to Board View</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <TableIcon className="w-5 h-5 text-theme-600" />
+                        <span>Switch to Table View</span>
+                      </span>
+                    )}
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm cursor-pointer"
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setEnableDrag(!enableDrag)
+                      toast.success(enableDrag ? "Card drag disabled" : "Card drag enabled")
+                    }}
+                  >
+                    {enableDrag ? (
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <XIcon className="w-5 h-5 text-theme-600" />
+                        <span>Disable Card Drag</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <CheckIcon className="w-5 h-5 text-theme-600" />
+                        <span>Enable Card Drag</span>
+                      </span>
+                    )}
+                  </a>
+                )}
+              </Menu.Item>
+            </div>
+            <div className="py-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm"
+                    )}
+                  >
+                    <Link
+                      prefetch={true}
+                      href={Routes.JobDescriptionPage({
+                        companySlug: job?.company?.slug || "0",
+                        jobSlug: job?.slug || "0",
+                      })}
+                      passHref
+                    >
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 whitespace-nowrap"
+                      >
+                        <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
+                        <span>View Job Listing</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm whitespace-nowrap"
+                    )}
+                  >
+                    <Link
+                      prefetch={true}
+                      href={
+                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
+                          JobUserRole.OWNER ||
+                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
+                          JobUserRole.ADMIN
+                          ? Routes.JobSettingsPage({ slug: job?.slug! })
+                          : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
+                      }
+                      passHref
+                    >
+                      <a className="flex items-center space-x-2">
+                        <CogIcon className="w-5 h-5 text-neutral-500" />
+                        <span>Go to Job Settings</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+            </div>
+          </Menu.Items>
+        </Transition>
+      </Menu>
+    )
+  }
 
   const searchQuery = async (e) => {
     const searchQuery = { search: JSON.stringify(e.target.value) }
@@ -878,7 +1055,7 @@ const SingleJobPageContent = ({
       placeholder="Search"
       type="text"
       defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-      className={`border border-gray-300 px-2 py-2 rounded w-full mr-2`}
+      className={`border border-gray-300 px-2 py-2 rounded w-full`}
       onChange={(e) => {
         execDebouncer(e)
       }}
@@ -1079,12 +1256,13 @@ const SingleJobPageContent = ({
 
       {/* Mobile Menu */}
       <div className="flex flex-col space-y-4 md:hidden lg:hidden">
-        <div className="flex w-full justify-between">
+        <div className="flex items-center w-full justify-between">
           {searchInput}
+          <PopMenu />
           {newCandidateButton}
         </div>
 
-        <div className="flex w-full justify-between">
+        {/* <div className="flex w-full justify-between">
           <ViewJobListingButton companySlug={company?.slug || "0"} jobSlug={job?.slug || "0"} />
           {jobSettingsLink}
         </div>
@@ -1092,7 +1270,7 @@ const SingleJobPageContent = ({
         <div className="flex w-full justify-between">
           {viewRejectedToggle}
           {tableViewToggle}
-        </div>
+        </div> */}
       </div>
 
       {/* Tablet Menu */}
@@ -1100,30 +1278,32 @@ const SingleJobPageContent = ({
         <div className="w-full flex flex-nowrap">
           <div className="w-1/6">{searchInput}</div>
 
-          <div className="flex w-5/6 space-x-3 flex-nowrap justify-end">
-            <ViewJobListingButton companySlug={company?.slug || "0"} jobSlug={job?.slug || "0"} />
-            {jobSettingsLink}
+          <div className="flex items-center w-5/6 space-x-3 flex-nowrap justify-end">
+            {/* <ViewJobListingButton companySlug={company?.slug || "0"} jobSlug={job?.slug || "0"} />
+            {jobSettingsLink} */}
+            <PopMenu />
             {newCandidateButton}
           </div>
         </div>
 
-        <div className="flex space-x-4 w-full justify-center">
+        {/* <div className="flex space-x-4 w-full justify-center">
           {enableDragToggle}
           {viewRejectedToggle}
           {tableViewToggle}
-        </div>
+        </div> */}
       </div>
 
       {/* Desktop Menu */}
       <div className="hidden md:hidden w-full lg:flex lg:flex-nowrap">
         <div className="w-1/6">{searchInput}</div>
 
-        <div className="flex w-5/6 space-x-3 flex-nowrap justify-end">
-          {enableDragToggle}
+        <div className="flex items-center w-5/6 space-x-3 flex-nowrap justify-end">
+          <PopMenu />
+          {/* {enableDragToggle}
           {viewRejectedToggle}
           {tableViewToggle}
           <ViewJobListingButton companySlug={company?.slug || "0"} jobSlug={job?.slug || "0"} />
-          {jobSettingsLink}
+          {jobSettingsLink} */}
           {newCandidateButton}
         </div>
       </div>
