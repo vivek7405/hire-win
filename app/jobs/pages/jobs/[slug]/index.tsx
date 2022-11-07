@@ -436,7 +436,10 @@ const Candidates = (props: CandidateProps) => {
 
   const getDynamicColumn = (formQuestion: ExtendedFormQuestion) => {
     return {
-      Header: formQuestion?.title,
+      Header:
+        formQuestion?.title?.length > 20
+          ? `${formQuestion?.title?.substring(0, 20)}...`
+          : formQuestion?.title,
       Cell: (props) => {
         return getCandidateAnswerForDisplay(formQuestion, props.cell.row.original, true)
       },
