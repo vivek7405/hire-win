@@ -94,7 +94,7 @@ const Table = ({
               <tr {...headerGroup.getHeaderGroupProps()} key={i}>
                 {headerGroup.headers.map((column, i) => (
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap"
                     {...column.getHeaderProps()}
                     key={i}
                   >
@@ -112,7 +112,7 @@ const Table = ({
                   {row.cells.map((cell, i) => {
                     return (
                       <td
-                        className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200"
+                        className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700 border-b border-gray-200"
                         {...cell.getCellProps()}
                         key={i}
                       >

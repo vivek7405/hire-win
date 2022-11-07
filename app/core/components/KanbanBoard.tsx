@@ -182,7 +182,7 @@ const KanbanBoard = ({
                           className="p-4 bg-neutral-100 border-2 border-gray-300 rounded m-2 focus:outline-none h-full inline-block align-top"
                         >
                           <div {...columnProvided.dragHandleProps}>
-                            <h1 className="pb-2.5 font-bold focus:outline-none">
+                            <h1 className="pb-2.5 font-semibold focus:outline-none">
                               {column.title?.length > 25
                                 ? `${column.title?.substring(0, 25)}...`
                                 : column.title}{" "}
