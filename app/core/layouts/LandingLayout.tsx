@@ -52,45 +52,45 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="bg-gradient-to-r from-fuchsia-100 via-purple-200 to-indigo-200 leading-relaxed tracking-wide">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col min-h-screen px-4">
-            <nav id="header" className="w-full z-30 top-0 py-1">
-              <div className="w-full flex flex-wrap items-center justify-between mt-0 py-2">
-                <div className="w-44 h-10 lg:h-16 lg:w-72 flex">
-                  <Link href={Routes.Home()}>
-                    <a>
-                      <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
-                    </a>
+        {/* <div className="max-w-8xl mx-auto"> */}
+        <div className="flex flex-col min-h-screen">
+          <nav id="header" className="w-full z-30 top-0 py-1 px-4">
+            <div className="w-full flex flex-wrap items-center justify-between mt-0 py-2">
+              <div className="w-44 h-10 lg:h-16 lg:w-72 flex">
+                <Link href={Routes.Home()}>
+                  <a>
+                    <LogoBrand logoProps={{ fill: "#4f46e5" }} brandProps={{ fill: "#4f46e5" }} />
+                  </a>
+                </Link>
+                <span className="text-xs">
+                  <Link href={Routes.Beta()}>
+                    <a className="text-indigo-600 hover:underline font-semibold">BETA</a>
                   </Link>
-                  <span className="text-xs">
-                    <Link href={Routes.Beta()}>
-                      <a className="text-indigo-600 hover:underline font-semibold">BETA</a>
-                    </Link>
-                  </span>
-                </div>
+                </span>
+              </div>
 
-                <div className="block lg:hidden">
-                  <button
-                    id="nav-toggle"
-                    className="flex items-center px-3 py-2 border rounded text-neutral-700 border-neutral-600 hover:text-neutral-900 hover:border-fuchsia-600 appearance-none focus:outline-none"
-                  >
-                    <svg
-                      className="fill-current h-3 w-3"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <title>Menu</title>
-                      <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div
-                  id="nav-content"
-                  className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
+              <div className="block lg:hidden">
+                <button
+                  id="nav-toggle"
+                  className="flex items-center px-3 py-2 border rounded text-neutral-700 border-neutral-600 hover:text-neutral-900 hover:border-fuchsia-600 appearance-none focus:outline-none"
                 >
-                  <ul className="list-reset lg:flex justify-end flex-1 items-center">
-                    <li className="mr-3">
+                  <svg
+                    className="fill-current h-3 w-3"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <title>Menu</title>
+                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                  </svg>
+                </button>
+              </div>
+
+              <div
+                id="nav-content"
+                className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
+              >
+                <ul className="list-reset lg:flex justify-end flex-1 items-center">
+                  {/* <li className="mr-3">
                       <Link href={`${Routes.Home().pathname}/#screenshots`}>
                         <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
                           Screenshots
@@ -104,13 +104,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                         </a>
                       </Link>
                     </li>
-                    {/* <li className="mr-3">
-                  <Link href={`${Routes.Home().pathname}/#reviews`}>
-                    <a className="inline-block cursor-pointer hover:underline font-semibold py-2 px-4 text-black no-underline">
-                      Reviews
-                    </a>
-                  </Link>
-                </li> */}
+                    <li className="mr-3">
+                      <Link href={`${Routes.Home().pathname}/#reviews`}>
+                        <a className="inline-block cursor-pointer hover:underline font-semibold py-2 px-4 text-black no-underline">
+                          Reviews
+                        </a>
+                      </Link>
+                    </li>
                     <li className="mr-3">
                       <Link href={`${Routes.Home().pathname}/#support`}>
                         <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
@@ -124,56 +124,56 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                           Our Story
                         </a>
                       </Link>
-                    </li>
-                  </ul>
-                  <Link prefetch={true} href={Routes.LoginPage()}>
-                    <a>
-                      <button
-                        id="navAction"
-                        className="bg-gradient-to-br from-fuchsia-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
-                      >
-                        Login
-                      </button>
+                    </li> */}
+                </ul>
+                <Link prefetch={true} href={Routes.LoginPage()}>
+                  <a>
+                    <button
+                      id="navAction"
+                      className="bg-gradient-to-br from-fuchsia-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
+                    >
+                      Login
+                    </button>
+                  </a>
+                </Link>
+              </div>
+            </div>
+          </nav>
+
+          <div className="mb-auto h-full mt-3">{children}</div>
+
+          <footer className="text-neutral-900 px-4">
+            <div className="my-8">
+              <div className="w-full flex flex-col py-6 items-center justify-center space-y-4">
+                <div>
+                  <Link href={Routes.Home()}>
+                    <a className="text-orange-600 no-underline hover:no-underline font-bold text-2xl lg:text-4xl">
+                      #hireWIN
                     </a>
                   </Link>
                 </div>
-              </div>
-            </nav>
 
-            <div className="mb-auto h-full mt-3">{children}</div>
+                <div className="flex space-x-4 font-bold">
+                  <Link prefetch={true} href={Routes.Terms()}>
+                    <a className="hover:underline">TERMS</a>
+                  </Link>
+                  <Link prefetch={true} href={Routes.Privacy()}>
+                    <a className="hover:underline">PRIVACY</a>
+                  </Link>
+                  <Link prefetch={true} href={Routes.Cookies()}>
+                    <a className="hover:underline">COOKIES</a>
+                  </Link>
+                </div>
 
-            <footer className="text-neutral-900">
-              <div className="my-8">
-                <div className="w-full flex flex-col py-6 items-center justify-center space-y-4">
-                  <div>
-                    <Link href={Routes.Home()}>
-                      <a className="text-orange-600 no-underline hover:no-underline font-bold text-2xl lg:text-4xl">
-                        #hireWIN
-                      </a>
-                    </Link>
-                  </div>
+                <div className="italic text-center">
+                  Copyright ©2022 hire.win - All rights reserved
+                </div>
 
-                  <div className="flex space-x-4 font-bold">
-                    <Link prefetch={true} href={Routes.Terms()}>
-                      <a className="hover:underline">TERMS</a>
-                    </Link>
-                    <Link prefetch={true} href={Routes.Privacy()}>
-                      <a className="hover:underline">PRIVACY</a>
-                    </Link>
-                    <Link prefetch={true} href={Routes.Cookies()}>
-                      <a className="hover:underline">COOKIES</a>
-                    </Link>
-                  </div>
+                <div className="italic text-center">
+                  Enjoy the rest of your {moment().format("dddd")}!
+                </div>
 
-                  <div className="italic text-center">
-                    Copyright ©2022 hire.win - All rights reserved
-                  </div>
-
-                  <div className="italic text-center">
-                    Enjoy the rest of your {moment().format("dddd")}!
-                  </div>
-
-                  {/* <div className="flex-1">
+                {/* <div className="flex-1">
                   <p className="uppercase font-extrabold md:mb-6">Links</p>
                   <ul className="list-reset mb-6">
                     <li className="mt-2 inline-block mr-2 md:block md:mr-0">
@@ -250,11 +250,11 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                     </li>
                   </ul>
                 </div> */}
-                </div>
               </div>
-            </footer>
-          </div>
+            </div>
+          </footer>
         </div>
+        {/* </div> */}
       </div>
     </>
   )

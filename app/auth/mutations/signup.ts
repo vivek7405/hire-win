@@ -33,8 +33,8 @@ export default async function signup(
     companyUserRole,
     password,
     timezone,
-    currency,
-  }: signupProps,
+  }: // currency,
+  signupProps,
   ctx: Ctx
 ) {
   if (!email) {
@@ -94,7 +94,7 @@ export default async function signup(
 
   if (!existingCompany) {
     await createFactoryItems({ companyId: compId }, ctx)
-    currency && (await provideTrail(user?.id, compId, currency))
+    // currency && (await provideTrail(user?.id, compId, currency))
   }
 
   const schedule = await addSchedule(

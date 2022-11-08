@@ -50,6 +50,18 @@ export default function Support({}) {
                   reach out to us for any queries and {`we'll`} be more than happy to assist you.
                 </li>
                 <li>
+                  - Visit our{" "}
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://hirewin.tawk.help"
+                    className="underline"
+                  >
+                    <span className="font-semibold">Hep Center</span>
+                  </a>{" "}
+                  to contact us.
+                </li>
+                {/* <li>
                   - Though, <span className="font-semibold">our support is limited to email</span>,
                   we shall be scheduling a video meet if absolutely necessary. If {`it's`} an issue
                   with your account or you need to report a bug, make sure you attach a screenshot
@@ -82,7 +94,7 @@ export default function Support({}) {
                       </div>
                     </div>
                   </div>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>

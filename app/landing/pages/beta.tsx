@@ -18,7 +18,7 @@ export default function Beta({}) {
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl text-center">hire.win | BETA</h1>
       </div>
-      <section id="pricing" className="bg-gray-100 py-8 mt-16">
+      <section id="beta" className="bg-gray-100 py-8 mt-16">
         <div className="px-2 pb-6 text-neutral-800">
           <div className="w-full text-center pt-2">
             <div className="mt-1 lg:px-14">
@@ -26,7 +26,7 @@ export default function Beta({}) {
             </div>
           </div>
 
-          <div className="w-full text-center mt-10">
+          {/* <div className="w-full text-center mt-10">
             <div className="mt-1 lg:px-14">
               <a
                 target="_blank"
@@ -38,12 +38,12 @@ export default function Beta({}) {
               </a>
               <br />
             </div>
-          </div>
+          </div> */}
 
           <div className="w-full flex flex-row items-center lg:px-28 mt-10">
             <div className="flex flex-col space-y-5 w-full text-lg">
               <ul className="px-6 space-y-6 text-justify">
-                <li>
+                {/* <li>
                   - <span className="font-semibold">Expect a few bugs</span> until we are running on
                   beta. You may check the{" "}
                   <a
@@ -55,8 +55,24 @@ export default function Beta({}) {
                     BETA Tracker
                   </a>{" "}
                   to view the status of known bugs.
+                </li> */}
+                <li>
+                  - <span className="font-semibold">Expect a few bugs</span> until we are running on
+                  beta.
                 </li>
                 <li>
+                  - Visit our{" "}
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://hirewin.tawk.help"
+                    className="underline font-bold"
+                  >
+                    Hep Center
+                  </a>{" "}
+                  to submit a ticket if you encounter a bug.
+                </li>
+                {/* <li>
                   - We will stay running on beta{" "}
                   <span className="font-semibold">till 16th November, 2022 11:59 PM IST</span>
                 </li>
@@ -73,7 +89,7 @@ export default function Beta({}) {
                 <li>
                   - Lastly, you may report us any bugs that you encounter by writing to{" "}
                   <span className="bg-yellow-300">support@hire.win</span>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>
