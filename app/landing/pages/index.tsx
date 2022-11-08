@@ -2271,7 +2271,7 @@ export default function Home() {
           </div>
         </section> */}
 
-        <section id="sign-up" className="bg-gray-100 py-8 px-4 mt-16">
+        <section id="sign-up" className="bg-white py-8 px-4">
           <div className="text-neutral-800">
             <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
               It only takes 5 minutes!
@@ -2281,7 +2281,7 @@ export default function Home() {
               <div className="mt-1">
                 <span className="text-2xl md:text-3xl lg:text-3xl">
                   Empower your company with the <span className="bg-yellow-300">power of ATS</span>{" "}
-                  now!
+                  now. 100+ companies have already done so!
                   {/* Get your <span className="bg-yellow-300">interviewing kit</span> with{" "}
                   <span className="bg-yellow-300">careers page</span> up and running now */}
                 </span>
