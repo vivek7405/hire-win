@@ -257,7 +257,7 @@ const Jobs = ({ company }: JobsProps) => {
       <div>
         {jobs?.map((job) => {
           // Filter jobs whose free candidate limit has reached
-          if (checkSubscription(company) && job.candidates.length >= 25) return <></>
+          // if (checkSubscription(company) && job.candidates.length >= 25) return <></>
 
           return (
             <div key={job.id}>

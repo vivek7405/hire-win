@@ -230,11 +230,11 @@ const JobSettingsMembersPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
-                  if (checkSubscription(company)) {
-                    setOpenInvite(true)
-                  } else {
-                    setOpenConfirmBilling(true)
-                  }
+                  // if (checkSubscription(company)) {
+                  setOpenInvite(true)
+                  // } else {
+                  //   setOpenConfirmBilling(true)
+                  // }
                 }}
                 data-testid={`open-inviteUser-modal`}
                 className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"

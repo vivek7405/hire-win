@@ -208,7 +208,7 @@ const CategoryFilterButtons = ({
 const Jobs = ({
   user,
   company,
-  subscription,
+  // subscription,
   setOpenConfirm,
   setConfirmMessage,
   viewType,
@@ -526,11 +526,12 @@ const Jobs = ({
           .map((jobUser) => {
             return {
               ...jobUser.job,
-              hasByPassedPlanLimit:
-                !(
-                  subscription?.status === SubscriptionStatus.ACTIVE ||
-                  subscription?.status === SubscriptionStatus.TRIALING
-                ) && jobUsers?.length > 1,
+              hasByPassedPlanLimit: false,
+              // hasByPassedPlanLimit:
+              //   !(
+              //     subscription?.status === SubscriptionStatus.ACTIVE ||
+              //     subscription?.status === SubscriptionStatus.TRIALING
+              //   ) && jobUsers?.length > 1,
               canUpdate: jobUser.role === "OWNER" || jobUser.role === "ADMIN",
             }
           })
@@ -769,35 +770,35 @@ const JobsHome = ({
     />
   )
 
-  const subscription = checkSubscription(company)
-  const subscriptionLink =
-    companyUserRole === CompanyUserRole.OWNER ? (
-      <>
-        <Link
-          prefetch={true}
-          href={Routes.UserSettingsBillingPage({ companySlug: company?.slug! })}
-          passHref
-        >
-          <a className="flex items-center py-2 whitespace-nowrap">
-            {subscription?.status === SubscriptionStatus.TRIALING ? (
-              <span className="text-yellow-600 hover:underline py-1 px-3 border-2 rounded-full border-yellow-500">
-                Trial ends in {subscription?.daysLeft}{" "}
-                {subscription?.daysLeft === 1 ? "day" : "days"}
-              </span>
-            ) : subscription?.status !== SubscriptionStatus.ACTIVE ? (
-              <span className="text-red-600 flex items-center hover:underline py-1 px-3 border-2 rounded-full border-red-500">
-                <ExclamationCircleIcon className="w-4 h-4 mr-1" />
-                <span>Subscribe Plan</span>
-              </span>
-            ) : (
-              <></>
-            )}
-          </a>
-        </Link>
-      </>
-    ) : (
-      <></>
-    )
+  // const subscription = checkSubscription(company)
+  // const subscriptionLink =
+  //   companyUserRole === CompanyUserRole.OWNER ? (
+  //     <>
+  //       <Link
+  //         prefetch={true}
+  //         href={Routes.UserSettingsBillingPage({ companySlug: company?.slug! })}
+  //         passHref
+  //       >
+  //         <a className="flex items-center py-2 whitespace-nowrap">
+  //           {subscription?.status === SubscriptionStatus.TRIALING ? (
+  //             <span className="text-yellow-600 hover:underline py-1 px-3 border-2 rounded-full border-yellow-500">
+  //               Trial ends in {subscription?.daysLeft}{" "}
+  //               {subscription?.daysLeft === 1 ? "day" : "days"}
+  //             </span>
+  //           ) : subscription?.status !== SubscriptionStatus.ACTIVE ? (
+  //             <span className="text-red-600 flex items-center hover:underline py-1 px-3 border-2 rounded-full border-red-500">
+  //               <ExclamationCircleIcon className="w-4 h-4 mr-1" />
+  //               <span>Subscribe Plan</span>
+  //             </span>
+  //           ) : (
+  //             <></>
+  //           )}
+  //         </a>
+  //       </Link>
+  //     </>
+  //   ) : (
+  //     <></>
+  //   )
 
   const viewCareersPageLink = (
     <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
@@ -831,24 +832,24 @@ const JobsHome = ({
             setCancelButtonText("Ok")
             setHideConfirmButton(true)
           } else {
-            if (
-              !(
-                subscription?.status === SubscriptionStatus.ACTIVE ||
-                subscription?.status === SubscriptionStatus.TRIALING
-              )
-            ) {
-              setConfirmHeader("Upgrade to the Pro Plan?")
-              setConfirmMessage(
-                "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
-              )
-              setCancelButtonText("Cancel")
-              setHideConfirmButton(false)
-            } else {
-              setConfirmHeader("No Permission")
-              setConfirmMessage("You don't have the permission to create a job")
-              setCancelButtonText("Ok")
-              setHideConfirmButton(true)
-            }
+            // if (
+            //   !(
+            //     subscription?.status === SubscriptionStatus.ACTIVE ||
+            //     subscription?.status === SubscriptionStatus.TRIALING
+            //   )
+            // ) {
+            //   setConfirmHeader("Upgrade to the Pro Plan?")
+            //   setConfirmMessage(
+            //     "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+            //   )
+            //   setCancelButtonText("Cancel")
+            //   setHideConfirmButton(false)
+            // } else {
+            setConfirmHeader("No Permission")
+            setConfirmMessage("You don't have the permission to create a job")
+            setCancelButtonText("Ok")
+            setHideConfirmButton(true)
+            // }
           }
           setOpenConfirm(true)
         }
@@ -988,7 +989,7 @@ const JobsHome = ({
         </Form>
 
         <div className="flex justify-center space-x-6">
-          {subscriptionLink}
+          {/* {subscriptionLink} */}
           {viewCareersPageLink}
         </div>
       </div>
@@ -1016,7 +1017,7 @@ const JobsHome = ({
         </div>
 
         <div className="flex items-center space-x-6">
-          {subscriptionLink}
+          {/* {subscriptionLink} */}
           {viewCareersPageLink}
           {newJobButton}
         </div>
@@ -1027,7 +1028,7 @@ const JobsHome = ({
           viewType={viewType}
           user={user}
           company={company}
-          subscription={subscription}
+          // subscription={subscription}
           setOpenConfirm={setOpenConfirm}
           setConfirmMessage={setConfirmMessage}
           introSteps={introSteps}
