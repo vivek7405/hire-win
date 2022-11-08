@@ -233,11 +233,11 @@ const UserSettingsMembersPage = ({
               <button
                 onClick={(e) => {
                   e.preventDefault()
-                  if (checkSubscription(company)) {
-                    setOpenInvite(true)
-                  } else {
-                    setOpenConfirmBilling(true)
-                  }
+                  // if (checkSubscription(company)) {
+                  setOpenInvite(true)
+                  // } else {
+                  //   setOpenConfirmBilling(true)
+                  // }
                 }}
                 className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
               >

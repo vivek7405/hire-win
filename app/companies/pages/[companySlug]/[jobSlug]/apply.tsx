@@ -128,7 +128,8 @@ const ApplyToJob = ({
     <JobApplicationLayout
       job={job}
       company={company}
-      addGoogleJobPostingScript={!!checkSubscription(company) && (job?.postToGoogle || false)}
+      // addGoogleJobPostingScript={!!checkSubscription(company) && (job?.postToGoogle || false)}
+      addGoogleJobPostingScript={job?.postToGoogle || false}
     >
       <Suspense fallback="Loading...">
         {(job?.description as any)?.blocks && (job?.description as any)?.blocks[0]?.text && (

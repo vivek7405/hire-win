@@ -63,11 +63,12 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       //   { companyId: job.companyId },
       //   ctx
       // )
-      if (!checkSubscription(job.company)) {
-        if (job._count.candidates >= 25) {
-          return false
-        }
-      }
+
+      // if (!checkSubscription(job.company)) {
+      //   if (job._count.candidates >= 25) {
+      //     return false
+      //   }
+      // }
 
       return true
     }
@@ -132,18 +133,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             jobs: true,
           },
         })
-        const allUserJobsLength = company?.jobs?.length || 0
-        if (allUserJobsLength >= 1) {
-          // const currentPlan = checkPlan(company)
-          // if (!currentPlan) return false
-          // const subscriptionStatus = await getCompanySubscriptionStatus(
-          //   { companyId: company?.id || "0" },
-          //   ctx
-          // )
-          if (!checkSubscription(company)) {
-            return false
-          }
-        }
+
+        // const allUserJobsLength = company?.jobs?.length || 0
+        // if (allUserJobsLength >= 1) {
+        //   // const currentPlan = checkPlan(company)
+        //   // if (!currentPlan) return false
+        //   // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   //   { companyId: company?.id || "0" },
+        //   //   ctx
+        //   // )
+        //   if (!checkSubscription(company)) {
+        //     return false
+        //   }
+        // }
 
         // Only company owner and admins can create jobs, company users can't
         const companyUser = await db.companyUser.findUnique({
@@ -180,18 +182,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             jobs: true,
           },
         })
-        const allCompanyJobsLength = company?.jobs?.length || 0
-        if (allCompanyJobsLength > 1) {
-          // const currentPlan = checkPlan(company)
-          // if (!currentPlan) return false
-          // const subscriptionStatus = await getCompanySubscriptionStatus(
-          //   { companyId: company?.id || "0" },
-          //   ctx
-          // )
-          if (!checkSubscription(company)) {
-            return false
-          }
-        }
+
+        // const allCompanyJobsLength = company?.jobs?.length || 0
+        // if (allCompanyJobsLength > 1) {
+        //   // const currentPlan = checkPlan(company)
+        //   // if (!currentPlan) return false
+        //   // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   //   { companyId: company?.id || "0" },
+        //   //   ctx
+        //   // )
+        //   if (!checkSubscription(company)) {
+        //     return false
+        //   }
+        // }
 
         return job?.companyId === ctx.session.companyId
       })
@@ -223,18 +226,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             jobs: true,
           },
         })
-        const allCompanyJobsLength = company?.jobs?.length || 0
-        if (allCompanyJobsLength > 1) {
-          // const currentPlan = checkPlan(company)
-          // if (!currentPlan) return false
-          // const subscriptionStatus = await getCompanySubscriptionStatus(
-          //   { companyId: company?.id || "0" },
-          //   ctx
-          // )
-          if (!checkSubscription(company)) {
-            return false
-          }
-        }
+
+        // const allCompanyJobsLength = company?.jobs?.length || 0
+        // if (allCompanyJobsLength > 1) {
+        //   // const currentPlan = checkPlan(company)
+        //   // if (!currentPlan) return false
+        //   // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   //   { companyId: company?.id || "0" },
+        //   //   ctx
+        //   // )
+        //   if (!checkSubscription(company)) {
+        //     return false
+        //   }
+        // }
 
         const owner = job?.users.find((u) => u.role === JobUserRole.OWNER)
         const admins = job?.users.filter((u) => u.role === JobUserRole.ADMIN)
@@ -267,9 +271,9 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         //   { companyId: company?.id || "0" },
         //   ctx
         // )
-        if (!checkSubscription(company)) {
-          return false
-        }
+        // if (!checkSubscription(company)) {
+        //   return false
+        // }
 
         const owner = job?.users.find((p) => p.role === JobUserRole.OWNER)
         const admins = job?.users.filter((m) => m.role === JobUserRole.ADMIN)
@@ -405,9 +409,9 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         //   { companyId: company?.id || "0" },
         //   ctx
         // )
-        if (!checkSubscription) {
-          return false
-        }
+        // if (!checkSubscription) {
+        //   return false
+        // }
 
         const owner = company?.users.find((u) => u.role === CompanyUserRole.OWNER)
         const admins = company?.users.filter((u) => u.role === CompanyUserRole.ADMIN)
