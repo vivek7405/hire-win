@@ -67,14 +67,14 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
           icon: UserGroupIcon,
         }
       : null,
-    companyUser?.role === CompanyUserRole.OWNER
-      ? {
-          name: "Billing",
-          href: `/settings/billing`,
-          current: router.route === `/settings/billing`,
-          icon: CreditCardIcon,
-        }
-      : null,
+    // companyUser?.role === CompanyUserRole.OWNER
+    //   ? {
+    //       name: "Billing",
+    //       href: `/settings/billing`,
+    //       current: router.route === `/settings/billing`,
+    //       icon: CreditCardIcon,
+    //     }
+    //   : null,
   ]
 
   return (
