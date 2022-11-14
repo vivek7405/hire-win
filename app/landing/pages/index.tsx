@@ -271,16 +271,40 @@ export default function Home() {
           </h1> */}
 
           <div className="w-full block sm:hidden md:hidden lg:hidden mobileCandidateHeight relative">
-            <Image alt="job" src="/candidate-angel.webp" layout="fill" objectFit="contain" />
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/candidate-angel.webp"
+              layout="fill"
+              objectFit="contain"
+            />
           </div>
           <div className="w-full hidden sm:block md:hidden lg:hidden smCandidateHeight relative">
-            <Image alt="job" src="/candidate-angel.webp" layout="fill" objectFit="contain" />
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/candidate-angel.webp"
+              layout="fill"
+              objectFit="contain"
+            />
           </div>
           <div className="w-full hidden sm:hidden md:block lg:hidden mdCandidateHeight relative">
-            <Image alt="job" src="/candidate-angel.webp" layout="fill" objectFit="contain" />
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/candidate-angel.webp"
+              layout="fill"
+              objectFit="contain"
+            />
           </div>
           <div className="w-full hidden sm:hidden md:hidden lg:block lgCandidateHeight relative">
-            <Image alt="job" src="/candidate-angel.webp" layout="fill" objectFit="contain" />
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/candidate-angel.webp"
+              layout="fill"
+              objectFit="contain"
+            />
           </div>
 
           <div className="mt-8">
@@ -351,61 +375,113 @@ export default function Home() {
             <div className="w-full flex items-center justify-center mt-10 space-x-10 px-8">
               <div className="w-1/3 sm:w-1/4">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileLogoHeight relative">
-                  <Image alt="job" src="/welfound-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/welfound-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:block md:hidden lg:hidden smLogoHeight relative">
-                  <Image alt="job" src="/welfound-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/welfound-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:block lg:hidden mdLogoHeight relative">
-                  <Image alt="job" src="/welfound-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/welfound-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:hidden lg:block lgLogoHeight relative">
-                  <Image alt="job" src="/welfound-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/welfound-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
               </div>
               <div className="w-1/3 sm:w-1/4">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileLogoHeight relative">
-                  <Image alt="job" src="/variance-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/variance-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:block md:hidden lg:hidden smLogoHeight relative">
-                  <Image alt="job" src="/variance-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/variance-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:block lg:hidden mdLogoHeight relative">
-                  <Image alt="job" src="/variance-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/variance-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:hidden lg:block lgLogoHeight relative">
-                  <Image alt="job" src="/variance-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/variance-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
               </div>
               <div className="w-1/3 sm:w-1/4">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileLogoHeight relative">
                   <Image
+                    priority={true}
                     alt="job"
-                    src="/prompt-softech-logo.webp"
+                    src="/landing-screenshots/prompt-softech-logo.webp"
                     layout="fill"
                     objectFit="contain"
                   />
                 </div>
                 <div className="w-full hidden sm:block md:hidden lg:hidden smLogoHeight relative">
                   <Image
+                    priority={true}
                     alt="job"
-                    src="/prompt-softech-logo.webp"
+                    src="/landing-screenshots/prompt-softech-logo.webp"
                     layout="fill"
                     objectFit="contain"
                   />
                 </div>
                 <div className="w-full hidden sm:hidden md:block lg:hidden mdLogoHeight relative">
                   <Image
+                    priority={true}
                     alt="job"
-                    src="/prompt-softech-logo.webp"
+                    src="/landing-screenshots/prompt-softech-logo.webp"
                     layout="fill"
                     objectFit="contain"
                   />
                 </div>
                 <div className="w-full hidden sm:hidden md:hidden lg:block lgLogoHeight relative">
                   <Image
+                    priority={true}
                     alt="job"
-                    src="/prompt-softech-logo.webp"
+                    src="/landing-screenshots/prompt-softech-logo.webp"
                     layout="fill"
                     objectFit="contain"
                   />
@@ -413,16 +489,40 @@ export default function Home() {
               </div>
               <div className="hidden sm:block w-1/4">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:block md:hidden lg:hidden smLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:block lg:hidden mdLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:hidden lg:block lgLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
               </div>
             </div>
@@ -430,44 +530,116 @@ export default function Home() {
             <div className="flex sm:hidden w-full items-center justify-center mt-10 space-x-10 px-8">
               <div className="w-1/3">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:block md:hidden lg:hidden smLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:block lg:hidden mdLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:hidden lg:block lgLogoHeight relative">
-                  <Image alt="job" src="/primus-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/primus-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
               </div>
               <div className="w-1/3">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileLogoHeight relative">
-                  <Image alt="job" src="/kcs-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/kcs-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:block md:hidden lg:hidden smLogoHeight relative">
-                  <Image alt="job" src="/kcs-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/kcs-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:block lg:hidden mdLogoHeight relative">
-                  <Image alt="job" src="/kcs-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/kcs-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:hidden lg:block lgLogoHeight relative">
-                  <Image alt="job" src="/kcs-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/kcs-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
               </div>
               <div className="w-1/3">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileLogoHeight relative">
-                  <Image alt="job" src="/arthentic-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/arthentic-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:block md:hidden lg:hidden smLogoHeight relative">
-                  <Image alt="job" src="/arthentic-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/arthentic-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:block lg:hidden mdLogoHeight relative">
-                  <Image alt="job" src="/arthentic-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/arthentic-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="w-full hidden sm:hidden md:hidden lg:block lgLogoHeight relative">
-                  <Image alt="job" src="/arthentic-logo.webp" layout="fill" objectFit="contain" />
+                  <Image
+                    priority={true}
+                    alt="job"
+                    src="/landing-screenshots/arthentic-logo.webp"
+                    layout="fill"
+                    objectFit="contain"
+                  />
                 </div>
               </div>
             </div>
@@ -1105,16 +1277,40 @@ export default function Home() {
                 </div>
                 <div className="w-full sm:w-1/2">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileScoresCommentsHeight relative">
-                    <Image alt="job" src="/scores.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/scores.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smScoresCommentsHeight relative">
-                    <Image alt="job" src="/scores.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/scores.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdScoresCommentsHeight relative">
-                    <Image alt="job" src="/scores.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/scores.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgScoresCommentsHeight relative">
-                    <Image alt="job" src="/scores.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/scores.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1122,16 +1318,40 @@ export default function Home() {
               <div className="flex flex-wrap flex-col-reverse sm:flex-row">
                 <div className="w-full sm:w-1/2">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/interviews.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/interviews.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/interviews.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/interviews.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/interviews.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/interviews.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/interviews.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/interviews.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
                 <div className="w-full sm:w-1/2 px-6">
@@ -1179,16 +1399,40 @@ export default function Home() {
                 </div>
                 <div className="w-full sm:w-1/2">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileScoresCommentsHeight relative">
-                    <Image alt="job" src="/comments.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/comments.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smScoresCommentsHeight relative">
-                    <Image alt="job" src="/comments.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/comments.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdScoresCommentsHeight relative">
-                    <Image alt="job" src="/comments.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/comments.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgScoresCommentsHeight relative">
-                    <Image alt="job" src="/comments.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/comments.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1196,16 +1440,40 @@ export default function Home() {
               <div className="flex flex-wrap flex-col-reverse sm:flex-row">
                 <div className="w-full sm:w-1/2">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/emails.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/emails.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/emails.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/emails.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/emails.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/emails.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgInterviewsEmailsHeight relative">
-                    <Image alt="job" src="/emails.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/emails.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
                 <div className="w-full sm:w-1/2 px-6">
@@ -1260,16 +1528,40 @@ export default function Home() {
                 </div>
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileFileUploadHeight relative">
-                    <Image alt="job" src="/file-upload.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/file-upload.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smFileUploadHeight relative">
-                    <Image alt="job" src="/file-upload.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/file-upload.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdFileUploadHeight relative">
-                    <Image alt="job" src="/file-upload.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/file-upload.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgFileUploadHeight relative">
-                    <Image alt="job" src="/file-upload.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/file-upload.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1278,32 +1570,36 @@ export default function Home() {
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileCandidateActivityHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-activity.webp"
+                      src="/landing-screenshots/candidate-activity.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smCandidateActivityHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-activity.webp"
+                      src="/landing-screenshots/candidate-activity.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdCandidateActivityHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-activity.webp"
+                      src="/landing-screenshots/candidate-activity.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgCandidateActivityHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-activity.webp"
+                      src="/landing-screenshots/candidate-activity.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -1348,16 +1644,40 @@ export default function Home() {
                 </div>
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobilePrivateNotesHeight relative">
-                    <Image alt="job" src="/private-notes.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/private-notes.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smPrivateNotesHeight relative">
-                    <Image alt="job" src="/private-notes.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/private-notes.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdPrivateNotesHeight relative">
-                    <Image alt="job" src="/private-notes.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/private-notes.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgPrivateNotesHeight relative">
-                    <Image alt="job" src="/private-notes.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/private-notes.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1387,31 +1707,79 @@ export default function Home() {
 
             <div className="w-full pt-3">
               <div className="w-full block sm:hidden md:hidden lg:hidden mobileBoardHeight relative">
-                <Image alt="job" src="/board.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/board.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
               <div className="w-full hidden sm:block md:hidden lg:hidden smBoardHeight relative">
-                <Image alt="job" src="/board.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/board.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
               <div className="w-full hidden sm:hidden md:block lg:hidden mdBoardHeight relative">
-                <Image alt="job" src="/board.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/board.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
               <div className="w-full hidden sm:hidden md:hidden lg:block lgBoardHeight relative">
-                <Image alt="job" src="/board.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/board.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
             </div>
 
             <div className="w-full pt-3">
               <div className="w-full block sm:hidden md:hidden lg:hidden mobileTableHeight relative">
-                <Image alt="job" src="/table.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/table.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
               <div className="w-full hidden sm:block md:hidden lg:hidden smTableHeight relative">
-                <Image alt="job" src="/table.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/table.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
               <div className="w-full hidden sm:hidden md:block lg:hidden mdTableHeight relative">
-                <Image alt="job" src="/table.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/table.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
               <div className="w-full hidden sm:hidden md:hidden lg:block lgTableHeight relative">
-                <Image alt="job" src="/table.webp" layout="fill" objectFit="contain" />
+                <Image
+                  priority={true}
+                  alt="job"
+                  src="/landing-screenshots/table.webp"
+                  layout="fill"
+                  objectFit="contain"
+                />
               </div>
             </div>
           </div>
@@ -1442,16 +1810,40 @@ export default function Home() {
                 </div>
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileMembersHeight relative">
-                    <Image alt="job" src="/members.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/members.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smMembersHeight relative">
-                    <Image alt="job" src="/members.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/members.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdMembersHeight relative">
-                    <Image alt="job" src="/members.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/members.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgMembersHeight relative">
-                    <Image alt="job" src="/members.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/members.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1460,32 +1852,36 @@ export default function Home() {
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileMemberAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/member-assignment.webp"
+                      src="/landing-screenshots/member-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smMemberAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/member-assignment.webp"
+                      src="/landing-screenshots/member-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdMemberAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/member-assignment.webp"
+                      src="/landing-screenshots/member-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgMemberAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/member-assignment.webp"
+                      src="/landing-screenshots/member-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -1545,16 +1941,40 @@ export default function Home() {
                 </div>
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileSchedulesHeight relative">
-                    <Image alt="job" src="/schedules.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/schedules.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smSchedulesHeight relative">
-                    <Image alt="job" src="/schedules.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/schedules.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdSchedulesHeight relative">
-                    <Image alt="job" src="/schedules.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/schedules.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgSchedulesHeight relative">
-                    <Image alt="job" src="/schedules.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/schedules.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1562,16 +1982,40 @@ export default function Home() {
               <div className="flex flex-wrap flex-col-reverse md:flex-row">
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileCalendarsHeight relative">
-                    <Image alt="job" src="/calendars.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/calendars.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smCalendarsHeight relative">
-                    <Image alt="job" src="/calendars.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/calendars.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdCalendarsHeight relative">
-                    <Image alt="job" src="/calendars.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/calendars.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgCalendarsHeight relative">
-                    <Image alt="job" src="/calendars.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/calendars.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
                 <div className="w-full md:w-1/3 px-6">
@@ -1623,32 +2067,36 @@ export default function Home() {
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileScheduleCalAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/schedule-calendar-assignment.webp"
+                      src="/landing-screenshots/schedule-calendar-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smScheduleCalAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/schedule-calendar-assignment.webp"
+                      src="/landing-screenshots/schedule-calendar-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdScheduleCalAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/schedule-calendar-assignment.webp"
+                      src="/landing-screenshots/schedule-calendar-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgScheduleCalAssignHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/schedule-calendar-assignment.webp"
+                      src="/landing-screenshots/schedule-calendar-assignment.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -1660,32 +2108,36 @@ export default function Home() {
                 <div className="w-full md:w-1/2">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileInterviewSchedulingHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/interview-scheduling.webp"
+                      src="/landing-screenshots/interview-scheduling.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smInterviewSchedulingHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/interview-scheduling.webp"
+                      src="/landing-screenshots/interview-scheduling.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdInterviewSchedulingHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/interview-scheduling.webp"
+                      src="/landing-screenshots/interview-scheduling.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgInterviewSchedulingHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/interview-scheduling.webp"
+                      src="/landing-screenshots/interview-scheduling.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -1740,32 +2192,36 @@ export default function Home() {
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileEmailTemplateHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/email-templates.webp"
+                      src="/landing-screenshots/email-templates.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smEmailTemplateHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/email-templates.webp"
+                      src="/landing-screenshots/email-templates.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdEmailTemplateHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/email-templates.webp"
+                      src="/landing-screenshots/email-templates.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgEmailTemplateHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/email-templates.webp"
+                      src="/landing-screenshots/email-templates.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -1777,32 +2233,36 @@ export default function Home() {
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileCandidatePoolsHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-pools.webp"
+                      src="/landing-screenshots/candidate-pools.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smCandidatePoolsHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-pools.webp"
+                      src="/landing-screenshots/candidate-pools.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdCandidatePoolsHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-pools.webp"
+                      src="/landing-screenshots/candidate-pools.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgCandidatePoolsHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/candidate-pools.webp"
+                      src="/landing-screenshots/candidate-pools.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -1856,16 +2316,40 @@ export default function Home() {
                 </div>
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileJobCategoriesHeight relative">
-                    <Image alt="job" src="/job-categories.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/job-categories.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smJobCategoriesHeight relative">
-                    <Image alt="job" src="/job-categories.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/job-categories.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdJobCategoriesHeight relative">
-                    <Image alt="job" src="/job-categories.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/job-categories.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgJobCategoriesHeight relative">
-                    <Image alt="job" src="/job-categories.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/job-categories.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1904,16 +2388,40 @@ export default function Home() {
                 </div>
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileJobsOverviewHeight relative">
-                    <Image alt="job" src="/jobs-overview.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/jobs-overview.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smJobsOverviewHeight relative">
-                    <Image alt="job" src="/jobs-overview.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/jobs-overview.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdJobsOverviewHeight relative">
-                    <Image alt="job" src="/jobs-overview.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/jobs-overview.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgJobsOverviewHeight relative">
-                    <Image alt="job" src="/jobs-overview.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/jobs-overview.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
               </div>
@@ -1922,32 +2430,36 @@ export default function Home() {
                 <div className="w-full md:w-1/2">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileCareersPageHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/company-settings.webp"
+                      src="/landing-screenshots/company-settings.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smCareersPageHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/company-settings.webp"
+                      src="/landing-screenshots/company-settings.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdCareersPageHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/company-settings.webp"
+                      src="/landing-screenshots/company-settings.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgCareersPageHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/company-settings.webp"
+                      src="/landing-screenshots/company-settings.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -2025,32 +2537,36 @@ export default function Home() {
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileFormConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/application-form-config.webp"
+                      src="/landing-screenshots/application-form-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smFormConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/application-form-config.webp"
+                      src="/landing-screenshots/application-form-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdFormConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/application-form-config.webp"
+                      src="/landing-screenshots/application-form-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgFormConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/application-form-config.webp"
+                      src="/landing-screenshots/application-form-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
@@ -2061,16 +2577,40 @@ export default function Home() {
               <div className="flex flex-wrap flex-col-reverse md:flex-row">
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileStagesConfigHeight relative">
-                    <Image alt="job" src="/stages-config.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/stages-config.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smStagesConfigHeight relative">
-                    <Image alt="job" src="/stages-config.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/stages-config.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdStagesConfigHeight relative">
-                    <Image alt="job" src="/stages-config.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/stages-config.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgStagesConfigHeight relative">
-                    <Image alt="job" src="/stages-config.webp" layout="fill" objectFit="contain" />
+                    <Image
+                      priority={true}
+                      alt="job"
+                      src="/landing-screenshots/stages-config.webp"
+                      layout="fill"
+                      objectFit="contain"
+                    />
                   </div>
                 </div>
                 <div className="w-full md:w-1/3 px-6">
@@ -2114,32 +2654,36 @@ export default function Home() {
                 <div className="w-full md:w-2/3">
                   <div className="w-full block sm:hidden md:hidden lg:hidden mobileScoreCardConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/score-card-config.webp"
+                      src="/landing-screenshots/score-card-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:block md:hidden lg:hidden smScoreCardConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/score-card-config.webp"
+                      src="/landing-screenshots/score-card-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:block lg:hidden mdScoreCardConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/score-card-config.webp"
+                      src="/landing-screenshots/score-card-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
                   </div>
                   <div className="w-full hidden sm:hidden md:hidden lg:block lgScoreCardConfigHeight relative">
                     <Image
+                      priority={true}
                       alt="job"
-                      src="/score-card-config.webp"
+                      src="/landing-screenshots/score-card-config.webp"
                       layout="fill"
                       objectFit="contain"
                     />
