@@ -208,66 +208,71 @@ export const Candidates = ({ slug }) => {
           <p>No Candidates</p>
         </div>
       ) : (
-        <div className="flex flex-wrap justify-center">
-          {candidates.map((candidate) => {
-            return (
-              <Card key={candidate.id}>
-                <div className="space-y-2">
-                  <div className="w-full relative">
-                    <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                      <Link
-                        prefetch={true}
-                        href={Routes.SingleCandidatePage({
-                          slug: candidate?.job?.slug,
-                          candidateEmail: candidate?.email,
-                        })}
-                        passHref
-                      >
-                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate">
-                          {candidate.name}
-                        </a>
-                      </Link>
+        <>
+          <p className="font-bold text-xl text-neutral-700 capitalize text-center mb-10">
+            {slug?.replaceAll("-", " ")}
+          </p>
+          <div className="flex flex-wrap justify-center">
+            {candidates.map((candidate) => {
+              return (
+                <Card key={candidate.id}>
+                  <div className="space-y-2">
+                    <div className="w-full relative">
+                      <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                        <Link
+                          prefetch={true}
+                          href={Routes.SingleCandidatePage({
+                            slug: candidate?.job?.slug,
+                            candidateEmail: candidate?.email,
+                          })}
+                          passHref
+                        >
+                          <a className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate">
+                            {candidate.name}
+                          </a>
+                        </Link>
+                      </div>
+                      <div className="absolute top-0.5 right-0">
+                        <button
+                          id={"delete-" + candidate.id}
+                          className="float-right text-red-600 hover:text-red-800"
+                          title="Remove Candidate"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setCandidateToRemoveFromPool(candidate)
+                            setOpenConfirm(true)
+                          }}
+                        >
+                          <XIcon className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="absolute top-0.5 right-0">
-                      <button
-                        id={"delete-" + candidate.id}
-                        className="float-right text-red-600 hover:text-red-800"
-                        title="Remove Candidate"
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          setCandidateToRemoveFromPool(candidate)
-                          setOpenConfirm(true)
+                    <div className="border-b-2 border-gray-50 w-full"></div>
+                    <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                      <Form
+                        noFormatting={true}
+                        onSubmit={async () => {
+                          return
                         }}
                       >
-                        <XIcon className="w-5 h-5" />
-                      </button>
+                        <LabeledRatingField
+                          name="candidateAverageRating"
+                          ratingClass="!flex items-center"
+                          height={6}
+                          value={getScoreAverage(
+                            candidate?.scores?.map((score) => score.rating) || []
+                          )}
+                          disabled={true}
+                        />
+                      </Form>
                     </div>
                   </div>
-                  <div className="border-b-2 border-gray-50 w-full"></div>
-                  <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                    <Form
-                      noFormatting={true}
-                      onSubmit={async () => {
-                        return
-                      }}
-                    >
-                      <LabeledRatingField
-                        name="candidateAverageRating"
-                        ratingClass="!flex items-center"
-                        height={6}
-                        value={getScoreAverage(
-                          candidate?.scores?.map((score) => score.rating) || []
-                        )}
-                        disabled={true}
-                      />
-                    </Form>
-                  </div>
-                </div>
-              </Card>
-            )
-          })}
-        </div>
+                </Card>
+              )
+            })}
+          </div>
+        </>
       )}
     </>
   )
