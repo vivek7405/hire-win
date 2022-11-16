@@ -360,7 +360,7 @@ export default function Home() {
         <section id="customers" className="bg-white border-b px-4 py-4 mt-12">
           <div className="container mx-auto flex flex-wrap items-center justify-between pb-12">
             <h2 className="w-full my-2 text-xl font-black leading-tight text-center text-gray-800 lg:mt-8">
-              100+ Companies are streamlining their hiring process with hire.win
+              Many companies are already streamlining their hiring process with hire.win
             </h2>
             <div className="w-full mb-4">
               <div className="h-1 mx-auto bg-gradient-to-r from-neutral-200 to-neutral-500 w-96 opacity-25 my-0 py-0 rounded-t"></div>
