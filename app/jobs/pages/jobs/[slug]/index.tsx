@@ -822,7 +822,7 @@ const SingleJobPage = ({
   }
 
   return (
-    <AuthLayout user={user}>
+    <AuthLayout user={user} isMax8xl={true}>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <br />
       <Suspense fallback="Loading...">
