@@ -77,6 +77,7 @@ import getJobs from "app/jobs/queries/getJobs"
 import createJobWithTitleAndValidThrough from "app/jobs/mutations/createJobWithTitleAndValidThrough"
 import { Menu, Transition } from "@headlessui/react"
 import classNames from "app/core/utils/classNames"
+import ViewCareersPageButton from "app/companies/components/ViewCareersPageButton"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -800,18 +801,18 @@ const JobsHome = ({
   //     <></>
   //   )
 
-  const viewCareersPageLink = (
-    <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center underline text-theme-600 py-2 hover:text-theme-800 whitespace-nowrap"
-      >
-        <span>View Careers Page</span>
-        <ExternalLinkIcon className="w-4 h-4 ml-1" />
-      </a>
-    </Link>
-  )
+  // const viewCareersPageLink = (
+  //   <Link prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
+  //     <a
+  //       target="_blank"
+  //       rel="noopener noreferrer"
+  //       className="flex items-center underline text-theme-600 py-2 hover:text-theme-800 whitespace-nowrap"
+  //     >
+  //       <span>View Careers Page</span>
+  //       <ExternalLinkIcon className="w-4 h-4 ml-1" />
+  //     </a>
+  //   </Link>
+  // )
 
   const [hideConfirmButton, setHideConfirmButton] = useState(false)
   const [cancelButtonText, setCancelButtonText] = useState("Cancel")
@@ -990,7 +991,8 @@ const JobsHome = ({
 
         <div className="flex justify-center space-x-6">
           {/* {subscriptionLink} */}
-          {viewCareersPageLink}
+          {/* {viewCareersPageLink} */}
+          <ViewCareersPageButton companySlug={company?.slug || "0"} />
         </div>
       </div>
 
@@ -1018,7 +1020,8 @@ const JobsHome = ({
 
         <div className="flex items-center space-x-6">
           {/* {subscriptionLink} */}
-          {viewCareersPageLink}
+          {/* {viewCareersPageLink} */}
+          <ViewCareersPageButton companySlug={company?.slug || "0"} />
           {newJobButton}
         </div>
       </div>

@@ -9,6 +9,7 @@ import {
   invokeWithMiddleware,
   useQuery,
   ErrorComponent,
+  Link,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
@@ -23,7 +24,7 @@ import { getColorValueFromTheme, getThemeFromColorValue } from "app/core/utils/t
 import UserSettingsLayout from "app/core/layouts/UserSettingsLayout"
 import SubscribeButton from "app/users/components/SubscribeButton"
 import { Plan } from "types"
-import { CheckIcon } from "@heroicons/react/outline"
+import { CheckIcon, ExternalLinkIcon } from "@heroicons/react/outline"
 import createStripeBillingPortal from "app/companies/mutations/createStripeBillingPortal"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import getCompany from "app/companies/queries/getCompany"
@@ -95,6 +96,7 @@ const UserSettingsCompanyPage = ({
                 website: company?.website || "",
                 theme: company?.theme || "indigo",
               }}
+              companySlugForCareersPage={company?.slug || "0"}
               onSubmit={async (values) => {
                 if (values?.info) {
                   values.info = convertToRaw(values?.info?.getCurrentContent())

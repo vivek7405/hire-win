@@ -16,28 +16,31 @@ type UserFormProps = {
 export const UserForm = (props: UserFormProps) => {
   return (
     <>
-      <Form
-        header={props.header}
-        subHeader={props.subHeader}
-        submitText="Submit"
-        schema={UserObj}
-        initialValues={props.initialValues}
-        onSubmit={props.onSubmit}
-      >
-        <LabeledTextField
-          name="name"
-          label="Name"
-          placeholder="Enter your name"
-          testid="userUpdateName"
-        />
-        <LabeledTextField
-          name="email"
-          type="email"
-          label="Email"
-          placeholder="Enter your email"
-          testid="userUpdateEmail"
-        />
-      </Form>
+      <div className="bg-white w-full">
+        <Form
+          header={props.header}
+          subHeader={props.subHeader}
+          submitText="Submit"
+          schema={UserObj}
+          initialValues={props.initialValues}
+          onSubmit={props.onSubmit}
+          className="max-w-sm mx-auto"
+        >
+          <LabeledTextField
+            name="name"
+            label="Name"
+            placeholder="Enter your name"
+            testid="userUpdateName"
+          />
+          <LabeledTextField
+            name="email"
+            type="email"
+            label="Email"
+            placeholder="Enter your email"
+            testid="userUpdateEmail"
+          />
+        </Form>
+      </div>
     </>
   )
 }

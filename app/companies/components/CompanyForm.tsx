@@ -7,6 +7,7 @@ import ThemePickerField from "app/core/components/ThemePickerField"
 import { CompanyObj } from "../validations"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import { getTailwindColors } from "app/core/utils/themeHelpers"
+import ViewCareersPageButton from "./ViewCareersPageButton"
 
 type CompanyFormProps = {
   onSuccess?: () => void
@@ -14,6 +15,7 @@ type CompanyFormProps = {
   onSubmit: any
   header?: string
   subHeader?: string
+  companySlugForCareersPage?: string
 }
 
 export const CompanyForm = (props: CompanyFormProps) => {
@@ -21,56 +23,68 @@ export const CompanyForm = (props: CompanyFormProps) => {
 
   return (
     <>
-      <Form
-        header={props.header}
-        subHeader={props.subHeader}
-        submitText="Submit"
-        schema={CompanyObj}
-        initialValues={props.initialValues}
-        onSubmit={props.onSubmit}
-      >
-        <LabeledTextField
-          name="name"
-          label="Name"
-          placeholder="Enter company name"
-          testid="userUpdateName"
-        />
+      <div className="bg-white w-full">
+        <Form
+          header={props.header}
+          subHeader={props.subHeader}
+          submitText="Submit"
+          schema={CompanyObj}
+          initialValues={props.initialValues}
+          onSubmit={props.onSubmit}
+          className="max-w-xl mx-auto"
+        >
+          <LabeledTextField
+            name="name"
+            label="Name"
+            placeholder="Enter company name"
+            testid="userUpdateName"
+          />
 
-        <LabeledTextField
-          type="text"
-          name="website"
-          label="Website"
-          placeholder="This shall be used to navigate to your website from careers page"
-          testid="userUpdateWebsite"
-        />
+          <LabeledTextField
+            type="text"
+            name="website"
+            label="Website"
+            placeholder="This shall be used to navigate to your website from careers page"
+            testid="userUpdateWebsite"
+          />
 
-        <SingleFileUploadField showImage={true} accept="image/*" name="logo" label="Logo" />
+          <SingleFileUploadField showImage={true} accept="image/*" name="logo" label="Logo" />
 
-        <LabeledRichTextField
-          name="info"
-          label="Info"
-          placeholder="This shall appear on careers page"
-          testid="userUpdateCompanyInfo"
-        />
+          <LabeledRichTextField
+            name="info"
+            label="Info"
+            placeholder="This shall appear on careers page"
+            testid="userUpdateCompanyInfo"
+          />
 
-        {/* <ThemePickerField name="theme" label="Careers Page Theme" /> */}
-        <LabeledReactSelectField
-          name="theme"
-          label="Careers Page Theme"
-          options={Object.keys(tailwindColors)?.map((key) => {
-            return {
-              label: (
-                key.replace("-600", "").charAt(0).toUpperCase() + key.replace("-600", "").slice(1)
-              )
-                .replace(/([A-Z])/g, " $1")
-                .trim(),
-              value: key.replace("-600", ""),
-              color: tailwindColors[key],
-            }
-          })}
-          isColored={true}
-        />
-      </Form>
+          {/* <ThemePickerField name="theme" label="Careers Page Theme" /> */}
+          <LabeledReactSelectField
+            name="theme"
+            label="Careers Page Theme"
+            options={Object.keys(tailwindColors)?.map((key) => {
+              return {
+                label: (
+                  key.replace("-600", "").charAt(0).toUpperCase() + key.replace("-600", "").slice(1)
+                )
+                  .replace(/([A-Z])/g, " $1")
+                  .trim(),
+                value: key.replace("-600", ""),
+                color: tailwindColors[key],
+              }
+            })}
+            isColored={true}
+          />
+
+          {props.companySlugForCareersPage && (
+            <div className="float-left">
+              <ViewCareersPageButton
+                companySlug={props.companySlugForCareersPage}
+                noPadding={true}
+              />
+            </div>
+          )}
+        </Form>
+      </div>
     </>
   )
 }

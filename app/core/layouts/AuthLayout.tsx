@@ -8,6 +8,7 @@ type LayoutProps = {
   children: ReactNode
   user?: ExtendedUser | null
   hideNavbar?: boolean
+  isMax8xl?: boolean
   setNavbarIntroSteps?: (steps: IntroStep[]) => void
   setNavbarIntroHints?: (hints: IntroHint[]) => void
 }
@@ -17,6 +18,7 @@ const AuthLayout = ({
   children,
   user,
   hideNavbar,
+  isMax8xl,
   setNavbarIntroSteps,
   setNavbarIntroHints,
 }: LayoutProps) => {
@@ -35,7 +37,11 @@ const AuthLayout = ({
           />
         )}
         <main>
-          <div className="max-w-8xl mx-auto py-6 px-4 md:px-8 lg:px-8 bg-gray-100">
+          <div
+            className={`${
+              isMax8xl ? "max-w-8xl" : "max-w-7xl"
+            } mx-auto py-6 px-4 md:px-8 lg:px-8 bg-gray-100`}
+          >
             <Suspense fallback="Loading...">{children}</Suspense>
           </div>
         </main>

@@ -53,38 +53,40 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
 
   return (
     <AuthLayout title="New Company" user={user}>
-      <Suspense fallback="Loading...">
-        {companyUser && <Breadcrumbs />}
-        <div className="mt-6">
-          <CompanyForm
-            header="Create A New Company"
-            subHeader="Enter your company details"
-            initialValues={{
-              name: "",
-              info: EditorState.createEmpty(),
-              logo: null,
-              website: "",
-              theme: "indigo",
-            }}
-            onSubmit={async (values) => {
-              if (values?.info) {
-                values.info = convertToRaw(values?.info?.getCurrentContent())
-              }
+      <div className="max-w-lg mx-auto">
+        <Suspense fallback="Loading...">
+          {/* {companyUser && <Breadcrumbs />} */}
+          <div className="mt-6">
+            <CompanyForm
+              header="Create A New Company"
+              subHeader="Enter your company details"
+              initialValues={{
+                name: "",
+                info: EditorState.createEmpty(),
+                logo: null,
+                website: "",
+                theme: "indigo",
+              }}
+              onSubmit={async (values) => {
+                if (values?.info) {
+                  values.info = convertToRaw(values?.info?.getCurrentContent())
+                }
 
-              const toastId = toast.loading(() => <span>Creating Company</span>)
-              try {
-                await createCompanyMutation(values)
-                toast.success(() => <span>Company Created</span>, { id: toastId })
-                router.push(Routes.JobsHome())
-              } catch (error) {
-                toast.error(
-                  "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                )
-              }
-            }}
-          />
-        </div>
-      </Suspense>
+                const toastId = toast.loading(() => <span>Creating Company</span>)
+                try {
+                  await createCompanyMutation(values)
+                  toast.success(() => <span>Company Created</span>, { id: toastId })
+                  router.push(Routes.JobsHome())
+                } catch (error) {
+                  toast.error(
+                    "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                  )
+                }
+              }}
+            />
+          </div>
+        </Suspense>
+      </div>
     </AuthLayout>
   )
 }

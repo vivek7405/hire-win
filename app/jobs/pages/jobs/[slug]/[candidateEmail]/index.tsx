@@ -327,7 +327,7 @@ const SingleCandidatePage = ({
   }
 
   return (
-    <AuthLayout user={user}>
+    <AuthLayout user={user} isMax8xl={true}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
       {viewCandidateSelection && (
         <div
