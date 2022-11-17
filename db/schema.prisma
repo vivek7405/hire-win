@@ -202,9 +202,9 @@ model Job {
   state   String
   city    String
 
-  remote     Boolean
-  hidden     Boolean @default(false)
-  showSalary Boolean @default(false)
+  remoteOption RemoteOption @default(No_Remote)
+  hidden       Boolean      @default(false)
+  showSalary   Boolean      @default(false)
 
   currency   String     @default("")
   minSalary  Int        @default(0)
@@ -242,6 +242,12 @@ model Job {
   companyId String
 
   @@unique([companyId, slug])
+}
+
+enum RemoteOption {
+  No_Remote
+  Remote_Friendly
+  Fully_Remote
 }
 
 // model InterviewDetail {

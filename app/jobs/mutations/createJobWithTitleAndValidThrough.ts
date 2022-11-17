@@ -1,6 +1,6 @@
 import { Ctx } from "blitz"
 import Guard from "app/guard/ability"
-import { EmploymentType } from "@prisma/client"
+import { EmploymentType, RemoteOption } from "@prisma/client"
 import createJob from "./createJob"
 
 type JobInput = {
@@ -30,7 +30,7 @@ async function createJobWithTitleAndValidThrough({ title, validThrough }: JobInp
       //   hidden: false,
 
       title,
-      remote: false,
+      remoteOption: RemoteOption.No_Remote,
       description,
       postToGoogle: false,
 

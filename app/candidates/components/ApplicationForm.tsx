@@ -233,25 +233,28 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
 
   return (
     <>
-      <Form
-        submitText="Submit"
-        submitDisabled={props.submitDisabled}
-        submitHidden={props.preview}
-        schema={zodObj}
-        initialValues={props.initialValues}
-        onSubmit={props.onSubmit}
-        testid="applicationForm"
-        header={props.header}
-        subHeader={props.subHeader}
-      >
-        {formQuestions.map((question) => {
-          // Hide question only on careers page and not when adding candidate manually
-          if (props.careersPage && question.behaviour === "OFF") {
-            return
-          }
-          return getQuestionField(question as any)
-        })}
-      </Form>
+      <div className="bg-white w-full">
+        <Form
+          submitText="Submit"
+          submitDisabled={props.submitDisabled}
+          submitHidden={props.preview}
+          schema={zodObj}
+          initialValues={props.initialValues}
+          onSubmit={props.onSubmit}
+          testid="applicationForm"
+          header={props.header}
+          subHeader={props.subHeader}
+          className="max-w-md mx-auto"
+        >
+          {formQuestions.map((question) => {
+            // Hide question only on careers page and not when adding candidate manually
+            if (props.careersPage && question.behaviour === "OFF") {
+              return
+            }
+            return getQuestionField(question as any)
+          })}
+        </Form>
+      </div>
     </>
   )
 }

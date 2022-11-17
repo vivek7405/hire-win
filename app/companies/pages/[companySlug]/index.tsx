@@ -37,7 +37,7 @@ import Pagination from "app/core/components/Pagination"
 import Debouncer from "app/core/utils/debouncer"
 import getSymbolFromCurrency from "currency-symbol-map"
 import getCompany from "app/companies/queries/getCompany"
-import { Company, CompanyUser, Job, JobUser, User } from "@prisma/client"
+import { Company, CompanyUser, Job, JobUser, RemoteOption, User } from "@prisma/client"
 import { checkPlan } from "app/companies/utils/checkPlan"
 import getCompanyJobsForCareersPage from "app/jobs/queries/getCompanyJobsForCareersPage"
 import getCompanyJobCategoriesForFilter from "app/categories/queries/getCompanyJobCategoriesForFilter"
@@ -332,9 +332,9 @@ const Jobs = ({ company }: JobsProps) => {
                           {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
                         </span>
                       )}
-                      {job?.remote && (
+                      {job?.remoteOption !== RemoteOption.No_Remote && (
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                          {job?.remote && "Remote"}
+                          {job?.remoteOption?.replaceAll("_", " ")}
                         </span>
                       )}
                     </div>

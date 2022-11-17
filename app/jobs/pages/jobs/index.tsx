@@ -32,7 +32,7 @@ import {
   PlanName,
   SubscriptionStatus,
 } from "types"
-import { Candidate, Category, CompanyUserRole, Stage } from "@prisma/client"
+import { Candidate, Category, CompanyUserRole, RemoteOption, Stage } from "@prisma/client"
 import moment from "moment"
 import { Country, State } from "country-state-city"
 import { titleCase } from "app/core/utils/titleCase"
@@ -673,9 +673,9 @@ const Jobs = ({
                           {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
                         </span>
                       )}
-                      {job?.remote && (
+                      {job?.remoteOption !== RemoteOption.No_Remote && (
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                          {job?.remote && "Remote"}
+                          {job?.remoteOption?.replaceAll("_", " ")}
                         </span>
                       )}
                     </div>

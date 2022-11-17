@@ -506,6 +506,7 @@ const JobSettingsApplicationFormPage = ({
                 header="Add New Question"
                 open={openAddNewQuestion}
                 setOpen={setOpenAddNewQuestion}
+                noOverflow={true}
               >
                 <QuestionForm
                   editmode={questionToEdit ? true : false}

@@ -18,13 +18,11 @@ import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import AuthLayout from "app/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "app/guard/ability"
-
-import JobForm from "app/jobs/components/JobForm"
-import Breadcrumbs from "app/core/components/Breadcrumbs"
 import updateJob from "app/jobs/mutations/updateJob"
 import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
 import moment from "moment"
+import JobForm from "app/jobs/components/JobForm"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -139,6 +137,60 @@ const JobSettingsPage = ({
             country: job?.country,
             state: job?.state,
             city: job?.city,
+            remoteOption: job?.remoteOption,
+            postToGoogle: job?.postToGoogle,
+            currency: job?.currency,
+            minSalary: job?.minSalary,
+            maxSalary: job?.maxSalary,
+            salaryType: job?.salaryType,
+            showSalary: job?.showSalary,
+            employmentType: job?.employmentType,
+            validThrough: job?.validThrough
+              ? moment(job?.validThrough).local().toDate()
+              : new Date(),
+            description: job?.description
+              ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
+              : EditorState.createEmpty(),
+            categoryId: job?.category?.id,
+            // workflowId: job?.workflow?.id,
+            // formId: job?.form?.id,
+            // scoreCards: job?.scoreCards,
+          }}
+          onSubmit={async (values) => {
+            const toastId = toast.loading(() => <span>Updating Job</span>)
+            try {
+              if (values?.description) {
+                values.description = convertToRaw(values?.description?.getCurrentContent() || {})
+              }
+
+              await updateJobMutation({
+                where: { id: job?.id },
+                data: { ...values },
+                initial: job!,
+              })
+              toast.success(() => <span>Job Updated</span>, { id: toastId })
+              router.push(Routes.JobsHome())
+            } catch (error) {
+              toast.error(
+                "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+              )
+            }
+          }}
+        />
+        {/* <JobFormOld
+          companyId={session.companyId || "0"}
+          user={user}
+          category={job?.category!}
+          // workflow={job?.workflow!}
+          // form={job?.form!}
+          jobId={job?.id}
+          header="Job Details"
+          subHeader="Update job details"
+          initialValues={{
+            title: job?.title,
+            country: job?.country,
+            state: job?.state,
+            city: job?.city,
             remote: job?.remote,
             postToGoogle: job?.postToGoogle,
             currency: job?.currency,
@@ -176,7 +228,7 @@ const JobSettingsPage = ({
               )
             }
           }}
-        />
+        /> */}
       </JobSettingsLayout>
     </AuthLayout>
   )
