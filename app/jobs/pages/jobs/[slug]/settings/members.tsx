@@ -46,6 +46,7 @@ import { titleCase } from "app/core/utils/titleCase"
 import addUserToJob from "app/jobs/mutations/addUserToJob"
 import { SubscriptionStatus } from "types"
 import { checkSubscription } from "app/companies/utils/checkSubscription"
+import assignInterviewDurationToJobStage from "app/jobs/mutations/assignInterviewDurationToJobStage"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -159,6 +160,7 @@ const JobSettingsMembersPage = ({
   const [changePermissionMutation] = useMutation(updateMemberRole)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
   const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
+  const [assignInterviewDurationToJobStageMutation] = useMutation(assignInterviewDurationToJobStage)
 
   const [jobData, setJobData] = useState(job)
 
@@ -374,7 +376,7 @@ const JobSettingsMembersPage = ({
             <div className="overflow-auto">
               <div className="mt-10 mb-6 w-full">
                 <h3 className="font-semibold text-lg flex justify-center whitespace-nowrap">
-                  Timings & Interviewers
+                  Interview Duration & Interviewers
                 </h3>
                 <div className="flex flex-col space-y-20 md:flex-row md:space-y-0 lg:flex-row lg:space-y-0 mt-6 items-center md:justify-center lg:justify-center">
                   {jobData?.stages?.map((stage, index) => {
@@ -403,7 +405,33 @@ const JobSettingsMembersPage = ({
                           name={`timeIntervals.${index}.intervalId`}
                           placeholder={`Time interval for ${stage?.name}`}
                           // disabled={existingInterviewDetail && !existingInterviewer}
-                          defaultValue="30"
+                          defaultValue={stage?.duration?.toString() || "30"}
+                          onChange={async (e) => {
+                            const selectedInterviewDuration = parseInt(e.target.value || "0")
+                            const toastId = toast.loading(() => <span>Updating Interviewer</span>)
+                            try {
+                              const updatedStage = await assignInterviewDurationToJobStageMutation({
+                                stageId: stage.id,
+                                interviewDuration: selectedInterviewDuration || 0,
+                              })
+                              if (stage.interviewerId && updatedStage) {
+                                stage.duration = updatedStage.duration
+                                setJobData(jobData)
+                              }
+
+                              toast.success(
+                                () => <span>Interview duration updated for stage</span>,
+                                {
+                                  id: toastId,
+                                }
+                              )
+                            } catch (error) {
+                              toast.error(
+                                "Sorry, we had an unexpected error. Please try again. - " +
+                                  error.toString()
+                              )
+                            }
+                          }}
                         >
                           <option value="15">15 minutes</option>
                           <option value="30">30 minutes</option>
@@ -428,14 +456,12 @@ const JobSettingsMembersPage = ({
                             const selectedInterviewerId = e.target.value
                             const toastId = toast.loading(() => <span>Updating Interviewer</span>)
                             try {
-                              const assignedInterviewer = await assignInterviewerToJobStageMutation(
-                                {
-                                  stageId: stage.id,
-                                  interviewerId: selectedInterviewerId || "0",
-                                }
-                              )
-                              if (stage.interviewerId && assignedInterviewer) {
-                                stage.interviewerId = assignedInterviewer.interviewerId
+                              const updatedStage = await assignInterviewerToJobStageMutation({
+                                stageId: stage.id,
+                                interviewerId: selectedInterviewerId || "0",
+                              })
+                              if (stage.interviewerId && updatedStage) {
+                                stage.interviewerId = updatedStage.interviewerId
                                 setJobData(jobData)
                               }
 
