@@ -5,7 +5,7 @@ import { Country, State } from "country-state-city"
 import { titleCase } from "../utils/titleCase"
 import draftToHtml from "draftjs-to-html"
 import moment from "moment"
-import { Company } from "@prisma/client"
+import { Company, RemoteOption } from "@prisma/client"
 
 function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
   return {
@@ -36,7 +36,11 @@ function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
         addressCountry: job?.country,
       },
     },
-    jobLocationType: job?.remote ? "TELECOMMUTE" : "",
+    jobLocationType:
+      job?.remoteOption === RemoteOption.Fully_Remote ||
+      job?.remoteOption === RemoteOption.Remote_Friendly
+        ? "TELECOMMUTE"
+        : "",
     baseSalary: {
       "@type": "MonetaryAmount",
       currency: job?.currency,
@@ -120,9 +124,9 @@ const JobApplicationLayout = ({
           {!isCareersPage && (
             <div className="mt-6 flex flex-col space-y-2 justify-center items-center">
               <h3 className="text-2xl font-bold">{job?.title}</h3>
-              {job?.remote && (
+              {job?.remoteOption !== RemoteOption.No_Remote && (
                 <span className="text-xs uppercase font-semibold inline-block py-1 px-2 rounded-full text-pink-600 bg-pink-200 last:mr-0 mr-1">
-                  Remote
+                  {job?.remoteOption?.replaceAll("_", " ")}
                 </span>
               )}
               <div className="flex flex-wrap justify-center items-center mx-3">

@@ -9,7 +9,7 @@ import {
   ErrorComponent,
 } from "blitz"
 import AuthLayout from "app/core/layouts/AuthLayout"
-import JobForm from "app/jobs/components/JobForm"
+import JobFormOld from "app/jobs/components/JobFormOld"
 import getCurrentUserServer from "app/users/queries/getCurrentUserServer"
 import toast from "react-hot-toast"
 import Breadcrumbs from "app/core/components/Breadcrumbs"
@@ -68,7 +68,7 @@ const NewJob = ({ user, error }: InferGetServerSidePropsType<typeof getServerSid
     <AuthLayout title="New Job" user={user}>
       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
       <div className="mt-6">
-        <JobForm
+        <JobFormOld
           companyId={session.companyId || "0"}
           user={user}
           header="Create A New Job"
