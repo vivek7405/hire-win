@@ -90,15 +90,13 @@ export const JobForm = (props: JobFormProps) => {
             step === steps[0] ? "flex" : "hidden"
           } flex-col space-y-6 w-full sm:w-3/5 mx-auto`}
         >
-          <div className="w-full">
-            <LabeledTextField
-              type="text"
-              name="title"
-              label="Title"
-              placeholder="Job Title"
-              testid="jobTitle"
-            />
-          </div>
+          <LabeledTextField
+            type="text"
+            name="title"
+            label="Title"
+            placeholder="Job Title"
+            testid="jobTitle"
+          />
 
           <LabeledRichTextField
             name="description"
@@ -126,7 +124,7 @@ export const JobForm = (props: JobFormProps) => {
             step === steps[1] ? "flex" : "hidden"
           } flex-col space-y-6 w-full items-center`}
         >
-          <div className="w-full md:w-1/3 lg:w-1/3">
+          <div className="w-full md:w-1/3">
             {/* <LabeledTextField
               name="country"
               label="Country"
@@ -150,7 +148,7 @@ export const JobForm = (props: JobFormProps) => {
             />
           </div>
 
-          <div className="w-full md:w-1/3 lg:w-1/3">
+          <div className="w-full md:w-1/3">
             {/* <LabeledTextField
               name="state"
               label="State"
@@ -175,7 +173,7 @@ export const JobForm = (props: JobFormProps) => {
             />
           </div>
 
-          <div className="w-full md:w-1/3 lg:w-1/3">
+          <div className="w-full md:w-1/3">
             {/* <LabeledTextField
               name="city"
               label="City"
