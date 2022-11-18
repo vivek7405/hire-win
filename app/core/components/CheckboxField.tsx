@@ -8,6 +8,7 @@ export interface CheckboxFieldProps extends PropsWithoutRef<JSX.IntrinsicElement
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   onChange?: any
+  showAsterisk?: boolean
 }
 
 export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
@@ -70,7 +71,7 @@ export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
             data-testid={`${props.testid && `${props.testid}-`}label`}
             className="align-middle block text-sm px-2 font-medium text-gray-700"
           >
-            {label}
+            {label} {props.showAsterisk && "*"}
           </label>
         </div>
       </div>

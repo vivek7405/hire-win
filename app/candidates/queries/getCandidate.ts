@@ -35,6 +35,7 @@ async function getCandidate({ where }: GetCandidateInput, ctx: Ctx) {
       },
       scores: true,
       candidateUserNotes: { where: { userId: ctx?.session?.userId || "0" } },
+      createdBy: true,
     },
   })
 

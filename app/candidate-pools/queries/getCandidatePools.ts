@@ -23,6 +23,7 @@ const getCandidatePools = resolver.pipe(
           ...paginateArgs,
           where,
           include: { _count: { select: { candidates: true } } },
+          orderBy: { createdAt: "asc" },
         }),
     })
 

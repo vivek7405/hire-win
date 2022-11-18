@@ -8,6 +8,7 @@ export interface LabeledTextAreaFieldProps
   label?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
+  showAsterisk?: boolean
 }
 
 export const LabeledTextAreaField = forwardRef<HTMLTextAreaElement, LabeledTextAreaFieldProps>(
@@ -35,7 +36,7 @@ export const LabeledTextAreaField = forwardRef<HTMLTextAreaElement, LabeledTextA
             data-testid={`${props.testid && `${props.testid}-`}label`}
             className="block text-sm font-medium text-gray-700"
           >
-            {label}
+            {label} {props.showAsterisk && "*"}
           </label>
         )}
         <div className={label && "mt-1"}>

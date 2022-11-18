@@ -155,7 +155,7 @@ const ApplyToJob = ({
         )}
 
         <ApplicationForm
-          header="Job Application Form"
+          header="Application Form"
           subHeader={`Apply to the job - ${job?.title}`}
           jobId={job?.id || "0"}
           preview={false}

@@ -51,7 +51,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
           href: `/jobs/${job?.slug}/settings/stages`,
           current:
             router.route === `/jobs/[slug]/settings/stages` ||
-            router.route.includes(`/jobs/[slug]/settings/score-cards`),
+            router.route.includes(`/jobs/[slug]/settings/stages/[stageSlug]`),
           icon: CollectionIcon,
           canView: true,
         }

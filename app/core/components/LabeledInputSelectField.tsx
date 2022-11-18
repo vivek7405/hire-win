@@ -11,6 +11,7 @@ export interface LabeledInputSelectFieldProps
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   options: string[]
+  showAsterisk?: boolean
 }
 
 export const LabeledInputSelectField = forwardRef<HTMLInputElement, LabeledInputSelectFieldProps>(
@@ -38,7 +39,7 @@ export const LabeledInputSelectField = forwardRef<HTMLInputElement, LabeledInput
             data-testid={`${props.testid && `${props.testid}-`}label`}
             className="block text-sm font-medium text-gray-700"
           >
-            {label}
+            {label} {props.showAsterisk && "*"}
           </label>
         )}
         <div className={label ? "mt-1" : ""}>

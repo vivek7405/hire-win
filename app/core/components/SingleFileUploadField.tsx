@@ -16,6 +16,7 @@ export interface SingleFileUploadProps extends PropsWithoutRef<JSX.IntrinsicElem
   onSubmit?: (e) => void
   accept: string
   showImage?: boolean
+  showAsterisk?: boolean
 }
 
 export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFileUploadProps>(
@@ -140,7 +141,9 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
             <>
               {file && file.key && file.key !== "" ? (
                 <div className="w-full">
-                  <label className="block text-sm font-medium text-gray-700">{label}</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {label} {props.showAsterisk && "*"}
+                  </label>
                   {!isRemoving && (
                     <>
                       {props.showImage && (
@@ -196,7 +199,9 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
                 </div>
               ) : (
                 <div {...getRootProps({ className: "btn-dropzone" })}>
-                  <label className="block text-sm font-medium text-gray-700">{label}</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    {label} {props.showAsterisk && "*"}
+                  </label>
                   <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border border-gray-300 rounded">
                     <div className="flex flex-col text-center text-sm text-gray-600">
                       {!isUploading && (

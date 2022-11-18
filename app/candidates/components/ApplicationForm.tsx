@@ -89,6 +89,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -99,6 +100,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -109,11 +111,19 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             accept={question.acceptedFiles}
             name={question.title}
             label={question.title}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
       case FormQuestionType.Checkbox:
-        return <CheckboxField key={question.id} name={question.title} label={question.title} />
+        return (
+          <CheckboxField
+            key={question.id}
+            name={question.title}
+            label={question.title}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
+          />
+        )
 
       case FormQuestionType.Multiple_select:
         return (
@@ -126,6 +136,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -139,6 +150,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -150,6 +162,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -160,6 +173,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -171,6 +185,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -182,6 +197,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
@@ -193,11 +209,19 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
 
       case FormQuestionType.Rating:
-        return <LabeledRatingField key={question.id} name={question.title} label={question.title} />
+        return (
+          <LabeledRatingField
+            key={question.id}
+            name={question.title}
+            label={question.title}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
+          />
+        )
 
       default:
         return (
@@ -207,6 +231,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
             name={question.title}
             label={question.title}
             placeholder={question.placeholder}
+            showAsterisk={question.behaviour === Behaviour.REQUIRED}
           />
         )
     }
@@ -248,7 +273,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
         >
           {formQuestions.map((question) => {
             // Hide question only on careers page and not when adding candidate manually
-            if (props.careersPage && question.behaviour === "OFF") {
+            if ((props.careersPage || props.preview) && question.behaviour === "OFF") {
               return
             }
             return getQuestionField(question as any)

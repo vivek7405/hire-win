@@ -34,6 +34,7 @@ async function updateCandidateStage({ where, data }: UpdateCandidateStageInput, 
       stage: { include: { interviewer: true, scoreCardQuestions: true, scores: true } },
       answers: { include: { formQuestion: { include: { options: true } } } },
       scores: true,
+      createdBy: true,
     },
   })
 

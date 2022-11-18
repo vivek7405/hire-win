@@ -19,7 +19,7 @@ export const config = {
 async function updateCandidate({ where, data }: UpdateCandidateInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { id, name, email, resume, answers, jobId } = Candidate.parse(data)
+  const { id, name, email, resume, answers, jobId, createdById } = Candidate.parse(data)
 
   // const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
@@ -52,6 +52,7 @@ async function updateCandidate({ where, data }: UpdateCandidateInput, ctx: Ctx) 
         }
       }),
     },
+    createdById,
   }
 
   if (resume) {

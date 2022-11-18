@@ -220,15 +220,15 @@ const EmailTemplates = () => {
       />
 
       {emailTemplates?.length > 0 && (
-        <div className="flex flex-wrap justify-center">
+        <div className="flex flex-wrap justify-center max-w-md mx-auto">
           {emailTemplates.map((et) => {
             return (
-              <Card key={et.id}>
+              <Card isFull={true} key={et.id}>
                 <div className="space-y-2">
                   <div className="w-full relative">
-                    <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                    <div className="font-bold flex items-center">
                       <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
+                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setEmailTemplateToEdit(et)
@@ -255,7 +255,7 @@ const EmailTemplates = () => {
                     </div>
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
-                  <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                  <div className="text-neutral-500 font-semibold flex">
                     {et._count?.emails} {et._count?.emails === 1 ? "Email" : "Emails"}
                   </div>
                 </div>

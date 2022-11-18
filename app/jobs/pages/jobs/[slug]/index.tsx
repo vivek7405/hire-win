@@ -90,6 +90,7 @@ import { PencilIcon } from "@heroicons/react/solid"
 import ViewJobListingButton from "app/jobs/components/ViewJobListingButton"
 import { Menu, Transition } from "@headlessui/react"
 import classNames from "app/core/utils/classNames"
+import getFirstWordIfGreaterThan from "app/core/utils/getFirstWord"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -348,6 +349,18 @@ const getBoard = (
                         )}
                       </div>
                     )}
+                  </div>
+                  <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-neutral-700">
+                      {c.source === CandidateSource.Manual ? (
+                        <span>
+                          Added by {getFirstWordIfGreaterThan(c.createdBy?.name || "...", 10)}
+                        </span>
+                      ) : (
+                        <span>Applied through Careers Page</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ),
@@ -940,7 +953,7 @@ const SingleJobPageContent = ({
                   </a>
                 )}
               </Menu.Item>
-              <Menu.Item>
+              {/* <Menu.Item>
                 {({ active }) => (
                   <a
                     className={classNames(
@@ -966,7 +979,7 @@ const SingleJobPageContent = ({
                     )}
                   </a>
                 )}
-              </Menu.Item>
+              </Menu.Item> */}
             </div>
             <div className="py-1">
               <Menu.Item>
@@ -1154,20 +1167,24 @@ const SingleJobPageContent = ({
 
   const newCandidateButton = (
     <button
-      className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-      disabled={
-        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.OWNER &&
-        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
-      }
+      className={`${
+        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.USER
+          ? "hidden"
+          : "block"
+      } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap`}
+      // disabled={
+      //   user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.OWNER &&
+      //   user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
+      // }
       onClick={(e) => {
-        if (isFreeCandidateLimitAvailable) {
-          // router.push(Routes.NewCandidate({ slug: job?.slug! }))
-          e.preventDefault()
-          setCandidateToEdit(null as any)
-          setOpenModal(true)
-        } else {
-          setOpenConfirm(true)
-        }
+        // if (isFreeCandidateLimitAvailable) {
+        // router.push(Routes.NewCandidate({ slug: job?.slug! }))
+        e.preventDefault()
+        setCandidateToEdit(null as any)
+        setOpenModal(true)
+        // } else {
+        //   setOpenConfirm(true)
+        // }
       }}
     >
       New Candidate
@@ -1221,6 +1238,7 @@ const SingleJobPageContent = ({
                             value: typeof val === "string" ? val : JSON.stringify(val),
                           }
                         }) as any) || ([] as any),
+                      createdById: user?.id,
                     },
                   })
                 : await createCandidateMutation({
@@ -1237,6 +1255,7 @@ const SingleJobPageContent = ({
                           value: typeof val === "string" ? val : JSON.stringify(val),
                         }
                       }) || [],
+                    createdById: user?.id,
                   })
               toast.success(`Candidate ${candidateToEdit ? "updated" : "created"}`, { id: toastId })
               invalidateQuery(getCandidates)
@@ -1317,7 +1336,11 @@ const SingleJobPageContent = ({
           user={user}
           isTable={isTable}
           viewRejected={viewRejected}
-          enableDrag={enableDrag}
+          enableDrag={
+            user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.USER
+              ? false
+              : enableDrag
+          }
           setCandidateToEdit={setCandidateToEdit}
           setOpenModal={setOpenModal}
         />

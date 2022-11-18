@@ -8,7 +8,7 @@ import getCandidateInterviewer from "../queries/getCandidateInterviewer"
 
 // Candidate can be created without authentication
 async function createCandidate(data: CandidateInputType, ctx: Ctx) {
-  const { name, email, resume, answers, jobId, source } = Candidate.parse(data)
+  const { name, email, resume, answers, jobId, source, createdById } = Candidate.parse(data)
 
   // const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
@@ -46,6 +46,7 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
     jobId: jobId!,
     source,
     stageId: defaultStage?.id,
+    createdById,
   }
 
   if (resume) {

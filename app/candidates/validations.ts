@@ -40,5 +40,6 @@ export const Candidate = z.object({
   stageId: z.string().optional(),
   rejected: z.boolean().optional(),
   files: z.array(CandidateFileObj).optional(),
+  createdById: z.string().optional(),
 })
 export type CandidateInputType = z.infer<typeof Candidate>
