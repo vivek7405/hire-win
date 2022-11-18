@@ -57,7 +57,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 }
 
 const Categories = () => {
-  const ITEMS_PER_PAGE = 12
+  const ITEMS_PER_PAGE = 25
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   const session = useSession()
@@ -211,15 +211,15 @@ const Categories = () => {
       />
 
       {categories?.length > 0 && (
-        <div className="flex flex-wrap justify-center">
+        <div className="flex flex-wrap justify-center max-w-md mx-auto">
           {categories.map((c) => {
             return (
-              <Card key={c.id}>
+              <Card isFull={true} key={c.id}>
                 <div className="space-y-2">
                   <div className="w-full relative">
-                    <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                    <div className="font-bold flex items-center">
                       <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
+                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setCategoryToEdit(c)
@@ -246,7 +246,7 @@ const Categories = () => {
                     </div>
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
-                  <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                  <div className="text-neutral-500 font-semibold flex">
                     {c.jobs.length} {c.jobs.length === 1 ? "Job" : "Jobs"}
                   </div>
                 </div>

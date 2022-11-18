@@ -11,6 +11,7 @@ const getCandidatePoolsWOPagination = resolver.pipe(
     const candidatePools = await db.candidatePool.findMany({
       where,
       include: { candidates: { select: { id: true } }, _count: { select: { candidates: true } } },
+      orderBy: { createdAt: "asc" },
     })
     return candidatePools
   }

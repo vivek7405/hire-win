@@ -213,19 +213,19 @@ const CandidatePools = () => {
       />
 
       {candidatePools?.length > 0 && (
-        <div className="flex flex-wrap justify-center">
+        <div className="flex flex-wrap justify-center max-w-md mx-auto">
           {candidatePools.map((cp) => {
             return (
-              <Card key={cp.id}>
+              <Card isFull={true} key={cp.id}>
                 <div className="space-y-2">
                   <div className="w-full relative">
-                    <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                    <div className="font-bold flex items-center">
                       <Link
                         prefetch={true}
                         href={Routes.SingleCandidatePoolPage({ slug: cp.slug })}
                         passHref
                       >
-                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 pr-12 md:px-12 lg:px-12 truncate">
+                        <a className="cursor-pointer text-theme-600 hover:text-theme-800 pr-12 truncate">
                           {cp.name}
                         </a>
                       </Link>
@@ -262,7 +262,7 @@ const CandidatePools = () => {
                     </div>
                   </div>
                   <div className="border-b-2 border-gray-50 w-full"></div>
-                  <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                  <div className="text-neutral-500 font-semibold flex">
                     {cp._count.candidates} {cp._count.candidates === 1 ? "Candidate" : "Candidates"}
                   </div>
                 </div>
