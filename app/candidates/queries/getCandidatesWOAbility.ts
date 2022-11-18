@@ -35,6 +35,7 @@ const getCandidatesWOAbility = resolver.pipe(
             stage: true,
             // workflowStage: { include: { stage: true } },
             answers: { include: { formQuestion: { include: { options: true } } } },
+            createdBy: true,
           },
         }),
     })

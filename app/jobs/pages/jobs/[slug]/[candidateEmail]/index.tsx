@@ -110,6 +110,7 @@ import { Fragment } from "react"
 import { Menu, Transition } from "@headlessui/react"
 import removeCandidateFromPool from "app/candidate-pools/mutations/removeCandidateFromPool"
 import classNames from "app/core/utils/classNames"
+import getFirstWordIfGreaterThan from "app/core/utils/getFirstWord"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -675,10 +676,7 @@ const SingleCandidatePageContent = ({
         candidate?.rejected ? "text-red-600" : "text-theme-600"
       } capitalize`}
     >
-      {/* Used regular expression for getting the first word */}
-      {candidate?.name?.replace(/ .*/, "")?.length > 10
-        ? `${candidate?.name?.replace(/ .*/, "")?.substring(0, 10)}...`
-        : candidate?.name?.replace(/ .*/, "")}
+      {getFirstWordIfGreaterThan(candidate?.name, 10)}
     </h3>
   )
 
@@ -1439,6 +1437,19 @@ const SingleCandidatePageContent = ({
                   </div> */}
                   <div className="border-t border-gray-200">
                     <dl>
+                      <div className={`bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
+                        <dt className="text-sm font-medium text-gray-500">Source</dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                          {candidate.source === CandidateSource.Manual ? (
+                            <span>
+                              Added by{" "}
+                              {getFirstWordIfGreaterThan(candidate.createdBy?.name || "...", 10)}
+                            </span>
+                          ) : (
+                            <span>Applied through Careers Page</span>
+                          )}
+                        </dd>
+                      </div>
                       {candidate?.job?.formQuestions?.map((question, index) => {
                         const answer = getCandidateAnswerForDisplay(question, candidate, false)
 
@@ -1579,16 +1590,16 @@ const SingleCandidatePageContent = ({
                       No files uploaded. Click on the button below to upload a file.
                     </div>
                   ) : (
-                    <div className="my-1 flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
+                    <div className="my-1 flex flex-wrap justify-center px-2 max-w-md mx-auto">
                       {candidate?.files?.map((file) => {
                         return (
-                          <Card key={file.id}>
+                          <Card isFull={true} key={file.id}>
                             <div className="space-y-2">
                               <div className="w-full relative">
-                                <div className="font-bold flex md:justify-center lg:justify:center items-center">
+                                <div className="font-bold flex items-center">
                                   <a
                                     href={(file.attachment as AttachmentObject).location}
-                                    className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
+                                    className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                                     target="_blank"
                                     rel="noreferrer"
                                   >
@@ -1612,7 +1623,7 @@ const SingleCandidatePageContent = ({
                                 </div>
                               </div>
                               <div className="border-b-2 border-gray-50 w-full"></div>
-                              <div className="flex md:justify-center lg:justify-center text-xs">
+                              <div className="flex text-xs">
                                 <span className="truncate">
                                   {moment(file.createdAt).local().fromNow()} by{" "}
                                   {file.createdBy?.name}
