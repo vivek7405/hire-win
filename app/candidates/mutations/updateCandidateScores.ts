@@ -96,11 +96,9 @@ async function updateCandidateScores({ where, data }: UpdateCandidateScoresInput
 
     await db.candidateActivity.create({
       data: {
-        title: `Candidate score ${scores
-          ?.map((score) => score.rating)
-          ?.reduce((a, b) => a + b, 0)}/5 submitted for stage "${stage?.name}" by ${
-          loggedInUser?.name
-        }`,
+        title: `Candidate score ${
+          scores?.map((score) => score.rating)?.reduce((a, b) => a + b, 0) / scores.length
+        }/5 submitted for stage "${stage?.name}" by ${loggedInUser?.name}`,
         type: CandidateActivityType.Score_Submitted,
         performedByUserId: ctx?.session?.userId || "0",
         candidateId: candidate?.id || "0",
