@@ -13,6 +13,7 @@ export interface LabeledSelectFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   options: { label: string; value?: string }[]
   disabled?: boolean
   onChange?: any
+  showAsterisk?: boolean
 }
 
 export const LabeledSelectField = forwardRef<HTMLSelectElement, LabeledSelectFieldProps>(
@@ -40,7 +41,7 @@ export const LabeledSelectField = forwardRef<HTMLSelectElement, LabeledSelectFie
             data-testid={`${props.testid && `${props.testid}-`}label`}
             className="block text-sm font-medium text-gray-700"
           >
-            {label}
+            {label} {props.showAsterisk && "*"}
           </label>
         )}
         <div className={label && "mt-1"}>

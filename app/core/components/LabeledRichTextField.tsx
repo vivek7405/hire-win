@@ -17,6 +17,7 @@ export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.Intrinsic
   readOnly?: boolean
   showTemplatePlaceholders?: boolean
   noBorder?: boolean
+  showAsterisk?: boolean
 }
 
 export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFieldProps>(
@@ -69,7 +70,7 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
             data-testid={`${props.testid && `${props.testid}-`}label`}
             className="block text-sm font-medium text-gray-700"
           >
-            {label}
+            {label} {props.showAsterisk && "*"}
           </label>
         )}
         <div className={label && "mt-1"}>

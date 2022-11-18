@@ -9,6 +9,7 @@ export interface LabeledTextValidatedFieldProps
   type?: "text" | "password" | "email" | "number" | "date" | "url"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
+  showAsterisk?: boolean
 }
 
 const ControllerPlus = ({ control, transform, name, isSubmitting, testid, ...props }) => {
@@ -57,7 +58,7 @@ export const LabeledTextValidatedField = forwardRef<
           data-testid={`${testid && `${testid}-`}label`}
           className="block text-sm font-medium text-gray-700"
         >
-          {label}
+          {label} {props.showAsterisk && "*"}
         </label>
       )}
       <div className={label && "mt-1"}>

@@ -12,6 +12,7 @@ export interface LabeledPhoneNumberFieldProps
   testid?: string
   disabled?: boolean
   defaultValue?: any
+  showAsterisk?: boolean
 }
 
 export const LabeledPhoneNumberField = forwardRef<HTMLInputElement, LabeledPhoneNumberFieldProps>(
@@ -40,7 +41,7 @@ export const LabeledPhoneNumberField = forwardRef<HTMLInputElement, LabeledPhone
             data-testid={`${props.testid && `${props.testid}-`}label`}
             className="block text-sm font-medium text-gray-700"
           >
-            {label}
+            {label} {props.showAsterisk && "*"}
           </label>
         )}
         <div className={label && `mt-1`}>

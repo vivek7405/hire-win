@@ -17,6 +17,7 @@ export interface LabeledRatingFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   ratingClass?: string
   color?: string
   value?: number
+  showAsterisk?: boolean
 }
 
 export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFieldProps>(
@@ -52,7 +53,7 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
             data-testid={`${props.testid && `${props.testid}-`}label`}
             className="block text-sm font-medium text-gray-700"
           >
-            {label}
+            {label} {props.showAsterisk && "*"}
           </label>
         )}
         <div className={label && `mt-1`}>
