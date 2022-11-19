@@ -61,6 +61,7 @@ async function getJob({ where }: GetJobInput, ctx: Ctx) {
           },
         },
       },
+      createdBy: true,
       // interviewDetails: true,
     },
   })

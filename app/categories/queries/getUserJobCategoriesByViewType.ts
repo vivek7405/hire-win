@@ -15,11 +15,11 @@ const getUserJobCategoriesByViewType = resolver.pipe(
   async ({ viewType, searchString }: GetCategoriesInput, ctx: Ctx) => {
     const todayDate = new Date(new Date().toDateString())
     const utcDateNow = moment().utc().toDate()
-    const validThrough = utcDateNow
-      ? viewType === JobViewType.Expired
-        ? { lt: utcDateNow }
-        : { gte: utcDateNow }
-      : todayDate
+    // const validThrough = utcDateNow
+    //   ? viewType === JobViewType.Expired
+    //     ? { lt: utcDateNow }
+    //     : { gte: utcDateNow }
+    //   : todayDate
 
     const categories = await db.category.findMany({
       where: {
@@ -27,7 +27,7 @@ const getUserJobCategoriesByViewType = resolver.pipe(
         jobs: {
           some: {
             archived: viewType === JobViewType.Archived,
-            validThrough: viewType === JobViewType.Archived ? {} : validThrough,
+            // validThrough: viewType === JobViewType.Archived ? {} : validThrough,
             title: {
               contains: JSON.parse(searchString),
               mode: "insensitive",

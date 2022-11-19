@@ -127,6 +127,7 @@ export type ExtendedJob = Prisma.JobGetPayload<{
     }
     formQuestions: { include: { options: true } }
     candidates: true
+    createdBy: true
   }
 }>
 export type ExtendedCandidate = Prisma.CandidateGetPayload<{
@@ -231,6 +232,6 @@ export type InterviewDetailType = {
 
 export enum JobViewType {
   Active = "Active",
-  Expired = "Expired",
+  // Expired = "Expired",
   Archived = "Archived",
 }

@@ -145,9 +145,9 @@ const JobSettingsPage = ({
             salaryType: job?.salaryType,
             showSalary: job?.showSalary,
             employmentType: job?.employmentType,
-            validThrough: job?.validThrough
-              ? moment(job?.validThrough).local().toDate()
-              : new Date(),
+            // validThrough: job?.validThrough
+            //   ? moment(job?.validThrough).local().toDate()
+            //   : new Date(),
             description: job?.description
               ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
               : EditorState.createEmpty(),

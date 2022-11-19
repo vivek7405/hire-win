@@ -13,6 +13,7 @@ import {
   useMutation,
   useQuery,
   invalidateQuery,
+  useSession,
 } from "blitz"
 import path from "path"
 import Guard from "app/guard/ability"
@@ -91,6 +92,7 @@ import ViewJobListingButton from "app/jobs/components/ViewJobListingButton"
 import { Menu, Transition } from "@headlessui/react"
 import classNames from "app/core/utils/classNames"
 import getFirstWordIfGreaterThan from "app/core/utils/getFirstWord"
+import moment from "moment"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -233,7 +235,8 @@ const getBoard = (
   setOpenCandidateMoveConfirm,
   enableDrag,
   setCandidateToEdit,
-  setOpenModal
+  setOpenModal,
+  session
 ) => {
   return {
     columns: job?.stages?.map((stage) => {
@@ -250,7 +253,7 @@ const getBoard = (
               isDragDisabled: !enableDrag,
               renderContent: (
                 <div>
-                  <div className="font-bold flex items-center">
+                  <div className="flex items-center justify-between">
                     <Link
                       prefetch={true}
                       href={Routes.SingleCandidatePage({
@@ -264,7 +267,7 @@ const getBoard = (
                           c.rejected
                             ? "text-red-600 hover:text-red-900"
                             : "text-theme-600 hover:text-theme-900"
-                        } truncate`}
+                        } truncate font-bold`}
                       >
                         {c.name}
                       </a>
@@ -272,7 +275,7 @@ const getBoard = (
                   </div>
 
                   <div className="border-b-2 my-2 border-gray-100 w-full"></div>
-                  <div className="flex items-center">
+                  <div className="flex items-center text-neutral-700">
                     <p className="truncate">{c.email}</p>
                   </div>
 
@@ -350,15 +353,20 @@ const getBoard = (
                       </div>
                     )}
                   </div>
+
                   <div className="border-b-2 my-2 border-gray-100 w-full"></div>
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-neutral-700">
+                    <div className="text-xs text-neutral-700">
+                      {moment(c.job?.createdAt).fromNow()}{" "}
                       {c.source === CandidateSource.Manual ? (
                         <span>
-                          Added by {getFirstWordIfGreaterThan(c.createdBy?.name || "...", 10)}
+                          by{" "}
+                          {session?.userId === job?.createdById
+                            ? "you"
+                            : getFirstWordIfGreaterThan(c.createdBy?.name || "...", 10)}
                         </span>
                       ) : (
-                        <span>Applied through Careers Page</span>
+                        <span>via Careers Page</span>
                       )}
                     </div>
                   </div>
@@ -388,6 +396,7 @@ type CandidateProps = {
   enableDrag: boolean
   setCandidateToEdit: any
   setOpenModal: any
+  session: any
 }
 const Candidates = (props: CandidateProps) => {
   const ITEMS_PER_PAGE = 25
@@ -617,7 +626,8 @@ const Candidates = (props: CandidateProps) => {
       setOpenCandidateMoveConfirm,
       props.enableDrag,
       props.setCandidateToEdit,
-      props.setOpenModal
+      props.setOpenModal,
+      props.session
     ) as KanbanBoardType
   )
   useEffect(() => {
@@ -633,7 +643,8 @@ const Candidates = (props: CandidateProps) => {
         setOpenCandidateMoveConfirm,
         props.enableDrag,
         props.setCandidateToEdit,
-        props.setOpenModal
+        props.setOpenModal,
+        props.session
       )
     )
   }, [
@@ -1062,6 +1073,8 @@ const SingleJobPageContent = ({
     return debouncer.execute(e)
   }
 
+  const session = useSession()
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -1343,6 +1356,7 @@ const SingleJobPageContent = ({
           }
           setCandidateToEdit={setCandidateToEdit}
           setOpenModal={setOpenModal}
+          session={session}
         />
       </Suspense>
     </>

@@ -261,7 +261,7 @@ const Jobs = ({ company }: JobsProps) => {
 
           return (
             <div key={job.id}>
-              <Card isFull={true}>
+              <div className="bg-white w-full border-2 border-gray-200 hover:border-gray-300 hover:shadow rounded my-4 cursor-pointer px-5 py-3">
                 <Link
                   prefetch={true}
                   href={Routes.JobDescriptionPage({
@@ -270,9 +270,9 @@ const Jobs = ({ company }: JobsProps) => {
                   })}
                   passHref
                 >
-                  <div className="bg-gray-50 cursor-pointer w-full rounded overflow-hidden hover:shadow hover:drop-shadow">
+                  <div className="overflow-hidden">
                     <div className="flex flex-wrap items-center justify-between">
-                      <div className="px-6 py-4">
+                      <div className="pb-4">
                         <div className="font-bold text-xl text-theme-700 whitespace-normal">
                           {job?.title}
                         </div>
@@ -281,7 +281,7 @@ const Jobs = ({ company }: JobsProps) => {
                           {moment(job.createdAt || undefined)
                             .local()
                             .fromNow()}
-                          ,{" "}
+                          {/* ,{" "}
                           {moment(job.validThrough || undefined)
                             .local()
                             .fromNow()
@@ -290,10 +290,10 @@ const Jobs = ({ company }: JobsProps) => {
                             : "expires"}{" "}
                           {moment(job.validThrough || undefined)
                             .local()
-                            .fromNow()}
+                            .fromNow()} */}
                         </p>
                       </div>
-                      <div className="px-6 py-4">
+                      <div className="pt-2 pb-4">
                         {job.showSalary && (job.minSalary > 0 || job.maxSalary > 0) && (
                           <p className="text-gray-500 text-sm">
                             {job.currency && getSymbolFromCurrency(job.currency)}
@@ -307,7 +307,7 @@ const Jobs = ({ company }: JobsProps) => {
                         )}
                       </div>
                     </div>
-                    <div className="px-6 pt-4 pb-2 flex flex-wrap">
+                    <div className="pt-4 flex flex-wrap">
                       {(job?.city || job?.state || job?.country) && (
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                           {job?.city && <span>{job?.city},&nbsp;</span>}
@@ -340,7 +340,7 @@ const Jobs = ({ company }: JobsProps) => {
                     </div>
                   </div>
                 </Link>
-              </Card>
+              </div>
             </div>
           )
         })}

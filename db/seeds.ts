@@ -57,7 +57,7 @@ async function createJobs() {
       maxSalary,
       salaryType,
       employmentType,
-      validThrough,
+      // validThrough,
       slug,
     } = Job.parse(job)
 
@@ -77,7 +77,7 @@ async function createJobs() {
           maxSalary,
           salaryType,
           employmentType,
-          validThrough,
+          // validThrough,
           users: {
             create: {
               role: JobUserRole.USER,

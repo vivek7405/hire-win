@@ -22,7 +22,7 @@ async function setJobArchived({ where, archived }: UpdateJobInput, ctx: Ctx) {
     data: archived
       ? {
           archived,
-          validThrough: moment().utc().toDate(),
+          // validThrough: moment().utc().toDate(),
         }
       : { archived },
   })

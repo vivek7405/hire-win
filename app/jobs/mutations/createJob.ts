@@ -31,7 +31,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     salaryType,
     showSalary,
     employmentType,
-    validThrough,
+    // validThrough,
   } = Job.parse(data)
 
   const user = await db.user.findFirst({
@@ -74,9 +74,9 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       salaryType: salaryType || SalaryType.YEAR,
       showSalary,
       employmentType,
-      validThrough: moment(validThrough || undefined)
-        .utc()
-        .toDate(),
+      // validThrough: moment(validThrough || undefined)
+      //   .utc()
+      //   .toDate(),
       users: {
         create: {
           role: JobUserRole.OWNER,

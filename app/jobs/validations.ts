@@ -14,7 +14,7 @@ export const Job = z.object({
 
   categoryId: z.string().optional(),
   employmentType: z.array(z.nativeEnum(EmploymentType)),
-  validThrough: z.date(),
+  // validThrough: z.date(),
 
   country: z.string(),
   state: z.string(),

@@ -5,9 +5,9 @@ import createJob from "./createJob"
 
 type JobInput = {
   title: string
-  validThrough: Date
+  // validThrough: Date
 }
-async function createJobWithTitleAndValidThrough({ title, validThrough }: JobInput, ctx: Ctx) {
+async function createJobWithTitle({ title }: JobInput, ctx: Ctx) {
   ctx.session.$authorize()
 
   const description = {
@@ -36,7 +36,7 @@ async function createJobWithTitleAndValidThrough({ title, validThrough }: JobInp
 
       // categoryId: undefined,
       employmentType: [EmploymentType.FULL_TIME],
-      validThrough,
+      // validThrough,
 
       country: "",
       state: "",
@@ -48,4 +48,4 @@ async function createJobWithTitleAndValidThrough({ title, validThrough }: JobInp
   return job
 }
 
-export default Guard.authorize("create", "job", createJobWithTitleAndValidThrough)
+export default Guard.authorize("create", "job", createJobWithTitle)

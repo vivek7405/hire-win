@@ -212,7 +212,7 @@ model Job {
   salaryType SalaryType @default(YEAR)
 
   employmentType EmploymentType[]
-  validThrough   DateTime?
+  // validThrough   DateTime?
   description    Json?
 
   postToGoogle Boolean @default(false)

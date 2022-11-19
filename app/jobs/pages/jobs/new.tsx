@@ -75,7 +75,7 @@ const NewJob = ({ user, error }: InferGetServerSidePropsType<typeof getServerSid
           subHeader="Enter job details"
           initialValues={{
             name: "",
-            validThrough: new Date(moment().add(1, "months").toISOString()),
+            // validThrough: new Date(moment().add(1, "months").toISOString()),
           }}
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Creating Job</span>)
