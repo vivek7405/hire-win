@@ -23,12 +23,12 @@ async function getCompanyJobsForCareersPage(
 ) {
   // ctx.session.$authorize()
 
-  const validThrough = { gte: moment().utc().toDate() }
+  // const validThrough = { gte: moment().utc().toDate() }
 
   const where = {
     archived: false,
     hidden: false,
-    validThrough,
+    // validThrough,
     companyId: companyId || "0",
     categoryId: categoryId || {},
     title: {

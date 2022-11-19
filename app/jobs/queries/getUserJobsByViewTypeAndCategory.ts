@@ -25,17 +25,17 @@ async function getUserJobsByViewTypeAndCategory(
 
   const todayDate = new Date(new Date().toDateString())
   const utcDateNow = moment().utc().toDate()
-  const validThrough = utcDateNow
-    ? viewType === JobViewType.Expired
-      ? { lt: utcDateNow }
-      : { gte: utcDateNow }
-    : todayDate
+  // const validThrough = utcDateNow
+  //   ? viewType === JobViewType.Expired
+  //     ? { lt: utcDateNow }
+  //     : { gte: utcDateNow }
+  //   : todayDate
 
   const where = {
     userId: ctx.session.userId || 0,
     job: {
       archived: viewType === JobViewType.Archived,
-      validThrough: viewType === JobViewType.Archived ? {} : validThrough,
+      // validThrough: viewType === JobViewType.Archived ? {} : validThrough,
       companyId: ctx.session.companyId || "0",
       categoryId: categoryId || {},
       title: {
@@ -64,6 +64,7 @@ async function getUserJobsByViewTypeAndCategory(
               category: true,
               candidates: true,
               stages: true,
+              createdBy: true,
               // workflow: { include: { stages: { include: { stage: true } } } },
             },
           },

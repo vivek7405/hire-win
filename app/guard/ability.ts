@@ -117,8 +117,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       if (!job || !job?.company) return false
 
-      const jobExpired = moment(job.validThrough || undefined).diff(moment()) < 0
-      if (job.archived || jobExpired) return false
+      // const jobExpired = moment(job.validThrough || undefined).diff(moment()) < 0
+      if (job.archived) return false
 
       return isFreePlanCandidateLimitAvailable(args)
     })

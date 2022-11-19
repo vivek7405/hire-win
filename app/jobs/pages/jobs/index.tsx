@@ -74,10 +74,11 @@ import { checkSubscription } from "app/companies/utils/checkSubscription"
 import Modal from "app/core/components/Modal"
 import LabeledTextField from "app/core/components/LabeledTextField"
 import getJobs from "app/jobs/queries/getJobs"
-import createJobWithTitleAndValidThrough from "app/jobs/mutations/createJobWithTitleAndValidThrough"
+import createJobWithTitle from "app/jobs/mutations/createJobWithTitle"
 import { Menu, Transition } from "@headlessui/react"
 import classNames from "app/core/utils/classNames"
 import ViewCareersPageButton from "app/companies/components/ViewCareersPageButton"
+import getFirstWordIfGreaterThan from "app/core/utils/getFirstWord"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -545,8 +546,8 @@ const Jobs = ({
             return (
               <div key={job.id}>
                 <Card isFull={true}>
-                  <div className="bg-gray-50 w-full rounded">
-                    <div className="flex items-center justify-between px-6 py-4">
+                  <div className="bg-white w-full rounded px-3 py-1">
+                    <div className="flex items-center justify-between pb-4 md:pb-0">
                       <div>
                         <div className="font-bold text-xl text-theme-900 whitespace-normal">
                           <a
@@ -571,8 +572,12 @@ const Jobs = ({
                           Created{" "}
                           {moment(job.createdAt || undefined)
                             .local()
-                            .fromNow()}
-                          ,{" "}
+                            .fromNow()}{" "}
+                          by{" "}
+                          {session?.userId === job?.createdById
+                            ? "you"
+                            : getFirstWordIfGreaterThan(job?.createdBy?.name || "...", 10)}
+                          {/* ,{" "}
                           {moment(job.validThrough || undefined)
                             .local()
                             .fromNow()
@@ -581,7 +586,7 @@ const Jobs = ({
                             : "expires"}{" "}
                           {moment(job.validThrough || undefined)
                             .local()
-                            .fromNow()}
+                            .fromNow()} */}
                         </p>
                       </div>
                       <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 items-center justify-center">
@@ -609,7 +614,7 @@ const Jobs = ({
                       </div>
                     </div>
 
-                    <div className="px-6 py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
+                    <div className="py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
                       <div className="text-lg text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
                         {job?.candidates?.length}{" "}
                         {job?.candidates?.length === 1 ? "candidate" : "candidates"}
@@ -634,7 +639,7 @@ const Jobs = ({
                           return (
                             <div
                               key={stage.id}
-                              className="overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
+                              className="shadow drop-shadow overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
                             >
                               <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
                                 {stage?.name}
@@ -648,7 +653,7 @@ const Jobs = ({
                       </div>
                     </div>
 
-                    <div className="px-6 pt-4 pb-2 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
+                    <div className="pt-4 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
                       {(job?.city || job?.state || job?.country) && (
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                           {job?.city && <span>{job?.city},&nbsp;</span>}
@@ -922,7 +927,7 @@ const JobsHome = ({
   // }) as any
 
   const [openModal, setOpenModal] = useState(false)
-  const [createJobWithTitleAndValidThroughMutation] = useMutation(createJobWithTitleAndValidThrough)
+  const [createJobWithTitleMutation] = useMutation(createJobWithTitle)
 
   return (
     <AuthLayout
@@ -952,8 +957,8 @@ const JobsHome = ({
           onSubmit={async (values) => {
             const toastId = toast.loading("Creating Job")
             try {
-              values["validThrough"] = new Date(moment().add(1, "months").toISOString())
-              const job = await createJobWithTitleAndValidThroughMutation({
+              // values["validThrough"] = new Date(moment().add(1, "months").toISOString())
+              const job = await createJobWithTitleMutation({
                 ...values,
               })
               router.push(Routes.JobSettingsPage({ slug: job.slug }))
@@ -981,7 +986,7 @@ const JobsHome = ({
           <RadioGroupField
             name="View"
             isBorder={true}
-            options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
+            options={[JobViewType.Active, JobViewType.Archived]}
             initialValue={JobViewType.Active}
             onChange={(value) => {
               setViewType(value)
@@ -1009,7 +1014,7 @@ const JobsHome = ({
             <RadioGroupField
               name="View"
               isBorder={false}
-              options={[JobViewType.Active, JobViewType.Expired, JobViewType.Archived]}
+              options={[JobViewType.Active, JobViewType.Archived]}
               initialValue={JobViewType.Active}
               onChange={(value) => {
                 setViewType(value)

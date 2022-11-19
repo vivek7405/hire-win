@@ -14,7 +14,7 @@ const getCompanyJobCategoriesForFilter = async (
   { searchString, companyId }: GetCategoriesInput,
   ctx: Ctx
 ) => {
-  const validThrough = { gte: moment().utc().toDate() }
+  // const validThrough = { gte: moment().utc().toDate() }
 
   const categories = await db.category.findMany({
     where: {
@@ -23,7 +23,7 @@ const getCompanyJobCategoriesForFilter = async (
         some: {
           archived: false,
           hidden: false,
-          validThrough,
+          // validThrough,
           title: {
             contains: JSON.parse(searchString),
             mode: "insensitive",

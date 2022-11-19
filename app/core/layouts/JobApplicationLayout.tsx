@@ -19,7 +19,7 @@ function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
       value: job?.id,
     },
     datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
-    validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
+    // validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
     employmentType: job?.employmentType,
     hiringOrganization: {
       "@type": "Organization",

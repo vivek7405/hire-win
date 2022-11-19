@@ -98,14 +98,14 @@ const Step2Extra = (props: Step2ExtraProps) => {
             ]}
           />
         </div>
-        <div className="w-full md:w-1/3 lg:w-1/3">
+        {/* <div className="w-full md:w-1/3 lg:w-1/3">
           <LabeledTextValidatedField
             type="date"
             name="validThrough"
             label="Valid Through"
             testid="jobValidThrough"
           />
-        </div>
+        </div> */}
       </div>
     </>
   )
@@ -509,7 +509,7 @@ export const JobForm = (props: JobFormProps) => {
       slug: z.string().optional(),
       categoryId: z.string().optional(),
       employmentType: z.array(z.nativeEnum(EmploymentType)),
-      validThrough: z.date(),
+      // validThrough: z.date(),
     }),
   }
   const stp3: FormStep = {

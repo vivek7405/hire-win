@@ -19,6 +19,7 @@ async function getJobusers({ where, orderBy, skip = 0, take = 100 }: GetJobusers
       db.jobUser.findMany({
         ...paginateArgs,
         where,
+        include: { job: { include: { createdBy: true } } },
         orderBy,
       }),
   })

@@ -305,14 +305,14 @@ export const JobForm = (props: JobFormProps) => {
               ]}
             />
           </div>
-          <div className="w-full md:w-1/3 lg:w-1/3">
+          {/* <div className="w-full md:w-1/3 lg:w-1/3">
             <LabeledTextValidatedField
               type="date"
               name="validThrough"
               label="Valid Through"
               testid="jobValidThrough"
             />
-          </div>
+          </div> */}
         </div>
       </Form>
     </Suspense>

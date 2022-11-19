@@ -32,7 +32,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     salaryType,
     showSalary,
     employmentType,
-    validThrough,
+    // validThrough,
     // scoreCards,
   } = Job.parse(data)
 
@@ -67,9 +67,9 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
       salaryType: salaryType || SalaryType.YEAR,
       showSalary,
       employmentType,
-      validThrough: moment(validThrough || undefined)
-        .utc()
-        .toDate(),
+      // validThrough: moment(validThrough || undefined)
+      //   .utc()
+      //   .toDate(),
       // scoreCards: {
       //   delete: initial?.scoreCards?.map((sc) => {
       //     return { id: sc.id }

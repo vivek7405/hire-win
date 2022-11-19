@@ -1443,7 +1443,9 @@ const SingleCandidatePageContent = ({
                           {candidate.source === CandidateSource.Manual ? (
                             <span>
                               Added by{" "}
-                              {getFirstWordIfGreaterThan(candidate.createdBy?.name || "...", 10)}
+                              {session?.userId === candidate.createdById
+                                ? "you"
+                                : getFirstWordIfGreaterThan(candidate.createdBy?.name || "...", 10)}
                             </span>
                           ) : (
                             <span>Applied through Careers Page</span>
