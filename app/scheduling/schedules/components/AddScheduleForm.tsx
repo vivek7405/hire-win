@@ -63,9 +63,9 @@ export const AddScheduleForm = (props: AddScheduleFormProps) => {
         <LabeledTextField
           type="text"
           name="name"
-          label="Schedule Name"
+          label="Name"
           // disabled={props.isDefaultEdit || false}
-          placeholder="e.g. Workdays"
+          placeholder="e.g. 9 to 5 Weekdays"
         />
         <p>
           Please specify when you are generally available. Your invitees cannot pick a time slot

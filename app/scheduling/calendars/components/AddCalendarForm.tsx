@@ -1,5 +1,5 @@
 import addCalendarMutation from "../mutations/addCalendar"
-import { invalidateQuery, useMutation, Link } from "blitz"
+import { invalidateQuery, useMutation, Link, Image, useQuery } from "blitz"
 import getCalendars from "../queries/getCalendars"
 import { useState } from "react"
 import { ConnectGoogleCalendarButton } from "app/scheduling/calendars/googlecalendar/components/ConnectGoogleCalendarButton"
@@ -9,6 +9,7 @@ import getDefaultCalendarByUser from "../queries/getDefaultCalendarByUser"
 import Form from "app/core/components/Form"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import LabeledTextField from "app/core/components/LabeledTextField"
+import getCcalOAuthUrl from "../googlecalendar/queries/createConnection"
 
 interface AddCalendarProps {
   onClose?: any
@@ -163,12 +164,28 @@ const CalDavFormBody = () => {
 }
 
 const GoogleFormBody = () => {
+  const [url] = useQuery(getCcalOAuthUrl, null)
   return (
     <>
       <p>Please provide access to your Google Calendar</p>
-      <ConnectGoogleCalendarButton id="google-login-button">
+      <button
+        className="w-40 h-10 relative"
+        onClick={(e) => {
+          e.preventDefault()
+          window.location.assign(url)
+        }}
+      >
+        <Image
+          priority={true}
+          alt="Google Sign In"
+          src="/GoogleSignInDark.png"
+          layout="fill"
+          objectFit="contain"
+        />
+      </button>
+      {/* <ConnectGoogleCalendarButton id="google-login-button">
         Go to Google Login
-      </ConnectGoogleCalendarButton>
+      </ConnectGoogleCalendarButton> */}
     </>
   )
 }

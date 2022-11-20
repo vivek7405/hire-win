@@ -36,6 +36,17 @@ export class OutlookCalendarService implements CalendarService {
   }
 
   public async createEvent(interview: CreateEventInterview) {
+    // How to book an event in a particular calendar?
+    // https://learn.microsoft.com/en-us/graph/api/user-list-calendars?view=graph-rest-1.0&tabs=javascript
+    // const options = {
+    //   authProvider,
+    // };
+    // const client = Client.init(options);
+    // let calendars = await client.api('/me/calendars')
+    //   .get();
+    // POST /me/calendars/{id}/events
+    // Google has this.calendar.calendarList.list()
+
     const url = "https://graph.microsoft.com/v1.0/me/calendar/events"
     const startDate = interview.startDateUTC
     const endDate = addMinutes(interview.startDateUTC, interview.duration)

@@ -129,12 +129,12 @@ const Schedules = ({ user }) => {
       </Modal>
 
       <Modal
-        header={`${scheduleToEdit ? "Edit" : "Add a new"} Schedule`}
+        header={`${scheduleToEdit ? "Edit" : "Add a new"} Availability`}
         open={openAddSchedule}
         setOpen={setOpenAddSchedule}
       >
         <AddScheduleForm
-          header={`${scheduleToEdit ? "Edit" : "Add a new"} Schedule`}
+          header={`${scheduleToEdit ? "Edit" : "Add a new"} Availability`}
           // isDefaultEdit={scheduleToEdit?.name?.toLowerCase() === "default" ? true : false}
           subHeader=""
           initialValues={
@@ -306,7 +306,7 @@ const Schedules = ({ user }) => {
               setOpenAddSchedule(true)
             }}
           >
-            New Schedule
+            New Availability
           </button>
         </div>
       </div>
