@@ -27,31 +27,7 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
   })
 
   const subNavigation = [
-    {
-      name: "Profile",
-      href: `/settings`,
-      current: router.route === `/settings`,
-      icon: UserCircleIcon,
-    },
-    {
-      name: "Availabilities",
-      href: `/settings/availabilities`,
-      current: router.route === `/settings/availabilities`,
-      icon: ClockIcon,
-    },
-    {
-      name: "Calendars",
-      href: `/settings/calendars`,
-      current: router.route === `/settings/calendars`,
-      icon: CalendarIcon,
-    },
-    {
-      name: "Security",
-      href: `/settings/security`,
-      current: router.route === `/settings/security`,
-      icon: KeyIcon,
-    },
-    companyUser?.role === CompanyUserRole.OWNER
+    companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
       ? {
           name: "Company",
           href: `/settings/company`,
@@ -67,6 +43,30 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
           icon: UserGroupIcon,
         }
       : null,
+    {
+      name: "Profile",
+      href: `/settings`,
+      current: router.route === `/settings`,
+      icon: UserCircleIcon,
+    },
+    {
+      name: "Security",
+      href: `/settings/security`,
+      current: router.route === `/settings/security`,
+      icon: KeyIcon,
+    },
+    {
+      name: "Availabilities",
+      href: `/settings/availabilities`,
+      current: router.route === `/settings/availabilities`,
+      icon: ClockIcon,
+    },
+    {
+      name: "Calendars",
+      href: `/settings/calendars`,
+      current: router.route === `/settings/calendars`,
+      icon: CalendarIcon,
+    },
     // companyUser?.role === CompanyUserRole.OWNER
     //   ? {
     //       name: "Billing",

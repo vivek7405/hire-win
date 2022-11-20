@@ -237,7 +237,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         allowEdit: false,
         createdById: ctx.session.userId,
         interviewerId: ctx.session.userId,
-        duration: 30,
+        duration: 15,
       },
       {
         jobId: job?.id || "0",
@@ -247,7 +247,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         allowEdit: true,
         createdById: ctx.session.userId,
         interviewerId: ctx.session.userId,
-        duration: 30,
+        duration: 15,
       },
       {
         jobId: job?.id || "0",
@@ -261,13 +261,23 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       },
       {
         jobId: job?.id || "0",
+        name: "Offer",
+        slug: "offer",
+        order: 4,
+        allowEdit: true,
+        createdById: ctx.session.userId,
+        interviewerId: ctx.session.userId,
+        duration: 15,
+      },
+      {
+        jobId: job?.id || "0",
         name: "Hired",
         slug: "hired",
-        order: 4,
+        order: 5,
         allowEdit: false,
         createdById: ctx.session.userId,
         interviewerId: ctx.session.userId,
-        duration: 30,
+        duration: 15,
       },
     ],
   })

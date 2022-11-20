@@ -26,7 +26,14 @@ import Table from "app/core/components/Table"
 // import AddExistingCardQuestionsForm from "app/score-cards/components/AddExistingCardQuestionsForm"
 import toast from "react-hot-toast"
 
-import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
+import {
+  ArrowUpIcon,
+  ArrowDownIcon,
+  XCircleIcon,
+  TrashIcon,
+  XIcon,
+  ArrowLeftIcon,
+} from "@heroicons/react/outline"
 import { CardType, DragDirection, ExtendedScoreCardQuestion, ShiftDirection } from "types"
 import shiftScoreCardQuestion from "app/score-cards/mutations/shiftScoreCardQuestion"
 import Confirm from "app/core/components/Confirm"
@@ -522,7 +529,13 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="Score Cards | hire.win" user={user}>
       <JobSettingsLayout job={job!}>
-        <br className="block md:hidden lg:hidden" />
+        {/* <br className="block md:hidden lg:hidden" /> */}
+        <Link href={Routes.JobSettingsStagesPage({ slug: job?.slug || "0" })}>
+          <a className="w-fit flex items-center space-x-2 text-neutral-600 hover:text-black">
+            <ArrowLeftIcon className="w-5 h-5" />
+            <div>Back to Stages Config</div>
+          </a>
+        </Link>
         {/* {canUpdate && ( */}
         <div className="space-y-6">
           <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">

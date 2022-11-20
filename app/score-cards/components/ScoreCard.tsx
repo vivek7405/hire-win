@@ -25,6 +25,7 @@ type ScoreCardProps = {
   onSubmit: any
   // submitDisabled?: boolean
   header: string
+  headerComponent?: any
   subHeader?: string
   // scoreCardId: string
   preview: boolean
@@ -110,6 +111,7 @@ export const ScoreCard = (props: ScoreCardProps) => {
         onSubmit={props.onSubmit}
         testid="applicationScoreCard"
         header={props.header}
+        headerComponent={props.headerComponent}
         subHeader={props.subHeader}
         key={`${props.candidate?.id}-${props.stageId}`}
       >

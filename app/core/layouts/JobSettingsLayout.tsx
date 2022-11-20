@@ -67,9 +67,9 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
     //   : null,
     jobUser?.role !== JobUserRole.USER
       ? {
-          name: "Members",
-          href: `/jobs/${job?.slug}/settings/members`,
-          current: router.route === `/jobs/[slug]/settings/members`,
+          name: "Hiring Team",
+          href: `/jobs/${job?.slug}/settings/hiring-team`,
+          current: router.route === `/jobs/[slug]/settings/hiring-team`,
           icon: UserGroupIcon,
           canView: true,
         }

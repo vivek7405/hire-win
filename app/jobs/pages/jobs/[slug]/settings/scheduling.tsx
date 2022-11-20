@@ -11,6 +11,7 @@ import {
   Routes,
   useQuery,
   invalidateQuery,
+  Link,
 } from "blitz"
 import path from "path"
 
@@ -27,7 +28,7 @@ import getJob from "app/jobs/queries/getJob"
 import JobSettingsLayout from "app/core/layouts/JobSettingsLayout"
 import Modal from "app/core/components/Modal"
 import Confirm from "app/core/components/Confirm"
-import { ArrowSmDownIcon, ArrowSmRightIcon, XCircleIcon } from "@heroicons/react/outline"
+import { ArrowSmDownIcon, ArrowSmRightIcon, CogIcon, XCircleIcon } from "@heroicons/react/outline"
 
 import { JobUserRole, User } from "db"
 import updateMemberRole from "app/jobs/mutations/updateMemberRole"
@@ -423,8 +424,13 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
 
                       <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
                         <div className="overflow-auto p-2 rounded-lg w-32 flex flex-col items-center justify-center">
-                          <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate">
-                            Availability
+                          <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate flex items-center justify-center space-x-2">
+                            <div>Availability</div>
+                            <Link href={Routes.UserSettingsAvailabilitiesPage()}>
+                              <a className="text-theme-600 hover:text-theme-800">
+                                <CogIcon className="w-5 h-5" />
+                              </a>
+                            </Link>
                           </div>
                         </div>
                       </div>
@@ -435,8 +441,13 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
 
                           <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
                             <div className="overflow-auto p-2 rounded-lg w-32 flex flex-col items-center justify-center">
-                              <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate">
-                                Calendar
+                              <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate flex items-center justify-center space-x-2">
+                                <div>Calendar</div>
+                                <Link href={Routes.UserSettingsCalendarsPage()}>
+                                  <a className="text-theme-600 hover:text-theme-800">
+                                    <CogIcon className="w-5 h-5" />
+                                  </a>
+                                </Link>
                               </div>
                             </div>
                           </div>
@@ -448,7 +459,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                   <div className="bg-white w-full flex flex-col md:flex-row lg:flex-row space-y-2 md:space-y-0 lg:space-y-0 md:space-x-6 lg:space-x-6 items-center justify-center p-1">
                     <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
                       <p className="block md:hidden lg:hidden text-xs text-neutral-500">Stage</p>
-                      <div className="overflow-auto p-2 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
+                      <div className="overflow-auto p-2 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center">
                         <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
                           {stage?.name}
                         </div>

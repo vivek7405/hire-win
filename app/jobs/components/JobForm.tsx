@@ -39,7 +39,7 @@ export const JobForm = (props: JobFormProps) => {
     where: { companyId: props.companyId },
   })
 
-  const steps = ["Basic", "Location", "Salary", "Other"]
+  const steps = ["Basic", "Description", "Location", "Salary"]
   const [step, setStep] = useState(steps[0])
 
   const [countryCode, setCountryCode] = useState(props.initialValues.country || "")
@@ -88,32 +88,80 @@ export const JobForm = (props: JobFormProps) => {
         <div
           className={`${
             step === steps[0] ? "flex" : "hidden"
-          } flex-col space-y-6 w-full sm:w-3/5 mx-auto`}
+          } flex-col space-y-6 w-full items-center`}
         >
-          <LabeledTextField
-            type="text"
-            name="title"
-            label="Title"
-            placeholder="Job Title"
-            testid="jobTitle"
-          />
+          <div className="w-full md:w-1/3">
+            <LabeledTextField
+              type="text"
+              name="title"
+              label="Title"
+              placeholder="Job Title"
+              testid="jobTitle"
+            />
+          </div>
 
-          <LabeledRichTextField
-            name="description"
-            label="Description"
-            placeholder="Description"
-            testid="jobDescription"
-          />
+          <div className="w-full md:w-1/3">
+            <LabeledReactSelectField
+              name="categoryId"
+              label="Category"
+              placeholder="Job Category"
+              testid="jobCategory"
+              disabled={props.category && !categories.find((c) => c.id === props.category?.id)}
+              // defaultValue={props.initialValues?.categoryId}
+              options={
+                !props.category || categories.find((c) => c.id === props.category?.id)
+                  ? [
+                      // { label: "Default", value: "" },
+                      ...categories.map((c) => {
+                        return { label: c.name!, value: c.id! }
+                      }),
+                    ]
+                  : [{ label: props.category?.name!, value: props.category?.id! }]
+              }
+            />
+          </div>
 
-          <LabeledReactSelectField
-            name="remoteOption"
-            label="Remote Option"
-            placeholder="Select one of the remote options"
-            options={Object.values(RemoteOption)?.map((r, i) => {
-              return { label: r.replaceAll("_", " "), value: r }
-            })}
-            defaultValue={RemoteOption.No_Remote}
-          />
+          <div className="w-full md:w-1/3">
+            <LabeledReactSelectField
+              name="employmentType"
+              label="Employment Type"
+              placeholder="Full Time, Part Time, etc."
+              testid="employmentType"
+              //   isMulti={true}
+              options={Object.keys(EmploymentType).map((employmentType) => {
+                return {
+                  label: titleCase(employmentType.replaceAll("_", " ")),
+                  value: employmentType,
+                }
+              })}
+              defaultValue={[
+                Object.keys(EmploymentType).find(
+                  (employmentType) => employmentType === "FULL_TIME"
+                ),
+              ]}
+            />
+          </div>
+
+          <div className="w-full md:w-1/3">
+            <LabeledReactSelectField
+              name="remoteOption"
+              label="Remote Option"
+              placeholder="Select one of the remote options"
+              options={Object.values(RemoteOption)?.map((r, i) => {
+                return { label: r.replaceAll("_", " "), value: r }
+              })}
+              defaultValue={RemoteOption.No_Remote}
+            />
+          </div>
+
+          {/* <div className="w-full md:w-1/3 lg:w-1/3">
+            <LabeledTextValidatedField
+              type="date"
+              name="validThrough"
+              label="Valid Through"
+              testid="jobValidThrough"
+            />
+          </div> */}
 
           {/* <CheckboxField name="remote" label="Remote Job" testid="jobRemote" /> */}
           {/* <CheckboxField name="postToGoogle" label="Post to Google Jobs" testid="postToGoogle" /> */}
@@ -122,6 +170,21 @@ export const JobForm = (props: JobFormProps) => {
         <div
           className={`${
             step === steps[1] ? "flex" : "hidden"
+          } flex-col space-y-6 w-full items-center`}
+        >
+          <div className="w-full">
+            <LabeledRichTextField
+              name="description"
+              label="Description"
+              placeholder="Description"
+              testid="jobDescription"
+            />
+          </div>
+        </div>
+
+        <div
+          className={`${
+            step === steps[2] ? "flex" : "hidden"
           } flex-col space-y-6 w-full items-center`}
         >
           <div className="w-full md:w-1/3">
@@ -201,7 +264,7 @@ export const JobForm = (props: JobFormProps) => {
 
         <div
           className={`${
-            step === steps[2] ? "flex" : "hidden"
+            step === steps[3] ? "flex" : "hidden"
           } flex-col space-y-6 w-full items-center`}
         >
           <div className="w-full md:w-1/3 lg:w-1/3">
@@ -258,61 +321,6 @@ export const JobForm = (props: JobFormProps) => {
           <div className="w-full md:w-1/3 lg:w-1/3">
             <CheckboxField name="showSalary" label="Show salary on careers page" />
           </div>
-        </div>
-
-        <div
-          className={`${
-            step === steps[3] ? "flex" : "hidden"
-          } flex-col space-y-6 w-full items-center`}
-        >
-          <div className="w-full md:w-1/3 lg:w-1/3">
-            <LabeledReactSelectField
-              name="categoryId"
-              label="Category"
-              placeholder="Job Category"
-              testid="jobCategory"
-              disabled={props.category && !categories.find((c) => c.id === props.category?.id)}
-              // defaultValue={props.initialValues?.categoryId}
-              options={
-                !props.category || categories.find((c) => c.id === props.category?.id)
-                  ? [
-                      // { label: "Default", value: "" },
-                      ...categories.map((c) => {
-                        return { label: c.name!, value: c.id! }
-                      }),
-                    ]
-                  : [{ label: props.category?.name!, value: props.category?.id! }]
-              }
-            />
-          </div>
-          <div className="w-full md:w-1/3 lg:w-1/3">
-            <LabeledReactSelectField
-              name="employmentType"
-              label="Employment Type"
-              placeholder="Full Time, Part Time, etc."
-              testid="employmentType"
-              //   isMulti={true}
-              options={Object.keys(EmploymentType).map((employmentType) => {
-                return {
-                  label: titleCase(employmentType.replaceAll("_", " ")),
-                  value: employmentType,
-                }
-              })}
-              defaultValue={[
-                Object.keys(EmploymentType).find(
-                  (employmentType) => employmentType === "FULL_TIME"
-                ),
-              ]}
-            />
-          </div>
-          {/* <div className="w-full md:w-1/3 lg:w-1/3">
-            <LabeledTextValidatedField
-              type="date"
-              name="validThrough"
-              label="Valid Through"
-              testid="jobValidThrough"
-            />
-          </div> */}
         </div>
       </Form>
     </Suspense>

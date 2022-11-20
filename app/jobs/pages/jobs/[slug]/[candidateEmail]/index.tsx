@@ -1552,6 +1552,18 @@ const SingleCandidatePageContent = ({
                       </div> */}
                     </dl>
                   </div>
+
+                  <div className="my-4 w-full flex items-center justify-center">
+                    <Link
+                      href={Routes.JobSettingsApplicationFormPage({
+                        slug: candidate?.job?.slug || "0",
+                      })}
+                    >
+                      <a className="bg-theme-600 hover:bg-theme-700 text-white rounded-lg px-4 py-1">
+                        Add more questions
+                      </a>
+                    </Link>
+                  </div>
                 </div>
                 // <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
                 //   {candidate?.job?.formQuestions?.map((question) => {
@@ -1846,6 +1858,29 @@ const SingleCandidatePageContent = ({
                       key={`${candidate?.id}-${selectedStage?.id}`}
                       candidate={candidate}
                       header="Score Card"
+                      headerComponent={
+                        user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                          JobUserRole.OWNER ||
+                        user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                          JobUserRole.ADMIN ? (
+                          <div className="flex items-center space-x-2">
+                            <h2 className="text-lg font-medium text-gray-900 whitespace-nowrap">
+                              Score Card
+                            </h2>
+                            <Link
+                              href={Routes.JobSettingsSingleScoreCardPage({
+                                slug: candidate?.job?.slug || "0",
+                                stageSlug: selectedStage?.slug || "0",
+                              })}
+                            >
+                              <a className="text-theme-600 hover:text-theme-800">
+                                <CogIcon className="w-5 h-5" />
+                              </a>
+                            </Link>
+                          </div>
+                        ) : null
+                      }
+                      // header="Score Card"
                       // subHeader={`${
                       //   candidate?.job?.workflow?.stages?.find(
                       //     (ws) => ws.id === selectedStage?.id
