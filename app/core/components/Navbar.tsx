@@ -223,27 +223,31 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
   let dropDownNav = [
     {
       name: "Settings",
-      href: Routes.UserSettingsPage().pathname,
+      href:
+        selectedCompanyUser?.role === CompanyUserRole.OWNER ||
+        selectedCompanyUser?.role === CompanyUserRole.ADMIN
+          ? Routes.UserSettingsCompanyPage().pathname
+          : Routes.UserSettingsPage().pathname,
       focus: router.route === "/settings",
     },
-    selectedCompanyUser?.role === CompanyUserRole.OWNER ||
-    selectedCompanyUser?.role === CompanyUserRole.ADMIN
-      ? {
-          name: "Members",
-          href: Routes.UserSettingsMembersPage().pathname,
-          focus: router.route === Routes.UserSettingsMembersPage().pathname,
-        }
-      : null,
-    {
-      name: "Availabilities",
-      href: Routes.UserSettingsAvailabilitiesPage().pathname,
-      focus: router.route === "/settings/availabilities",
-    },
-    {
-      name: "Calendars",
-      href: Routes.UserSettingsCalendarsPage().pathname,
-      focus: router.route === Routes.UserSettingsCalendarsPage().pathname,
-    },
+    // selectedCompanyUser?.role === CompanyUserRole.OWNER ||
+    // selectedCompanyUser?.role === CompanyUserRole.ADMIN
+    //   ? {
+    //       name: "Members",
+    //       href: Routes.UserSettingsMembersPage().pathname,
+    //       focus: router.route === Routes.UserSettingsMembersPage().pathname,
+    //     }
+    //   : null,
+    // {
+    //   name: "Availabilities",
+    //   href: Routes.UserSettingsAvailabilitiesPage().pathname,
+    //   focus: router.route === "/settings/availabilities",
+    // },
+    // {
+    //   name: "Calendars",
+    //   href: Routes.UserSettingsCalendarsPage().pathname,
+    //   focus: router.route === Routes.UserSettingsCalendarsPage().pathname,
+    // },
     {
       name: "Sign Out",
       action: async () => {

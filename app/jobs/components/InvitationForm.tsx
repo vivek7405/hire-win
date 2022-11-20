@@ -1,6 +1,6 @@
 import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form } from "app/core/components/Form"
-import { invalidateQuery, useQuery, useSession } from "blitz"
+import { invalidateQuery, Link, Routes, useQuery, useSession } from "blitz"
 import getCompanyUsers from "app/companies/queries/getCompanyUsers"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import { z } from "zod"
@@ -9,6 +9,7 @@ import { useEffect } from "react"
 import getCompanyUsersListForInvitation from "app/companies/queries/getCompanyUsersListForInvitation"
 import { CompanyUserRole, JobUserRole } from "@prisma/client"
 import { titleCase } from "app/core/utils/titleCase"
+import { ArrowRightIcon } from "@heroicons/react/outline"
 
 type InvitationFormProps = {
   onSuccess?: () => void
@@ -54,7 +55,14 @@ export const InvitationForm = (props: InvitationFormProps) => {
       >
         {props.isJobInvitation ? (
           <>
+            <Link href={Routes.UserSettingsMembersPage()}>
+              <a className="flex items-center space-x-2 text-sm text-neutral-700 hover:text-black">
+                <div>View/Invite Company Users</div>
+                <ArrowRightIcon className="w-4 h-4" />
+              </a>
+            </Link>
             <LabeledReactSelectField
+              label="User"
               name="email"
               options={companyUsers?.map((cu) => {
                 return { label: `${cu.user?.name} - ${cu.user?.email}`, value: cu.user?.email }

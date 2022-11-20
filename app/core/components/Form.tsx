@@ -16,6 +16,7 @@ export interface FormProps<S extends z.ZodType<any, any>>
   initialValues?: UseFormProps<z.infer<S>>["defaultValues"]
   testid?: string
   header?: string
+  headerComponent?: any
   subHeader?: string
   noFormatting?: boolean
   isSubmitTop?: boolean
@@ -34,6 +35,7 @@ export function Form<S extends z.ZodType<any, any>>({
   initialValues,
   onSubmit,
   header,
+  headerComponent,
   subHeader,
   noFormatting,
   isSubmitTop,
@@ -67,7 +69,11 @@ export function Form<S extends z.ZodType<any, any>>({
             <div className="flex items-center">
               {(header || subHeader) && (
                 <div className="w-3/4">
-                  <h2 className="text-lg font-medium text-gray-900 whitespace-nowrap">{header}</h2>
+                  {headerComponent || (
+                    <h2 className="text-lg font-medium text-gray-900 whitespace-nowrap">
+                      {header}
+                    </h2>
+                  )}
                   <p className="mt-1 text-sm text-gray-500 whitespace-nowrap">{subHeader}</p>
                 </div>
               )}

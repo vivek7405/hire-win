@@ -143,7 +143,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const JobSettingsMembersPage = ({
+const JobSettingsHiringTeamPage = ({
   user,
   job,
   company,
@@ -178,16 +178,16 @@ const JobSettingsMembersPage = ({
                 id="billing-history-heading"
                 className="text-lg leading-6 font-medium text-gray-900"
               >
-                Members
+                Hiring Team
               </h2>
               <Modal
-                header="Add User to Job"
+                header="Add Member to Job"
                 open={openInvite}
                 setOpen={setOpenInvite}
                 noOverflow={true}
               >
                 <InvitationForm
-                  header="Add User"
+                  header="Add Team Member"
                   subHeader="Add an existing company user to this job"
                   submitText="Add"
                   jobId={job?.id || "0"}
@@ -241,7 +241,7 @@ const JobSettingsMembersPage = ({
                 data-testid={`open-inviteUser-modal`}
                 className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
               >
-                Add User
+                Add Member
               </button>
             </div>
 
@@ -392,7 +392,7 @@ const JobSettingsMembersPage = ({
                         key={stage.id}
                         className="bg-white w-32 flex flex-col space-y-2 items-center justify-center p-1"
                       >
-                        <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-full flex flex-col items-center justify-center">
+                        <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-white w-full flex flex-col items-center justify-center">
                           <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
                             {stage?.name}
                           </div>
@@ -628,4 +628,4 @@ const JobSettingsMembersPage = ({
   )
 }
 
-export default JobSettingsMembersPage
+export default JobSettingsHiringTeamPage
