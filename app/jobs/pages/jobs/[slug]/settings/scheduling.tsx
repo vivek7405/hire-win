@@ -414,7 +414,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                       <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
                         <div className="overflow-auto p-2 rounded-lg w-32 flex flex-col items-center justify-center">
                           <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate">
-                            Stages
+                            Stage
                           </div>
                         </div>
                       </div>
@@ -424,7 +424,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                       <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
                         <div className="overflow-auto p-2 rounded-lg w-32 flex flex-col items-center justify-center">
                           <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate">
-                            Schedules
+                            Availability
                           </div>
                         </div>
                       </div>
@@ -436,7 +436,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                           <div className="flex flex-col space-y-1 md:space-y-0 lg:space-y-0 items-center">
                             <div className="overflow-auto p-2 rounded-lg w-32 flex flex-col items-center justify-center">
                               <div className="overflow-hidden text-md text-neutral-700 font-semibold whitespace-nowrap w-full text-center truncate">
-                                Calendars
+                                Calendar
                               </div>
                             </div>
                           </div>
@@ -589,7 +589,7 @@ const JobSettingsSchedulingPage = ({
                 id="billing-history-heading"
                 className="text-lg leading-6 font-medium text-gray-900"
               >
-                Schedules & Calendars
+                Availabilities & Calendars
               </h2>
             </div>
 

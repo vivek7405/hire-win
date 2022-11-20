@@ -235,9 +235,9 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
         }
       : null,
     {
-      name: "Schedules",
-      href: Routes.UserSettingsSchedulesPage().pathname,
-      focus: router.route === "/settings/schedules",
+      name: "Availabilities",
+      href: Routes.UserSettingsAvailabilitiesPage().pathname,
+      focus: router.route === "/settings/availabilities",
     },
     {
       name: "Calendars",

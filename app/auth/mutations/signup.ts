@@ -99,7 +99,7 @@ export default async function signup(
 
   const schedule = await addSchedule(
     {
-      name: "Weekdays",
+      name: "9 to 5 Weekdays",
       timezone: timezone || "UTC",
       schedule: initialSchedule,
     },

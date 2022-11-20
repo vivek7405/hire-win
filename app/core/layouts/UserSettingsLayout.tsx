@@ -34,9 +34,9 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
       icon: UserCircleIcon,
     },
     {
-      name: "Schedules",
-      href: `/settings/schedules`,
-      current: router.route === `/settings/schedules`,
+      name: "Availabilities",
+      href: `/settings/availabilities`,
+      current: router.route === `/settings/availabilities`,
       icon: ClockIcon,
     },
     {

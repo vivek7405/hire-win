@@ -25,6 +25,10 @@ export class GoogleCalendarService implements CalendarService {
   }
 
   public async createEvent(interview: CreateEventInterview) {
+    // How to book an event in a particular calendar?
+    // const calendarList = await this.calendar.calendarList.list()
+    // Specify calendarId instead of "primary" while creating event
+
     const startDate = interview.startDateUTC
     const endDate = addMinutes(interview.startDateUTC, interview.duration)
 

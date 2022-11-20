@@ -50,7 +50,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   }
 }
 
-const UserSettingsSchedulesPage = ({
+const UserSettingsAvailabilitiesPage = ({
   user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
@@ -65,6 +65,6 @@ const UserSettingsSchedulesPage = ({
   )
 }
 
-UserSettingsSchedulesPage.suppressFirstRenderFlicker = true
+UserSettingsAvailabilitiesPage.suppressFirstRenderFlicker = true
 
-export default UserSettingsSchedulesPage
+export default UserSettingsAvailabilitiesPage
