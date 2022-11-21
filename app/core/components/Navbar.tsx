@@ -432,11 +432,11 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                 </svg>
               </a>
             </Link>
-            <span className="text-xs">
+            {/* <span className="text-xs">
               <Link href={Routes.Beta()}>
                 <a className="text-neutral-200 hover:underline">BETA</a>
               </Link>
-            </span>
+            </span> */}
           </span>
 
           {companyUser && (

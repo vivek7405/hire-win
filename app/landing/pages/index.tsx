@@ -307,12 +307,6 @@ export default function Home() {
             />
           </div>
 
-          <div className="mt-8">
-            <Suspense fallback="Loading...">
-              <BookADemoButton />
-            </Suspense>
-          </div>
-
           <div className="mt-8 flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-3 md:space-y-0 lg:space-y-0 md:space-x-3 lg:space-x-3">
             {/* <a
               href="https://www.producthunt.com/posts/hire-win?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-hire&#0045;win"
@@ -339,25 +333,31 @@ export default function Home() {
                 // height="54"
               />
             </a>
-            <Link prefetch={true} href={Routes.SignupPage()}>
+            {/* <Link prefetch={true} href={Routes.OldSignupPage()}>
               <a>
-                {/* <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 hover:underline text-white font-extrabold rounded py-4 px-8 shadow-lg w-72 text-xl">
+                <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 hover:underline text-white font-extrabold rounded py-4 px-8 shadow-lg w-72 text-xl">
                   Start 14 days free trial
-                </button> */}
+                </button>
                 <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 hover:underline text-white font-extrabold rounded py-4 px-8 shadow-lg w-fit text-xl">
                   Get Early Access
                 </button>
               </a>
-            </Link>
+            </Link> */}
             {/* <Link prefetch={true} href={Routes.LoginPage()}>
             <a className="inline-block mx-auto lg:mx-0 hover:underline bg-transparent text-neutral-600 font-extrabold py-2 lg:py-4 px-8">
               Login
             </a>
           </Link> */}
           </div>
+
+          <div className="mt-8">
+            <Suspense fallback="Loading...">
+              <BookADemoButton />
+            </Suspense>
+          </div>
         </section>
 
-        <section id="customers" className="bg-white border-b px-4 py-4 mt-12">
+        {/* <section id="customers" className="bg-white border-b px-4 py-4 mt-12">
           <div className="container mx-auto flex flex-wrap items-center justify-between pb-12">
             <h2 className="w-full my-2 text-xl font-black leading-tight text-center text-gray-800 lg:mt-8">
               Many companies are already streamlining their hiring process with hire.win
@@ -365,12 +365,6 @@ export default function Home() {
             <div className="w-full mb-4">
               <div className="h-1 mx-auto bg-gradient-to-r from-neutral-200 to-neutral-500 w-96 opacity-25 my-0 py-0 rounded-t"></div>
             </div>
-
-            {/* <div className="w-full my-5 flex flex-col items-center justify-center">
-              <div className="flex items-center justify-center">
-                <p className="text-neutral-700 text-md md:text-lg lg:text-2xl">Are you the next?</p>
-              </div>
-            </div> */}
 
             <div className="w-full flex items-center justify-center mt-10 space-x-10 px-8">
               <div className="w-1/3 sm:w-1/4">
@@ -663,7 +657,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         <section id="careers-page" className="mx-5 sm:mx-10">
           <h1 className="text-center pt-8 pb-4 font-bold text-xl lg:text-2xl">
@@ -758,7 +752,7 @@ export default function Home() {
           </div>
         </section> */}
 
-        <section id="who-is-it-for" className="bg-gray-100 border-b px-4 py-8 mt-12">
+        <section id="who-is-it-for" className="bg-white border-b px-4 py-8 mt-12">
           <div className="container max-w-5xl mx-auto mt-8">
             <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-gray-800">
               Who is it for?
@@ -776,11 +770,11 @@ export default function Home() {
               </div>
             </div>
 
-            <p className="w-full text-center text-lg italic text-neutral-700 pb-10">
+            {/* <p className="w-full text-center text-lg italic text-neutral-700 pb-10">
               If you are using Excel Sheets and other supportive tools, you are going to love
               hire.win! We stay closer to the simplicity of sheets while giving you the power of a{" "}
               <span className="font-bold">full-fledged Applicant Tracking System (ATS)</span> 😎
-            </p>
+            </p> */}
 
             <div className="flex flex-wrap">
               <div className="w-full sm:w-1/2 p-6">
@@ -1164,7 +1158,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="how-to-use" className="bg-white border-b px-4 py-12 mt-12">
+        {/* <section id="how-to-use" className="bg-white border-b px-4 py-12 mt-12">
           <div className="container mx-auto flex flex-wrap">
             <h2 className="w-full my-2 text-5xl font-black leading-tight text-center text-neutral-800">
               Getting started is easy!
@@ -2692,7 +2686,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* <section id="features" className="bg-gray-100 border-b px-4 py-12">
           <div className="container mx-auto flex flex-wrap">
@@ -3449,10 +3443,10 @@ export default function Home() {
                   {/* Decrease your time-to-hire per candidate by at least 3x. */}
                 </span>
               </div>
-              <div className="mt-6">
-                <Link prefetch={true} href={Routes.SignupPage()}>
+              {/* <div className="mt-6">
+                <Link prefetch={true} href={Routes.OldSignupPage()}>
                   <a>
-                    {/* <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white hover:shadow-indigo-500 shadow-lg rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
+                    <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white hover:shadow-indigo-500 shadow-lg rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
                       <span className="font-extrabold text-xl">Start 14 days free trial</span>
                       <br />
                       <span className="font-light hidden md:block lg:block">
@@ -3461,17 +3455,19 @@ export default function Home() {
                       <span className="font-light md:hidden lg:hidden">
                         no credit card required
                       </span>
-                    </button> */}
+                    </button>
                     <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white font-extrabold text-xl hover:underline shadow-lg rounded my-4 py-3 lg:py-4 px-8 w-fit">
                       Get Early Access
                     </button>
                   </a>
                 </Link>
               </div>
-              <div className="mb-4">OR</div>
-              <Suspense fallback="Loading...">
-                <BookADemoButton />
-              </Suspense>
+              <div className="mb-4">OR</div> */}
+              <div className="mt-8">
+                <Suspense fallback="Loading...">
+                  <BookADemoButton />
+                </Suspense>
+              </div>
             </div>
           </div>
         </section>

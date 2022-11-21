@@ -40,7 +40,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   return { props: {} }
 }
 
-const SignupPage: BlitzPage = () => {
+const OldSignupPage: BlitzPage = () => {
   const router = useRouter()
   const [confirmEmailMutation] = useMutation(confirmEmail)
 
@@ -211,6 +211,6 @@ const SignupPage: BlitzPage = () => {
   )
 }
 
-// SignupPage.redirectAuthenticatedTo = "/"
+// OldSignupPage.redirectAuthenticatedTo = "/"
 
-export default SignupPage
+export default OldSignupPage
