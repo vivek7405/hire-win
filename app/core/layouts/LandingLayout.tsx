@@ -94,11 +94,11 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                     </div>
                   </a>
                 </Link>
-                <span className="text-xs">
+                {/* <span className="text-xs">
                   <Link href={Routes.Beta()}>
                     <a className="text-indigo-600 hover:underline font-semibold">BETA</a>
                   </Link>
-                </span>
+                </span> */}
               </div>
 
               <div className="block lg:hidden">
