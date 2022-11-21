@@ -105,7 +105,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         props: {
           user: user,
           job,
-          stageId: stage?.id || "0",
+          stage: stage || null,
           //   canUpdate: canUpdate,
           //   scoreCard: scoreCard,
         },
@@ -137,7 +137,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
 export const CardQuestions = ({
   user,
-  stageId,
+  stage,
   setCardQuestionToEdit,
   setOpenAddNewCardQuestion,
 }) => {
@@ -188,7 +188,7 @@ export const CardQuestions = ({
 
   const [scoreCardQuestions] = useQuery(getScoreCardQuestions, {
     where: {
-      stageId,
+      stageId: stage?.id || "0",
       ...query,
     },
     orderBy: { order: "asc" },
@@ -487,7 +487,7 @@ export const CardQuestions = ({
               <ScoreCard
                 header="Score Card (Preview)"
                 subHeader=""
-                stageId={stageId!}
+                stageId={stage?.id || "0"}
                 preview={true}
                 onSubmit={async (values) => {
                   toast.error("Can't submit the score in preview mode")
@@ -506,7 +506,7 @@ export const CardQuestions = ({
 const JobSettingsSingleScoreCardPage = ({
   user,
   job,
-  stageId,
+  stage,
   //   scoreCard,
   error,
 }: //   canUpdate,
@@ -533,9 +533,14 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
         <Link href={Routes.JobSettingsStagesPage({ slug: job?.slug || "0" })}>
           <a className="w-fit flex items-center space-x-2 text-neutral-600 hover:text-black">
             <ArrowLeftIcon className="w-5 h-5" />
-            <div>Back to Stages Config</div>
+            <div>Stages Config</div>
           </a>
         </Link>
+        <div className="text-left sm:text-center text-neutral-700 text-xl font-medium">
+          Score Card Config for stage {'"'}
+          {stage?.name}
+          {'"'}
+        </div>
         {/* {canUpdate && ( */}
         <div className="space-y-6">
           <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
@@ -653,7 +658,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                             initial: scoreCardQuestionToEdit!,
                           })
                         : await addNewCardQuestionToScoreCardMutation({
-                            stageId,
+                            stageId: stage?.id || "0",
                             ...values,
                           })
                       invalidateQuery(getScoreCardQuestions)
@@ -709,7 +714,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
           <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <CardQuestions
               // companyId={session.companyId || "0"}
-              stageId={stageId}
+              stage={stage}
               user={user}
               setCardQuestionToEdit={setScoreCardQuestionToEdit}
               setOpenAddNewCardQuestion={setOpenAddNewCardQuestion}

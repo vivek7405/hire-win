@@ -228,7 +228,11 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
         selectedCompanyUser?.role === CompanyUserRole.ADMIN
           ? Routes.UserSettingsCompanyPage().pathname
           : Routes.UserSettingsPage().pathname,
-      focus: router.route === "/settings",
+      focus:
+        selectedCompanyUser?.role === CompanyUserRole.OWNER ||
+        selectedCompanyUser?.role === CompanyUserRole.ADMIN
+          ? router.route === Routes.UserSettingsCompanyPage().pathname
+          : router.route === Routes.UserSettingsPage().pathname,
     },
     // selectedCompanyUser?.role === CompanyUserRole.OWNER ||
     // selectedCompanyUser?.role === CompanyUserRole.ADMIN
@@ -286,7 +290,7 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
     return (
       <div className="flex items-center space-x-2">
         <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
-          <DropdownMenu.Trigger className="bg-theme-700 flex items-center text-sm text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
+          <DropdownMenu.Trigger className="bg-theme-700 hover:bg-theme-800 flex items-center text-sm text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-theme-700 focus:ring-white">
             <div
               title={selectedCompanyUser?.company?.name}
               className="w-24 py-1 px-2 text-white font-semibold truncate"
@@ -456,10 +460,8 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                         <Link prefetch={true} href={item.href} passHref>
                           <a
                             className={`${
-                              item.focus
-                                ? "text-white bg-theme-800"
-                                : "text-neutral-50 hover:text-neutral-200"
-                            } px-3 py-2 rounded-md text-sm font-medium`}
+                              item.focus ? "text-white bg-theme-800" : "text-neutral-50"
+                            } px-3 py-2 rounded-md text-sm font-medium hover:bg-theme-700 hover:text-white`}
                           >
                             {item.name}
                           </a>
@@ -487,7 +489,7 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                       <div
                         id={width >= 1024 ? "selectorUserMenuStep" : "#selectorUserMenuStep"}
                         title={`${user?.name} - ${user?.email}`}
-                        className="selectorUserMenuHint flex items-center justify-center h-8 w-8 rounded-full bg-gray-100"
+                        className="selectorUserMenuHint flex items-center justify-center h-8 w-8 rounded-full bg-white hover:bg-gray-200"
                       >
                         {user?.name.charAt(0).toUpperCase()}
                       </div>
@@ -504,7 +506,7 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                           //   setOpenConfirm(true)
                           // }
                         }}
-                        className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                        className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
                       >
                         Add Company
                       </DropdownMenu.Item>
@@ -519,7 +521,7 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                               e.preventDefault()
                               item.href.length ? router.push(item.href) : item.action!()
                             }}
-                            className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500"
+                            className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
                           >
                             {item.name}
                           </DropdownMenu.Item>
@@ -585,6 +587,30 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
 
             <div className="w-full h1 border border-theme-700 rounded-full mt-4 mb-2" />
 
+            {/* <div
+              onSelect={(e) => {
+                e.preventDefault()
+                // if (canCreateCompany) {
+                router.push(Routes.NewCompany())
+                // } else {
+                //   setOpenConfirm(true)
+                // }
+              }}
+              className={`cursor-pointer px-4 py-2 text-sm text-neutral-50 hover:text-neutral-200`}
+            >
+              Add Company
+            </div> */}
+            <Link prefetch={true} href={Routes.NewCompany().pathname} passHref>
+              <a
+                className={`${
+                  router.route === Routes.NewCompany().pathname
+                    ? "text-white bg-theme-800"
+                    : "text-neutral-50 hover:text-neutral-200"
+                } px-3 py-2 rounded-md text-sm font-medium`}
+              >
+                Add Company
+              </a>
+            </Link>
             {dropDownNav.map((item, i) => {
               if (!item) return <></>
 
@@ -592,7 +618,11 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                 <Link prefetch={true} href={item.href} passHref key={i}>
                   <a
                     data-testid={`${item.name}-navLink`}
-                    className={`px-4 py-2 text-sm text-neutral-50 hover:text-neutral-200`}
+                    className={`${
+                      router.route === item.href
+                        ? "text-white bg-theme-800"
+                        : "text-neutral-50 hover:text-neutral-200"
+                    } px-3 py-2 rounded-md text-sm font-medium`}
                   >
                     {item.name}
                   </a>
@@ -605,7 +635,11 @@ const NavbarContent = ({ user, setNavbarIntroSteps, setNavbarIntroHints }: Navba
                     e.preventDefault()
                     item.action && item.action()
                   }}
-                  className="px-4 py-2 text-left text-sm text-neutral-50 hover:text-neutral-200"
+                  className={`${
+                    router.route === item.href
+                      ? "text-white bg-theme-800"
+                      : "text-neutral-50 hover:text-neutral-200"
+                  } px-3 py-2 rounded-md text-sm font-medium text-left`}
                 >
                   {item.name}
                 </button>
