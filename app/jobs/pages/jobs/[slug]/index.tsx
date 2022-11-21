@@ -399,7 +399,7 @@ type CandidateProps = {
   session: any
 }
 const Candidates = (props: CandidateProps) => {
-  const ITEMS_PER_PAGE = 25
+  const ITEMS_PER_PAGE = 100
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   // const [data, setData] = useState<ExtendedCandidate[]>([])

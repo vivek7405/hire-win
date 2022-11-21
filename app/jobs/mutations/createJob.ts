@@ -300,15 +300,142 @@ async function createJob(data: JobInputType, ctx: Ctx) {
   // })
 
   await db.scoreCardQuestion.createMany({
-    data: stages?.map((stage) => {
-      return {
-        stageId: stage.id,
-        title: "Overall Score",
-        slug: "overall-score",
-        order: 1,
-        createdById: user.id,
-      }
-    }),
+    data: stages
+      ?.map((stage) => {
+        switch (stage?.name) {
+          case "Sourced":
+            return [
+              {
+                stageId: stage.id,
+                title: "Fits the Role",
+                slug: "fits-the-role",
+                order: 1,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Qualification",
+                slug: "qualification",
+                order: 2,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Job Description Match",
+                slug: "job-description-match",
+                order: 3,
+                createdById: user.id,
+              },
+            ]
+          case "Screen":
+            return [
+              {
+                stageId: stage.id,
+                title: "Communication",
+                slug: "communication",
+                order: 1,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Salary Expectation Match",
+                slug: "salary-expectation-match",
+                order: 2,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Notice Period Match",
+                slug: "notice-period-match",
+                order: 3,
+                createdById: user.id,
+              },
+            ]
+          case "Interview":
+            return [
+              {
+                stageId: stage.id,
+                title: "Overall Performance",
+                slug: "overall-performance",
+                order: 1,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Attitude & Behaviour",
+                slug: "attitude-and-behaviour",
+                order: 2,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Problem Solving Skills",
+                slug: "problem-solving-skills",
+                order: 3,
+                createdById: user.id,
+              },
+            ]
+          case "Offer":
+            return [
+              {
+                stageId: stage.id,
+                title: "Background Verification",
+                slug: "background-verification",
+                order: 1,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Probability of Joining",
+                slug: "probability-of-joining",
+                order: 2,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Holds fewer offers",
+                slug: "holds-fewer-offers",
+                order: 3,
+                createdById: user.id,
+              },
+            ]
+          case "Hired":
+            return [
+              {
+                stageId: stage.id,
+                title: "Received all Documents",
+                slug: "received-all-documents",
+                order: 1,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Project Manager Review",
+                slug: "project-manager-review",
+                order: 2,
+                createdById: user.id,
+              },
+              {
+                stageId: stage.id,
+                title: "Retention Estimate",
+                slug: "retention-estimate",
+                order: 3,
+                createdById: user.id,
+              },
+            ]
+          default:
+            return [
+              {
+                stageId: stage.id,
+                title: "Generalized Review",
+                slug: "generalized-review",
+                order: 1,
+                createdById: user.id,
+              },
+            ]
+        }
+      })
+      ?.flat(),
   })
 
   await db.stageUserScheduleCalendar.createMany({

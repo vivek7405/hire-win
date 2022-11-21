@@ -262,7 +262,7 @@ const Emails = ({ user, stageId, candidate }) => {
                         setEmailToView(null as any)
                         setOpenModal(true)
                       }}
-                      className="text-left w-auto max-w-xs whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:text-gray-500 focus:outline-none focus-visible:text-gray-500 truncate"
+                      className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
                     >
                       {et.name}
                     </DropdownMenu.Item>

@@ -80,7 +80,8 @@ const UserSettingsCompanyPage = ({
 
   return (
     <>
-      {companyUser?.role === CompanyUserRole.OWNER ? (
+      {companyUser?.role === CompanyUserRole.OWNER ||
+      companyUser?.role === CompanyUserRole.ADMIN ? (
         <AuthLayout title="Settings | Company" user={user}>
           <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
           <UserSettingsLayout>

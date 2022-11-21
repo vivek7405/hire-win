@@ -936,7 +936,7 @@ const SingleCandidatePageContent = ({
                 onSelect={(e) => {
                   e.preventDefault()
                 }}
-                className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
+                className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
               >
                 No stages
               </DropdownMenu.Item>
@@ -956,7 +956,7 @@ const SingleCandidatePageContent = ({
                       setOpenCandidateMoveConfirm(true)
                     }
                   }}
-                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-500"
+                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
                 >
                   {stage?.name?.length > 30 ? `${stage?.name?.substring(0, 30)}...` : stage?.name}
                 </DropdownMenu.Item>
@@ -993,7 +993,7 @@ const SingleCandidatePageContent = ({
               onSelect={(e) => {
                 e.preventDefault()
               }}
-              className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-500"
+              className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
             >
               No more pools to add
             </DropdownMenu.Item>
@@ -1037,7 +1037,7 @@ const SingleCandidatePageContent = ({
                   }
                   setCandidatePoolsOpen(false)
                 }}
-                className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-500"
+                className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
               >
                 {cp.candidates.find((c) => c.id === candidate.id) ? (
                   <CheckIcon className="w-5 h-5 text-theme-600" />
@@ -1426,7 +1426,7 @@ const SingleCandidatePageContent = ({
                 </Form>
               </div>
               {candidateDetailToggleView === CandidateDetailToggleView.Info && (
-                <div key={candidate.id} className="overflow-hidden bg-white shadow">
+                <div key={candidate.id} className="overflow-hidden shadow">
                   {/* <div className="px-4 py-5 sm:px-6">
                     <h3 className="text-lg font-medium leading-6 text-gray-900">
                       Applicant Information

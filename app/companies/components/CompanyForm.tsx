@@ -38,6 +38,7 @@ export const CompanyForm = (props: CompanyFormProps) => {
             label="Name"
             placeholder="Enter company name"
             testid="userUpdateName"
+            showAsterisk={true}
           />
 
           <LabeledTextField
