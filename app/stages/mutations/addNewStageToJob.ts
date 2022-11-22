@@ -56,8 +56,8 @@ async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
     data: [
       {
         stageId: stage?.id || "0",
-        title: "Overall Score",
-        slug: "overall-score",
+        title: "Generalized Review",
+        slug: "generalized-review",
         order: 1,
         createdById: ctx.session.userId,
       },
