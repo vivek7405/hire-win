@@ -18,10 +18,25 @@ export interface LabeledRatingFieldProps extends PropsWithoutRef<JSX.IntrinsicEl
   color?: string
   value?: number
   showAsterisk?: boolean
+  allowCursorWhenDisabled?: boolean
 }
 
 export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFieldProps>(
-  ({ label, outerProps, name, defaultValue, value, disabled, height, color, ...props }, ref) => {
+  (
+    {
+      label,
+      outerProps,
+      name,
+      defaultValue,
+      value,
+      disabled,
+      height,
+      color,
+      allowCursorWhenDisabled,
+      ...props
+    },
+    ref
+  ) => {
     const {
       control,
       setValue,
@@ -69,14 +84,22 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
                     <StarIconOutline
                       className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
                         !color ? "text-theme-600" : `text-${color}-600`
-                      } w-auto ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } w-auto ${
+                        disabled
+                          ? `opacity-50 ${allowCursorWhenDisabled ? "" : "cursor-not-allowed"}`
+                          : ""
+                      }`}
                     />
                   }
                   fullSymbol={
                     <StarIconSolid
                       className={`${height && height > 0 ? `h-${height}` : "h-6"} ${
                         !color ? "text-theme-600" : `text-${color}-600`
-                      } w-auto ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } w-auto ${
+                        disabled
+                          ? `opacity-50 ${allowCursorWhenDisabled ? "" : "cursor-not-allowed"}`
+                          : ""
+                      }`}
                     />
                   }
                   initialRating={value || defaultValue}

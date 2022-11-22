@@ -305,7 +305,7 @@ const SingleCandidatePage = ({
   const [openNewCandidateModal, setOpenNewCandidateModal] = useState(false)
 
   const handleWindowSizeChange = () => {
-    setViewCandidateSelection(false)
+    // setViewCandidateSelection(false)
   }
   useEffect(() => {
     window.addEventListener("resize", handleWindowSizeChange)
@@ -330,41 +330,54 @@ const SingleCandidatePage = ({
   return (
     <AuthLayout user={user} isMax8xl={true}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
-      {viewCandidateSelection && (
-        <div
-          // ref={viewAllCandidatesRef}
-          className="md:mt-56 lg:mt-24 absolute right-7 w-1/6 md:w-2/5 lg:w-1/3 h-screen z-10"
-        >
+      <br />
+      <div className="w-full 2xl:w-5/6 mx-auto flex justify-center">
+        {viewCandidateSelection && (
+          // <div
+          //   // ref={viewAllCandidatesRef}
+          //   // className="md:mt-56 lg:mt-24 absolute right-7 w-1/6 md:w-2/5 lg:w-1/3 h-screen bg-white border-2 border-theme-400 rounded-lg z-10"
+          //   className="w-1/4 h-screen sticky top-0 bg-white border-2 border-theme-400 rounded-lg z-10"
+          // >
+          <div className="hidden xl:block w-1/4 pr-6">
+            <div className={`w-full bg-white border-2 border-theme-400 rounded-lg sticky top-0`}>
+              <div className="w-full rounded-2xl">
+                <Suspense fallback="Loading...">
+                  <CandidateSelection
+                    jobId={jobId || "0"}
+                    stageId={stageId || "0"}
+                    selectedCandidateEmail={selectedCandidateEmail || "0"}
+                    setSelectedCandidateEmail={setSelectedCandidateEmail}
+                    setOpenNewCandidateModal={setOpenNewCandidateModal}
+                    canAddNewCandidate={
+                      user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                        JobUserRole.OWNER ||
+                      user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                        JobUserRole.ADMIN
+                    }
+                  />
+                </Suspense>
+              </div>
+            </div>
+          </div>
+          // </div>
+        )}
+        {/* <div className={`${viewCandidateSelection ? "w-3/4" : "w-full"}`}> */}
+        <div className={`w-full ${viewCandidateSelection ? "xl:w-3/4" : "xl:w-5/6 2xl:w-3/4"}`}>
           <Suspense fallback="Loading...">
-            <CandidateSelection
-              jobId={jobId || "0"}
-              stageId={stageId || "0"}
-              selectedCandidateEmail={selectedCandidateEmail || "0"}
-              setSelectedCandidateEmail={setSelectedCandidateEmail}
+            <SingleCandidatePageContent
+              user={user as any}
+              error={error as any}
+              candidateEmail={selectedCandidateEmail as any}
+              jobId={jobId as any}
+              viewCandidateSelection={viewCandidateSelection}
+              setViewCandidateSelection={setViewCandidateSelection}
+              openNewCandidateModal={openNewCandidateModal}
               setOpenNewCandidateModal={setOpenNewCandidateModal}
-              canAddNewCandidate={
-                user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
-                  JobUserRole.OWNER ||
-                user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role === JobUserRole.ADMIN
-              }
+              setSelectedCandidateEmail={setSelectedCandidateEmail}
             />
           </Suspense>
         </div>
-      )}
-      <br />
-      <Suspense fallback="Loading...">
-        <SingleCandidatePageContent
-          user={user as any}
-          error={error as any}
-          candidateEmail={selectedCandidateEmail as any}
-          jobId={jobId as any}
-          viewCandidateSelection={viewCandidateSelection}
-          setViewCandidateSelection={setViewCandidateSelection}
-          openNewCandidateModal={openNewCandidateModal}
-          setOpenNewCandidateModal={setOpenNewCandidateModal}
-          setSelectedCandidateEmail={setSelectedCandidateEmail}
-        />
-      </Suspense>
+      </div>
     </AuthLayout>
   )
 }
@@ -653,6 +666,8 @@ const SingleCandidatePageContent = ({
         data: { stageId: selectedStageId },
       })
       invalidateQuery(getCandidate)
+      invalidateQuery(getJobStages)
+      invalidateQuery(getAllCandidatesByStage)
       toast.success(
         () => (
           <span>
@@ -1086,15 +1101,17 @@ const SingleCandidatePageContent = ({
         onClick={() => {
           setViewCandidateSelection(false)
         }}
+        className="flex items-center justify-center"
       >
         <XIcon className="w-6 h-6 text-theme-600 hover:text-theme-800" />
       </button>
     ) : (
       <button
-        title="Open Candidate Selection"
+        title="Candidate Menu"
         onClick={() => {
           setViewCandidateSelection(true)
         }}
+        className="flex items-center justify-center"
       >
         <MenuIcon className="w-6 h-6 text-theme-600 hover:text-theme-800" />
       </button>
@@ -1185,6 +1202,7 @@ const SingleCandidatePageContent = ({
               })
               toast.success(`Candidate updated`, { id: toastId })
               await invalidateQuery(getCandidate)
+              invalidateQuery(getAllCandidatesByStage)
               setOpenEditModal(false)
               if (updatedCandidate?.email !== candidate?.email) {
                 router.replace(
@@ -1366,13 +1384,16 @@ const SingleCandidatePageContent = ({
             candidatePoolsOpen={candidatePoolsOpenTablet}
             setCandidatePoolsOpen={setCandidatePoolsOpenTablet}
           />
-          <OpenCloseViewAllCandidatesButton />
+          {/* <OpenCloseViewAllCandidatesButton /> */}
         </div>
       </div>
 
       {/* Desktop Menu */}
       <div className="hidden lg:flex justify-between items-center space-x-4">
         <div className="flex flex-nowrap items-center space-x-4">
+          <span className="hidden xl:block">
+            <OpenCloseViewAllCandidatesButton />
+          </span>
           {candidateNameHeader}
           {candidateRatingDiv}
           {candidateStageAndInterviewerDiv}
@@ -1390,15 +1411,14 @@ const SingleCandidatePageContent = ({
             candidatePoolsOpen={candidatePoolsOpenDesktop}
             setCandidatePoolsOpen={setCandidatePoolsOpenDesktop}
           />
-          <OpenCloseViewAllCandidatesButton />
         </div>
       </div>
 
       <Suspense fallback="Loading...">
-        <div className="mt-8 md:mt-7 lg:mt-6 w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 lg:space-y-0 md:space-x-0 lg:space-x-0">
+        <div className="mt-8 md:mt-7 lg:mt-6 w-full flex flex-col md:flex-row lg:flex-row space-y-6 md:space-y-0 md:space-x-0">
           {/* PDF Viewer and Candidate Answers */}
-          <div className="w-full md:w-3/5 lg:w-2/3">
-            <div className="flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg md:mr-8 lg:mr-8">
+          <div className="w-full md:w-3/5 md:pr-6">
+            <div className="flex flex-col space-y-1 py-1 border-2 border-theme-400 rounded-lg">
               <div className="w-full flex items-center justify-center mt-2 mb-4">
                 <Form noFormatting={true} onSubmit={async (values) => {}}>
                   <LabeledToggleGroupField
@@ -1426,7 +1446,7 @@ const SingleCandidatePageContent = ({
                 </Form>
               </div>
               {candidateDetailToggleView === CandidateDetailToggleView.Info && (
-                <div key={candidate.id} className="overflow-hidden shadow">
+                <div key={candidate.id} className="overflow-hidden">
                   {/* <div className="px-4 py-5 sm:px-6">
                     <h3 className="text-lg font-medium leading-6 text-gray-900">
                       Applicant Information
@@ -1435,7 +1455,7 @@ const SingleCandidatePageContent = ({
                       Personal details and application.
                     </p>
                   </div> */}
-                  <div className="border-t border-gray-200">
+                  <div className="border-y border-gray-200">
                     <dl>
                       <div className={`bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6`}>
                         <dt className="text-sm font-medium text-gray-500">Source</dt>
@@ -1589,7 +1609,7 @@ const SingleCandidatePageContent = ({
               )}
               {candidateDetailToggleView === CandidateDetailToggleView.Resume && (
                 <div className="px-2 md:px-0 lg:px-0">
-                  {file && <PDFViewer file={file} scale={1.29} />}
+                  {file && <PDFViewer file={file} />}
                   {!(candidate?.resume as AttachmentObject)?.key && (
                     <div className="text-center my-3 px-2">
                       No Resume Uploaded. Upload one by clicking on the Update Candidate button.
@@ -1790,7 +1810,7 @@ const SingleCandidatePageContent = ({
           </div>
 
           {/* Interviewing Info */}
-          <div className="w-full md:w-2/5 lg:w-1/3">
+          <div className="w-full md:w-2/5">
             <div
               className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
             >
@@ -1933,6 +1953,7 @@ const SingleCandidatePageContent = ({
                           // Stop resume from reloading by assigning previous value since resume won't be changed by this mutation
                           // setCandidate({ ...updatedCandidate, resume: candidate?.resume! })
                           await invalidateQuery(getCandidate)
+                          invalidateQuery(getAllCandidatesByStage)
                           toast.success(
                             () => (
                               <span>

@@ -100,7 +100,7 @@ const Candidates = ({
             } px-3 py-1 flex items-center text-neutral-600 cursor-pointer rounded hover:bg-neutral-300 m-1`}
           >
             <div className="w-full flex items-center">
-              <div className="w-3/5 flex items-center">
+              <div className="w-3/5 pr-5 flex items-center">
                 {/* <div className="w-1/6">
                   {selectedCandidateEmail === candidate.email && (
                     <ChevronLeftIcon className={`w-4 h-4`} />
@@ -125,6 +125,7 @@ const Candidates = ({
                       color={candidate?.rejected ? "red" : "theme"}
                       value={getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])}
                       disabled={true}
+                      allowCursorWhenDisabled={true}
                     />
                   </Form>
                 )}
@@ -159,9 +160,9 @@ const CandidateSelection = ({
   //   const [candidates] = useQuery(getAllCandidatesByStage, selectedStageId)
 
   return (
-    <div className="w-full h-full flex flex-col border-2 rounded-lg border-theme-400 bg-white">
+    <div className="w-full flex flex-col max-h-screen">
       <div
-        className={`w-full py-2 px-4 flex items-center ${
+        className={`w-full py-5 px-4 flex items-center ${
           canAddNewCandidate ? "justify-between" : "justify-center"
         } border-b-2 border-theme-400`}
       >
@@ -186,23 +187,24 @@ const CandidateSelection = ({
           </button>
         )}
       </div>
-      <div className="w-full h-full flex">
-        <div className="w-3/5 border-r-2 border-theme-400">
-          <Suspense fallback="Loading...">
-            <Candidates
-              selectedStageId={selectedStageId}
-              selectedCandidateEmail={selectedCandidateEmail}
-              setSelectedCandidateEmail={setSelectedCandidateEmail}
-              viewRejected={viewRejected}
-            />
-          </Suspense>
-        </div>
-        <div className="w-2/5 flex flex-col">
-          <Suspense fallback="Loading...">
+      <div className="w-full flex max-h-full overflow-auto">
+        <div className="w-2/5 max-h-full overflow-auto">
+          <Suspense fallback={<div className="w-full text-center px-4 py-2">Loading...</div>}>
             <Stages
               jobId={jobId}
               selectedStageId={selectedStageId}
               setSelectedStageId={setSelectedStageId}
+              viewRejected={viewRejected}
+            />
+          </Suspense>
+        </div>
+        <div className="w-0.5 max-h-full overflow-auto bg-theme-400"></div>
+        <div className="w-3/5 max-h-full overflow-auto">
+          <Suspense fallback={<div className="w-full text-center px-4 py-2">Loading...</div>}>
+            <Candidates
+              selectedStageId={selectedStageId}
+              selectedCandidateEmail={selectedCandidateEmail}
+              setSelectedCandidateEmail={setSelectedCandidateEmail}
               viewRejected={viewRejected}
             />
           </Suspense>
