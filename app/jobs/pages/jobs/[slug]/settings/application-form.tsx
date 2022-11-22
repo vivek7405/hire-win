@@ -189,6 +189,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
           id: question?.id,
           title: question?.title,
           description: "",
+          isDragDisabled: !question?.allowEdit,
           renderContent: (
             <>
               <div className="flex flex-col space-y-2">
