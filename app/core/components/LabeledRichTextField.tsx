@@ -6,6 +6,13 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 import TemplatePlaceholders from "app/email-templates/components/TemplatePlaceholders"
 import styles from "./LabeledRichTextField.module.css"
 
+const Editor = dynamic(
+  () => {
+    return import("react-draft-wysiwyg").then((mod) => mod.Editor)
+  },
+  { ssr: false }
+) as any
+
 export interface LabeledRichTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["div"]> {
   /** Field name. */
   name: string
@@ -50,18 +57,17 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
         })
     }, [errors, name])
 
-    const [Editor, setEditor] = useState(null as any)
-
-    useEffect(() => {
-      setEditor(
-        dynamic(
-          () => {
-            return import("react-draft-wysiwyg").then((mod) => mod.Editor)
-          },
-          { ssr: false }
-        ) as any
-      )
-    }, [])
+    // const [Editor, setEditor] = useState(null as any)
+    // useEffect(() => {
+    //   setEditor(
+    //     dynamic(
+    //       () => {
+    //         return import("react-draft-wysiwyg").then((mod) => mod.Editor)
+    //       },
+    //       { ssr: false }
+    //     ) as any
+    //   )
+    // }, [])
 
     return (
       <div {...outerProps}>
@@ -79,7 +85,8 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
             control={control}
             defaultValue=""
             render={({ field: { onChange, value } }) => {
-              return Editor ? (
+              // return Editor ? (
+              return (
                 <Editor
                   wrapperClassName={!noBorder ? styles.reactDraftWrapperClass : ""}
                   editorClassName={!noBorder ? styles.reactDraftEditorClass : ""}
@@ -103,9 +110,10 @@ export const LabeledRichTextField = forwardRef<HTMLDivElement, LabeledRichTextFi
                     // history: { inDropdown: true },
                   }}
                 />
-              ) : (
-                <></>
               )
+              // : (
+              //   <></>
+              // )
             }}
           />
         </div>

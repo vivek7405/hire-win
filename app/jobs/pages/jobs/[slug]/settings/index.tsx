@@ -148,9 +148,10 @@ const JobSettingsPage = ({
             // validThrough: job?.validThrough
             //   ? moment(job?.validThrough).local().toDate()
             //   : new Date(),
-            description: job?.description
-              ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
-              : EditorState.createEmpty(),
+            // description: job?.description
+            //   ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
+            //   : EditorState.createEmpty(),
+            description: job?.description,
             categoryId: job?.category?.id,
             // workflowId: job?.workflow?.id,
             // formId: job?.form?.id,
@@ -159,9 +160,9 @@ const JobSettingsPage = ({
           onSubmit={async (values) => {
             const toastId = toast.loading(() => <span>Updating Job</span>)
             try {
-              if (values?.description) {
-                values.description = convertToRaw(values?.description?.getCurrentContent() || {})
-              }
+              // if (values?.description) {
+              //   values.description = convertToRaw(values?.description?.getCurrentContent() || {})
+              // }
 
               await updateJobMutation({
                 where: { id: job?.id },

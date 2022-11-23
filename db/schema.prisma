@@ -163,7 +163,8 @@ model Company {
 
   name    String
   slug    String  @unique
-  info    Json?
+  // info    Json?
+  info    String?
   website String?
   logo    Json?
   theme   String? @default("indigo")
@@ -213,7 +214,7 @@ model Job {
 
   employmentType EmploymentType[]
   // validThrough   DateTime?
-  description    Json?
+  description    String?
 
   postToGoogle Boolean @default(false)
 
@@ -593,7 +594,8 @@ model CandidateUserNote {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  note Json?
+  // note Json?
+  note String?
 
   @@unique([candidateId, userId])
 }

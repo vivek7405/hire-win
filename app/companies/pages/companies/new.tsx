@@ -62,15 +62,15 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
               subHeader="Enter your company details"
               initialValues={{
                 name: "",
-                info: EditorState.createEmpty(),
+                // info: EditorState.createEmpty(),
                 logo: null,
                 website: "",
                 theme: "indigo",
               }}
               onSubmit={async (values) => {
-                if (values?.info) {
-                  values.info = convertToRaw(values?.info?.getCurrentContent())
-                }
+                // if (values?.info) {
+                //   values.info = convertToRaw(values?.info?.getCurrentContent())
+                // }
 
                 const toastId = toast.loading(() => <span>Creating Company</span>)
                 try {

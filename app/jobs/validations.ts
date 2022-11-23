@@ -9,7 +9,7 @@ export const Job = z.object({
 
   title: z.string().nonempty({ message: "Required" }),
   remoteOption: z.nativeEnum(RemoteOption).optional(),
-  description: z.any(),
+  description: z.string().optional(),
   postToGoogle: z.boolean(),
 
   categoryId: z.string().optional(),

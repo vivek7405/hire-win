@@ -111,6 +111,7 @@ import { Menu, Transition } from "@headlessui/react"
 import removeCandidateFromPool from "app/candidate-pools/mutations/removeCandidateFromPool"
 import classNames from "app/core/utils/classNames"
 import getFirstWordIfGreaterThan from "app/core/utils/getFirstWord"
+import LabeledQuillEditor from "app/core/components/LabeledQuillEditor"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -1769,23 +1770,25 @@ const SingleCandidatePageContent = ({
                       ? candidate?.candidateUserNotes[0]?.id
                       : "0"
                   }
-                  subHeader="These notes are private to you"
+                  // subHeader="These notes are private to you"
                   submitText="Save"
                   initialValues={{
                     note:
                       candidate?.candidateUserNotes &&
                       (candidate?.candidateUserNotes?.length || 0) > 0 &&
                       candidate?.candidateUserNotes[0]?.note
-                        ? EditorState.createWithContent(
-                            convertFromRaw(candidate?.candidateUserNotes[0]?.note || {})
-                          )
-                        : EditorState.createEmpty(),
+                        ? candidate?.candidateUserNotes[0]?.note?.toString()
+                        : "",
+                    // ? EditorState.createWithContent(
+                    //     convertFromRaw(candidate?.candidateUserNotes[0]?.note || {})
+                    //   )
+                    // : EditorState.createEmpty(),
                   }}
                   schema={CandidateUserNoteObj}
                   onSubmit={async (values) => {
-                    if (values.note) {
-                      values.note = convertToRaw(values?.note?.getCurrentContent() || {})
-                    }
+                    // if (values.note) {
+                    //   values.note = convertToRaw(values?.note?.getCurrentContent() || {})
+                    // }
 
                     const toastId = toast.loading(() => <span>Saving Note</span>)
                     try {
@@ -1803,7 +1806,11 @@ const SingleCandidatePageContent = ({
                     }
                   }}
                 >
-                  <LabeledRichTextField name="note" />
+                  {/* <LabeledRichTextField name="note" /> */}
+                  <LabeledQuillEditor
+                    name="note"
+                    placeholder="The notes you take are private to you..."
+                  />
                 </Form>
               )}
             </div>

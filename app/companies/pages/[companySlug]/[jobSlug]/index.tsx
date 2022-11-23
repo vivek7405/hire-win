@@ -142,16 +142,23 @@ const JobDescriptionPage = ({
         <br />
         <br />
 
-        <Form
-          initialValues={{
-            description: job?.description
-              ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
-              : EditorState.createEmpty(),
-          }}
-          onSubmit={async (values) => {}}
+        <div
+          className="bg-white px-10 py-7"
+          // initialValues={{
+          //   description: job?.description,
+          //   // ? EditorState.createWithContent(convertFromRaw(job?.description || {}))
+          //   // : EditorState.createEmpty(),
+          // }}
+          // onSubmit={async (values) => {}}
         >
-          <h3 className="text-lg font-bold">Description</h3>
-          <LabeledRichTextField
+          <h3 className="text-xl font-bold mb-6">Job Description</h3>
+          <div
+            className="quill-container-output"
+            dangerouslySetInnerHTML={{
+              __html: job?.description || "",
+            }}
+          />
+          {/* <LabeledRichTextField
             name="description"
             // label="Description"
             // placeholder="Description"
@@ -159,8 +166,8 @@ const JobDescriptionPage = ({
             toolbarHidden={true}
             readOnly={true}
             noBorder={true}
-          />
-        </Form>
+          /> */}
+        </div>
       </Suspense>
     </JobApplicationLayout>
   )
