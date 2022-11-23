@@ -20,6 +20,7 @@ import { useFormContext } from "react-hook-form"
 import getCategoriesWOPaginationWOAbility from "app/categories/queries/getCategoriesWOPaginationWOAbility"
 import getSalaryIntervalFromSalaryType from "../utils/getSalaryIntervalFromSalaryType"
 import Form from "app/core/components/Form"
+import LabeledQuillEditor from "app/core/components/LabeledQuillEditor"
 
 type JobFormProps = {
   onSuccess?: () => void
@@ -173,11 +174,16 @@ export const JobForm = (props: JobFormProps) => {
           } flex-col space-y-6 w-full items-center`}
         >
           <div className="w-full">
-            <LabeledRichTextField
+            {/* <LabeledRichTextField
               name="description"
               label="Description"
               placeholder="Description"
               testid="jobDescription"
+            /> */}
+            <LabeledQuillEditor
+              name="description"
+              label="Job Description"
+              placeholder="Enter job description..."
             />
           </div>
         </div>

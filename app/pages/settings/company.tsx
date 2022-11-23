@@ -91,17 +91,17 @@ const UserSettingsCompanyPage = ({
               initialValues={{
                 name: company?.name || "",
                 logo: company?.logo,
-                info: company?.info
-                  ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
-                  : EditorState.createEmpty(),
+                info: company?.info,
+                // ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
+                // : EditorState.createEmpty(),
                 website: company?.website || "",
                 theme: company?.theme || "indigo",
               }}
               companySlugForCareersPage={company?.slug || "0"}
               onSubmit={async (values) => {
-                if (values?.info) {
-                  values.info = convertToRaw(values?.info?.getCurrentContent())
-                }
+                // if (values?.info) {
+                //   values.info = convertToRaw(values?.info?.getCurrentContent())
+                // }
 
                 const toastId = toast.loading(() => <span>Updating Company details</span>)
                 try {

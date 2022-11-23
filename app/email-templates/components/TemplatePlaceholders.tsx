@@ -24,7 +24,7 @@ const TemplatePlaceholders = ({ editorState, onChange }) => {
   //   { key: "city", value: "{{city}}", text: "City" },
   // ]
 
-  const listItem = Object.keys(EmailTemplatePlaceholders).map((item) => (
+  const listItems = Object.keys(EmailTemplatePlaceholders).map((item) => (
     <li
       onClick={(e) => {
         e.preventDefault()
@@ -56,7 +56,7 @@ const TemplatePlaceholders = ({ editorState, onChange }) => {
               open ? "" : "placeholder-ul"
             }`}
           >
-            {listItem}
+            {listItems}
           </ul>
         </div>
       </div>

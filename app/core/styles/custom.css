@@ -38,3 +38,64 @@
 .rdw-embedded-modal {
   height: auto !important;
 }
+
+/* Quill text editor css modifications */
+.ql-toolbar {
+  @apply rounded-t !border-gray-300;
+}
+.ql-container {
+  @apply !text-base !font-sans rounded-b !border-gray-300;
+}
+.ql-container blockquote {
+  @apply bg-gray-50 border-l-4 border-neutral-300 !p-2;
+}
+.ql-container ul {
+  @apply !py-1;
+}
+.ql-container ol {
+  @apply !py-1;
+}
+.ql-container li {
+  @apply !m-0 !p-0;
+}
+
+/* Quill editor html output format with tailwind */
+.quill-container-output {
+  @apply whitespace-pre-wrap p-0;
+}
+.quill-container-output h1 {
+  @apply text-2xl font-medium;
+}
+.quill-container-output ol {
+  @apply list-outside list-decimal py-1 ml-10;
+}
+.quill-container-output ul {
+  @apply list-outside list-disc py-1 ml-10;
+}
+/* .quill-container-output li {
+  @apply ml-7;
+} */
+.quill-container-output blockquote {
+  @apply bg-gray-50 border-l-4 border-neutral-300 p-2;
+}
+.quill-container-output pre {
+  @apply bg-gray-50 p-2 my-2 text-sm;
+}
+.quill-container-output a {
+  @apply text-blue-600 underline;
+}
+.quill-container-output .ql-align-center {
+  @apply text-center;
+}
+.quill-container-output .ql-align-right {
+  @apply text-right;
+}
+.quill-container-output .ql-size-small {
+  @apply text-sm;
+}
+.quill-container-output .ql-size-large {
+  @apply text-2xl;
+}
+.quill-container-output .ql-size-huge {
+  @apply text-4xl;
+}

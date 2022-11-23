@@ -23,7 +23,8 @@ export const CandidateUserNoteObj = z.object({
   id: z.string().optional(),
   candidateId: z.string().optional(),
   userId: z.string().optional(),
-  note: z.any(),
+  // note: z.any(),
+  note: z.string().optional(),
 })
 export type CandidateUserNoteInputType = z.infer<typeof CandidateUserNoteObj>
 

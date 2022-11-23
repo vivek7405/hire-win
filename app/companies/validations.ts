@@ -8,7 +8,8 @@ export const CompanyObj = z.object({
     })
     .nullable(),
   name: z.string().nonempty({ message: "Required" }),
-  info: z.any().optional(),
+  // info: z.any().optional(),
+  info: z.string().optional(),
   website: z.string().url().or(z.literal("")).optional(),
   theme: z.string().optional(),
   stripeSubscriptionId: z.string().optional(),

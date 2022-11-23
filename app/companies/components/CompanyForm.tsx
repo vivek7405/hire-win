@@ -8,6 +8,7 @@ import { CompanyObj } from "../validations"
 import LabeledReactSelectField from "app/core/components/LabeledReactSelectField"
 import { getTailwindColors } from "app/core/utils/themeHelpers"
 import ViewCareersPageButton from "./ViewCareersPageButton"
+import LabeledQuillEditor from "app/core/components/LabeledQuillEditor"
 
 type CompanyFormProps = {
   onSuccess?: () => void
@@ -51,11 +52,16 @@ export const CompanyForm = (props: CompanyFormProps) => {
 
           <SingleFileUploadField showImage={true} accept="image/*" name="logo" label="Logo" />
 
-          <LabeledRichTextField
+          {/* <LabeledRichTextField
             name="info"
             label="Info"
             placeholder="This shall appear on careers page"
             testid="userUpdateCompanyInfo"
+          /> */}
+          <LabeledQuillEditor
+            name="info"
+            label="Info"
+            placeholder="This shall appear on careers page..."
           />
 
           {/* <ThemePickerField name="theme" label="Careers Page Theme" /> */}

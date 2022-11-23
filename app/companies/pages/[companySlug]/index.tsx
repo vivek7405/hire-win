@@ -355,9 +355,15 @@ const CareersPage = ({ company }: InferGetServerSidePropsType<typeof getServerSi
       <Suspense fallback="Loading...">
         <h3 className="text-2xl font-bold">Careers at {titleCase(company?.name)}</h3>
         <div
+          className="quill-container-output mt-1 mb-8"
+          dangerouslySetInnerHTML={{
+            __html: company?.info || "",
+          }}
+        />
+        {/* <div
           className="mt-1 mb-8"
           dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
-        />
+        /> */}
         <Jobs company={company!} />
       </Suspense>
     </JobApplicationLayout>
