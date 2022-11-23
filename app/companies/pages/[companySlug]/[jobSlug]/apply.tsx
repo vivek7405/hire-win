@@ -132,7 +132,7 @@ const ApplyToJob = ({
       addGoogleJobPostingScript={job?.postToGoogle || false}
     >
       <Suspense fallback="Loading...">
-        {(job?.description as any)?.blocks && (job?.description as any)?.blocks[0]?.text && (
+        {job?.description && (
           <>
             <button
               type="button"

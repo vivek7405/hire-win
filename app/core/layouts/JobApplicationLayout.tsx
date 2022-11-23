@@ -6,6 +6,7 @@ import { titleCase } from "../utils/titleCase"
 import draftToHtml from "draftjs-to-html"
 import moment from "moment"
 import { Company, RemoteOption } from "@prisma/client"
+import { BriefcaseIcon, ClockIcon, LocationMarkerIcon } from "@heroicons/react/outline"
 
 function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
   return {
@@ -136,27 +137,38 @@ const JobApplicationLayout = ({
                 </span>
                 <span>{Country.getCountryByCode(job?.country!)?.name}</span> */}
                 {(job?.city || job?.state || job?.country) && (
-                  <span>
-                    {job?.city && <span>{job?.city},&nbsp;</span>}
-                    {job?.state && job?.country && (
-                      <span>
-                        {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
-                        ,&nbsp;
-                      </span>
-                    )}
-                    {job?.country && <span>{Country.getCountryByCode(job?.country!)?.name}</span>}
-                  </span>
+                  <div className="flex flex-nowrap items-center justify-center space-x-2">
+                    <LocationMarkerIcon className="w-5 h-5 text-neutral-700" />
+                    <span>
+                      {job?.city && <span>{job?.city},&nbsp;</span>}
+                      {job?.state && job?.country && (
+                        <span>
+                          {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name}
+                          ,&nbsp;
+                        </span>
+                      )}
+                      {job?.country && <span>{Country.getCountryByCode(job?.country!)?.name}</span>}
+                    </span>
+                  </div>
                 )}
                 {(job?.city || job?.state || job?.country) &&
                   (job?.category || (job?.employmentType && job?.employmentType?.length > 0)) && (
                     <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
                   )}
-                {job?.category && <span>{job?.category?.name}</span>}
+                {job?.category && (
+                  <div className="flex flex-nowrap items-center space-x-2">
+                    <BriefcaseIcon className="w-5 h-5 text-neutral-700" />
+                    <span>{job?.category?.name}</span>
+                  </div>
+                )}
                 {job?.category && job?.employmentType && job?.employmentType?.length > 0 && (
                   <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
                 )}
                 {job?.employmentType && job?.employmentType && job?.employmentType?.length > 0 && (
-                  <span>{titleCase(job?.employmentType?.join(" ")?.replaceAll("_", " "))}</span>
+                  <div className="flex flex-nowrap items-center space-x-2">
+                    <ClockIcon className="w-5 h-5 text-neutral-700" />
+                    <span>{titleCase(job?.employmentType?.join(" ")?.replaceAll("_", " "))}</span>
+                  </div>
                 )}
               </div>
             </div>
