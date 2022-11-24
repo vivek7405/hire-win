@@ -258,7 +258,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
 
   return (
     <>
-      <div className="bg-white w-full">
+      <div className="bg-white w-full rounded-lg">
         <Form
           submitText="Submit"
           submitDisabled={props.submitDisabled}
@@ -270,6 +270,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           header={props.header}
           subHeader={props.subHeader}
           className="max-w-md mx-auto"
+          isRounded={true}
         >
           {formQuestions.map((question) => {
             // Hide question only on careers page and not when adding candidate manually
