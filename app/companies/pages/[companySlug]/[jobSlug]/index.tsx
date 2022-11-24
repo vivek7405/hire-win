@@ -147,7 +147,7 @@ const JobDescriptionPage = ({
         <br />
 
         <div
-          className="bg-white px-10 py-7"
+          className="bg-white px-10 py-7 rounded-lg"
           // initialValues={{
           //   description: job?.description,
           //   // ? EditorState.createWithContent(convertFromRaw(job?.description || {}))

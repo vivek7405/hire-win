@@ -20,6 +20,7 @@ export interface FormProps<S extends z.ZodType<any, any>>
   subHeader?: string
   noFormatting?: boolean
   isSubmitTop?: boolean
+  isRounded?: boolean
 }
 
 interface OnSubmitResult {
@@ -39,6 +40,7 @@ export function Form<S extends z.ZodType<any, any>>({
   subHeader,
   noFormatting,
   isSubmitTop,
+  isRounded,
   ...props
 }: FormProps<S>) {
   const ctx = useForm<z.infer<S>>({
@@ -64,7 +66,11 @@ export function Form<S extends z.ZodType<any, any>>({
         className={!noFormatting ? `form space-y-5` : ``}
         {...props}
       >
-        <div className={!noFormatting ? `bg-white py-6 px-4 sm:p-6` : ``}>
+        <div
+          className={
+            !noFormatting ? `bg-white py-6 px-4 sm:p-6 ${isRounded ? "rounded-lg" : ""}` : ``
+          }
+        >
           <div>
             <div className="flex items-center">
               {(header || subHeader) && (
