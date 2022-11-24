@@ -58,7 +58,11 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     )
 
     if (job) {
-      if ((job?.description as any)?.blocks && !(job?.description as any)?.blocks[0]?.text) {
+      if (
+        !job?.description ||
+        job?.description?.trim() === "" ||
+        job?.description?.trim() === "<p><br></p>"
+      ) {
         return {
           redirect: {
             destination: Routes.ApplyToJob({
