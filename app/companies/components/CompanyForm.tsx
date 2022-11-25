@@ -50,7 +50,14 @@ export const CompanyForm = (props: CompanyFormProps) => {
             testid="userUpdateWebsite"
           />
 
-          <SingleFileUploadField showImage={true} accept="image/*" name="logo" label="Logo" />
+          <SingleFileUploadField
+            showImage={true}
+            accept="image/*"
+            name="logo"
+            label="Logo"
+            subLabel="Logo shall appear as careers page header if provided"
+            subLabel2="If not provided, the company name shall appear as careers page header"
+          />
 
           {/* <LabeledRichTextField
             name="info"

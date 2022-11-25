@@ -7,6 +7,8 @@ export interface LabeledReactSelectFieldProps
   extends PropsWithoutRef<JSX.IntrinsicElements["select"]> {
   name: string
   label?: string
+  subLabel?: string
+  subLabel2?: string
   placeholder?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
@@ -19,7 +21,10 @@ export interface LabeledReactSelectFieldProps
 }
 
 export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReactSelectFieldProps>(
-  ({ label, outerProps, name, options, defaultValue, disabled, ...props }, ref) => {
+  (
+    { label, subLabel, subLabel2, outerProps, name, options, defaultValue, disabled, ...props },
+    ref
+  ) => {
     const {
       control,
       setValue,
@@ -62,6 +67,8 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
             {label} {props.showAsterisk && "*"}
           </label>
         )}
+        {subLabel && <label className="block text-xs text-gray-600">{subLabel}</label>}
+        {subLabel2 && <label className="block text-xs text-gray-600">{subLabel2}</label>}
         <div className={label && "mt-1"}>
           <Controller
             name={name}

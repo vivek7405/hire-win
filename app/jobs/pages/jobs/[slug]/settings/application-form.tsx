@@ -330,7 +330,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
 
   return (
     <>
-      <div className="flex mb-2">
+      {/* <div className="flex mb-2">
         <input
           placeholder="Search"
           type="text"
@@ -340,7 +340,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
             execDebouncer(e)
           }}
         />
-      </div>
+      </div> */}
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
@@ -499,9 +499,102 @@ const JobSettingsApplicationFormPage = ({
   return (
     <AuthLayout title="Application Form | hire.win" user={user}>
       <JobSettingsLayout job={job!}>
-        <br className="block md:hidden lg:hidden" />
         <div className="space-y-6">
-          <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+            <div>
+              <h2 className="text-lg leading-6 font-medium text-gray-900">Job Application Form</h2>
+              <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+                Add and re-order application form questions
+              </h4>
+              <h4 className="text-xs sm:text-sm text-gray-700">
+                The questions added here shall appear on Careers Page
+              </h4>
+              <h4 className="text-xs sm:text-sm text-gray-700">
+                Turn off the question to show it internally but not on Careers Page
+              </h4>
+            </div>
+            <Modal
+              header="Add New Question"
+              open={openAddNewQuestion}
+              setOpen={setOpenAddNewQuestion}
+              noOverflow={true}
+            >
+              <QuestionForm
+                editmode={questionToEdit ? true : false}
+                header={`${questionToEdit ? "Update" : "Add New"} Question`}
+                subHeader="Enter question details"
+                initialValues={
+                  questionToEdit
+                    ? {
+                        title: questionToEdit?.title,
+                        type: questionToEdit?.type,
+                        placeholder: questionToEdit?.placeholder,
+                        acceptedFiles: questionToEdit?.acceptedFiles,
+                        options: questionToEdit?.options?.map((op) => {
+                          return { id: op.id, text: op.text }
+                        }),
+                      }
+                    : {}
+                }
+                onSubmit={async (values) => {
+                  const isEdit = questionToEdit ? true : false
+
+                  const toastId = toast.loading(isEdit ? "Updating Question" : "Creating Question")
+                  try {
+                    isEdit
+                      ? await updateFormQuestionMutation({
+                          where: { id: questionToEdit.id },
+                          data: { ...values },
+                        })
+                      : await addNewQuestionToFormMutation({ jobId: job?.id || "0", ...values })
+                    await invalidateQuery(getJobApplicationFormQuestions)
+                    toast.success(
+                      isEdit ? "Question updated successfully" : "Question added successfully",
+                      {
+                        id: toastId,
+                      }
+                    )
+                    setQuestionToEdit(null as any)
+                    setOpenAddNewQuestion(false)
+                  } catch (error) {
+                    toast.error(
+                      `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                      { id: toastId }
+                    )
+                  }
+                }}
+                // onSubmit={async (values) => {
+                //   const toastId = toast.loading(() => <span>Adding Question</span>)
+                //   try {
+                //     await addNewQuestionToFormMutation({
+                //       ...values,
+                //       formId: form?.id as string,
+                //     })
+                //     toast.success(() => <span>Question added</span>, {
+                //       id: toastId,
+                //     })
+                //     router.reload()
+                //   } catch (error) {
+                //     toast.error(
+                //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                //     )
+                //   }
+                // }}
+              />
+            </Modal>
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                setQuestionToEdit(null as any)
+                setOpenAddNewQuestion(true)
+              }}
+              data-testid={`open-addQuestion-modal`}
+              className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+            >
+              Add New Question
+            </button>
+          </div>
+          {/* <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
             <div className="flex flex-row justify-between space-x-3">
               <Modal
                 header="Add New Question"
@@ -586,7 +679,7 @@ const JobSettingsApplicationFormPage = ({
                 Add New Question
               </button>
             </div>
-          </div>
+          </div> */}
 
           <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <JobApplicationForm

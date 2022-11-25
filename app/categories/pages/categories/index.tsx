@@ -185,7 +185,7 @@ const Categories = () => {
             setOpenModal(true)
           }}
         >
-          New Category
+          New Job Category
         </button>
       </div>
       <div className="flex mb-2">
@@ -267,6 +267,12 @@ const CategoriesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSi
           New Category
         </a>
       </Link> */}
+      <div className="mb-6">
+        <h2 className="text-lg leading-6 font-medium text-gray-900">Job Categories</h2>
+        <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+          Job categories help filter the jobs by department
+        </h4>
+      </div>
 
       <Suspense fallback="Loading...">
         <Categories />

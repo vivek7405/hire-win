@@ -291,7 +291,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
 
   return (
     <>
-      <div className="flex mb-2">
+      {/* <div className="flex mb-2">
         <input
           placeholder="Search"
           type="text"
@@ -301,7 +301,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
             execDebouncer(e)
           }}
         />
-      </div>
+      </div> */}
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
@@ -336,7 +336,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
       >
         Are you sure you want to remove this stage from the workflow?
       </Confirm>
-      <div className="sticky top-0 z-10 hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+      <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
         {data?.map((stage) => {
           return (
             <div
@@ -454,45 +454,54 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="Hiring Stages | hire.win" user={user}>
       <JobSettingsLayout job={job!}>
-        <br className="block md:hidden lg:hidden" />
+        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+          <div>
+            <h2 className="text-lg leading-6 font-medium text-gray-900">Stages & Score Cards</h2>
+            <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+              Add and re-order hiring stages for this job
+            </h4>
+            <h4 className="text-xs sm:text-sm text-gray-700">
+              Click on the stage to configure its score card
+            </h4>
+          </div>
+          <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
+            <StageForm
+              header={`${stageToEdit ? "Update" : "Add New"} Stage`}
+              subHeader="Enter stage details"
+              initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
+              onSubmit={async (values) => {
+                const isEdit = stageToEdit ? true : false
 
-        <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
-          <StageForm
-            header={`${stageToEdit ? "Update" : "Add New"} Stage`}
-            subHeader="Enter stage details"
-            initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
-            onSubmit={async (values) => {
-              const isEdit = stageToEdit ? true : false
-
-              const toastId = toast.loading(isEdit ? "Updating Stage" : "Creating Stage")
-              try {
-                isEdit
-                  ? await updateStageMutation({
-                      where: { id: stageToEdit.id },
-                      data: { ...values },
-                      initial: stageToEdit,
-                    })
-                  : await addNewStageToJobMutation({
-                      jobId: job?.id || "0",
-                      ...values,
-                    })
-                await invalidateQuery(getJobStages)
-                toast.success(isEdit ? "Stage updated successfully" : "Stage added successfully", {
-                  id: toastId,
-                })
-                setStageToEdit(null as any)
-                setOpenAddNewStage(false)
-              } catch (error) {
-                toast.error(
-                  `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
-                  { id: toastId }
-                )
-              }
-            }}
-          />
-        </Modal>
-
-        <div className="space-y-6">
+                const toastId = toast.loading(isEdit ? "Updating Stage" : "Creating Stage")
+                try {
+                  isEdit
+                    ? await updateStageMutation({
+                        where: { id: stageToEdit.id },
+                        data: { ...values },
+                        initial: stageToEdit,
+                      })
+                    : await addNewStageToJobMutation({
+                        jobId: job?.id || "0",
+                        ...values,
+                      })
+                  await invalidateQuery(getJobStages)
+                  toast.success(
+                    isEdit ? "Stage updated successfully" : "Stage added successfully",
+                    {
+                      id: toastId,
+                    }
+                  )
+                  setStageToEdit(null as any)
+                  setOpenAddNewStage(false)
+                } catch (error) {
+                  toast.error(
+                    `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                    { id: toastId }
+                  )
+                }
+              }}
+            />
+          </Modal>
           <button
             onClick={(e) => {
               e.preventDefault()
@@ -504,7 +513,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
           >
             Add New Stage
           </button>
+        </div>
 
+        <div className="space-y-6">
           <Suspense fallback={<p className="pt-3">Loading...</p>}>
             <Stages
               job={job}

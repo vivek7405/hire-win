@@ -278,7 +278,6 @@ export const JobForm = (props: JobFormProps) => {
               name="currency"
               label="Currency"
               placeholder="Currency for salary"
-              testid="jobCurrency"
               options={[
                 { label: "Select Currency", value: "" },
                 ...Country.getAllCountries().map((c) => {
@@ -295,7 +294,6 @@ export const JobForm = (props: JobFormProps) => {
               name="minSalary"
               label="Minimum Salary"
               placeholder="Minimum salary for this job"
-              testid="jobMinSalary"
             />
           </div>
 
@@ -305,8 +303,8 @@ export const JobForm = (props: JobFormProps) => {
               min="0"
               name="maxSalary"
               label="Maximum Salary"
+              subLabel="Provide mim salary and leave max salary blank if you want to display fixed salary"
               placeholder="Maximum salary for this job"
-              testid="jobMaxSalary"
             />
           </div>
 
@@ -315,7 +313,6 @@ export const JobForm = (props: JobFormProps) => {
               name="salaryType"
               label="Salary Type"
               placeholder="Hourly, Weekly, etc."
-              testid="salaryType"
               defaultValue={Object.keys(SalaryType).find((type) => type === SalaryType.YEAR)}
               options={Object.keys(SalaryType).map((salaryType) => {
                 const type = getSalaryIntervalFromSalaryType(salaryType)

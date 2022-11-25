@@ -131,7 +131,7 @@ const JobSettingsPage = ({
           // form={job?.form!}
           jobId={job?.id}
           header="Job Details"
-          subHeader="Update job details"
+          subHeader="Job details shall be displayed on Careers Page job listing"
           initialValues={{
             title: job?.title,
             country: job?.country,
