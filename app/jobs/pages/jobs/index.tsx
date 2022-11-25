@@ -79,6 +79,7 @@ import { Menu, Transition } from "@headlessui/react"
 import classNames from "app/core/utils/classNames"
 import ViewCareersPageButton from "app/companies/components/ViewCareersPageButton"
 import getFirstWordIfGreaterThan from "app/core/utils/getFirstWord"
+import SignupWelcome from "app/auth/components/SignupWelcome"
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -929,6 +930,8 @@ const JobsHome = ({
   const [openModal, setOpenModal] = useState(false)
   const [createJobWithTitleMutation] = useMutation(createJobWithTitle)
 
+  const [openWelcomeModal, setOpenWelcomeModal] = useState(user?.isFirstSignup || false)
+
   return (
     <AuthLayout
       title="Jobs | hire-win"
@@ -1030,6 +1033,14 @@ const JobsHome = ({
           {newJobButton}
         </div>
       </div>
+
+      <Modal header="" open={openWelcomeModal} setOpen={setOpenWelcomeModal}>
+        <SignupWelcome
+          setOpenModal={setOpenWelcomeModal}
+          userName={user?.name || ""}
+          userId={user?.id}
+        />
+      </Modal>
 
       <Suspense fallback={<p className="pt-7">Loading...</p>}>
         <Jobs

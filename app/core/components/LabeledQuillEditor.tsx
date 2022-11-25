@@ -2,7 +2,6 @@ import { forwardRef, PropsWithoutRef, useMemo, useRef, useState } from "react"
 import { useFormContext, Controller } from "react-hook-form"
 import toast from "react-hot-toast"
 import { dynamic } from "blitz"
-import "react-quill/dist/quill.snow.css"
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false })
 

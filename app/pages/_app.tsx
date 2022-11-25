@@ -17,6 +17,7 @@ import "react-phone-number-input/style.css"
 import "react-nice-dates/build/style.css"
 import "app/core/styles/custom.css"
 import "intro.js/introjs.css"
+import "react-quill/dist/quill.snow.css"
 import { IdProvider } from "@radix-ui/react-id"
 import LoginPage from "app/auth/pages/login"
 

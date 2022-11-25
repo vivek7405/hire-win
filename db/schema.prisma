@@ -23,6 +23,7 @@ model User {
   role           UserRole  @default(USER)
   tokens         Token[]
   sessions       Session[]
+  isFirstSignup  Boolean   @default(true)
 
   companies CompanyUser[]
   jobs      JobUser[]
