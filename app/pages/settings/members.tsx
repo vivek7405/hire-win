@@ -182,13 +182,19 @@ const UserSettingsMembersPage = ({
       <UserSettingsLayout>
         <div className="bg-white md:col-span-2">
           <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <h2
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+              {/* <h2
                 id="billing-history-heading"
                 className="text-lg leading-6 font-medium text-gray-900"
               >
                 Members
-              </h2>
+              </h2> */}
+              <div>
+                <h2 className="text-lg leading-6 font-medium text-gray-900">Team Members</h2>
+                <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+                  Invite team members and add them to Job Hiring Team
+                </h4>
+              </div>
               <Modal
                 noOverflow={true}
                 header="Invite A User"

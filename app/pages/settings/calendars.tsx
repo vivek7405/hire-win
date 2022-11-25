@@ -56,6 +56,17 @@ const UserSettingsCalendarsPage = ({
     <AuthLayout title="Settings" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <UserSettingsLayout>
+        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+          <div>
+            <h2 className="text-lg leading-6 font-medium text-gray-900">Your Calendars</h2>
+            <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+              Add your calendar where interviews shall be booked
+            </h4>
+            <h4 className="text-xs sm:text-sm text-gray-700">
+              The default calendar you set shall be used for booking interviews
+            </h4>
+          </div>
+        </div>
         <Suspense fallback="Loading...">
           <Calendars user={user as any} />
         </Suspense>

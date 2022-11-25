@@ -271,6 +271,13 @@ const EmailTemplates = () => {
 const EmailTemplatesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="Email Templates | hire-win" user={user}>
+      <div className="mb-6">
+        <h2 className="text-lg leading-6 font-medium text-gray-900">Email Templates</h2>
+        <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+          Add email templates to send an email to candidates with one-click
+        </h4>
+      </div>
+
       <Suspense fallback="Loading...">
         <EmailTemplates />
       </Suspense>

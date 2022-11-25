@@ -10,6 +10,8 @@ export interface LabeledQuillEditorProps extends PropsWithoutRef<JSX.IntrinsicEl
   name: string
   /** Field label. */
   label?: string
+  subLabel?: string
+  subLabel2?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   toolbarHidden?: boolean
@@ -23,6 +25,8 @@ export const LabeledQuillEditor = forwardRef<HTMLDivElement, LabeledQuillEditorP
   (
     {
       label,
+      subLabel,
+      subLabel2,
       outerProps,
       name,
       toolbarHidden,
@@ -108,6 +112,8 @@ export const LabeledQuillEditor = forwardRef<HTMLDivElement, LabeledQuillEditorP
             {label} {props.showAsterisk && "*"}
           </label>
         )}
+        {subLabel && <label className="block text-xs text-gray-700">{subLabel}</label>}
+        {subLabel2 && <label className="block text-xs text-gray-700">{subLabel2}</label>}
         <div className={label && "mt-1"}>
           <Controller
             name={name}

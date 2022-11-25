@@ -11,6 +11,7 @@ import {
   Routes,
   useQuery,
   invalidateQuery,
+  Link,
 } from "blitz"
 import path from "path"
 
@@ -173,13 +174,22 @@ const JobSettingsHiringTeamPage = ({
       <JobSettingsLayout job={jobData!}>
         <div className="bg-white mt-5 md:mt-0 md:col-span-2">
           <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <h2
-                id="billing-history-heading"
-                className="text-lg leading-6 font-medium text-gray-900"
-              >
-                Hiring Team
-              </h2>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+              <div>
+                <h2 className="text-lg leading-6 font-medium text-gray-900">Hiring Team</h2>
+                <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+                  Add existing company users to the Hiring Team for this job
+                </h4>
+                <h4 className="text-xs sm:text-sm text-gray-700">
+                  You may{" "}
+                  <Link href={Routes.UserSettingsMembersPage()}>
+                    <a className="text-indigo-600 hover:text-indigo-700">
+                      invite more company users
+                    </a>
+                  </Link>{" "}
+                  from Members Settings
+                </h4>
+              </div>
               <Modal
                 header="Add Member to Job"
                 open={openInvite}

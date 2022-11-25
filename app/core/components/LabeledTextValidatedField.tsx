@@ -6,6 +6,8 @@ export interface LabeledTextValidatedFieldProps
   extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   name: string
   label?: string
+  subLabel?: string
+  subLabel2?: string
   type?: "text" | "password" | "email" | "number" | "date" | "url"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
@@ -34,7 +36,7 @@ const ControllerPlus = ({ control, transform, name, isSubmitting, testid, ...pro
 export const LabeledTextValidatedField = forwardRef<
   HTMLInputElement,
   LabeledTextValidatedFieldProps
->(({ label, outerProps, name, testid, ...props }, ref) => {
+>(({ label, subLabel, subLabel2, outerProps, name, testid, ...props }, ref) => {
   const {
     control,
     formState: { isSubmitting, errors },
@@ -61,6 +63,8 @@ export const LabeledTextValidatedField = forwardRef<
           {label} {props.showAsterisk && "*"}
         </label>
       )}
+      {subLabel && <label className="block text-xs text-gray-700">{subLabel}</label>}
+      {subLabel2 && <label className="block text-xs text-gray-700">{subLabel2}</label>}
       <div className={label && "mt-1"}>
         {/* <input
             disabled={isSubmitting}

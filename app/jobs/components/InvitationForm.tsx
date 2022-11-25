@@ -72,6 +72,8 @@ export const InvitationForm = (props: InvitationFormProps) => {
             <LabeledReactSelectField
               name="jobUserRole"
               label="Role"
+              subLabel="Admins can add/update hiring team, assign interviewers, organize interviews & add/update candidates"
+              subLabel2="Users can only conduct interviews and provide candidate score"
               placeholder="Select Job Role"
               options={Object.values(JobUserRole)
                 ?.filter((m) => m !== "OWNER")
@@ -92,6 +94,8 @@ export const InvitationForm = (props: InvitationFormProps) => {
             <LabeledReactSelectField
               name="companyUserRole"
               label="Role"
+              subLabel="Admins can add/update jobs, company info, job categories, email templates & candidate pools"
+              subLabel2="Users can only access assigned jobs and their personal profile settings"
               placeholder="Select Company Role"
               options={Object.values(CompanyUserRole)
                 ?.filter((m) => m !== "OWNER")

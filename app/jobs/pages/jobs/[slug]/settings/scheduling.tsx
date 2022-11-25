@@ -435,7 +435,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                         </div>
                       </div>
 
-                      {calendars?.length > 0 && (
+                      {/* {calendars?.length > 0 && (
                         <>
                           <ArrowSmRightIcon className="invisible h-6 w-auto text-neutral-500" />
 
@@ -452,7 +452,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                             </div>
                           </div>
                         </>
-                      )}
+                      )} */}
                     </div>
                   )}
 
@@ -509,7 +509,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                       </select>
                     </div>
 
-                    {calendars?.length > 0 && (
+                    {/* {calendars?.length > 0 && (
                       <>
                         <ArrowSmRightIcon className="hidden md:block lg:block h-6 w-auto text-neutral-500" />
                         <ArrowSmDownIcon className="block md:hidden lg:hidden h-6 w-auto text-neutral-500" />
@@ -555,7 +555,7 @@ const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) 
                           </select>
                         </div>
                       </>
-                    )}
+                    )} */}
                   </div>
                 </div>
               )
@@ -595,13 +595,22 @@ const JobSettingsSchedulingPage = ({
       <JobSettingsLayout job={job!}>
         <div className="bg-white mt-5 md:mt-0 md:col-span-2">
           <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
-            <div className="flex justify-between items-center mb-6">
-              <h2
-                id="billing-history-heading"
-                className="text-lg leading-6 font-medium text-gray-900"
-              >
-                Availabilities & Calendars
-              </h2>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+              <div>
+                <h2 className="text-lg leading-6 font-medium text-gray-900">
+                  Availability for interviews
+                </h2>
+                <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+                  Map your availability to stages when you are available for conducting interviews
+                </h4>
+                <h4 className="text-xs sm:text-sm text-gray-700">
+                  You may{" "}
+                  <Link href={Routes.UserSettingsAvailabilitiesPage()}>
+                    <a className="text-indigo-600 hover:text-indigo-700">add more availabilities</a>
+                  </Link>{" "}
+                  from User Settings
+                </h4>
+              </div>
             </div>
 
             <Suspense fallback="Loading...">

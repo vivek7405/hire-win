@@ -278,6 +278,17 @@ const CandidatePools = () => {
 const CandidatePoolsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="CandidatePoolsHome | hire-win" user={user}>
+      <div className="mb-6">
+        <h2 className="text-lg leading-6 font-medium text-gray-900">Candidate Pools</h2>
+        <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+          Candidate Pools are databases of candidates for future reference
+        </h4>
+        <h4 className="text-xs sm:text-sm text-gray-700">
+          While in the candidate detail page, you shall see a Pools dropdown. Add/remove the
+          candidate to pools using that dropdown.
+        </h4>
+      </div>
+
       <Suspense fallback="Loading...">
         <CandidatePools />
       </Suspense>
