@@ -472,9 +472,7 @@ const Jobs = ({
         }}
       >
         Are you sure you want to {viewType === JobViewType.Archived ? "Restore" : "Archive"} the
-        job?{" "}
-        {viewType !== JobViewType.Archived &&
-          "This will also expire the job and set the expiry date to current date time."}
+        job?
       </Confirm>
 
       {jobUsers?.length > 0 && (
