@@ -40,7 +40,9 @@ const getCandidateAnswerForDisplay = (
         return answer?.formQuestion?.options?.find((op) => val === op.id)?.text
       case FormQuestionType.Attachment:
         const attachmentObj: AttachmentObject = JSON.parse(val || "{}")
-        return attachmentObj && attachmentObj?.location?.trim() !== "" ? (
+        return attachmentObj &&
+          attachmentObj?.location &&
+          attachmentObj?.location?.trim() !== "" ? (
           isTableView ? (
             <a
               href={attachmentObj.location}

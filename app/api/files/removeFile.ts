@@ -25,13 +25,18 @@ export default async (req, res) => {
 
   const s3 = new AWS.S3({ region, accessKeyId, secretAccessKey })
 
-  const params = {
-    Key: body.key,
-    Bucket: process.env.S3_BUCKET ? process.env.S3_BUCKET : "hire.win",
-  }
+  // Don't delete the angel sample candidate resume from aws object storage
+  if (body.key !== "Angel's Resume.pdf") {
+    const params = {
+      Key: body.key,
+      Bucket: process.env.S3_BUCKET ? process.env.S3_BUCKET : "hire.win",
+    }
 
-  await s3.deleteObject(params, (err, _data) => {
-    if (err) res.status(500).send(err).end()
-    else res.end("Deleted file")
-  })
+    await s3.deleteObject(params, (err, _data) => {
+      if (err) res.status(500).send(err).end()
+      else res.end("Deleted file")
+    })
+  } else {
+    res.end("Deleted file")
+  }
 }

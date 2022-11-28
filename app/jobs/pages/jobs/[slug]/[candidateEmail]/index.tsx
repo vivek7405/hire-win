@@ -1613,7 +1613,7 @@ const SingleCandidatePageContent = ({
                   {file && <PDFViewer file={file} />}
                   {!(candidate?.resume as AttachmentObject)?.key && (
                     <div className="text-center my-3 px-2">
-                      No Resume Uploaded. Upload one by clicking on the Update Candidate button.
+                      No Resume Uploaded. Upload one by clicking on the Edit Candidate menu.
                     </div>
                   )}
                 </div>
