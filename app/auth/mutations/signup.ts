@@ -13,6 +13,7 @@ import { Currency, PlanName } from "types"
 import provideTrail from "app/core/utils/provideTrial"
 import createFactoryItems from "./createFactoryItems"
 import updateDefaultSchedule from "app/scheduling/schedules/mutations/updateDefaultSchedule"
+import createFactoryJob from "app/jobs/mutations/createFactoryJob"
 
 type signupProps = {
   name: string
@@ -75,6 +76,7 @@ export default async function signup(
               create: {
                 name: companyName || "NA",
                 slug: newSlug,
+                info: "We often have multiple job openings listed below. Apply to the one relevant to you.",
               },
               where: {
                 id: existingCompany?.id || "0",
@@ -105,8 +107,10 @@ export default async function signup(
     },
     ctx
   )
-
   await updateDefaultSchedule(schedule.id || "0", ctx)
+
+  // Always keep factory job at last
+  await createFactoryJob(compId, ctx)
 
   return user
 }
