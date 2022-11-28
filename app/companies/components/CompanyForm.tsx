@@ -67,8 +67,8 @@ export const CompanyForm = (props: CompanyFormProps) => {
           /> */}
           <LabeledQuillEditor
             name="info"
-            label="Info"
-            placeholder="This shall appear on careers page..."
+            label="Careers Page Description"
+            placeholder="You may provide your company info here..."
           />
 
           {/* <ThemePickerField name="theme" label="Careers Page Theme" /> */}

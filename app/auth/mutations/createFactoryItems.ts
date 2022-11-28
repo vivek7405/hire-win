@@ -5,6 +5,7 @@ import createFactoryCandidatePools from "app/candidate-pools/mutations/createFac
 // import createScoreCardWithFactoryScoreCardQuestions from "app/score-cards/mutations/createScoreCardWithFactoryScoreCardQuestions"
 // import createWorkflowWithFactoryWorkflowStages from "app/workflows/mutations/createWorkflowWithFactoryWorkflowStages"
 import { Ctx } from "blitz"
+import createFactoryJob from "app/jobs/mutations/createFactoryJob"
 
 type InputType = {
   companyId: string
