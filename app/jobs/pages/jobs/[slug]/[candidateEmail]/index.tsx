@@ -1831,7 +1831,7 @@ const SingleCandidatePageContent = ({
                           index < (candidate?.job?.stages?.length || 0) - 1
                             ? "border-r-2 rounded-br-md"
                             : ""
-                        } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:drop-shadow-2xl hover:bg-theme-200 cursor-pointer ${
+                        } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:bg-theme-200 cursor-pointer ${
                           selectedStage?.id === stage.id ? "!bg-theme-500 !text-white" : ""
                         } whitespace-nowrap`}
                         onClick={() => {
