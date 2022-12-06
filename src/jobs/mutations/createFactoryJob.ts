@@ -2,6 +2,7 @@ import { Ctx } from "blitz"
 import createJob from "./createJob"
 import db, { Answer, CandidateSource, EmploymentType, RemoteOption, SalaryType } from "db"
 import createCandidate from "src/candidates/mutations/createCandidate"
+import addComment from "src/comments/mutations/addComment"
 
 async function createFactoryJob(companyId: string, ctx: Ctx) {
   ctx.session.$authorize()
@@ -34,6 +35,7 @@ async function createFactoryJob(companyId: string, ctx: Ctx) {
     where: { id: job.id },
     include: {
       formQuestions: true,
+      stages: true,
     },
   })
 
@@ -81,7 +83,7 @@ async function createFactoryJob(companyId: string, ctx: Ctx) {
     }
   })
 
-  await createCandidate(
+  const createdCandidate = await createCandidate(
     {
       name: "Angel (Sample)",
       email: "angel@sample.com",
@@ -93,6 +95,15 @@ async function createFactoryJob(companyId: string, ctx: Ctx) {
       answers,
       source: CandidateSource.Careers_Page,
       jobId: job?.id || "0",
+    },
+    ctx
+  )
+
+  await addComment(
+    {
+      text: `Angel seems to be a good candidate and can be moved to the next stage. (Sample Comment)`,
+      candidateId: createdCandidate?.id || "0",
+      stageId: createdJob?.stages?.find((stg) => stg.order === 1)?.id || "0",
     },
     ctx
   )

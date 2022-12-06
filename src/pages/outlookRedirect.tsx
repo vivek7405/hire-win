@@ -5,9 +5,11 @@ import { BlitzPage, Routes } from "@blitzjs/next"
 import Form from "src/core/components/Form"
 import LabeledTextField from "src/core/components/LabeledTextField"
 import AuthLayout from "src/core/layouts/AuthLayout"
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import handleOAuthCode from "src/calendars/outlookcalendar/mutations/handleOAuthCode"
+import Navbar from "src/core/components/Navbar"
+import { z } from "zod"
 
 /**
  * This gets a code as a query parameter. This code needs to be sent to microsoft which returns a refresh_token. The refresh_token is used to generate a session_access_token.
@@ -17,8 +19,15 @@ function OAuthCallbackPage() {
   const [isCalenderAdded, setIsCalenderAdded] = useState(false)
   const [calendarName, setCalendarName] = useState("Your Outlook Calendar")
   const router = useRouter()
+  let { code } = router.query
 
-  let { code } = useRouter().query
+  // parsing code from router query param takes time
+  // Used loader to avoid flicker between authenticated and unauthenticated UI
+  const [isLoading, setIsLoading] = useState(true)
+  setTimeout(() => {
+    setIsLoading(false)
+  }, 1000)
+
   const handleCode = async () => {
     setIsError(false)
     try {
@@ -64,60 +73,66 @@ function OAuthCallbackPage() {
     // )
   }
 
-  return (
+  return isLoading ? (
     <>
-      {/* <h1>Your Authentication was succesful.</h1>
-          <h3>Last step. Please choose a name for your new Calendar.</h3> */}
-      {/* <Form>
-            <Form.Group controlId="formGoogleCalendarName">
-              <Form.Label>Calendar Name</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter a name you'd like for your calendar"
-                onChange={(event) => setCalendarName(event.target.value)}
-              />
-              <Form.Text className="text-muted">
-                This name helps you to recognize the calendar. For example "Private" or "My project
-                with Alice".
-              </Form.Text>
-            </Form.Group>
-          </Form>
-          <Button
-            variant="primary"
-            onClick={async () => {
-              await handleCode()
-              if (!isError) setIsCalenderAdded(true)
+      <Form header="Authenticating..." onSubmit={async () => {}}>
+        <p className="text-neutral-500">It won't take a second!</p>
+      </Form>
+    </>
+  ) : (
+    <>
+      {code ? (
+        <Form
+          submitText="Submit"
+          header="Your Authentication was succesful"
+          subHeader="Last step. Please choose a name for your new Calendar."
+          onSubmit={async (values) => {
+            await handleCode()
+            if (!isError) setIsCalenderAdded(true)
+          }}
+          schema={z.object({
+            name: z.string().nonempty({ message: "Calendar name is required" }),
+          })}
+        >
+          <LabeledTextField
+            name="name"
+            label="Calendar Name"
+            placeholder="Enter a name you'd like for your calendar"
+            onChange={(e) => setCalendarName(e.target.value)}
+          />
+        </Form>
+      ) : (
+        <Form
+          header="Authentication Failed"
+          subHeader="We were not able to authenticate your calendar"
+          onSubmit={async () => {}}
+        >
+          <button
+            className="px-4 py-2 bg-theme-600 hover:bg-theme-700 rounded text-white"
+            onClick={() => {
+              router.replace(Routes.UserSettingsCalendarsPage())
             }}
           >
-            Add Calendar
-          </Button> */}
-      <Form
-        submitText="Submit"
-        header="Your Authentication was succesful"
-        subHeader="Last step. Please choose a name for your new Calendar."
-        onSubmit={async (values) => {
-          await handleCode()
-          if (!isError) setIsCalenderAdded(true)
-        }}
-      >
-        <LabeledTextField
-          name="name"
-          label="Calendar Name"
-          placeholder="Enter a name you'd like for your calendar"
-          onChange={(e) => setCalendarName(e.target.value)}
-        />
-      </Form>
+            Go back to Calendar Settings
+          </button>
+        </Form>
+      )}
     </>
   )
 }
 
 const oAuth2Callback: BlitzPage = () => {
   return (
-    <div>
-      <Suspense fallback="Loading ...">
-        <OAuthCallbackPage />
-      </Suspense>
-    </div>
+    <>
+      <Navbar showEmptyNavbar={true} />
+      <div className="max-w-lg mx-auto">
+        <div className="mt-6">
+          <Suspense fallback="Loading ...">
+            <OAuthCallbackPage />
+          </Suspense>
+        </div>
+      </div>
+    </>
   )
 }
 
