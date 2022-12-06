@@ -1,6 +1,6 @@
-import { useSession } from "@blitzjs/auth";
-import { useRouter } from "next/router";
-import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc";
+import { useSession } from "@blitzjs/auth"
+import { useRouter } from "next/router"
+import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc"
 import { TrashIcon } from "@heroicons/react/outline"
 import { Calendar, Schedule, User } from "@prisma/client"
 import Card from "src/core/components/Card"
@@ -29,9 +29,11 @@ import { areDatesOnSameDay } from "../utils/comparison"
 // import { InterviewInput } from "../validations"
 import AvailableTimeSlotsSelection from "./AvailableTimeSlotsSelection"
 import getStage from "src/stages/queries/getStage"
+import Link from "next/link"
+import { Routes } from "@blitzjs/next"
 
 type ScheduleInterviewProps = {
-  interviewer: User
+  interviewer: User & { calendars: Calendar[] }
   candidateId: string
   stageId: string
   setOpenScheduleInterviewModal: any
@@ -150,18 +152,22 @@ const PickAndSchedule = ({
 
   if ((organizer?.calendars?.length || 0) === 0) {
     return (
-      <h2 className="text-center p-10 bg-white">
-        You cannot schedule an interview since you, the organizer ({organizer?.name}) has no
-        calendars connected.
-      </h2>
+      <div className="pt-8 pb-3 text-center">
+        <h2 className="mb-5">Please connect your calendar in order to schedule an interview.</h2>
+        <Link href={Routes.UserSettingsCalendarsPage()}>
+          <span className="px-4 py-2 bg-theme-600 hover:bg-theme-700 rounded-md text-white cursor-pointer">
+            Connect Calendar
+          </span>
+        </Link>
+      </div>
     )
   }
 
   if ((interviewer?.calendars?.length || 0) === 0) {
     return (
-      <h2 className="text-center p-10 bg-white">
-        You cannot schedule an interview since the interviewer ({interviewer?.name}) has no
-        calendars connected.
+      <h2 className="pt-8 pb-3 text-center">
+        Please ask the interviewer ({interviewer?.name}) to connect their calendar in order to
+        schedule an interview.
       </h2>
     )
   }

@@ -1,6 +1,6 @@
-import { SecurePassword } from "@blitzjs/auth";
-import { resolver } from "@blitzjs/rpc";
-import { Ctx } from "blitz";
+import { SecurePassword } from "@blitzjs/auth"
+import { resolver } from "@blitzjs/rpc"
+import { Ctx } from "blitz"
 import db from "db"
 import { Signup } from "src/auth/validations"
 import slugify from "slugify"
@@ -96,11 +96,6 @@ export default async function signup(
 
   await ctx.session.$create({ userId: user.id, role: user.role as UserRole, companyId: compId })
 
-  if (!existingCompany) {
-    await createFactoryItems({ companyId: compId }, ctx)
-    // currency && (await provideTrail(user?.id, compId, currency))
-  }
-
   const schedule = await addSchedule(
     {
       name: "9 to 5 Weekdays",
@@ -111,8 +106,13 @@ export default async function signup(
   )
   await updateDefaultSchedule(schedule.id || "0", ctx)
 
-  // Always keep factory job at last
-  await createFactoryJob(compId, ctx)
+  if (!existingCompany) {
+    await createFactoryItems({ companyId: compId }, ctx)
+    // currency && (await provideTrail(user?.id, compId, currency))
+
+    // Always keep factory job at last
+    await createFactoryJob(compId, ctx)
+  }
 
   return user
 }
