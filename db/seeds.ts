@@ -1,10 +1,11 @@
 import db, { User } from "./index"
-import { SecurePassword } from "blitz"
+// import { SecurePassword } from "blitz"
 import seedData from "./seedData.json"
 import slugify from "slugify"
-import { findFreeSlug } from "app/core/utils/findFreeSlug"
-import { Job } from "app/jobs/validations"
+import { findFreeSlug } from "src/core/utils/findFreeSlug"
+import { Job } from "src/jobs/validations"
 import { JobUserRole, UserRole } from "@prisma/client"
+import { SecurePassword } from "@blitzjs/auth"
 
 /*
  * This seed function is executed when you run `blitz db seed`.

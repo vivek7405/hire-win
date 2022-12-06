@@ -7,7 +7,7 @@
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
 import db, { Candidate, Interview, Job, User } from "db"
-import { createICalendarEvent } from "app/scheduling/interviews/utils/createCalendarEvent"
+import { createICalendarEvent } from "src/interviews/utils/createCalendarEvent"
 import { InterviewDetailType } from "types"
 
 type SendInterviewConfirmationMailerInput = {

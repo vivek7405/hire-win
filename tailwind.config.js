@@ -1,6 +1,6 @@
 // tailwind.config.js
 module.exports = {
-  content: ["{pages,app}/**/*.{js,ts,jsx,tsx}"],
+  content: ["{pages,src}/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       // textColor: {

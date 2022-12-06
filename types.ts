@@ -1,6 +1,7 @@
-import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
+// import { DefaultCtx, SessionContext, SimpleRolesIsAuthorized } from "blitz"
 import { User } from "db"
 import { Calendar, DailySchedule, Job, Prisma, Schedule, UserRole } from "@prisma/client"
+import { SessionContext, SimpleRolesIsAuthorized } from "@blitzjs/auth"
 
 export enum Currency {
   INR = "INR",
@@ -98,10 +99,7 @@ export type KanbanBoardType = {
   columns: KanbanColumnType[]
 }
 
-declare module "blitz" {
-  export interface Ctx extends DefaultCtx {
-    session: SessionContext
-  }
+declare module "@blitzjs/auth" {
   export interface Session {
     isAuthorized: SimpleRolesIsAuthorized<UserRole>
     PublicData: {
@@ -111,6 +109,26 @@ declare module "blitz" {
     }
   }
 }
+
+declare module "blitz" {
+  export interface Ctx {
+    session: SessionContext
+  }
+}
+
+// declare module "blitz" {
+//   export interface Ctx extends DefaultCtx {
+//     session: SessionContext
+//   }
+//   export interface Session {
+//     isAuthorized: SimpleRolesIsAuthorized<UserRole>
+//     PublicData: {
+//       userId: User["id"]
+//       role: UserRole
+//       companyId: string
+//     }
+//   }
+// }
 
 export enum ShiftDirection {
   UP,
