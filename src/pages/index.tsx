@@ -27,21 +27,6 @@ import {
 } from "@heroicons/react/outline"
 import { useRouter } from "next/router"
 
-// Redirecting to login page until launch
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  path.resolve("next.config.js")
-  path.resolve("blitz.config.js")
-  path.resolve(".next/blitz/db.js")
-
-  return {
-    redirect: {
-      destination: Routes.FirstCompany().pathname,
-      permanent: false,
-    },
-    props: {},
-  }
-}
-
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
 //   path.resolve("blitz.config.js")
@@ -247,6 +232,19 @@ export default function Home() {
             Traditionally known as an Applicant Tracking System (ATS)
           </p>
 
+          <div className="w-full flex items-center justify-center my-8">
+            <a
+              href="https://www.producthunt.com/posts/hire-win?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-hire&#0045;win"
+              target="_blank"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=356023&theme=light&period=daily"
+                alt="hire&#0046;win - Interviewing&#0032;Kit&#0032;with&#0032;Careers&#0032;Page | Product Hunt"
+                className="w-64"
+              />
+            </a>
+          </div>
+
           {/* <div className="w-full flex items-center justify-center mb-8">
             <div className="w-full sm:w-5/6 md:w-3/5 lg:w-1/2 xl:w-2/5 bg-white rounded-xl flex flex-col items-center justify-center space-y-2">
               <div className="w-full p-7">
@@ -308,20 +306,8 @@ export default function Home() {
             </div>
           </div> */}
 
-          <div className="w-full flex items-center justify-center my-8">
-            <a
-              href="https://www.producthunt.com/posts/hire-win?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-hire&#0045;win"
-              target="_blank"
-            >
-              <img
-                src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=356023&theme=light&period=daily"
-                alt="hire&#0046;win - Interviewing&#0032;Kit&#0032;with&#0032;Careers&#0032;Page | Product Hunt"
-                className="w-64"
-              />
-            </a>
-          </div>
-
-          <div className="w-full flex items-center justify-center mt-8">
+          {/* Uncomment this once you want to provide google signup */}
+          {/* <div className="w-full flex items-center justify-center mt-8">
             <div className="w-full sm:w-3/4 md:w-1/2 lg:w-2/5 xl:w-1/3 bg-white rounded-xl p-4">
               <div className="w-full">
                 <Form
@@ -361,7 +347,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="mt-8 mb-4 w-full flex items-center justify-center">
             <a
@@ -456,7 +442,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="sign-up" className="bg-white py-8 px-4 mt-20">
+        {/* Uncomment this once you want to provide signup */}
+        {/* <section id="sign-up" className="bg-white py-8 px-4 mt-20">
           <div className="text-neutral-800">
             <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
               It only takes 1 minute!
@@ -475,29 +462,13 @@ export default function Home() {
                   <a>
                     <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
                       <span className="font-extrabold text-xl">Sign up for Free!</span>
-                      {/* <br />
-                      <span className="font-light hidden md:block lg:block">
-                        no credit card required, cancel any time
-                      </span>
-                      <span className="font-light md:hidden lg:hidden">
-                        no credit card required
-                      </span> */}
                     </button>
-                    {/* <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white font-extrabold text-xl hover:underline shadow-lg rounded my-4 py-3 lg:py-4 px-8 w-fit">
-                      Get Early Access
-                    </button> */}
                   </a>
                 </Link>
               </div>
-              {/* <div className="mb-4">OR</div>
-              <div className="mt-8">
-                <Suspense fallback="Loading...">
-                  <BookADemoButton />
-                </Suspense>
-              </div> */}
             </div>
           </div>
-        </section>
+        </section> */}
       </div>
 
       <style jsx>{`
