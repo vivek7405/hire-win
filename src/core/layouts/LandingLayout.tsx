@@ -170,7 +170,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   <a>
                     <button
                       id="navAction"
-                      className="bg-gradient-to-br from-fuchsia-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
+                      className="bg-gradient-to-br from-fuchsia-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold text-lg rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
                     >
                       Login
                     </button>

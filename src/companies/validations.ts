@@ -13,6 +13,7 @@ export const CompanyObj = z.object({
   website: z.string().url().or(z.literal("")).optional(),
   theme: z.string().optional(),
   stripeSubscriptionId: z.string().optional(),
+  timezone: z.string().optional(),
 })
 
 export type CompanyInputType = z.infer<typeof CompanyObj>

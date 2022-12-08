@@ -10,10 +10,12 @@ export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElem
   testid?: string
   onChange?: any
   showAsterisk?: boolean
+  subLabel?: string
+  subLabel2?: string
 }
 
 export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldProps>(
-  ({ label, outerProps, name, ...props }, ref) => {
+  ({ label, subLabel, subLabel2, outerProps, name, ...props }, ref) => {
     const {
       register,
       setValue,
@@ -41,6 +43,8 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             {label} {props.showAsterisk && "*"}
           </label>
         )}
+        {subLabel && <label className="block text-xs text-gray-600">{subLabel}</label>}
+        {subLabel2 && <label className="block text-xs text-gray-600">{subLabel2}</label>}
         <div className={label && "mt-1"}>
           <input
             disabled={isSubmitting}

@@ -15,6 +15,7 @@ import { EditorState, convertToRaw } from "draft-js"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
 import { Suspense } from "react"
 import { initialInfo } from "src/companies/constants"
+import createFactoryJob from "src/jobs/mutations/createFactoryJob"
 
 export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -38,10 +39,11 @@ export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext
   }
 })
 
-const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const FirstCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const session = useSession()
   const [createCompanyMutation] = useMutation(createCompany)
+  const [createFactoryJobMutation] = useMutation(createFactoryJob)
   const [companyUser] = useQuery(getCompanyUser, {
     where: {
       companyId: session.companyId || "0",
@@ -56,8 +58,9 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
           {/* {companyUser && <Breadcrumbs />} */}
           <div className="mt-6">
             <CompanyForm
-              header="Create A New Company"
-              subHeader="Enter your company details"
+              onlyName={true}
+              header="Create a company"
+              subHeader="You may add more companies later"
               initialValues={{
                 name: "",
                 // info: EditorState.createEmpty(),
@@ -72,11 +75,17 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
 
                 const toastId = toast.loading(() => <span>Creating Company</span>)
                 try {
+                  values["info"] = initialInfo
+
                   values["timezone"] = Intl?.DateTimeFormat()
                     ?.resolvedOptions()
                     ?.timeZone?.replace("Calcutta", "Kolkata")
 
-                  await createCompanyMutation(values)
+                  const createdCompany = await createCompanyMutation(values)
+                  if (createdCompany) {
+                    await createFactoryJobMutation(createdCompany.id)
+                  }
+
                   toast.success(() => <span>Company Created</span>, { id: toastId })
                   router.push(Routes.JobsHome())
                 } catch (error) {
@@ -93,4 +102,4 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
   )
 }
 
-export default NewCompany
+export default FirstCompany

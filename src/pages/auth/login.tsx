@@ -55,7 +55,7 @@ export const getServerSideProps = gSSP(async (context) => {
     } else {
       return {
         redirect: {
-          destination: "/companies/new",
+          destination: Routes.FirstCompany().pathname,
           permanent: false,
         },
         props: {},
@@ -150,6 +150,22 @@ const LoginPage: BlitzPage = () => {
               }
             }}
           />
+
+          {/* Uncomment this once you want to provide Google Login */}
+          {/* <div className="w-full flex items-center justify-center space-x-5">
+            <div className="w-1/2 h-px bg-neutral-300 rounded-full my-7" />
+            <div className="text-neutral-400 italic">Or</div>
+            <div className="w-1/2 h-px bg-neutral-300 rounded-full my-7" />
+          </div>
+
+          <a href="/api/auth/google">
+            <button className="w-full px-4 py-2 rounded bg-white text-neutral-600 border border-theme-600 hover:bg-gray-50">
+              <div className="flex items-center justify-between">
+                <Image height={20} width={20} src="/GoogleLogo.png" />
+                <span className="w-full text-center">Login with Google</span>
+              </div>
+            </button>
+          </a> */}
         </div>
 
         <div>
