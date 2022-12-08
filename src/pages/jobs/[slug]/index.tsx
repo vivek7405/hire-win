@@ -132,7 +132,7 @@ export const getServerSideProps = gSSP(async (context) => {
     } else {
       return {
         redirect: {
-          destination: "/companies/new",
+          destination: Routes.FirstCompany().pathname,
           permanent: false,
         },
         props: {},

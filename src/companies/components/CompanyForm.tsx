@@ -17,88 +17,96 @@ type CompanyFormProps = {
   header?: string
   subHeader?: string
   companySlugForCareersPage?: string
+  onlyName?: boolean
 }
 
 export const CompanyForm = (props: CompanyFormProps) => {
   const tailwindColors = getTailwindColors(true)
 
-  return <>
-    <div className="bg-white w-full">
-      <Form
-        header={props.header}
-        subHeader={props.subHeader}
-        submitText="Submit"
-        schema={CompanyObj}
-        initialValues={props.initialValues}
-        onSubmit={props.onSubmit}
-        className="max-w-xl mx-auto"
-      >
-        <LabeledTextField
-          name="name"
-          label="Name"
-          placeholder="Enter company name"
-          testid="userUpdateName"
-          showAsterisk={true}
-        />
+  return (
+    <>
+      <div className="bg-white w-full">
+        <Form
+          header={props.header}
+          subHeader={props.subHeader}
+          submitText="Submit"
+          schema={CompanyObj}
+          initialValues={props.initialValues}
+          onSubmit={props.onSubmit}
+          className="max-w-xl mx-auto"
+        >
+          <LabeledTextField
+            name="name"
+            label="Company Name"
+            subLabel="Make it as short as possible, eg. Acme instead of Acme Inc."
+            placeholder="This shall appear on careers page"
+            showAsterisk={true}
+          />
 
-        <LabeledTextField
-          type="text"
-          name="website"
-          label="Website"
-          placeholder="This shall be used to navigate to your website from careers page"
-          testid="userUpdateWebsite"
-        />
+          {!props.onlyName && (
+            <>
+              <LabeledTextField
+                type="text"
+                name="website"
+                label="Website"
+                placeholder="This shall be used to navigate to your website from careers page"
+                testid="userUpdateWebsite"
+              />
 
-        <SingleFileUploadField
-          showImage={true}
-          accept="image/*"
-          name="logo"
-          label="Logo"
-          subLabel="Logo shall appear as careers page header if provided"
-          subLabel2="If not provided, the company name shall appear as careers page header"
-        />
+              <SingleFileUploadField
+                showImage={true}
+                accept="image/*"
+                name="logo"
+                label="Logo"
+                subLabel="Logo shall appear as careers page header if provided"
+                subLabel2="If not provided, the company name shall appear as careers page header"
+              />
 
-        {/* <LabeledRichTextField
+              {/* <LabeledRichTextField
           name="info"
           label="Info"
           placeholder="This shall appear on careers page"
           testid="userUpdateCompanyInfo"
         /> */}
-        <LabeledQuillEditor
-          name="info"
-          label="Careers Page Description"
-          placeholder="You may provide your company info here..."
-        />
+              <LabeledQuillEditor
+                name="info"
+                label="Careers Page Description"
+                placeholder="You may provide your company info here..."
+              />
 
-        {/* <ThemePickerField name="theme" label="Careers Page Theme" /> */}
-        <LabeledReactSelectField
-          name="theme"
-          label="Careers Page Theme"
-          options={Object.keys(tailwindColors)?.map((key) => {
-            return {
-              label: (
-                key.replace("-600", "").charAt(0).toUpperCase() + key.replace("-600", "").slice(1)
-              )
-                .replace(/([A-Z])/g, " $1")
-                .trim(),
-              value: key.replace("-600", ""),
-              color: tailwindColors[key],
-            };
-          })}
-          isColored={true}
-        />
+              {/* <ThemePickerField name="theme" label="Careers Page Theme" /> */}
+              <LabeledReactSelectField
+                name="theme"
+                label="Careers Page Theme"
+                options={Object.keys(tailwindColors)?.map((key) => {
+                  return {
+                    label: (
+                      key.replace("-600", "").charAt(0).toUpperCase() +
+                      key.replace("-600", "").slice(1)
+                    )
+                      .replace(/([A-Z])/g, " $1")
+                      .trim(),
+                    value: key.replace("-600", ""),
+                    color: tailwindColors[key],
+                  }
+                })}
+                isColored={true}
+              />
 
-        {props.companySlugForCareersPage && (
-          <div className="float-left">
-            <ViewCareersPageButton
-              companySlug={props.companySlugForCareersPage}
-              noPadding={true}
-            />
-          </div>
-        )}
-      </Form>
-    </div>
-  </>;
+              {props.companySlugForCareersPage && (
+                <div className="float-left">
+                  <ViewCareersPageButton
+                    companySlug={props.companySlugForCareersPage}
+                    noPadding={true}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </Form>
+      </div>
+    </>
+  )
 }
 
 export default CompanyForm

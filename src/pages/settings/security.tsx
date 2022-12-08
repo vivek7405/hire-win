@@ -51,6 +51,7 @@ const UserSettingsSecurityPage = ({
       <Suspense fallback="Loading...">
         <UserSettingsLayout>
           <SecurityForm
+            user={user}
             header="Security"
             subHeader="Update your account password"
             onSubmit={async (values) => {

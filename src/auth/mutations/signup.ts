@@ -16,6 +16,7 @@ import provideTrail from "src/core/utils/provideTrial"
 import createFactoryItems from "./createFactoryItems"
 import updateDefaultSchedule from "src/schedules/mutations/updateDefaultSchedule"
 import createFactoryJob from "src/jobs/mutations/createFactoryJob"
+import { initialInfo } from "src/companies/constants"
 
 type signupProps = {
   name: string
@@ -78,7 +79,7 @@ export default async function signup(
               create: {
                 name: companyName || "NA",
                 slug: newSlug,
-                info: "We often have multiple job openings listed below. Apply to the one relevant to you.",
+                info: initialInfo,
               },
               where: {
                 id: existingCompany?.id || "0",

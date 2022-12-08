@@ -1,6 +1,7 @@
 import { LabeledTextField } from "src/core/components/LabeledTextField"
 import { Form } from "src/core/components/Form"
 import { UserSecurity } from "src/users/validations"
+import { User } from "@prisma/client"
 
 type SecurityFormProps = {
   onSuccess?: () => void
@@ -8,6 +9,7 @@ type SecurityFormProps = {
   onSubmit: any
   header?: string
   subHeader?: string
+  user: User
 }
 
 export const SecurityForm = (props: SecurityFormProps) => {
@@ -23,7 +25,11 @@ export const SecurityForm = (props: SecurityFormProps) => {
           onSubmit={props.onSubmit}
           className="max-w-sm mx-auto"
         >
-          <LabeledTextField name="currentPassword" label="Current Password" type="password" />
+          {/* Show Current password field only when hashed password is not null */}
+          {/* Hashed password field will be null when the user has signed up with Google Auth */}
+          {props.user.hashedPassword && (
+            <LabeledTextField name="currentPassword" label="Current Password" type="password" />
+          )}
           <LabeledTextField name="newPassword" label="New Password" type="password" />
           <LabeledTextField
             name="confirmNewPassword"

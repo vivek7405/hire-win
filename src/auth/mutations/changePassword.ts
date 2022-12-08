@@ -13,10 +13,14 @@ export default resolver.pipe(
     const user = await db.user.findFirst({ where: { id: ctx.session.userId! } })
     if (!user) throw new NotFoundError()
 
-    try {
-      await authenticateUser(user.email, currentPassword)
-    } catch (err) {
-      throw new Error("Wrong password")
+    // Only check for current password if the hashed password is not null
+    // Hashed password will be null if the user has signed up using Google Auth
+    if (user.hashedPassword) {
+      try {
+        await authenticateUser(user.email, currentPassword)
+      } catch (err) {
+        throw new Error("Wrong password")
+      }
     }
 
     const hashedPassword = await SecurePassword.hash(newPassword.trim())

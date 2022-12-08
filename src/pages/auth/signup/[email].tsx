@@ -38,7 +38,7 @@ export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext
   return { props: {} }
 })
 
-const OldSignupPage: BlitzPage = () => {
+const EmailSignupPage: BlitzPage = () => {
   const router = useRouter()
   const [confirmEmailMutation] = useMutation(confirmEmail)
 
@@ -155,7 +155,7 @@ const OldSignupPage: BlitzPage = () => {
             </div>
           </AuthForm> */}
             <SignupForm
-              // email={email}
+              email={(router?.query?.email as string) || ""}
               // companyId={companyId}
               onSuccess={() => {
                 if (router.query.next) {
@@ -183,21 +183,6 @@ const OldSignupPage: BlitzPage = () => {
               }}
             />
           </div>
-
-          <div className="w-full flex items-center justify-center space-x-5">
-            <div className="w-1/2 h-px bg-neutral-300 rounded-full my-7" />
-            <div className="text-neutral-400 italic">Or</div>
-            <div className="w-1/2 h-px bg-neutral-300 rounded-full my-7" />
-          </div>
-
-          <a href="/api/auth/google">
-            <button className="w-full px-4 py-2 rounded bg-white text-neutral-600 border border-theme-600 hover:bg-gray-50">
-              <div className="flex items-center justify-between">
-                <Image height={20} width={20} src="/GoogleLogo.png" />
-                <span className="w-full text-center">Sign up with Google</span>
-              </div>
-            </button>
-          </a>
           {/* <SignupForm
           onSuccess={() => {
             if (router.query.next) {
@@ -226,4 +211,4 @@ const OldSignupPage: BlitzPage = () => {
 
 // OldSignupPage.redirectAuthenticatedTo = "/"
 
-export default OldSignupPage
+export default EmailSignupPage
