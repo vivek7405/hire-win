@@ -15,7 +15,7 @@ export default resolver.pipe(
 
     // Only check for current password if the hashed password is not null
     // Hashed password will be null if the user has signed up using Google Auth
-    if (user.hashedPassword) {
+    if (user.hashedPassword && currentPassword) {
       try {
         await authenticateUser(user.email, currentPassword)
       } catch (err) {

@@ -183,9 +183,11 @@ const UserSettingsMembersPage = ({
                 Members
               </h2> */}
                 <div>
-                  <h2 className="text-lg leading-6 font-medium text-gray-900">Team Members</h2>
+                  <h2 className="text-lg leading-6 font-medium text-gray-900">
+                    Company Members ({company?.name || ""})
+                  </h2>
                   <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
-                    Invite team members and add them to Job Hiring Team
+                    Invite members to company and add them to Job Hiring Team
                   </h4>
                 </div>
                 <Modal

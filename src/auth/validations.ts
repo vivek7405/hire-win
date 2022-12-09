@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const password = z.string().min(8).max(100)
+export const password = z.string().min(8).max(100).nonempty({ message: "Required" })
 
 export const Signup = z.object({
   name: z.string().nonempty({ message: "Required" }),
@@ -32,6 +32,29 @@ export const ResetPassword = z
   })
 
 export const ChangePassword = z.object({
-  currentPassword: z.string(),
+  // made current password optional as it will not be provided
+  // when the user has authenticated using Google
+  currentPassword: z.string().optional(),
   newPassword: password,
 })
+
+export const UserSecurity = z
+  .object({
+    currentPassword: z.string().nonempty({ message: "Required" }),
+    newPassword: password,
+    confirmNewPassword: password,
+  })
+  .refine((val) => val.newPassword === val.confirmNewPassword, {
+    message: "Passwords don't match",
+    path: ["confirmNewPassword"],
+  })
+
+export const UserSecurityWOCurrentPassword = z
+  .object({
+    newPassword: password,
+    confirmNewPassword: password,
+  })
+  .refine((val) => val.newPassword === val.confirmNewPassword, {
+    message: "Passwords don't match",
+    path: ["confirmNewPassword"],
+  })
