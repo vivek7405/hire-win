@@ -13,6 +13,8 @@ import {
   XIcon,
   MinusCircleIcon,
   BadgeCheckIcon,
+  PlusCircleIcon,
+  PlusIcon,
 } from "@heroicons/react/outline"
 import { ExtendedUser, IntroHint, IntroStep, SubscriptionStatus } from "types"
 import logout from "src/auth/mutations/logout"
@@ -237,12 +239,12 @@ const NavbarContent = ({
         selectedCompanyUser?.role === CompanyUserRole.OWNER ||
         selectedCompanyUser?.role === CompanyUserRole.ADMIN
           ? Routes.UserSettingsCompanyPage().pathname
-          : Routes.UserSettingsPage().pathname,
+          : Routes.UserSettingsProfilePage().pathname,
       focus:
         selectedCompanyUser?.role === CompanyUserRole.OWNER ||
         selectedCompanyUser?.role === CompanyUserRole.ADMIN
           ? router.route === Routes.UserSettingsCompanyPage().pathname
-          : router.route === Routes.UserSettingsPage().pathname,
+          : router.route === Routes.UserSettingsProfilePage().pathname,
     },
     // selectedCompanyUser?.role === CompanyUserRole.OWNER ||
     // selectedCompanyUser?.role === CompanyUserRole.ADMIN
@@ -314,14 +316,18 @@ const NavbarContent = ({
             <DropdownMenu.RadioGroup
               value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
               onValueChange={async (companyId) => {
-                const cu = companyUsers?.find(
-                  (cu) => cu.userId === user?.id && cu.companyId === companyId
-                )
-                setSelectedCompanyUser(cu!)
-                await updateCompanySessionMutation(companyId || "0")
-                router.pathname === Routes.JobsHome().pathname
-                  ? router.reload()
-                  : router.push(Routes.JobsHome())
+                if (companyId === "new_company") {
+                  router.push(Routes.NewCompany())
+                } else {
+                  const cu = companyUsers?.find(
+                    (cu) => cu.userId === user?.id && cu.companyId === companyId
+                  )
+                  setSelectedCompanyUser(cu!)
+                  await updateCompanySessionMutation(companyId || "0")
+                  router.pathname === Routes.JobsHome().pathname
+                    ? router.reload()
+                    : router.push(Routes.JobsHome())
+                }
               }}
             >
               {companyUsers?.map((cu) => {
@@ -334,18 +340,27 @@ const NavbarContent = ({
                       <DropdownMenu.ItemIndicator className="flex items-center">
                         <CheckIcon className="w-4 h-4 absolute left-2" />
                       </DropdownMenu.ItemIndicator>
-                      <p className="ml-2 flex flex-nowrap space-x-1 items-center">
+                      <div className="ml-2 flex flex-nowrap space-x-1 items-center">
                         {/* <div className="flex">
                           {cu.subscription && <BadgeCheckIcon width={18} height={18} />}
                           {!cu.subscription && <MinusCircleIcon width={18} height={18} />}
                         </div> */}
                         <div>{cu.company?.name}</div>
                         <div className="lowercase">({cu.role})</div>
-                      </p>
+                      </div>
                     </DropdownMenu.RadioItem>
                   </div>
                 )
               })}
+              <DropdownMenu.RadioItem
+                value="new_company"
+                className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
+              >
+                <div className="ml-2 flex flex-nowrap space-x-1 items-center">
+                  <PlusIcon className="w-4 h-4 absolute left-2" />
+                  <div>Add New Company</div>
+                </div>
+              </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
@@ -512,7 +527,7 @@ const NavbarContent = ({
 
                     <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
                       <DropdownMenu.Arrow className="fill-current" offset={10} />
-                      <DropdownMenu.Item
+                      {/* <DropdownMenu.Item
                         onSelect={(e) => {
                           e.preventDefault()
                           // if (canCreateCompany) {
@@ -524,7 +539,7 @@ const NavbarContent = ({
                         className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
                       >
                         Add Company
-                      </DropdownMenu.Item>
+                      </DropdownMenu.Item> */}
                       {dropDownNav.map((item, i) => {
                         if (!item) return <></>
 
@@ -615,7 +630,7 @@ const NavbarContent = ({
             >
               Add Company
             </div> */}
-            <Link prefetch={true} href={Routes.NewCompany().pathname} passHref legacyBehavior>
+            {/* <Link prefetch={true} href={Routes.NewCompany().pathname} passHref legacyBehavior>
               <a
                 className={`${
                   router.route === Routes.NewCompany().pathname
@@ -625,7 +640,7 @@ const NavbarContent = ({
               >
                 Add Company
               </a>
-            </Link>
+            </Link> */}
             {dropDownNav.map((item, i) => {
               if (!item) return <></>
 

@@ -17,14 +17,3 @@ export const UserObj = z.object({
 })
 
 export type UserInputType = z.infer<typeof UserObj>
-
-export const UserSecurity = z
-  .object({
-    currentPassword: z.string(),
-    newPassword: z.string(),
-    confirmNewPassword: z.string(),
-  })
-  .refine((val) => val.newPassword === val.confirmNewPassword, {
-    message: "Passwords don't match",
-    path: ["confirmNewPassword"],
-  })

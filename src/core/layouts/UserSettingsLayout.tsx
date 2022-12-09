@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { useQuery } from "@blitzjs/rpc";
-import { useSession } from "@blitzjs/auth";
-import { useRouter } from "next/router";
+import Link from "next/link"
+import { useQuery } from "@blitzjs/rpc"
+import { useSession } from "@blitzjs/auth"
+import { useRouter } from "next/router"
 import React, { ReactNode } from "react"
 import {
   CreditCardIcon,
@@ -17,6 +17,7 @@ import { ClockIcon } from "@heroicons/react/solid"
 import getUser from "src/users/queries/getUser"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
 import { CompanyUserRole } from "@prisma/client"
+import { Routes } from "@blitzjs/next"
 
 type LayoutProps = {
   children: ReactNode
@@ -33,41 +34,41 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
     companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
       ? {
           name: "Company",
-          href: `/settings/company`,
-          current: router.route === `/settings/company`,
+          href: Routes.UserSettingsCompanyPage().pathname,
+          current: router.route === Routes.UserSettingsCompanyPage().pathname,
           icon: OfficeBuildingIcon,
         }
       : null,
     companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
       ? {
           name: "Members",
-          href: `/settings/members`,
-          current: router.route === `/settings/members`,
+          href: Routes.UserSettingsMembersPage().pathname,
+          current: router.route === Routes.UserSettingsMembersPage().pathname,
           icon: UserGroupIcon,
         }
       : null,
     {
       name: "Profile",
-      href: `/settings`,
-      current: router.route === `/settings`,
+      href: Routes.UserSettingsProfilePage().pathname,
+      current: router.route === Routes.UserSettingsProfilePage().pathname,
       icon: UserCircleIcon,
     },
     {
       name: "Security",
-      href: `/settings/security`,
-      current: router.route === `/settings/security`,
+      href: Routes.UserSettingsSecurityPage().pathname,
+      current: router.route === Routes.UserSettingsSecurityPage().pathname,
       icon: KeyIcon,
     },
     {
       name: "Availabilities",
-      href: `/settings/availabilities`,
-      current: router.route === `/settings/availabilities`,
+      href: Routes.UserSettingsAvailabilitiesPage().pathname,
+      current: router.route === Routes.UserSettingsAvailabilitiesPage().pathname,
       icon: ClockIcon,
     },
     {
       name: "Calendars",
-      href: `/settings/calendars`,
-      current: router.route === `/settings/calendars`,
+      href: Routes.UserSettingsCalendarsPage().pathname,
+      current: router.route === Routes.UserSettingsCalendarsPage().pathname,
       icon: CalendarIcon,
     },
     // companyUser?.role === CompanyUserRole.OWNER
