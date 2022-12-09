@@ -53,8 +53,27 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
   return (
     <>
       <Head>
-        <title>{title || "hire-win"}</title>
+        <title>{title || "Hire.win | Interview Kit with Careers Page"}</title>
         <link rel="icon" href="/favicon.ico" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charSet="utf-8" />
+
+        <meta property="og:image" content="/logo-whitebg.png" key="ogimage" />
+        <meta
+          property="og:title"
+          content={title || "Hire.win | Interview Kit with Careers Page"}
+          key="ogtitle"
+        />
+        <meta
+          name="description"
+          content="The simpler, more affordable hiring solution for your next job opening"
+        ></meta>
+        <meta
+          property="og:description"
+          content="The simpler, more affordable hiring solution for your next job opening"
+          key="ogdesc"
+        />
       </Head>
       <div className="bg-gradient-to-r from-fuchsia-100 via-purple-200 to-indigo-200 leading-relaxed tracking-wide">
         {/* <div className="max-w-8xl mx-auto"> */}
