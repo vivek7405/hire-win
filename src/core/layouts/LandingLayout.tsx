@@ -201,6 +201,35 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
 
           <div className="mb-auto h-full mt-3">{children}</div>
 
+          <section id="call-to-action" className="bg-white py-8 px-4 mt-20">
+            <div className="text-neutral-800">
+              <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
+                It only takes 1 minute!
+              </h2>
+
+              <div className="w-full text-center pt-4">
+                <div className="mt-1">
+                  <span className="text-xl lg:text-2xl text-neutral-600">
+                    Get your{" "}
+                    <span className="font-semibold italic">Interview Kit with Careers Page</span> up
+                    and running now!
+                  </span>
+                </div>
+                <div className="mt-6">
+                  {/* Uncomment this and comment the line below it once you want to provide signup */}
+                  {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
+                  <Link href={Routes.Home()} legacyBehavior>
+                    <a>
+                      <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
+                        <span className="font-extrabold text-xl">Sign up for Free!</span>
+                      </button>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <footer className="text-neutral-900 px-4">
             <div className="my-8">
               <div className="w-full flex flex-col py-6 items-center justify-center space-y-4">

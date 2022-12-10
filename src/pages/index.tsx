@@ -441,34 +441,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Uncomment this once you want to provide signup */}
-        {/* <section id="sign-up" className="bg-white py-8 px-4 mt-20">
-          <div className="text-neutral-800">
-            <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
-              It only takes 1 minute!
-            </h2>
-
-            <div className="w-full text-center pt-4">
-              <div className="mt-1">
-                <span className="text-xl lg:text-2xl text-neutral-600">
-                  Get your{" "}
-                  <span className="font-semibold italic">Interview Kit with Careers Page</span> up
-                  and running now!
-                </span>
-              </div>
-              <div className="mt-6">
-                <Link legacyBehavior prefetch={true} href={Routes.OldSignupPage()}>
-                  <a>
-                    <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
-                      <span className="font-extrabold text-xl">Sign up for Free!</span>
-                    </button>
-                  </a>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section> */}
       </div>
 
       <style jsx>{`
