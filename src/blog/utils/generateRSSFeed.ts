@@ -1,7 +1,7 @@
 import fs from "fs"
 import { Routes } from "@blitzjs/next"
 // import RSS from "rss"
-import { Feed } from "feed"
+import { Feed, FeedOptions } from "feed"
 import { getAllBlogPosts } from "./getAllBlogPosts"
 
 export default async function generateRssFeed() {
@@ -9,7 +9,7 @@ export default async function generateRssFeed() {
 
   const allPosts = await getAllBlogPosts()
 
-  const feedOptions = {
+  const feedOptions: FeedOptions = {
     title: "Hire.win Blog | RSS Feed",
     description: "Don't just hire, Hire better!",
     id: `${site_url}/blog`,
