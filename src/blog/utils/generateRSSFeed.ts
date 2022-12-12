@@ -14,7 +14,6 @@ export default async function generateRssFeed() {
     description: "Don't just hire, Hire better!",
     id: `${site_url}/blog`,
     link: `${site_url}/blog`,
-    image: `${site_url}/logo.png`,
     favicon: `${site_url}/favicon.png`,
     copyright: `Copyright ©${new Date().getFullYear()} hire.win - All rights reserved`,
     generator: "Feed for Node.js",
