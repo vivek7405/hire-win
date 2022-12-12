@@ -21,11 +21,16 @@ export function getAllBlogPosts() {
     // Combine the data with the slug
     return {
       slug,
+      title: matterResult.data.title,
+      date: matterResult.data.date,
+      image: matterResult.data.image,
+      excerpt: matterResult.data.excerpt,
+      // content: matterResult.data.content,
       ...matterResult.data,
     }
   })
   // Sort posts by date
-  return allPostsData.sort((a: any, b: any) => {
+  return allPostsData.sort((a, b) => {
     if (a.date < b.date) {
       return 1
     } else {

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Hire.win Blog | RSS Feed</title>
+        <link>http://localhost:3000/blog</link>
+        <description>Don't just hire, Hire better!</description>
+        <lastBuildDate>Mon, 12 Dec 2022 13:49:45 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>Feed for Node.js</generator>
+        <image>
+            <title>Hire.win Blog | RSS Feed</title>
+            <url>http://localhost:3000/logo.png</url>
+            <link>http://localhost:3000/blog</link>
+        </image>
+        <copyright>Copyright ©2022 hire.win - All rights reserved</copyright>
+        <item>
+            <title><![CDATA[Why use an Interview Kit?]]></title>
+            <link>http://localhost:3000/blog/why-use-interview-kit</link>
+            <guid>why-use-interview-kit</guid>
+            <pubDate>Sun, 11 Dec 2022 18:30:00 GMT</pubDate>
+            <description><![CDATA[Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.]]></description>
+        </item>
+    </channel>
+</rss>

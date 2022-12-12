@@ -62,7 +62,7 @@ const UserSettingsCalendarsPage = ({
             <div>
               <h2 className="text-lg leading-6 font-medium text-gray-900">Your Calendars</h2>
               <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
-                Add your calendar where interviews shall be booked
+                Your availability shall be checked across all the calendars you add
               </h4>
               <h4 className="text-xs sm:text-sm text-gray-700">
                 The default calendar you set shall be used for booking interviews
