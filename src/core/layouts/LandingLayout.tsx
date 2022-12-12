@@ -254,8 +254,8 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                 </div>
 
                 <iframe
-                  src="https://hirewin.instatus.com/embed-status/light-md"
-                  className="w-64 h-14"
+                  src="https://hirewin.instatus.com/embed-status/light-sm"
+                  className="w-56 h-12"
                 />
 
                 <div className="flex space-x-4 font-bold">
