@@ -4,10 +4,9 @@
     "home_page_url": "http://localhost:3000/blog",
     "feed_url": "http://localhost:3000/blog/rss.json",
     "description": "Don't just hire, Hire better!",
-    "icon": "http://localhost:3000/logo.png",
     "items": [
         {
-            "id": "why-use-interview-kit",
+            "id": "http://localhost:3000/blog/why-use-interview-kit",
             "url": "http://localhost:3000/blog/why-use-interview-kit",
             "title": "Why use an Interview Kit?",
             "summary": "Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.",

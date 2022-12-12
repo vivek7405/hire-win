@@ -4,19 +4,14 @@
         <title>Hire.win Blog | RSS Feed</title>
         <link>http://localhost:3000/blog</link>
         <description>Don't just hire, Hire better!</description>
-        <lastBuildDate>Mon, 12 Dec 2022 18:31:52 GMT</lastBuildDate>
+        <lastBuildDate>Mon, 12 Dec 2022 20:16:02 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
-        <image>
-            <title>Hire.win Blog | RSS Feed</title>
-            <url>http://localhost:3000/logo.png</url>
-            <link>http://localhost:3000/blog</link>
-        </image>
         <copyright>Copyright ©2022 hire.win - All rights reserved</copyright>
         <item>
             <title><![CDATA[Why use an Interview Kit?]]></title>
             <link>http://localhost:3000/blog/why-use-interview-kit</link>
-            <guid>why-use-interview-kit</guid>
+            <guid>http://localhost:3000/blog/why-use-interview-kit</guid>
             <pubDate>Sun, 11 Dec 2022 18:30:00 GMT</pubDate>
             <description><![CDATA[Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.]]></description>
             <enclosure url="https://www.glassdoor.com/employers/app/uploads/sites/2/2021/05/GoogleDrive_640X469_How-to-Improve-Your-Interview-Process-02.png" length="0" type="image/png"/>
