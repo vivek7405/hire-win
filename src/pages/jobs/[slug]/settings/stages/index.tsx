@@ -449,7 +449,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
   }
 
   return (
-    <AuthLayout title="Hiring Stages | hire.win" user={user}>
+    <AuthLayout title="Hire.win | Hiring Stages" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
           <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">

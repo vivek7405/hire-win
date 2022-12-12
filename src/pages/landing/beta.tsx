@@ -14,9 +14,9 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function Beta({}) {
   return (
-    <LandingLayout title="hire-win | Beta">
+    <LandingLayout title="Hire.win | Beta">
       <div className="w-full h-full flex justify-center">
-        <h1 className="font-bold text-5xl text-center">hire.win | BETA</h1>
+        <h1 className="font-bold text-5xl text-center">Hire.win | BETA</h1>
       </div>
       <section id="beta" className="bg-gray-100 py-8 mt-16">
         <div className="px-2 pb-6 text-neutral-800">

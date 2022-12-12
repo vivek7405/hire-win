@@ -14,7 +14,7 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function Refunds({}) {
   return (
-    <LandingLayout title="hire-win | Refunds">
+    <LandingLayout title="Hire.win | Refunds">
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl text-center">Cancellation & Refund Policy</h1>
       </div>

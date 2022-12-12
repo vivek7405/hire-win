@@ -18,7 +18,7 @@ export async function getStaticProps() {
 
 export default function Blog({ allPostsData }) {
   return (
-    <LandingLayout title="hire-win | Blog">
+    <LandingLayout title="Hire.win | Blog">
       <section className="px-4">
         <div className="w-full h-full flex justify-center">
           <h1 className="font-bold text-5xl text-center">Don't just hire, Hire better!</h1>

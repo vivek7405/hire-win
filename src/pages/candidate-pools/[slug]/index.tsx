@@ -280,7 +280,7 @@ const SingleCandidatePoolPage = ({
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
   return (
-    <AuthLayout title="CandidatePoolsHome | hire-win" user={user}>
+    <AuthLayout title="Hire.win | Candidate Pool" user={user}>
       <Breadcrumbs />
       <br />
       <Suspense fallback="Loading...">

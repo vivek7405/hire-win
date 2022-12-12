@@ -522,7 +522,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
   }
 
   return (
-    <AuthLayout title="Score Cards | hire.win" user={user}>
+    <AuthLayout title="Hire.win | Score Card" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
           {/* <br className="block md:hidden lg:hidden" /> */}

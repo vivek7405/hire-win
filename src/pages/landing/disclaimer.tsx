@@ -14,7 +14,7 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function Disclaimer({}) {
   return (
-    <LandingLayout title="hire-win | Disclaimer">
+    <LandingLayout title="Hire.win | Disclaimer">
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl">Disclaimer</h1>
       </div>

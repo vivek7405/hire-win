@@ -928,7 +928,7 @@ const JobsHome = ({
 
   return (
     <AuthLayout
-      title="Jobs | hire-win"
+      title="Hire.win | Jobs"
       user={user}
       setNavbarIntroSteps={setNavbarIntroSteps}
       setNavbarIntroHints={setNavbarIntroHints}

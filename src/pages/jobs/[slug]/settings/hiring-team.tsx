@@ -165,7 +165,7 @@ const JobSettingsHiringTeamPage = ({
   }
 
   return (
-    <AuthLayout user={user}>
+    <AuthLayout title="Hire.win | Hiring Team" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={jobData!}>
           <div className="bg-white mt-5 md:mt-0 md:col-span-2">

@@ -46,7 +46,7 @@ const UserSettingsSecurityPage = ({
   const [changePasswordMutation] = useMutation(changePassword)
 
   return (
-    <AuthLayout title="Settings" user={user}>
+    <AuthLayout title="Hire.win | Security Settings" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>

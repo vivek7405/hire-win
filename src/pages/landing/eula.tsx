@@ -14,7 +14,7 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function EULA({}) {
   return (
-    <LandingLayout title="hire-win | EULA">
+    <LandingLayout title="Hire.win | EULA">
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl">EULA</h1>
       </div>

@@ -87,7 +87,7 @@ const SignupWithEmailConfirmedPage = ({
   return (
     <>
       <Head>
-        <title>Sign Up | hire-win</title>
+        <title>Hire.win | Sign Up</title>
       </Head>
       <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center space-y-6">
         <Link href={Routes.Home()} legacyBehavior>

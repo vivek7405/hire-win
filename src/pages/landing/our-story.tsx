@@ -14,7 +14,7 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function OurStory({}) {
   return (
-    <LandingLayout title="hire-win | Our Story">
+    <LandingLayout title="Hire.win | Our Story">
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl text-center">Our Story</h1>
       </div>

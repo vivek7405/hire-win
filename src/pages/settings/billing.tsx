@@ -157,7 +157,7 @@ const UserSettingsBillingPage = ({
   return (
     <>
       {companyUser?.role === CompanyUserRole.OWNER ? (
-        <AuthLayout title="Settings" user={user}>
+        <AuthLayout title="Hire.win | Billing" user={user}>
           <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
           <Suspense fallback="Loading...">
             <UserSettingsLayout>

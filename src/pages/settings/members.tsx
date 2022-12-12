@@ -169,7 +169,7 @@ const UserSettingsMembersPage = ({
   }
 
   return (
-    <AuthLayout user={user}>
+    <AuthLayout title="Hire.win | Company Members" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>

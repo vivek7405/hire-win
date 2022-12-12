@@ -54,7 +54,7 @@ const UserSettingsCalendarsPage = ({
   user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <AuthLayout title="Settings" user={user}>
+    <AuthLayout title="Hire.win | Calendar Settings" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>

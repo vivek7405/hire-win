@@ -22,7 +22,7 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function Cookies() {
   return (
-    <LandingLayout title="hire-win | Cookies">
+    <LandingLayout title="Hire.win | Cookies">
       <section className="px-4">
         <div className="w-full h-full flex justify-center">
           <h1 className="font-bold text-5xl">Cookie Use</h1>

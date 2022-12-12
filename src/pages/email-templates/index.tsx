@@ -265,7 +265,7 @@ const EmailTemplates = () => {
 
 const EmailTemplatesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <AuthLayout title="Email Templates | hire-win" user={user}>
+    <AuthLayout title="Hire.win | Email Templates" user={user}>
       <div className="mb-6">
         <h2 className="text-lg leading-6 font-medium text-gray-900">Email Templates</h2>
         <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
