@@ -2,10 +2,12 @@ import { Routes } from "@blitzjs/next"
 import moment from "moment"
 import Image from "next/image"
 import Link from "next/link"
+import generateRssFeed from "src/blog/utils/generateRSSFeed"
 import { getAllBlogPosts } from "src/blog/utils/getAllBlogPosts"
 import LandingLayout from "src/core/layouts/LandingLayout"
 
 export async function getStaticProps() {
+  await generateRssFeed()
   const allPostsData = getAllBlogPosts()
   return {
     props: {
