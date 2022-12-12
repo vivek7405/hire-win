@@ -8,6 +8,7 @@ import { ExtendedUser } from "types"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
 import LogoBrand from "src/assets/LogoBrand"
 import moment from "moment"
+import { ExternalLinkIcon } from "@heroicons/react/outline"
 
 type LayoutProps = {
   title?: string
@@ -215,16 +216,27 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                     and running now!
                   </span>
                 </div>
-                <div className="mt-6">
+                <div className="mt-12 mb-6">
                   {/* Uncomment this and comment the line below it once you want to provide signup */}
                   {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
                   <Link href={Routes.Home()} legacyBehavior>
                     <a>
-                      <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded my-2 md:my-6 py-3 lg:py-4 px-8 w-fit">
+                      <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded py-3 lg:py-4 px-8 w-fit">
                         <span className="font-extrabold text-xl">Sign up for Free!</span>
                       </button>
                     </a>
                   </Link>
+                  <div className="mt-2">
+                    <Link href={Routes.CareersPage({ companySlug: "padason" })}>
+                      <a
+                        target="_blank"
+                        className="text-indigo-600 hover:underline flex items-center justify-center space-x-1"
+                      >
+                        <span>View Live Careers Page Example</span>
+                        <ExternalLinkIcon className="w-5 h-5" />
+                      </a>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
