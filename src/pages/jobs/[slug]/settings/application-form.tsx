@@ -494,7 +494,7 @@ const JobSettingsApplicationFormPage = ({
   }
 
   return (
-    <AuthLayout title="Application Form | hire.win" user={user}>
+    <AuthLayout title="Hire.win | Application Form" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
           <div className="space-y-6">

@@ -6,6 +6,8 @@ import { ArrowNarrowLeftIcon } from "@heroicons/react/outline"
 import Link from "next/link"
 import { Routes } from "@blitzjs/next"
 import moment from "moment"
+import Head from "next/head"
+import { BlogPostInputType } from "src/blog/validations"
 
 export async function getStaticPaths() {
   // Call an external API endpoint to get posts
@@ -31,9 +33,20 @@ export async function getStaticProps({ params }) {
   return { props: { post } }
 }
 
-export default function BlogPost({ post }) {
+type InputType = {
+  post: BlogPostInputType
+}
+export default function BlogPost({ post }: InputType) {
   return (
-    <LandingLayout title="hire-win | Blog">
+    <LandingLayout title="Hire.win | Blog">
+      <Head>
+        <title>{post.title ? `Hire.win | ${post.title}` : "Hire.win | Blog Post"}</title>
+        <meta name="description" content={post.excerpt || ""} />
+        <meta name="keywords" content={post.keywords?.join(",") || ""} />
+        {post.image ? <meta property="og:image" content={post.image} key="ogimage" /> : null}
+        {/* {post.author ? <meta name="author" content={post.author} /> : null} */}
+        <link rel="canonical" href={`${Routes.Blog().pathname}/${post.slug}`} />
+      </Head>
       <section className="px-4 lg:mt-5">
         <div className="w-full h-full flex items-center justify-center">
           <div className="p-5 sm:p-10 bg-white rounded-xl">
@@ -56,7 +69,7 @@ export default function BlogPost({ post }) {
               </ReactMarkdown>
               <ReactMarkdown className="text-center block lg:hidden">{`## ${post.title}`}</ReactMarkdown>
               <ReactMarkdown className="text-center hidden lg:block">{`# ${post.title}`}</ReactMarkdown>
-              <ReactMarkdown>{post.content}</ReactMarkdown>
+              <ReactMarkdown>{post.content || ""}</ReactMarkdown>
             </div>
           </div>
         </div>

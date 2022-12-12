@@ -19,7 +19,7 @@ const ResetPasswordPage: BlitzPage = () => {
   return (
     <>
       <Head>
-        <title>Reset Password | hire-win</title>
+        <title>Hire.win | Reset Password</title>
       </Head>
       <div className="min-h-screen bg-gray-50 flex flex-col md:justify-center lg:justify-center items-center space-y-6">
         <Link href={Routes.Home()} legacyBehavior>

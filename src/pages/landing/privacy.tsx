@@ -22,7 +22,7 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function Privacy() {
   return (
-    <LandingLayout title="hire-win | Privacy">
+    <LandingLayout title="Hire.win | Privacy">
       <section className="px-4">
         <div className="w-full h-full flex justify-center">
           <h1 className="font-bold text-5xl">Privacy Policy</h1>

@@ -584,7 +584,7 @@ const JobSettingsSchedulingPage = ({
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
   return (
-    <AuthLayout user={user}>
+    <AuthLayout title="Hire.win | Scheduling Settings" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
           <div className="bg-white mt-5 md:mt-0 md:col-span-2">

@@ -273,7 +273,7 @@ const CandidatePools = () => {
 
 const CandidatePoolsHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <AuthLayout title="CandidatePoolsHome | hire-win" user={user}>
+    <AuthLayout title="Hire.win | Candidate Pools" user={user}>
       <div className="mb-6">
         <h2 className="text-lg leading-6 font-medium text-gray-900">Candidate Pools</h2>
         <h4 className="text-xs sm:text-sm text-gray-700 mt-1">

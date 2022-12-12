@@ -3,6 +3,7 @@ title: "Why use an Interview Kit?"
 date: "12-12-2022"
 image: "https://www.glassdoor.com/employers/app/uploads/sites/2/2021/05/GoogleDrive_640X469_How-to-Improve-Your-Interview-Process-02.png"
 excerpt: "Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates."
+keywords: ["interview kit", "interviewing", "benefits", "interview process"]
 ---
 
 Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.

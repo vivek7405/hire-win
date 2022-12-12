@@ -52,7 +52,7 @@ const UserSettingsAvailabilitiesPage = ({
   user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <AuthLayout title="Settings" user={user}>
+    <AuthLayout title="Hire.win | Availability Settings" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>

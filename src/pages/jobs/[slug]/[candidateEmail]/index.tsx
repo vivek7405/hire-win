@@ -322,7 +322,7 @@ const SingleCandidatePage = ({
   }
 
   return (
-    <AuthLayout user={user} isMax8xl={true}>
+    <AuthLayout title="Hire.win | Candidate" user={user} isMax8xl={true}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
       <br />
       <div className="w-full 2xl:w-5/6 mx-auto flex justify-center">

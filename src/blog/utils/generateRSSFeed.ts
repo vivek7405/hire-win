@@ -15,6 +15,7 @@ export default async function generateRssFeed() {
     id: `${site_url}/blog`,
     link: `${site_url}/blog`,
     favicon: `${site_url}/favicon.ico`,
+    image: `${site_url}/logo.png`,
     copyright: `Copyright ©${new Date().getFullYear()} hire.win - All rights reserved`,
     generator: "Feed for Node.js",
     feedLinks: {
@@ -28,12 +29,12 @@ export default async function generateRssFeed() {
 
   allPosts.forEach((post) => {
     feed.addItem({
-      title: post.title,
+      title: post.title || "",
       id: `${post.slug}`,
       link: `${site_url}/blog/${post.slug}`,
       image: post.image,
       description: post.excerpt,
-      date: new Date(post.date),
+      date: new Date(post.date || ""),
     })
   })
 

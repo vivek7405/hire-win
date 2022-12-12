@@ -118,7 +118,7 @@ const JobSettingsPage = ({
   }
 
   return (
-    <AuthLayout user={user}>
+    <AuthLayout title="Hire.win | Job Settings" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
           <JobForm

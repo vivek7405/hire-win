@@ -60,7 +60,7 @@ const UserSettingsProfilePage = ({
   const [updateUserMutation] = useMutation(updateUser)
 
   return (
-    <AuthLayout title="Settings" user={user}>
+    <AuthLayout title="Hire.win | Profile Settings" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>

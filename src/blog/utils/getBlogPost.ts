@@ -1,6 +1,7 @@
 import fs from "fs"
 import path from "path"
 import matter from "gray-matter"
+import { BlogPostInputType } from "../validations"
 
 const postsDirectory = path.join(process.cwd(), "src/blog/posts")
 
@@ -15,7 +16,12 @@ export function getBlogPost(slug) {
   // Combine the data with the id
   return {
     slug,
+    title: matterResult.data.title,
+    date: matterResult.data.date,
+    image: matterResult.data.image,
+    excerpt: matterResult.data.excerpt,
+    keywords: matterResult.data.keywords,
     content: matterResult.content,
     ...matterResult.data,
-  }
+  } as BlogPostInputType
 }

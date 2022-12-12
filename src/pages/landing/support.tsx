@@ -14,7 +14,7 @@ export const getStaticProps = gSP(async function getStaticProps(context) {
 
 export default function Support({}) {
   return (
-    <LandingLayout title="hire-win | Support">
+    <LandingLayout title="Hire.win | Support">
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl text-center">Friendly Folks Standing By!</h1>
       </div>

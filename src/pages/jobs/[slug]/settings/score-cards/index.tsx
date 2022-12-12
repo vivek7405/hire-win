@@ -328,7 +328,7 @@ const JobSettingsScoreCardsPage = ({
   job,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
-    <AuthLayout title="Score Cards | hire.win" user={user}>
+    <AuthLayout title="Hire.win | Score Cards" user={user}>
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
