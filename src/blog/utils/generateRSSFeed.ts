@@ -32,6 +32,7 @@ export default async function generateRssFeed() {
       title: post.title,
       id: `${post.slug}`,
       link: `${site_url}/blog/${post.slug}`,
+      image: post.image,
       description: post.excerpt,
       date: new Date(post.date),
     })
