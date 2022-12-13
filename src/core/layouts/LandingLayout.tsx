@@ -255,8 +255,10 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
 
                 <iframe
                   src="https://hirewin.instatus.com/embed-status/light-sm"
-                  className="w-56 h-12"
-                />
+                  className="border-0 w-56 h-12 rounded-lg"
+                  frameBorder="0"
+                  scrolling="no"
+                ></iframe>
 
                 <div className="flex space-x-4 font-bold">
                   <Link prefetch={true} href={Routes.Terms()} legacyBehavior>
