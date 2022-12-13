@@ -1,7 +1,6 @@
 import Head from "next/head"
 import Link from "next/link"
 import Image from "next/image"
-import Script from "next/script"
 import { Routes } from "@blitzjs/next"
 import { invalidateQuery, useQuery } from "@blitzjs/rpc"
 import { GetServerSidePropsContext } from "next"
@@ -217,10 +216,6 @@ export default function Home() {
   return (
     <LandingLayout>
       <div className="h-full">
-        <Script
-          strategy="lazyOnload"
-          src="https://embed.tawk.to/6364c8c8b0d6371309cd3d09/1gh0r0k2g"
-        />
         <section className="text-center px-4">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-black">
             Interview Kit with Careers Page

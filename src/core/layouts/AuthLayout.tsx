@@ -3,6 +3,7 @@ import { ReactNode, Suspense } from "react"
 import Navbar from "src/core/components/Navbar"
 import { ExtendedUser, IntroHint, IntroStep } from "types"
 import Link from "next/link"
+import Script from "next/script"
 
 type LayoutProps = {
   title?: string
@@ -25,6 +26,10 @@ const AuthLayout = ({
 }: LayoutProps) => {
   return (
     <>
+      <Script
+        strategy="lazyOnload"
+        src="https://embed.tawk.to/6364c8c8b0d6371309cd3d09/1gh0r0k2g"
+      />
       <Head>
         <title>{title || "hire-win"}</title>
         <link rel="icon" href="/favicon.ico" />

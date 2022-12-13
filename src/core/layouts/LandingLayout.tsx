@@ -9,6 +9,7 @@ import getCompanyUser from "src/companies/queries/getCompanyUser"
 import LogoBrand from "src/assets/LogoBrand"
 import moment from "moment"
 import { ExternalLinkIcon } from "@heroicons/react/outline"
+import Script from "next/script"
 
 type LayoutProps = {
   title?: string
@@ -53,6 +54,10 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
 
   return (
     <>
+      <Script
+        strategy="lazyOnload"
+        src="https://embed.tawk.to/6364c8c8b0d6371309cd3d09/1gh0r0k2g"
+      />
       <Head>
         <title>{title || "Hire.win | Interview Kit with Careers Page"}</title>
         <link rel="icon" href="/favicon.ico" />
@@ -145,46 +150,25 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
               </div>
 
               <div
-                // id="nav-content"
                 ref={navMenuDiv}
                 className="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden mt-2 lg:mt-0 text-black p-4 lg:p-0 z-20"
               >
                 <ul className="list-reset lg:flex justify-end flex-1 items-center">
+                  {/* Uncomment when you want the menu to appear */}
                   {/* <li className="mr-3">
-                      <Link href={`${Routes.Home().pathname}/#screenshots`}>
-                        <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
-                          Screenshots
-                        </a>
-                      </Link>
-                    </li>
-                    <li className="mr-3">
-                      <Link href={`${Routes.Home().pathname}/#pricing`}>
-                        <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
-                          Pricing
-                        </a>
-                      </Link>
-                    </li>
-                    <li className="mr-3">
-                      <Link href={`${Routes.Home().pathname}/#reviews`}>
-                        <a className="inline-block cursor-pointer hover:underline font-semibold py-2 px-4 text-black no-underline">
-                          Reviews
-                        </a>
-                      </Link>
-                    </li>
-                    <li className="mr-3">
-                      <Link href={`${Routes.Home().pathname}/#support`}>
-                        <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
-                          Support
-                        </a>
-                      </Link>
-                    </li>
-                    <li className="mr-3">
-                      <Link href={`${Routes.OurStory().pathname}`}>
-                        <a className="inline-block cursor-pointer hover:underline font-semibold text-black no-underline hover:text-neutral-800 hover:text-underline py-2 px-4">
-                          Our Story
-                        </a>
-                      </Link>
-                    </li> */}
+                    <Link href={Routes.Pricing()}>
+                      <a className="font-medium cursor-pointer hover:underline py-2 px-4">
+                        Pricing
+                      </a>
+                    </Link>
+                  </li>
+                  <li className="mr-3">
+                    <Link href={Routes.OldSignupPage()}>
+                      <a className="font-medium cursor-pointer hover:underline py-2 px-4">
+                        Sign up free
+                      </a>
+                    </Link>
+                  </li> */}
                 </ul>
                 <Link prefetch={true} href={Routes.LoginPage()} legacyBehavior>
                   <a>
@@ -258,7 +242,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   className="border-0 w-56 h-12 rounded-lg"
                   frameBorder="0"
                   scrolling="no"
-                ></iframe>
+                />
 
                 <div className="flex space-x-4 font-bold">
                   <Link prefetch={true} href={Routes.Terms()} legacyBehavior>

@@ -18,7 +18,7 @@ export default function Support({}) {
       <div className="w-full h-full flex justify-center">
         <h1 className="font-bold text-5xl text-center">Friendly Folks Standing By!</h1>
       </div>
-      <section id="pricing" className="bg-gray-100 py-8 mt-16">
+      <section id="pricing" className="bg-white py-8 mt-16">
         <div className="container mx-auto px-2 pb-6 text-neutral-800">
           <div className="w-full text-center pt-2">
             <div className="mt-1 lg:px-14">
@@ -31,7 +31,9 @@ export default function Support({}) {
 
           <div className="w-full text-center mt-10">
             <div className="mt-1 lg:px-14">
-              <span className="text-4xl font-bold bg-yellow-300">support@hire.win</span>
+              <span className="text-4xl font-bold bg-yellow-200 px-3 rounded-tl-2xl rounded-br-2xl">
+                support@hire.win
+              </span>
               <br />
             </div>
           </div>
