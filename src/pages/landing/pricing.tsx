@@ -49,9 +49,11 @@ export default function Pricing({}) {
               </span>
             </div>
 
-            <div className="w-full md:mt-16 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0">
-              <div className="rounded-lg md:rounded-none md:rounded-l-lg bg-white my-10">
-                <div className="w-full p-8 text-center bg-white border-b rounded-t-lg md:rounded-none md:rounded-tl-lg sticky top-0">
+            <div className="w-full md:mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* <div className="rounded-lg md:rounded-none md:rounded-l-lg bg-white my-10"> */}
+              <div className="rounded-lg bg-white">
+                {/* <div className="w-full p-8 text-center bg-white border-b rounded-t-lg md:rounded-none md:rounded-tl-lg sticky top-0"> */}
+                <div className="mt-5 w-full p-8 text-center bg-white border-b rounded-t-lg sticky top-0">
                   <span className="text-3xl font-bold">🤩 Free</span>
                   <br />
                   <div className="mt-2">
@@ -71,8 +73,12 @@ export default function Pricing({}) {
                     <div>3 Active Jobs at a time</div>
                   </li>
                   <li className="py-3">
-                    <div className="text-neutral-600">Users per Company</div>
-                    <div>1 User (You)</div>
+                    <div className="text-neutral-600">Team Collaboration</div>
+                    <div>No</div>
+                  </li>
+                  <li className="py-3">
+                    <div className="text-neutral-600">Candidates per job</div>
+                    <div>50 Candidates</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Score Card Customisation</div>
@@ -122,10 +128,6 @@ export default function Pricing({}) {
                     <div className="text-neutral-600">Candidate Emails</div>
                     <div>Unlimited Emails</div>
                   </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidates per job</div>
-                    <div>Unlimited Candidates</div>
-                  </li>
                 </ul>
                 <div className="sticky bottom-0 bg-white border-t mt-auto rounded-b-lg md:rounded-bl-lg rounded-t-none overflow-hidden p-6">
                   <div className="w-full pb-3 text-4xl font-bold text-center">Free</div>
@@ -141,13 +143,14 @@ export default function Pricing({}) {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-white md:drop-shadow-2xl md:z-10 py-10">
-                <div className="-mt-16 flex items-center justify-center">
+              {/* <div className="rounded-lg bg-white md:drop-shadow-2xl md:z-10 py-10"> */}
+              <div className="rounded-lg bg-white md:drop-shadow-2xl md:z-10">
+                <div className="-mt-5 flex items-center justify-center">
                   <div className="px-4 py-2 bg-indigo-600 text-white rounded-t-lg w-fit">
                     Limited Time
                   </div>
                 </div>
-                <div className="mt-6 w-full p-8 text-center bg-white border-b sticky top-0">
+                <div className="w-full p-8 text-center bg-white border-b sticky top-0 rounded-t-lg">
                   <span className="text-3xl font-bold">💝 Lifetime</span>
                   <br />
                   <div className="mt-2">
@@ -160,11 +163,11 @@ export default function Pricing({}) {
                 <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
                   <li className="py-3">
                     <div className="text-neutral-600">Company with Careers Page</div>
-                    <div>1 Company</div>
+                    <div>Unlimited Companies</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
-                    <div>10 Active Jobs at a time</div>
+                    <div>Unlimited Jobs</div>
                     {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
                       {licenseTier === 1 && <div>5</div>}
                       {licenseTier === 2 && <div>10</div>}
@@ -180,8 +183,9 @@ export default function Pricing({}) {
                     </div> */}
                   </li>
                   <li className="py-3">
-                    <div className="text-neutral-600">Users per Company</div>
-                    <div className="flex items-center flex-nowrap whitespace-nowrap">
+                    <div className="text-neutral-600">Team Collaboration</div>
+                    <div>Unlimited Users</div>
+                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
                       {licenseTier === 1 && <div>5</div>}
                       {licenseTier === 2 && <div>10</div>}
                       {licenseTier === 3 && <div>15</div>}
@@ -193,7 +197,17 @@ export default function Pricing({}) {
                       {licenseTier === 9 && <div>45</div>}
                       {licenseTier === 10 && <div>50</div>}
                       <div>&nbsp;Users can Collaborate</div>
-                    </div>
+                    </div> */}
+                  </li>
+                  <li className="py-3">
+                    <div className="text-neutral-600">Candidates per job</div>
+                    <div>Unlimited Candidates</div>
+                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
+                      {licenseTier === 1 && <div>100</div>}
+                      {licenseTier === 2 && <div>200</div>}
+                      {licenseTier === 3 && <div>300</div>}
+                      <div>&nbsp;Candidates</div>
+                    </div> */}
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Score Card Customisation</div>
@@ -249,16 +263,6 @@ export default function Pricing({}) {
                     <div className="text-neutral-600">Candidate Emails</div>
                     <div>Unlimited Emails</div>
                   </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidates per job</div>
-                    <div>Unlimited Candidates</div>
-                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>100</div>}
-                      {licenseTier === 2 && <div>200</div>}
-                      {licenseTier === 3 && <div>300</div>}
-                      <div>&nbsp;Candidates</div>
-                    </div> */}
-                  </li>
                 </ul>
                 <div className="sticky bottom-0 bg-white border-t mt-auto rounded-b-lg rounded-t-none overflow-hidden p-6">
                   <div className="w-full pb-3 text-4xl font-bold text-center">
@@ -278,109 +282,107 @@ export default function Pricing({}) {
                     {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
                     <Link href={Routes.Home()} legacyBehavior>
                       <a className="w-full text-center px-4 py-1 border-2 border-theme-600 hover:border-theme-700 rounded text-white bg-theme-600 hover:bg-theme-700">
-                        Buy Now
+                        Buy Now on App Sumo
                       </a>
                     </Link>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-lg md:rounded-none md:rounded-r-lg bg-white my-10">
-                {/* <div className="opacity-50"> */}
-                <div className="w-full p-8 text-center bg-white border-b rounded-t-lg md:rounded-tr-lg sticky top-0">
-                  <span className="text-3xl font-bold">🚀 Recruiter</span>
-                  <br />
-                  <div className="mt-2">
-                    <span className="text-lg">Beyond Limits</span>
+              {/* <div className="rounded-lg md:rounded-none md:rounded-r-lg bg-white my-10">
+                <div className="opacity-50">
+                  <div className="w-full p-8 text-center bg-white border-b rounded-t-lg md:rounded-tr-lg sticky top-0">
+                    <span className="text-3xl font-bold">🚀 Recruiter</span>
+                    <br />
+                    <div className="mt-2">
+                      <span className="text-lg">Beyond Limits</span>
+                    </div>
+                    <div className="mt-2 invisible">
+                      <LicenseTierSelect />
+                    </div>
                   </div>
-                  {/* <div className="mt-2 invisible">
-                    <LicenseTierSelect />
-                  </div> */}
-                </div>
-                <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
-                  <li className="py-3">
-                    <div className="text-neutral-600">Company with Careers Page</div>
-                    <div className="whitespace-nowrap">⭐️ Unlimited Companies</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Jobs per company</div>
-                    <div className="whitespace-nowrap">Unlimited Jobs</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Users per Company</div>
-                    <div className="whitespace-nowrap">Unlimited Collaboration</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Score Card Customisation</div>
-                    <div>Yes</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate Notes</div>
-                    <div>Yes</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate Comments</div>
-                    <div>Yes</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate Activity</div>
-                    <div>Yes</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Theme Customisation</div>
-                    <div>Yes</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Job Stages Customisation</div>
-                    <div>Yes</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Application Form Customisation</div>
-                    <div>Yes</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Interview Scheduling</div>
-                    <div>Unlimited Interviews</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate File Uploads</div>
-                    <div>Unlimited Files</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate Pools</div>
-                    <div>Unlimited Pools</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Email Templates</div>
-                    <div>Unlimited Templates</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate Emails</div>
-                    <div>Unlimited Emails</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidates per job</div>
-                    <div className="whitespace-nowrap">Unlimited Candidates</div>
-                  </li>
-                </ul>
-                <div className="sticky bottom-0 bg-white border-t mt-auto rounded-b-lg md:rounded-br-lg rounded-t-none overflow-hidden p-6">
-                  <div className="w-full pb-3 text-4xl font-bold text-center">$19/month</div>
-                  <div className="w-full flex items-center justify-center">
-                    {/* Uncomment the below line and comment the next one when you want to provide Sign Up */}
-                    {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
-                    <Link href={Routes.Home()} legacyBehavior>
-                      <a className="w-full text-center px-4 py-1 border-2 rounded border-theme-600 hover:bg-theme-600 hover:text-white">
-                        Go Truly Unlimited!
-                      </a>
-                    </Link>
-                  </div>
-                  {/* <div className="w-full flex items-center justify-center space-x-2 py-1 border-2 border-transparent whitespace-nowrap">
+                  <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
+                    <li className="py-3">
+                      <div className="text-neutral-600">Company with Careers Page</div>
+                      <div className="whitespace-nowrap">⭐️ Unlimited Companies</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Jobs per company</div>
+                      <div className="whitespace-nowrap">Unlimited Jobs</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Users per Company</div>
+                      <div className="whitespace-nowrap">Unlimited Collaboration</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Score Card Customisation</div>
+                      <div>Yes</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Candidate Notes</div>
+                      <div>Yes</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Candidate Comments</div>
+                      <div>Yes</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Candidate Activity</div>
+                      <div>Yes</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Theme Customisation</div>
+                      <div>Yes</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Job Stages Customisation</div>
+                      <div>Yes</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Application Form Customisation</div>
+                      <div>Yes</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Interview Scheduling</div>
+                      <div>Unlimited Interviews</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Candidate File Uploads</div>
+                      <div>Unlimited Files</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Candidate Pools</div>
+                      <div>Unlimited Pools</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Email Templates</div>
+                      <div>Unlimited Templates</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Candidate Emails</div>
+                      <div>Unlimited Emails</div>
+                    </li>
+                    <li className="py-3">
+                      <div className="text-neutral-600">Candidates per job</div>
+                      <div className="whitespace-nowrap">Unlimited Candidates</div>
+                    </li>
+                  </ul>
+                  <div className="sticky bottom-0 bg-white border-t mt-auto rounded-b-lg md:rounded-br-lg rounded-t-none overflow-hidden p-6">
+                    <div className="w-full pb-3 text-4xl font-bold text-center">$19/month</div>
+                    <div className="w-full flex items-center justify-center">
+                      <Link href={Routes.Home()} legacyBehavior>
+                        <a className="w-full text-center px-4 py-1 border-2 rounded border-theme-600 hover:bg-theme-600 hover:text-white">
+                          Go Truly Unlimited!
+                        </a>
+                      </Link>
+                    </div>
+                    <div className="w-full flex items-center justify-center space-x-2 py-1 border-2 border-transparent whitespace-nowrap">
                       <ArrowNarrowLeftIcon className="w-5 h-5 hidden md:block" />
                       <span>Requires Lifetime Plan</span>
-                    </div> */}
+                    </div>
+                  </div>
                 </div>
-                {/* </div> */}
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-12 w-full flex flex-col lg:flex-row items-center justify-center space-y-10 lg:space-y-0 lg:space-x-20">
