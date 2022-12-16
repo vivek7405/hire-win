@@ -12,6 +12,7 @@ import { Currency } from "types"
 import { useState } from "react"
 import LocaleCurrency from "locale-currency"
 import { CompanyUserRole } from "@prisma/client"
+import { useRouter } from "next/router"
 
 type SignupFormProps = {
   onSuccess?: () => void
@@ -21,6 +22,7 @@ type SignupFormProps = {
 }
 
 export const SignupForm = (props: SignupFormProps) => {
+  const router = useRouter()
   const [signupMutation] = useMutation(signup)
   // const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
   // const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
@@ -31,7 +33,14 @@ export const SignupForm = (props: SignupFormProps) => {
         <h1 className="text-gray-800 text-xl font-medium">Start Your Journey</h1>
         <p className="text-gray-500">
           Already have an account?{" "}
-          <Link prefetch={true} href={Routes.LoginPage()} passHref legacyBehavior>
+          <Link
+            prefetch={true}
+            href={`${Routes.LoginPage().pathname}${
+              router.query.next ? `?next=${router.query.next}` : ""
+            }`}
+            passHref
+            legacyBehavior
+          >
             <a className="text-theme-600 hover:text-theme-900 font-medium">Login</a>
           </Link>
         </p>

@@ -6,8 +6,8 @@ import { Routes } from "@blitzjs/next"
 
 export default api(
   passportAuth({
-    successRedirectUrl: "/",
-    errorRedirectUrl: "/",
+    // successRedirectUrl: "/",
+    // errorRedirectUrl: "/",
     strategies: [
       {
         authenticateOptions: { scope: ["email", "profile"] },
@@ -57,8 +57,8 @@ export default api(
             }
             done(undefined, {
               publicData,
-              redirectUrl:
-                companyId === "0" ? Routes.FirstCompany().pathname : Routes.JobsHome().pathname,
+              // redirectUrl:
+              //   companyId === "0" ? Routes.FirstCompany().pathname : Routes.JobsHome().pathname,
             })
           }
         ),

@@ -102,7 +102,7 @@ import { Fragment } from "react"
 import { Menu, Transition } from "@headlessui/react"
 import removeCandidateFromPool from "src/candidate-pools/mutations/removeCandidateFromPool"
 import classNames from "src/core/utils/classNames"
-import getFirstWordIfGreaterThan from "src/core/utils/getFirstWord"
+import getFirstWordIfLessThan from "src/core/utils/getFirstWordIfLessThan"
 import LabeledQuillEditor from "src/core/components/LabeledQuillEditor"
 import { AuthorizationError } from "blitz"
 
@@ -685,7 +685,7 @@ const SingleCandidatePageContent = ({
         candidate?.rejected ? "text-red-600" : "text-theme-600"
       } capitalize`}
     >
-      {getFirstWordIfGreaterThan(candidate?.name, 10)}
+      {getFirstWordIfLessThan(candidate?.name, 10)}
     </h3>
   )
 
@@ -1461,7 +1461,7 @@ const SingleCandidatePageContent = ({
                               Added by{" "}
                               {session?.userId === candidate.createdById
                                 ? "you"
-                                : getFirstWordIfGreaterThan(candidate.createdBy?.name || "...", 10)}
+                                : getFirstWordIfLessThan(candidate.createdBy?.name || "...", 10)}
                             </span>
                           ) : (
                             <span>Applied through Careers Page</span>

@@ -275,7 +275,7 @@ export default function Home() {
                     </div>
                   </Form>
 
-                  <a href="/api/auth/google">
+                  <a href={`/api/auth/google?redirectUrl=${router.query.next ? router.query.next : Routes.JobsHome().pathname}`}>
                     <button className="w-full px-4 py-1 rounded bg-white text-neutral-600 border border-gray-300 hover:bg-gray-50 mt-4 h-10">
                       <div className="flex items-center justify-between">
                         <Image height={20} width={20} src="/GoogleLogo.png" />
@@ -332,7 +332,11 @@ export default function Home() {
                   </div>
                 </Form>
 
-                <a href="/api/auth/google">
+                <a
+                  href={`/api/auth/google?redirectUrl=${
+                    router.query.next ? router.query.next : Routes.JobsHome().pathname
+                  }`}
+                >
                   <button className="w-full px-4 py-1 rounded bg-white text-neutral-600 border border-gray-300 hover:bg-gray-50 mt-4 h-10">
                     <div className="flex items-center justify-between">
                       <Image height={20} width={20} src="/GoogleLogo.png" />

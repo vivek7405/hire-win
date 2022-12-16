@@ -84,7 +84,7 @@ import { PencilIcon } from "@heroicons/react/solid"
 import ViewJobListingButton from "src/jobs/components/ViewJobListingButton"
 import { Menu, Transition } from "@headlessui/react"
 import classNames from "src/core/utils/classNames"
-import getFirstWordIfGreaterThan from "src/core/utils/getFirstWord"
+import getFirstWordIfLessThan from "src/core/utils/getFirstWordIfLessThan"
 import moment from "moment"
 import { AuthorizationError } from "blitz"
 
@@ -354,7 +354,7 @@ const getBoard = (
                           by{" "}
                           {session?.userId === job?.createdById
                             ? "you"
-                            : getFirstWordIfGreaterThan(c.createdBy?.name || "...", 10)}
+                            : getFirstWordIfLessThan(c.createdBy?.name || "...", 10)}
                         </span>
                       ) : (
                         <span>via Careers Page</span>

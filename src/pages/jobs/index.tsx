@@ -73,8 +73,11 @@ import createJobWithTitle from "src/jobs/mutations/createJobWithTitle"
 import { Menu, Transition } from "@headlessui/react"
 import classNames from "src/core/utils/classNames"
 import ViewCareersPageButton from "src/companies/components/ViewCareersPageButton"
-import getFirstWordIfGreaterThan from "src/core/utils/getFirstWord"
+import getFirstWordIfLessThan from "src/core/utils/getFirstWordIfLessThan"
 import SignupWelcome from "src/auth/components/SignupWelcome"
+import CouponRedeemedWelcome from "src/coupons/components/CouponRedeemedWelcome"
+import getFirstWord from "src/core/utils/getFirstWordIfLessThan"
+import InvalidCouponMessage from "src/coupons/components/InvalidCouponMessage"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -85,7 +88,8 @@ export const getServerSideProps = gSSP(async (context) => {
   // End anti-tree-shaking
 
   const user = await getCurrentUserServer({ ...context })
-  const session = await getSession(context.req, context.res)
+  // const session = await getSession(context.req, context.res)
+  const session = context.ctx.session
 
   let companyUser = await getCompanyUser(
     {
@@ -101,7 +105,7 @@ export const getServerSideProps = gSSP(async (context) => {
     {
       where: {
         // companyId: session.companyId || "0",
-        userId: session.userId || "0",
+        userId: context.ctx.session.userId || "0",
       },
     },
     { ...context.ctx }
@@ -567,7 +571,7 @@ const Jobs = ({
                           by{" "}
                           {session?.userId === job?.createdById
                             ? "you"
-                            : getFirstWordIfGreaterThan(job?.createdBy?.name || "...", 10)}
+                            : getFirstWordIfLessThan(job?.createdBy?.name || "...", 10)}
                           {/* ,{" "}
                           {moment(job.validThrough || undefined)
                             .local()
@@ -926,6 +930,18 @@ const JobsHome = ({
     setOpenWelcomeModal(user?.isFirstSignup || false)
   }, [])
 
+  // used useEffect for setting couponRedeemed to avoid Hydration error
+  const [couponRedeemed, setCouponRedeemed] = useState(false)
+  useEffect(() => {
+    setCouponRedeemed(router.query.couponRedeemed ? true : false)
+  }, [])
+
+  // used useEffect for setting invalidCoupon to avoid Hydration error
+  const [invalidCoupon, setInvalidCoupon] = useState(false)
+  useEffect(() => {
+    setInvalidCoupon(router.query.invalidCoupon ? true : false)
+  }, [])
+
   return (
     <AuthLayout
       title="Hire.win | Jobs"
@@ -933,6 +949,18 @@ const JobsHome = ({
       setNavbarIntroSteps={setNavbarIntroSteps}
       setNavbarIntroHints={setNavbarIntroHints}
     >
+      {invalidCoupon && (
+        <InvalidCouponMessage userName={user?.name || ""} setInvalidCoupon={setInvalidCoupon} />
+      )}
+
+      {couponRedeemed && (
+        <CouponRedeemedWelcome
+          setCouponRedeemed={setCouponRedeemed}
+          userName={user?.name || ""}
+          userId={user?.id}
+        />
+      )}
+
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}

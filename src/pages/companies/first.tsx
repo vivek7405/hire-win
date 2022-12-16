@@ -87,7 +87,14 @@ const FirstCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSide
                   }
 
                   toast.success(() => <span>Company Created</span>, { id: toastId })
-                  router.push(Routes.JobsHome())
+
+                  // If the user has come from the coupon redemption page,
+                  // redirect back to the redemption page
+                  if (router.query.next && router.query.next?.includes("redeem")) {
+                    router.push(router.query.next as string)
+                  } else {
+                    router.push(Routes.JobsHome())
+                  }
                 } catch (error) {
                   toast.error(
                     "Sorry, we had an unexpected error. Please try again. - " + error.toString()
