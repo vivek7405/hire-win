@@ -15,8 +15,9 @@ import { EditorState, convertToRaw } from "draft-js"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
 import { Suspense } from "react"
 import { initialInfo } from "src/companies/constants"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 
-export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
   // https://github.com/blitz-js/blitz/issues/794
   path.resolve("next.config.js")
@@ -26,7 +27,9 @@ export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext
   const user = await getCurrentUserServer({ ...context })
 
   if (user) {
-    return { props: { user: user } }
+    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
+    return { props: { user, activePlanName } }
   } else {
     return {
       redirect: {
@@ -38,7 +41,10 @@ export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext
   }
 })
 
-const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const NewCompany = ({
+  user,
+  activePlanName,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const session = useSession()
   const [createCompanyMutation] = useMutation(createCompany)
@@ -56,6 +62,7 @@ const NewCompany = ({ user }: InferGetServerSidePropsType<typeof getServerSidePr
           {/* {companyUser && <Breadcrumbs />} */}
           <div className="mt-6">
             <CompanyForm
+              activePlanName={activePlanName}
               header="Create A New Company"
               subHeader="Enter your company details"
               initialValues={{

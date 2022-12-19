@@ -21,7 +21,7 @@ import Table from "src/core/components/Table"
 import toast from "react-hot-toast"
 
 import { CreditCardIcon, StarIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
-import { CardType, DragDirection, ExtendedStage, ShiftDirection } from "types"
+import { CardType, DragDirection, ExtendedStage, PlanName, ShiftDirection } from "types"
 import shiftJobStage from "src/stages/mutations/shiftJobStage"
 import Confirm from "src/core/components/Confirm"
 import removeStageFromJob from "src/stages/mutations/removeStageFromJob"
@@ -36,6 +36,8 @@ import getJob from "src/jobs/queries/getJob"
 import JobSettingsLayout from "src/core/layouts/JobSettingsLayout"
 import { PencilIcon } from "@heroicons/react/solid"
 import { AuthorizationError } from "blitz"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 
 export const getServerSideProps = gSSP(async (context) => {
   path.resolve("next.config.js")
@@ -78,10 +80,13 @@ export const getServerSideProps = gSSP(async (context) => {
         { ...context.ctx }
       )
 
+      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
       return {
         props: {
           user: user,
           job: job,
+          activePlanName,
           //   canUpdate: canUpdate,
           //   workflow: workflow,
         } as any,
@@ -111,7 +116,15 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
+export const Stages = ({
+  user,
+  setStageToEdit,
+  setOpenAddNewStage,
+  job,
+  activePlanName,
+  openUpgradeConfirm,
+  setOpenUpgradeConfirm,
+}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -230,8 +243,13 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
                         title="Delete Stage"
                         onClick={async (e) => {
                           e.preventDefault()
-                          setWorkflowStageToRemove(stage)
-                          setOpenConfirm(true)
+
+                          if (activePlanName === PlanName.FREE) {
+                            setOpenUpgradeConfirm(true)
+                          } else {
+                            setWorkflowStageToRemove(stage)
+                            setOpenConfirm(true)
+                          }
                         }}
                       >
                         <XIcon className="h-5 w-5" />
@@ -333,6 +351,22 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
       >
         Are you sure you want to remove this stage from the workflow?
       </Confirm>
+
+      <Confirm
+        open={openUpgradeConfirm}
+        setOpen={setOpenUpgradeConfirm}
+        header="Upgrade to lifetime plan"
+        cancelText="Ok"
+        hideConfirm={true}
+        onSuccess={async () => {
+          setOpenConfirm(false)
+          setOpenUpgradeConfirm(false)
+          setWorkflowStageToRemove(null)
+        }}
+      >
+        Upgrade to lifetime plan for customising hiring stages.
+      </Confirm>
+
       <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
         {data?.map((stage) => {
           return (
@@ -433,6 +467,7 @@ export const Stages = ({ user, setStageToEdit, setOpenAddNewStage, job }) => {
 const JobSettingsStagesPage = ({
   user,
   job,
+  activePlanName,
   error,
 }: //   canUpdate,
 InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -444,6 +479,8 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const session = useSession()
 
+  const [openUpgradeConfirm, setOpenUpgradeConfirm] = React.useState(false)
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -453,21 +490,33 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
           <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
-            <div>
+            <div className="sm:mr-5">
               <h2 className="text-lg leading-6 font-medium text-gray-900">Stages & Score Cards</h2>
               <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
                 Add and re-order hiring stages for this job
               </h4>
               <h4 className="text-xs sm:text-sm text-gray-700">
-                Click on the stage to configure its score card
+                Click on the stage name to configure its score card
               </h4>
+              {activePlanName === PlanName.FREE && (
+                <div className="mt-2">
+                  <UpgradeMessage message="Upgrade to add more stages" />
+                </div>
+              )}
             </div>
             <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
               <StageForm
                 header={`${stageToEdit ? "Update" : "Add New"} Stage`}
-                subHeader="Enter stage details"
+                subHeader=""
                 initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
                 onSubmit={async (values) => {
+                  if (activePlanName === PlanName.FREE) {
+                    setStageToEdit(null as any)
+                    setOpenAddNewStage(false)
+                    setOpenUpgradeConfirm(true)
+                    return
+                  }
+
                   const isEdit = stageToEdit ? true : false
 
                   const toastId = toast.loading(isEdit ? "Updating Stage" : "Creating Stage")
@@ -520,6 +569,9 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                 user={user}
                 setStageToEdit={setStageToEdit}
                 setOpenAddNewStage={setOpenAddNewStage}
+                activePlanName={activePlanName}
+                openUpgradeConfirm={openUpgradeConfirm}
+                setOpenUpgradeConfirm={setOpenUpgradeConfirm}
               />
             </Suspense>
           </div>

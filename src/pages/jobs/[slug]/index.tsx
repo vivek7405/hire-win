@@ -25,6 +25,7 @@ import {
   CardType,
   KanbanColumnType,
   ExtendedFormQuestion,
+  PlanName,
 } from "types"
 import {
   Answer,
@@ -87,6 +88,8 @@ import classNames from "src/core/utils/classNames"
 import getFirstWordIfLessThan from "src/core/utils/getFirstWordIfLessThan"
 import moment from "moment"
 import { AuthorizationError } from "blitz"
+import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -171,7 +174,7 @@ export const getServerSideProps = gSSP(async (context) => {
         { ...context.ctx }
       )
 
-      const { can: isFreeCandidateLimitAvailable } = await Guard.can(
+      const { can: isCandidateLimitAvailable } = await Guard.can(
         "isLimitAvailable",
         "freeCandidate",
         { ...context.ctx },
@@ -180,13 +183,16 @@ export const getServerSideProps = gSSP(async (context) => {
         }
       )
 
+      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
       return {
         props: {
           user,
           company: companyUser.company,
           canUpdate: canUpdate,
           job,
-          isFreeCandidateLimitAvailable,
+          isCandidateLimitAvailable,
+          activePlanName,
         } as any,
       }
     } catch (error) {
@@ -831,7 +837,8 @@ const SingleJobPage = ({
   job,
   error,
   canUpdate,
-  isFreeCandidateLimitAvailable,
+  isCandidateLimitAvailable,
+  activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -848,7 +855,8 @@ const SingleJobPage = ({
           job={job as any}
           error={error as any}
           canUpdate={canUpdate as any}
-          isFreeCandidateLimitAvailable={isFreeCandidateLimitAvailable}
+          isCandidateLimitAvailable={isCandidateLimitAvailable}
+          activePlanName={activePlanName}
         />
       </Suspense>
     </AuthLayout>
@@ -861,11 +869,11 @@ const SingleJobPageContent = ({
   job,
   error,
   canUpdate,
-  isFreeCandidateLimitAvailable,
+  isCandidateLimitAvailable,
+  activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [isTable, setTable] = useState(false)
   const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
-  const [openConfirm, setOpenConfirm] = useState(false)
   const router = useRouter()
   const [viewRejected, setViewRejected] = useState(false)
   const [enableDrag, setEnableDrag] = useState(true)
@@ -883,6 +891,12 @@ const SingleJobPageContent = ({
   const [openModal, setOpenModal] = useState(false)
   const [createCandidateMutation] = useMutation(createCandidate)
   const [updateCandidateMutation] = useMutation(updateCandidate)
+
+  const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
+  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to lifetime plan")
+  const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
+    `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+  )
 
   function PopMenu() {
     return (
@@ -1185,14 +1199,30 @@ const SingleJobPageContent = ({
       //   user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
       // }
       onClick={(e) => {
-        // if (isFreeCandidateLimitAvailable) {
-        // router.push(Routes.NewCandidate({ slug: job?.slug! }))
         e.preventDefault()
-        setCandidateToEdit(null as any)
-        setOpenModal(true)
-        // } else {
-        //   setOpenConfirm(true)
-        // }
+
+        if (isCandidateLimitAvailable) {
+          // router.push(Routes.NewCandidate({ slug: job?.slug! }))
+          setCandidateToEdit(null)
+          setOpenModal(true)
+        } else {
+          setCandidateToEdit(null)
+          setOpenModal(false)
+
+          if (activePlanName === PlanName.FREE) {
+            setUpgradeConfirmHeader("Upgrade to lifetime plan")
+            setUpgradeConfirmMessage(
+              `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+            )
+            setOpenUpgradeConfirm(true)
+          } else if (activePlanName === PlanName.LIFETIMET1) {
+            setUpgradeConfirmHeader("Candidate limit reached")
+            setUpgradeConfirmMessage(
+              `The lifetime plan allows upto ${LIFETIMET1_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${LIFETIMET1_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+            )
+            setOpenUpgradeConfirm(true)
+          }
+        }
       }}
     >
       New Candidate
@@ -1202,15 +1232,16 @@ const SingleJobPageContent = ({
   return (
     <>
       <Confirm
-        open={openConfirm}
-        setOpen={setOpenConfirm}
-        header="Upgrade to the Pro Plan?"
+        open={openUpgradeConfirm}
+        setOpen={setOpenUpgradeConfirm}
+        header={upgradeConfirmHeader}
+        cancelText="Ok"
+        hideConfirm={true}
         onSuccess={async () => {
-          router.push(Routes.UserSettingsBillingPage())
+          setOpenUpgradeConfirm(false)
         }}
       >
-        You have reached the maximum candidates limit on the free plan. Upgrade to the PRO plan to
-        add unlimited jobs and candidates.
+        {upgradeConfirmMessage}
       </Confirm>
 
       <Modal
@@ -1275,10 +1306,10 @@ const SingleJobPageContent = ({
         />
       </Modal>
 
-      {!isFreeCandidateLimitAvailable && (
+      {!isCandidateLimitAvailable && (
         <div className="flex flex-col items-center text-red-600">
           <h1 className="font-semibold">{`Free Candidate Limit Reached`}</h1>
-          <h1 className="text-sm text-justify">{`Your job listing page has been taken down. Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1>
+          <h1 className="text-sm text-justify">{`Your job listing page has been taken down. Please upgrade to get it up again and keep adding more candidates`}</h1>
           {/* <h1 className="text-sm">{`Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1> */}
           <br />
         </div>

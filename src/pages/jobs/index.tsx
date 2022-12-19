@@ -78,6 +78,10 @@ import SignupWelcome from "src/auth/components/SignupWelcome"
 import CouponRedeemedWelcome from "src/coupons/components/CouponRedeemedWelcome"
 import getFirstWord from "src/core/utils/getFirstWordIfLessThan"
 import InvalidCouponMessage from "src/coupons/components/InvalidCouponMessage"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import { FREE_JOBS_LIMIT, LIFETIMET1_JOBS_LIMIT } from "src/plans/constants"
+import { z } from "zod"
+import getActiveJobsCount from "src/jobs/queries/getActiveJobsCount"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -137,6 +141,8 @@ export const getServerSideProps = gSSP(async (context) => {
   if (user && companyUser) {
     const { can: canCreate } = await Guard.can("create", "job", { ...context.ctx }, {})
 
+    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, { ...context.ctx })
+
     return {
       props: {
         user,
@@ -144,6 +150,7 @@ export const getServerSideProps = gSSP(async (context) => {
         company: companyUser.company,
         companyUsersLength: companyUsers?.length || 0,
         canCreate,
+        activePlanName: activePlanName,
       } as any,
     }
   } else {
@@ -205,18 +212,21 @@ const CategoryFilterButtons = ({
 }
 
 const Jobs = ({
-  user,
+  // user,
   company,
   // subscription,
-  setOpenConfirm,
-  setConfirmMessage,
-  viewType,
-  introSteps,
-  introStepsEnabled,
-  isIntroFirstLoad,
-  setIsIntroFirstLoad,
-  Steps,
+  // setOpenConfirm,
+  // setConfirmMessage,
+  // viewType,
+  // introSteps,
+  // introStepsEnabled,
+  // isIntroFirstLoad,
+  // setIsIntroFirstLoad,
+  // Steps,
   companyUsersLength,
+  activePlanName,
+  canCreate,
+  companyUserRole,
 }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
@@ -229,6 +239,97 @@ const Jobs = ({
   useEffect(() => {
     setSearchString((router.query.search as string) || '""')
   }, [router.query])
+
+  const [openConfirm, setOpenConfirm] = useState(false)
+  const [confirmMessage, setConfirmMessage] = useState(
+    "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+  )
+  const [viewType, setViewType] = useState(JobViewType.Active)
+
+  const searchQuery = async (e) => {
+    const searchQuery = { search: JSON.stringify(e.target.value) }
+    router.push({
+      query: {
+        ...router.query,
+        ...searchQuery,
+      },
+    })
+  }
+
+  const debouncer = new Debouncer((e) => searchQuery(e), 500)
+  const execDebouncer = (e) => {
+    e.persist()
+    return debouncer.execute(e)
+  }
+
+  const searchInput = (
+    <input
+      placeholder="Search"
+      type="text"
+      defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
+      className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+      onChange={(e) => {
+        execDebouncer(e)
+      }}
+    />
+  )
+
+  const [hideConfirmButton, setHideConfirmButton] = useState(false)
+  const [cancelButtonText, setCancelButtonText] = useState("Cancel")
+  const [confirmHeader, setConfirmHeader] = useState("Upgrade to the Pro Plan?")
+
+  const newJobButton = (
+    <button
+      // disabled={viewType === JobViewType.Archived}
+      className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+      onClick={(e) => {
+        e.preventDefault()
+        // if (canCreate) {
+        //   // return router.push(Routes.NewJob())
+        //   setOpenModal(true)
+        // } else {
+        if (companyUserRole === CompanyUserRole.USER) {
+          setConfirmHeader("No Permission")
+          setConfirmMessage("You need admin rights for creating a job")
+          setCancelButtonText("Ok")
+          setHideConfirmButton(true)
+          setOpenConfirm(true)
+        } else {
+          if (activePlanName === PlanName.FREE) {
+            if (activeJobsCount >= FREE_JOBS_LIMIT) {
+              setConfirmHeader("Upgrade to lifetime plan")
+              setConfirmMessage(
+                `The free plan allows upto ${FREE_JOBS_LIMIT} jobs to be added. Since this job already has ${FREE_JOBS_LIMIT} jobs added, you can't add a new job.`
+              )
+              setCancelButtonText("Ok")
+              setHideConfirmButton(true)
+              setOpenConfirm(true)
+              return
+            }
+          } else if (activePlanName === PlanName.LIFETIMET1) {
+            if (activeJobsCount >= LIFETIMET1_JOBS_LIMIT) {
+              setConfirmHeader("Reached Job Limit!")
+              setConfirmMessage(
+                `The Lifetime Plan allows upto ${LIFETIMET1_JOBS_LIMIT} active jobs. Since you already have ${LIFETIMET1_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one.`
+              )
+              setCancelButtonText("Ok")
+              setHideConfirmButton(true)
+              setOpenConfirm(true)
+              return
+            }
+          }
+
+          setOpenModal(true)
+        }
+        // }
+      }}
+    >
+      New Job
+    </button>
+  )
+
+  const [openModal, setOpenModal] = useState(false)
+  const [createJobWithTitleMutation] = useMutation(createJobWithTitle)
 
   // const todayDate = new Date(new Date().toDateString())
   // const [utcDateNow, setUTCDateNow] = useState(null as any)
@@ -259,6 +360,8 @@ const Jobs = ({
   // }, [router.query])
 
   const [selectedCategoryId, setSelectedCategoryId] = useState(null as string | null)
+
+  const [activeJobsCount] = useQuery(getActiveJobsCount, { companyId: company?.id || "0" })
 
   const [{ jobUsers, hasMore, count }] = usePaginatedQuery(getUserJobsByViewTypeAndCategory, {
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -381,6 +484,34 @@ const Jobs = ({
                       )}
                       onClick={(e) => {
                         e.preventDefault()
+
+                        // Check for the job limit when the job is being restored
+                        if (job?.archived) {
+                          if (activePlanName === PlanName.FREE) {
+                            if (activeJobsCount >= FREE_JOBS_LIMIT) {
+                              setConfirmHeader("Upgrade to lifetime plan")
+                              setConfirmMessage(
+                                `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                              )
+                              setCancelButtonText("Ok")
+                              setHideConfirmButton(true)
+                              setOpenConfirm(true)
+                              return
+                            }
+                          } else if (activePlanName === PlanName.LIFETIMET1) {
+                            if (activeJobsCount >= LIFETIMET1_JOBS_LIMIT) {
+                              setConfirmHeader("Reached Job Limit!")
+                              setConfirmMessage(
+                                `The lifetime plan allows upto ${LIFETIMET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIMET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                              )
+                              setCancelButtonText("Ok")
+                              setHideConfirmButton(true)
+                              setOpenConfirm(true)
+                              return
+                            }
+                          }
+                        }
+
                         setJobToArchive(job)
                         setOpenJobArchiveConfirm(true)
                       }}
@@ -409,7 +540,114 @@ const Jobs = ({
 
   return (
     <>
-      {Steps &&
+      {activePlanName === PlanName.FREE && (
+        <div className="w-full text-center mb-5 lg:mb-0">
+          <a href="" className="text-theme-600 hover:text-theme-800 font-bold">
+            Upgrade $29 lifetime access!
+          </a>
+        </div>
+      )}
+
+      <Confirm
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        header={confirmHeader}
+        onSuccess={async () => {
+          router.push(Routes.UserSettingsBillingPage())
+        }}
+        hideConfirm={hideConfirmButton}
+        cancelText={cancelButtonText}
+      >
+        {confirmMessage}
+      </Confirm>
+
+      <Modal header="New Job" open={openModal} setOpen={setOpenModal}>
+        <Form
+          header={`New Job`}
+          subHeader=""
+          submitText="Create"
+          schema={z.object({
+            title: z.string().nonempty({ message: "Required" }),
+          })}
+          onSubmit={async (values) => {
+            const toastId = toast.loading("Creating Job")
+            try {
+              // values["validThrough"] = new Date(moment().add(1, "months").toISOString())
+              const job = await createJobWithTitleMutation({
+                ...values,
+              })
+              router.push(Routes.JobSettingsPage({ slug: job.slug }))
+              await invalidateQuery(getActiveJobsCount)
+              invalidateQuery(getUserJobsByViewTypeAndCategory)
+              invalidateQuery(getUserJobCategoriesByViewType)
+              toast.success("Job created successfully", { id: toastId })
+            } catch (error) {
+              toast.error(`Failed to create new job - ${error.toString()}`, { id: toastId })
+            }
+            setOpenModal(false)
+          }}
+        >
+          <LabeledTextField name="title" label="Title" placeholder="Enter Job Title" />
+        </Form>
+      </Modal>
+
+      {/* Mobile Menu */}
+      <div className="flex flex-col space-y-4 md:hidden lg:hidden">
+        <div className="flex w-full justify-between">
+          {searchInput}
+          {newJobButton}
+        </div>
+
+        <Form noFormatting={true} onSubmit={async () => {}}>
+          <RadioGroupField
+            name="View"
+            isBorder={true}
+            options={[JobViewType.Active, JobViewType.Archived]}
+            initialValue={JobViewType.Active}
+            onChange={(value) => {
+              setViewType(value)
+            }}
+          />
+        </Form>
+
+        <div className="flex justify-center space-x-6">
+          {/* {subscriptionLink} */}
+          {/* {viewCareersPageLink} */}
+          <ViewCareersPageButton companySlug={company?.slug || "0"} />
+        </div>
+      </div>
+
+      {/* Tablet and Desktop Menu */}
+      <div className="hidden md:flex lg:flex items-center w-full justify-between">
+        <div className="flex items-center">
+          {searchInput}
+          <Form
+            noFormatting={true}
+            onSubmit={(value) => {
+              return value
+            }}
+          >
+            <RadioGroupField
+              name="View"
+              isBorder={false}
+              options={[JobViewType.Active, JobViewType.Archived]}
+              initialValue={JobViewType.Active}
+              onChange={(value) => {
+                setViewType(value)
+              }}
+            />
+          </Form>
+        </div>
+
+        <div className="flex items-center space-x-6">
+          {/* {subscriptionLink} */}
+          {/* {viewCareersPageLink} */}
+          <ViewCareersPageButton companySlug={company?.slug || "0"} />
+          {newJobButton}
+        </div>
+      </div>
+
+      {/* {Steps &&
         companyUsersLength === 1 &&
         jobUsers?.length === 0 &&
         introStepsEnabled &&
@@ -429,7 +667,7 @@ const Jobs = ({
               }
             }}
           />
-        )}
+        )} */}
       {/* {Hints && introHintsEnabled && isIntroFirstLoad && (
         <Hints enabled={introHintsEnabled || false} hints={introHints} />
       )} */}
@@ -453,6 +691,7 @@ const Jobs = ({
               id: toastId,
             })
             setSelectedCategoryId(null)
+            await invalidateQuery(getActiveJobsCount)
             invalidateQuery(getUserJobsByViewTypeAndCategory)
             invalidateQuery(getUserJobCategoriesByViewType)
           } catch (error) {
@@ -550,14 +789,14 @@ const Jobs = ({
                             className="cursor-pointer text-theme-600 hover:text-theme-800"
                             onClick={(e) => {
                               e.preventDefault()
-                              if (job.hasByPassedPlanLimit) {
-                                setConfirmMessage(
-                                  "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
-                                )
-                                setOpenConfirm(true)
-                              } else {
-                                router.push(Routes.SingleJobPage({ slug: job.slug }))
-                              }
+                              // if (job.hasByPassedPlanLimit) {
+                              //   setConfirmMessage(
+                              //     "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
+                              //   )
+                              //   setOpenConfirm(true)
+                              // } else {
+                              router.push(Routes.SingleJobPage({ slug: job.slug }))
+                              // }
                             }}
                           >
                             {job?.title}
@@ -590,16 +829,16 @@ const Jobs = ({
                           className="cursor-pointer text-theme-600 hover:text-theme-800"
                           onClick={(e) => {
                             e.preventDefault()
-                            if (job.hasByPassedPlanLimit) {
-                              setConfirmMessage(
-                                "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
-                              )
-                              setOpenConfirm(true)
-                            } else {
-                              job.canUpdate
-                                ? router.push(Routes.JobSettingsPage({ slug: job.slug }))
-                                : router.push(Routes.JobSettingsSchedulingPage({ slug: job.slug }))
-                            }
+                            // if (job.hasByPassedPlanLimit) {
+                            //   setConfirmMessage(
+                            //     "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
+                            //   )
+                            //   setOpenConfirm(true)
+                            // } else {
+                            job.canUpdate
+                              ? router.push(Routes.JobSettingsPage({ slug: job.slug }))
+                              : router.push(Routes.JobSettingsSchedulingPage({ slug: job.slug }))
+                            // }
                           }}
                         >
                           <CogIcon className="h-6 w-6" />
@@ -695,234 +934,9 @@ const JobsHome = ({
   company,
   canCreate,
   companyUsersLength,
+  activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
-  const [openConfirm, setOpenConfirm] = useState(false)
-  const [confirmMessage, setConfirmMessage] = useState(
-    "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
-  )
-  const [viewType, setViewType] = useState(JobViewType.Active)
-
-  const searchQuery = async (e) => {
-    const searchQuery = { search: JSON.stringify(e.target.value) }
-    router.push({
-      query: {
-        ...router.query,
-        ...searchQuery,
-      },
-    })
-  }
-
-  const debouncer = new Debouncer((e) => searchQuery(e), 500)
-  const execDebouncer = (e) => {
-    e.persist()
-    return debouncer.execute(e)
-  }
-
-  // // Redirect user to stripe checkout if trial has ended
-  // const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
-  // const manageBilling = useCallback(async () => {
-  //   try {
-  //     const url = await createStripeBillingPortalMutation({
-  //       companyId: company?.id || "0",
-  //     })
-
-  //     if (url) window.location.href = url
-  //   } catch (err) {
-  //     toast.error("Unable to open Manage Billing")
-  //   }
-  // }, [company?.id, createStripeBillingPortalMutation])
-  // const [createStripeSessionMutation] = useMutation(createStripeCheckoutSession)
-  // const createSubscription = useCallback(async () => {
-  //   if (priceId && priceId !== "0") {
-  //     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
-  //     const sessionId = await createStripeSessionMutation({
-  //       priceId,
-  //       companyId: company?.id || "0",
-  //       quantity: 1,
-  //     })
-
-  //     sessionId &&
-  //       stripe?.redirectToCheckout({
-  //         sessionId: sessionId,
-  //       })
-  //   }
-  // }, [company?.id, createStripeSessionMutation, priceId])
-  // useEffect(() => {
-  //   if (!currentPlan && priceId !== "0") {
-  //     createSubscription()
-  //     // company?.stripeSubscriptionId ? manageBilling() : createSubscription()
-  //   }
-  // }, [currentPlan, createSubscription, priceId])
-
-  // if (!currentPlan) {
-  //   return <></>
-  // }
-
-  const searchInput = (
-    <input
-      placeholder="Search"
-      type="text"
-      defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-      className={`border border-gray-300 mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
-      onChange={(e) => {
-        execDebouncer(e)
-      }}
-    />
-  )
-
-  // const subscription = checkSubscription(company)
-  // const subscriptionLink =
-  //   companyUserRole === CompanyUserRole.OWNER ? (
-  //     <>
-  //       <Link legacyBehavior
-  //         prefetch={true}
-  //         href={Routes.UserSettingsBillingPage({ companySlug: company?.slug! })}
-  //         passHref
-  //       >
-  //         <a className="flex items-center py-2 whitespace-nowrap">
-  //           {subscription?.status === SubscriptionStatus.TRIALING ? (
-  //             <span className="text-yellow-600 hover:underline py-1 px-3 border-2 rounded-full border-yellow-500">
-  //               Trial ends in {subscription?.daysLeft}{" "}
-  //               {subscription?.daysLeft === 1 ? "day" : "days"}
-  //             </span>
-  //           ) : subscription?.status !== SubscriptionStatus.ACTIVE ? (
-  //             <span className="text-red-600 flex items-center hover:underline py-1 px-3 border-2 rounded-full border-red-500">
-  //               <ExclamationCircleIcon className="w-4 h-4 mr-1" />
-  //               <span>Subscribe Plan</span>
-  //             </span>
-  //           ) : (
-  //             <></>
-  //           )}
-  //         </a>
-  //       </Link>
-  //     </>
-  //   ) : (
-  //     <></>
-  //   )
-
-  // const viewCareersPageLink = (
-  //   <Link legacyBehavior prefetch={true} href={Routes.CareersPage({ companySlug: company?.slug! })} passHref>
-  //     <a
-  //       target="_blank"
-  //       rel="noopener noreferrer"
-  //       className="flex items-center underline text-theme-600 py-2 hover:text-theme-800 whitespace-nowrap"
-  //     >
-  //       <span>View Careers Page</span>
-  //       <ExternalLinkIcon className="w-4 h-4 ml-1" />
-  //     </a>
-  //   </Link>
-  // )
-
-  const [hideConfirmButton, setHideConfirmButton] = useState(false)
-  const [cancelButtonText, setCancelButtonText] = useState("Cancel")
-  const [confirmHeader, setConfirmHeader] = useState("Upgrade to the Pro Plan?")
-
-  const newJobButton = (
-    <button
-      className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-      onClick={(e) => {
-        e.preventDefault()
-        if (canCreate) {
-          // return router.push(Routes.NewJob())
-          setOpenModal(true)
-        } else {
-          if (companyUserRole === CompanyUserRole.USER) {
-            setConfirmHeader("No Permission")
-            setConfirmMessage("You need admin rights for creating a job")
-            setCancelButtonText("Ok")
-            setHideConfirmButton(true)
-          } else {
-            // if (
-            //   !(
-            //     subscription?.status === SubscriptionStatus.ACTIVE ||
-            //     subscription?.status === SubscriptionStatus.TRIALING
-            //   )
-            // ) {
-            //   setConfirmHeader("Upgrade to the Pro Plan?")
-            //   setConfirmMessage(
-            //     "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
-            //   )
-            //   setCancelButtonText("Cancel")
-            //   setHideConfirmButton(false)
-            // } else {
-            setConfirmHeader("No Permission")
-            setConfirmMessage("You don't have the permission to create a job")
-            setCancelButtonText("Ok")
-            setHideConfirmButton(true)
-            // }
-          }
-          setOpenConfirm(true)
-        }
-      }}
-    >
-      New Job
-    </button>
-  )
-
-  const [introStepsEnabled, setIntroStepsEnabled] = useState(false)
-  // const [introHintsEnabled, setIntroHintsEnabled] = useState(false)
-  const [isIntroFirstLoad, setIsIntroFirstLoad] = useState(true)
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setIntroStepsEnabled(true)
-  //     // setIntroHintsEnabled(true)
-  //   }, 1000)
-  // }, [])
-
-  const [introSteps, setIntroSteps] = useState([] as IntroStep[])
-  const [introHints, setIntroHints] = useState([] as IntroHint[])
-  const setNavbarIntroSteps = (navbarIntroSteps) => {
-    setIntroSteps([
-      {
-        title: "Welcome to hire.win",
-        intro: (
-          <span>
-            <p>
-              {`We'll`} walk you through a <b>quick intro</b> so that you better understand the
-              application.
-            </p>
-            <br />
-            <p>
-              <b>Click on the Next button</b> to proceed or else the close button to Skip
-            </p>
-          </span>
-        ),
-      },
-      ...navbarIntroSteps,
-      {
-        title: "That's it for now",
-        intro: (
-          <span>
-            <p>
-              {`You'll`} better understand the application once you <b>start using it</b>.
-            </p>
-            <br />
-            <p>
-              Feel free to reach out to us in case of any queries and {`we'll`} be happy to help 😊
-            </p>
-            <br />
-            <p>
-              Write us to <b>support@hire.win</b>
-            </p>
-          </span>
-        ),
-      },
-    ])
-  }
-  const setNavbarIntroHints = (navbarIntroHints) => {
-    setIntroHints(navbarIntroHints)
-  }
-
-  const Steps = dynamic(() => import("intro.js-react").then((mod) => mod.Steps), {
-    ssr: false,
-  }) as any
-  // const Hints = dynamic(() => import("intro.js-react").then((mod) => mod.Hints), {
-  //   ssr: false,
-  // }) as any
-
-  const [openModal, setOpenModal] = useState(false)
-  const [createJobWithTitleMutation] = useMutation(createJobWithTitle)
 
   // used useEffect for setting openWelcomeModal to avoid Hydration error
   const [openWelcomeModal, setOpenWelcomeModal] = useState(false)
@@ -946,8 +960,8 @@ const JobsHome = ({
     <AuthLayout
       title="Hire.win | Jobs"
       user={user}
-      setNavbarIntroSteps={setNavbarIntroSteps}
-      setNavbarIntroHints={setNavbarIntroHints}
+      // setNavbarIntroSteps={setNavbarIntroSteps}
+      // setNavbarIntroHints={setNavbarIntroHints}
     >
       {invalidCoupon && (
         <InvalidCouponMessage userName={user?.name || ""} setInvalidCoupon={setInvalidCoupon} />
@@ -961,101 +975,6 @@ const JobsHome = ({
         />
       )}
 
-      <Confirm
-        open={openConfirm}
-        setOpen={setOpenConfirm}
-        header={confirmHeader}
-        onSuccess={async () => {
-          router.push(Routes.UserSettingsBillingPage())
-        }}
-        hideConfirm={hideConfirmButton}
-        cancelText={cancelButtonText}
-      >
-        {confirmMessage}
-      </Confirm>
-
-      <Modal header="New Job" open={openModal} setOpen={setOpenModal}>
-        <Form
-          header={`New Job`}
-          subHeader=""
-          submitText="Create"
-          onSubmit={async (values) => {
-            const toastId = toast.loading("Creating Job")
-            try {
-              // values["validThrough"] = new Date(moment().add(1, "months").toISOString())
-              const job = await createJobWithTitleMutation({
-                ...values,
-              })
-              router.push(Routes.JobSettingsPage({ slug: job.slug }))
-              invalidateQuery(getUserJobsByViewTypeAndCategory)
-              invalidateQuery(getUserJobCategoriesByViewType)
-              toast.success("Job created successfully", { id: toastId })
-            } catch (error) {
-              toast.error(`Failed to create new job - ${error.toString()}`, { id: toastId })
-            }
-            setOpenModal(false)
-          }}
-        >
-          <LabeledTextField name="title" label="Title" placeholder="Enter Job Title" />
-        </Form>
-      </Modal>
-
-      {/* Mobile Menu */}
-      <div className="flex flex-col space-y-4 md:hidden lg:hidden">
-        <div className="flex w-full justify-between">
-          {searchInput}
-          {newJobButton}
-        </div>
-
-        <Form noFormatting={true} onSubmit={async () => {}}>
-          <RadioGroupField
-            name="View"
-            isBorder={true}
-            options={[JobViewType.Active, JobViewType.Archived]}
-            initialValue={JobViewType.Active}
-            onChange={(value) => {
-              setViewType(value)
-            }}
-          />
-        </Form>
-
-        <div className="flex justify-center space-x-6">
-          {/* {subscriptionLink} */}
-          {/* {viewCareersPageLink} */}
-          <ViewCareersPageButton companySlug={company?.slug || "0"} />
-        </div>
-      </div>
-
-      {/* Tablet and Desktop Menu */}
-      <div className="hidden md:flex lg:flex items-center w-full justify-between">
-        <div className="flex items-center">
-          {searchInput}
-          <Form
-            noFormatting={true}
-            onSubmit={(value) => {
-              return value
-            }}
-          >
-            <RadioGroupField
-              name="View"
-              isBorder={false}
-              options={[JobViewType.Active, JobViewType.Archived]}
-              initialValue={JobViewType.Active}
-              onChange={(value) => {
-                setViewType(value)
-              }}
-            />
-          </Form>
-        </div>
-
-        <div className="flex items-center space-x-6">
-          {/* {subscriptionLink} */}
-          {/* {viewCareersPageLink} */}
-          <ViewCareersPageButton companySlug={company?.slug || "0"} />
-          {newJobButton}
-        </div>
-      </div>
-
       <Modal header="" open={openWelcomeModal} setOpen={setOpenWelcomeModal}>
         <SignupWelcome
           setOpenModal={setOpenWelcomeModal}
@@ -1066,18 +985,21 @@ const JobsHome = ({
 
       <Suspense fallback={<p className="pt-7">Loading...</p>}>
         <Jobs
-          viewType={viewType}
-          user={user}
+          // viewType={viewType}
+          // user={user}
           company={company}
           // subscription={subscription}
-          setOpenConfirm={setOpenConfirm}
-          setConfirmMessage={setConfirmMessage}
-          introSteps={introSteps}
-          introStepsEnabled={introStepsEnabled}
-          isIntroFirstLoad={isIntroFirstLoad}
-          setIsIntroFirstLoad={setIsIntroFirstLoad}
-          Steps={Steps}
+          // setOpenConfirm={setOpenConfirm}
+          // setConfirmMessage={setConfirmMessage}
+          // introSteps={introSteps}
+          // introStepsEnabled={introStepsEnabled}
+          // isIntroFirstLoad={isIntroFirstLoad}
+          // setIsIntroFirstLoad={setIsIntroFirstLoad}
+          // Steps={Steps}
           companyUsersLength={companyUsersLength}
+          activePlanName={activePlanName}
+          canCreate={canCreate}
+          companyUserRole={companyUserRole}
         />
       </Suspense>
     </AuthLayout>

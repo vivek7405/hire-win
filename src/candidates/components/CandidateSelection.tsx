@@ -1,6 +1,6 @@
-import { useRouter } from "next/router";
-import { Routes } from "@blitzjs/next";
-import { invalidateQuery, useQuery } from "@blitzjs/rpc";
+import { useRouter } from "next/router"
+import { Routes } from "@blitzjs/next"
+import { invalidateQuery, useQuery } from "@blitzjs/rpc"
 import { BanIcon, ChevronLeftIcon, XCircleIcon } from "@heroicons/react/outline"
 import Form from "src/core/components/Form"
 import LabeledRatingField from "src/core/components/LabeledRatingField"
@@ -10,6 +10,9 @@ import getJobStages from "src/stages/queries/getJobStages"
 import { Suspense, useState } from "react"
 import getAllCandidatesByStage from "../queries/getAllCandidatesByStage"
 import getCandidate from "../queries/getCandidate"
+import Confirm from "src/core/components/Confirm"
+import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
+import { PlanName } from "types"
 
 type StagesPropsType = {
   jobId: string
@@ -146,7 +149,12 @@ type CandidateSelectionPropsType = {
   selectedCandidateEmail: string
   setSelectedCandidateEmail: any
   setOpenNewCandidateModal: any
+  setOpenUpgradeConfirm: any
+  setUpgradeConfirmHeader: any
+  setUpgradeConfirmMessage: any
+  activePlanName: PlanName
   canAddNewCandidate: boolean
+  isCandidateLimitAvailable: boolean
 }
 const CandidateSelection = ({
   jobId,
@@ -154,7 +162,12 @@ const CandidateSelection = ({
   selectedCandidateEmail,
   setSelectedCandidateEmail,
   setOpenNewCandidateModal,
+  setOpenUpgradeConfirm,
+  setUpgradeConfirmHeader,
+  setUpgradeConfirmMessage,
+  activePlanName,
   canAddNewCandidate,
+  isCandidateLimitAvailable,
 }: CandidateSelectionPropsType) => {
   const [selectedStageId, setSelectedStageId] = useState(stageId)
   const [viewRejected, setViewRejected] = useState(false)
@@ -162,57 +175,78 @@ const CandidateSelection = ({
   //   const [candidates] = useQuery(getAllCandidatesByStage, selectedStageId)
 
   return (
-    <div className="w-full flex flex-col max-h-screen">
-      <div
-        className={`w-full py-5 px-4 flex items-center ${
-          canAddNewCandidate ? "justify-between" : "justify-center"
-        } border-b-2 border-theme-400`}
-      >
-        <Form noFormatting={true} onSubmit={async () => {}}>
-          <LabeledToggleSwitch
-            name="rejected"
-            label="View Rejected"
-            flex={true}
-            onChange={() => {
-              setViewRejected(!viewRejected)
-            }}
-          />
-        </Form>
-        {canAddNewCandidate && (
-          <button
-            onClick={() => {
-              setOpenNewCandidateModal(true)
-            }}
-            className="px-4 py-1 rounded-lg bg-theme-600 hover:bg-theme-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            New
-          </button>
-        )}
-      </div>
-      <div className="w-full flex max-h-full overflow-auto">
-        <div className="w-2/5 max-h-full overflow-auto">
-          <Suspense fallback={<div className="w-full text-center px-4 py-2">Loading...</div>}>
-            <Stages
-              jobId={jobId}
-              selectedStageId={selectedStageId}
-              setSelectedStageId={setSelectedStageId}
-              viewRejected={viewRejected}
+    <>
+      <div className="w-full flex flex-col max-h-screen">
+        <div
+          className={`w-full py-5 px-4 flex items-center ${
+            canAddNewCandidate ? "justify-between" : "justify-center"
+          } border-b-2 border-theme-400`}
+        >
+          <Form noFormatting={true} onSubmit={async () => {}}>
+            <LabeledToggleSwitch
+              name="rejected"
+              label="View Rejected"
+              flex={true}
+              onChange={() => {
+                setViewRejected(!viewRejected)
+              }}
             />
-          </Suspense>
+          </Form>
+          {canAddNewCandidate && (
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+
+                if (isCandidateLimitAvailable) {
+                  // router.push(Routes.NewCandidate({ slug: job?.slug! }))
+                  setOpenNewCandidateModal(true)
+                } else {
+                  if (activePlanName === PlanName.FREE) {
+                    setUpgradeConfirmHeader("Upgrade to lifetime plan")
+                    setUpgradeConfirmMessage(
+                      `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+                    )
+                    setOpenUpgradeConfirm(true)
+                  } else if (activePlanName === PlanName.LIFETIMET1) {
+                    setUpgradeConfirmHeader("Candidate limit reached")
+                    setUpgradeConfirmMessage(
+                      `The lifetime plan allows upto ${LIFETIMET1_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${LIFETIMET1_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+                    )
+                    setOpenUpgradeConfirm(true)
+                  }
+                }
+              }}
+              className="px-4 py-1 rounded-lg bg-theme-600 hover:bg-theme-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              New
+            </button>
+          )}
         </div>
-        <div className="w-0.5 max-h-full overflow-auto bg-theme-400"></div>
-        <div className="w-3/5 max-h-full overflow-auto">
-          <Suspense fallback={<div className="w-full text-center px-4 py-2">Loading...</div>}>
-            <Candidates
-              selectedStageId={selectedStageId}
-              selectedCandidateEmail={selectedCandidateEmail}
-              setSelectedCandidateEmail={setSelectedCandidateEmail}
-              viewRejected={viewRejected}
-            />
-          </Suspense>
+        <div className="w-full flex max-h-full overflow-auto">
+          <div className="w-2/5 max-h-full overflow-auto">
+            <Suspense fallback={<div className="w-full text-center px-4 py-2">Loading...</div>}>
+              <Stages
+                jobId={jobId}
+                selectedStageId={selectedStageId}
+                setSelectedStageId={setSelectedStageId}
+                viewRejected={viewRejected}
+              />
+            </Suspense>
+          </div>
+          <div className="w-0.5 max-h-full overflow-auto bg-theme-400"></div>
+          <div className="w-3/5 max-h-full overflow-auto">
+            <Suspense fallback={<div className="w-full text-center px-4 py-2">Loading...</div>}>
+              <Candidates
+                selectedStageId={selectedStageId}
+                selectedCandidateEmail={selectedCandidateEmail}
+                setSelectedCandidateEmail={setSelectedCandidateEmail}
+                viewRejected={viewRejected}
+              />
+            </Suspense>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

@@ -14,7 +14,7 @@ import Breadcrumbs from "src/core/components/Breadcrumbs"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 import getCandidate from "src/candidates/queries/getCandidate"
-import { AttachmentObject, CardType, ExtendedCandidate, ExtendedStage } from "types"
+import { AttachmentObject, CardType, ExtendedCandidate, ExtendedStage, PlanName } from "types"
 import axios from "axios"
 import PDFViewer from "src/core/components/PDFViewer"
 import {
@@ -105,6 +105,9 @@ import classNames from "src/core/utils/classNames"
 import getFirstWordIfLessThan from "src/core/utils/getFirstWordIfLessThan"
 import LabeledQuillEditor from "src/core/components/LabeledQuillEditor"
 import { AuthorizationError } from "blitz"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
+import { FREE_CANDIDATES_LIMIT, LIFETIMET1_FILES_LIMIT } from "src/plans/constants"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -151,13 +154,26 @@ export const getServerSideProps = gSSP(async (context) => {
         { ...context.ctx }
       )
 
+      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
+      const { can: isCandidateLimitAvailable } = await Guard.can(
+        "isLimitAvailable",
+        "freeCandidate",
+        { ...context.ctx },
+        {
+          jobId: job?.id,
+        }
+      )
+
       if (candidate) {
         return {
           props: {
-            user: user,
+            user,
             candidateEmail: candidate?.email as string,
             jobId: candidate?.jobId,
             stageId: candidate?.stageId,
+            activePlanName,
+            isCandidateLimitAvailable,
             // candidate: candidate,
           } as any,
         }
@@ -293,10 +309,18 @@ const SingleCandidatePage = ({
   candidateEmail,
   jobId,
   stageId,
+  activePlanName,
+  isCandidateLimitAvailable,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [selectedCandidateEmail, setSelectedCandidateEmail] = useState(candidateEmail)
   const [viewCandidateSelection, setViewCandidateSelection] = useState(false)
   const [openNewCandidateModal, setOpenNewCandidateModal] = useState(false)
+
+  const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
+  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to lifetime plan")
+  const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
+    `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+  )
 
   const handleWindowSizeChange = () => {
     // setViewCandidateSelection(false)
@@ -325,6 +349,18 @@ const SingleCandidatePage = ({
     <AuthLayout title="Hire.win | Candidate" user={user} isMax8xl={true}>
       <Breadcrumbs ignore={[{ href: "/candidates", breadcrumb: "Candidates" }]} />
       <br />
+      <Confirm
+        open={openUpgradeConfirm}
+        setOpen={setOpenUpgradeConfirm}
+        header={upgradeConfirmHeader}
+        cancelText="Ok"
+        hideConfirm={true}
+        onSuccess={async () => {
+          setOpenUpgradeConfirm(false)
+        }}
+      >
+        {upgradeConfirmMessage}
+      </Confirm>
       <div className="w-full 2xl:w-5/6 mx-auto flex justify-center">
         {viewCandidateSelection && (
           // <div
@@ -342,12 +378,17 @@ const SingleCandidatePage = ({
                     selectedCandidateEmail={selectedCandidateEmail || "0"}
                     setSelectedCandidateEmail={setSelectedCandidateEmail}
                     setOpenNewCandidateModal={setOpenNewCandidateModal}
+                    setOpenUpgradeConfirm={setOpenUpgradeConfirm}
+                    setUpgradeConfirmHeader={setUpgradeConfirmHeader}
+                    setUpgradeConfirmMessage={setUpgradeConfirmMessage}
+                    activePlanName={activePlanName}
                     canAddNewCandidate={
                       user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
                         JobUserRole.OWNER ||
                       user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
                         JobUserRole.ADMIN
                     }
+                    isCandidateLimitAvailable={isCandidateLimitAvailable}
                   />
                 </Suspense>
               </div>
@@ -368,6 +409,8 @@ const SingleCandidatePage = ({
               openNewCandidateModal={openNewCandidateModal}
               setOpenNewCandidateModal={setOpenNewCandidateModal}
               setSelectedCandidateEmail={setSelectedCandidateEmail}
+              activePlanName={activePlanName}
+              isCandidateLimitAvailable={isCandidateLimitAvailable}
             />
           </Suspense>
         </div>
@@ -386,6 +429,8 @@ const SingleCandidatePageContent = ({
   setViewCandidateSelection,
   openNewCandidateModal,
   setOpenNewCandidateModal,
+  activePlanName,
+  isCandidateLimitAvailable,
 }: InferGetServerSidePropsType<typeof getServerSideProps> & {
   viewCandidateSelection?: boolean
   setViewCandidateSelection?: any
@@ -526,6 +571,8 @@ const SingleCandidatePageContent = ({
     candidateId: candidate?.id || "0",
     stageId: candidate?.stageId || "0",
   })
+
+  const [openUpgradeConfirm, setOpenUpgradeConfirm] = React.useState(false)
 
   // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
   //   where: { candidateId: candidate.id, workflowStageId: selectedStage?.id },
@@ -1303,6 +1350,19 @@ const SingleCandidatePageContent = ({
       </Confirm>
 
       <Confirm
+        open={openUpgradeConfirm}
+        setOpen={setOpenUpgradeConfirm}
+        header="Files limit reached"
+        cancelText="Ok"
+        hideConfirm={true}
+        onSuccess={async () => {
+          setOpenUpgradeConfirm(false)
+        }}
+      >
+        {`The lifetime plan allows upto ${LIFETIMET1_FILES_LIMIT} file uploads per candidate. Since this candidate already has ${LIFETIMET1_FILES_LIMIT} files uploaded, you can't upload a new file.`}
+      </Confirm>
+
+      <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
         header={`Delete File - ${(fileToDelete?.attachment as AttachmentObject | null)?.name}`}
@@ -1614,150 +1674,166 @@ const SingleCandidatePageContent = ({
                   )}
                 </div>
               )}
-              {candidateDetailToggleView === CandidateDetailToggleView.Files && (
-                <div className="flex flex-col items-center">
-                  {candidate?.files?.length === 0 ? (
-                    <div className="text-center my-3 px-2">
-                      No files uploaded. Click on the button below to upload a file.
-                    </div>
-                  ) : (
-                    <div className="my-1 flex flex-wrap justify-center px-2 max-w-md mx-auto">
-                      {candidate?.files?.map((file) => {
-                        return (
-                          <Card isFull={true} key={file.id}>
-                            <div className="space-y-2">
-                              <div className="w-full relative">
-                                <div className="font-bold flex items-center">
-                                  <a
-                                    href={(file.attachment as AttachmentObject).location}
-                                    className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    {(file.attachment as AttachmentObject).name}
-                                  </a>
-                                </div>
-                                <div className="absolute top-0.5 right-0">
-                                  <button
-                                    id={"delete-" + file.id}
-                                    className="float-right text-red-600 hover:text-red-800"
-                                    title="Delete File"
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.preventDefault()
-                                      setFileToDelete(file)
-                                      setOpenConfirm(true)
-                                    }}
-                                  >
-                                    <TrashIcon className="w-5 h-5" />
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="border-b-2 border-gray-50 w-full"></div>
-                              <div className="flex text-xs">
-                                <span className="truncate">
-                                  {moment(file.createdAt).local().fromNow()} by{" "}
-                                  {file.createdBy?.name}
-                                </span>
-                              </div>
-                            </div>
-                          </Card>
-                        )
-                      })}
-                    </div>
-                  )}
-                  <button
-                    className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => {
-                      setUploadFileOpen(true)
-                    }}
-                  >
-                    Upload File
-                  </button>
-                  <Modal header="Upload File" open={uploadFileOpen} setOpen={setUploadFileOpen}>
-                    <Form
-                      schema={CandidateFileObj}
-                      header="Upload File"
-                      subHeader="Select a file, then click Submit"
-                      submitText="Submit"
-                      onSubmit={async (values) => {
-                        const toastId = toast.loading(() => <span>Uploading File</span>)
-                        try {
-                          values["candidateId"] = candidate?.id
-                          await createCandidateFileMutation({
-                            attachment: values.attachment,
-                            candidateId: values.candidateId,
-                          })
-                          invalidateQuery(getCandidate)
-                          toast.success("File uploaded", { id: toastId })
-                        } catch (error) {
-                          toast.error(
-                            "Sorry, we had an unexpected error. Please try again. - " +
-                              error.toString()
-                          )
-                        }
-                        setUploadFileOpen(false)
-                      }}
-                    >
-                      <SingleFileUploadField accept="" name="attachment" label="" />
-                    </Form>
-                  </Modal>
-                </div>
-              )}
-              {candidateDetailToggleView === CandidateDetailToggleView.Activity && (
-                <div className="flex flex-col items-center">
-                  {candidate?.activities?.length === 0 ? (
-                    <div className="text-center my-3 px-2">No activities yet.</div>
-                  ) : (
-                    <div className="my-2 flex flex-col justify-center px-2">
-                      {candidate?.activities?.map((activity, index) => {
-                        return (
-                          <>
-                            <Card key={activity.id} isFull={true} noMarginY={true}>
+              {candidateDetailToggleView === CandidateDetailToggleView.Files &&
+                (activePlanName === PlanName.FREE ? (
+                  <div className="px-3 py-2">
+                    <UpgradeMessage message="Upgrade to upload Candidate Files" />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    {candidate?.files?.length === 0 ? (
+                      <div className="text-center my-3 px-2">
+                        No files uploaded. Click on the button below to upload a file.
+                      </div>
+                    ) : (
+                      <div className="my-1 flex flex-wrap justify-center px-2 max-w-md mx-auto">
+                        {candidate?.files?.map((file) => {
+                          return (
+                            <Card isFull={true} key={file.id}>
                               <div className="space-y-2">
                                 <div className="w-full relative">
-                                  <div className="font-medium flex md:justify-center lg:justify:center md:text-center lg:text-center items-center">
-                                    {getCandidateActivitySymbolByType(activity.type)}
-                                    <span className="ml-2">
-                                      {activity.type.replaceAll("_", " ")}
-                                    </span>
+                                  <div className="font-bold flex items-center">
+                                    <a
+                                      href={(file.attachment as AttachmentObject).location}
+                                      className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      {(file.attachment as AttachmentObject).name}
+                                    </a>
+                                  </div>
+                                  <div className="absolute top-0.5 right-0">
+                                    <button
+                                      id={"delete-" + file.id}
+                                      className="float-right text-red-600 hover:text-red-800"
+                                      title="Delete File"
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.preventDefault()
+
+                                        if (activePlanName === PlanName.FREE) {
+                                          setFileToDelete(null)
+                                          setOpenConfirm(false)
+                                        }
+
+                                        setFileToDelete(file)
+                                        setOpenConfirm(true)
+                                      }}
+                                    >
+                                      <TrashIcon className="w-5 h-5" />
+                                    </button>
                                   </div>
                                 </div>
-                                <div className="border-b-2 border-gray-50 w-full" />
-                                <div className="w-full relative">
-                                  <div className="text-sm font-medium flex md:justify-center lg:justify:center md:text-center lg:text-center items-center">
-                                    {activity.title}
-                                  </div>
-                                </div>
-                                <div className="border-b-2 border-gray-50 w-full" />
-                                <div className="flex md:justify-center lg:justify-center text-xs">
+                                <div className="border-b-2 border-gray-50 w-full"></div>
+                                <div className="flex text-xs">
                                   <span className="truncate">
-                                    {moment(activity.performedAt).local().fromNow()} -{" "}
-                                    {moment(activity.performedAt)
-                                      .local()
-                                      .toDate()
-                                      .toLocaleDateString()}{" "}
-                                    {moment(activity.performedAt)
-                                      .local()
-                                      .toDate()
-                                      .toLocaleTimeString()}
-                                    {/* by {activity.performedByUser?.name} */}
+                                    {moment(file.createdAt).local().fromNow()} by{" "}
+                                    {file.createdBy?.name}
                                   </span>
                                 </div>
                               </div>
                             </Card>
-                            {index !== candidate?.activities?.length - 1 && (
-                              <div className="flex justify-center items-center">
-                                <div className="h-10 w-1 border-2 border-neutral-300" />
-                              </div>
-                            )}
-                          </>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+                          )
+                        })}
+                      </div>
+                    )}
+                    <button
+                      className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => {
+                        setUploadFileOpen(true)
+                      }}
+                    >
+                      Upload File
+                    </button>
+                    <Modal header="Upload File" open={uploadFileOpen} setOpen={setUploadFileOpen}>
+                      <Form
+                        schema={CandidateFileObj}
+                        header="Upload File"
+                        subHeader="Select a file, then click Submit"
+                        submitText="Submit"
+                        onSubmit={async (values) => {
+                          const toastId = toast.loading(() => <span>Uploading File</span>)
+                          try {
+                            values["candidateId"] = candidate?.id
+                            await createCandidateFileMutation({
+                              attachment: values.attachment,
+                              candidateId: values.candidateId,
+                            })
+                            invalidateQuery(getCandidate)
+                            toast.success("File uploaded", { id: toastId })
+                          } catch (error) {
+                            toast.error(
+                              "Sorry, we had an unexpected error. Please try again. - " +
+                                error.toString()
+                            )
+                          }
+                          setUploadFileOpen(false)
+                        }}
+                      >
+                        <SingleFileUploadField accept="" name="attachment" label="" />
+                      </Form>
+                    </Modal>
+                  </div>
+                ))}
+              {candidateDetailToggleView === CandidateDetailToggleView.Activity &&
+                (activePlanName === PlanName.FREE ? (
+                  <div className="px-3 py-2">
+                    <UpgradeMessage message="Upgrade to view the entire Candidate Events timeline" />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    {candidate?.activities?.length === 0 ? (
+                      <div className="text-center my-3 px-2">No activities yet.</div>
+                    ) : (
+                      <div className="my-2 flex flex-col justify-center px-2">
+                        {candidate?.activities?.map((activity, index) => {
+                          return (
+                            <>
+                              <Card key={activity.id} isFull={true} noMarginY={true}>
+                                <div className="space-y-2">
+                                  <div className="w-full relative">
+                                    <div className="font-medium flex md:justify-center lg:justify:center md:text-center lg:text-center items-center">
+                                      {getCandidateActivitySymbolByType(activity.type)}
+                                      <span className="ml-2">
+                                        {activity.type.replaceAll("_", " ")}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="border-b-2 border-gray-50 w-full" />
+                                  <div className="w-full relative">
+                                    <div className="text-sm font-medium flex md:justify-center lg:justify:center md:text-center lg:text-center items-center">
+                                      {activity.title}
+                                    </div>
+                                  </div>
+                                  <div className="border-b-2 border-gray-50 w-full" />
+                                  <div className="flex md:justify-center lg:justify-center text-xs">
+                                    <span className="truncate">
+                                      {moment(activity.performedAt).local().fromNow()} -{" "}
+                                      {moment(activity.performedAt)
+                                        .local()
+                                        .toDate()
+                                        .toLocaleDateString()}{" "}
+                                      {moment(activity.performedAt)
+                                        .local()
+                                        .toDate()
+                                        .toLocaleTimeString()}
+                                      {/* by {activity.performedByUser?.name} */}
+                                    </span>
+                                  </div>
+                                </div>
+                              </Card>
+                              {index !== candidate?.activities?.length - 1 && (
+                                <div className="flex justify-center items-center">
+                                  <div className="h-10 w-1 border-2 border-neutral-300" />
+                                </div>
+                              )}
+                            </>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
               {candidateDetailToggleView === CandidateDetailToggleView.Notes && (
                 <Form
                   key={

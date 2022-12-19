@@ -3,6 +3,14 @@ import { ArrowNarrowLeftIcon } from "@heroicons/react/outline"
 import Link from "next/link"
 import { useState } from "react"
 import LandingLayout from "src/core/layouts/LandingLayout"
+import {
+  FREE_CANDIDATES_LIMIT,
+  FREE_JOBS_LIMIT,
+  LIFETIMET1_CANDIDATES_LIMIT,
+  LIFETIMET1_FILES_LIMIT,
+  LIFETIMET1_JOBS_LIMIT,
+  LIFETIMET1_MEMBERS_LIMIT,
+} from "src/plans/constants"
 
 export default function Pricing({}) {
   const [licenseTier, setLicenseTier] = useState(1)
@@ -70,15 +78,15 @@ export default function Pricing({}) {
                   </li> */}
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
-                    <div>3 Active Jobs at a time</div>
+                    <div>{FREE_JOBS_LIMIT} Active Jobs at a time</div>
+                  </li>
+                  <li className="py-3">
+                    <div className="text-neutral-600">Candidates per job</div>
+                    <div>{FREE_CANDIDATES_LIMIT} Candidates</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Team Collaboration</div>
                     <div>No</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidates per job</div>
-                    <div>50 Candidates</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Candidate File Uploads</div>
@@ -167,7 +175,7 @@ export default function Pricing({}) {
                   </li> */}
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
-                    <div>10 Active Jobs at a time</div>
+                    <div>{LIFETIMET1_JOBS_LIMIT} Active Jobs at a time</div>
                     {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
                       {licenseTier === 1 && <div>5</div>}
                       {licenseTier === 2 && <div>10</div>}
@@ -183,8 +191,18 @@ export default function Pricing({}) {
                     </div> */}
                   </li>
                   <li className="py-3">
+                    <div className="text-neutral-600">Candidates per job</div>
+                    <div>{LIFETIMET1_CANDIDATES_LIMIT} Candidates</div>
+                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
+                      {licenseTier === 1 && <div>100</div>}
+                      {licenseTier === 2 && <div>200</div>}
+                      {licenseTier === 3 && <div>300</div>}
+                      <div>&nbsp;Candidates</div>
+                    </div> */}
+                  </li>
+                  <li className="py-3">
                     <div className="text-neutral-600">Team Collaboration</div>
-                    <div>5 Users can Collaborate</div>
+                    <div>{LIFETIMET1_MEMBERS_LIMIT} Users can Collaborate</div>
                     {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
                       {licenseTier === 1 && <div>5</div>}
                       {licenseTier === 2 && <div>10</div>}
@@ -200,18 +218,8 @@ export default function Pricing({}) {
                     </div> */}
                   </li>
                   <li className="py-3">
-                    <div className="text-neutral-600">Candidates per job</div>
-                    <div>300 Candidates</div>
-                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>100</div>}
-                      {licenseTier === 2 && <div>200</div>}
-                      {licenseTier === 3 && <div>300</div>}
-                      <div>&nbsp;Candidates</div>
-                    </div> */}
-                  </li>
-                  <li className="py-3">
                     <div className="text-neutral-600">Candidate File Uploads</div>
-                    <div>10 Files per Candidate</div>
+                    <div>{LIFETIMET1_FILES_LIMIT} Files per Candidate</div>
                     {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
                       {licenseTier === 1 && <div>10</div>}
                       {licenseTier === 2 && <div>20</div>}

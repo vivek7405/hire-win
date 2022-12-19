@@ -1,8 +1,10 @@
 import { Ctx, paginate } from "blitz"
 import db, { Prisma } from "db"
 import Guard from "src/guard/ability"
-import { JobViewType } from "types"
+import { JobViewType, PlanName } from "types"
 import moment from "moment"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
 
 interface GetJobsInput extends Pick<Prisma.JobUserFindManyArgs, "orderBy" | "skip" | "take"> {}
 
@@ -25,7 +27,30 @@ async function getCompanyJobsForCareersPage(
 
   // const validThrough = { gte: moment().utc().toDate() }
 
+  const companyJobs = await db.job.findMany({
+    where: {
+      companyId: companyId || "0",
+    },
+    include: {
+      _count: { select: { candidates: true } },
+    },
+  })
+
+  const activePlanName = await getCurrentCompanyOwnerActivePlan({}, ctx)
+
+  let jobIdsWhereCandidateLimitReached: string[] = []
+  if (activePlanName === PlanName.FREE) {
+    jobIdsWhereCandidateLimitReached = companyJobs
+      ?.filter((job) => job._count.candidates >= FREE_CANDIDATES_LIMIT)
+      ?.map((job) => job.id)
+  } else if (activePlanName === PlanName.LIFETIMET1) {
+    jobIdsWhereCandidateLimitReached = companyJobs
+      ?.filter((job) => job._count.candidates >= LIFETIMET1_CANDIDATES_LIMIT)
+      ?.map((job) => job.id)
+  }
+
   const where = {
+    id: { notIn: jobIdsWhereCandidateLimitReached },
     archived: false,
     hidden: false,
     // validThrough,
@@ -52,9 +77,7 @@ async function getCompanyJobsForCareersPage(
         orderBy,
         include: {
           category: true,
-          candidates: true,
           stages: true,
-          // workflow: { include: { stages: { include: { stage: true } } } },
         },
       }),
   })
