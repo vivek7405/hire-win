@@ -873,14 +873,8 @@ const SingleCandidatePageContent = ({
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
-                    )}
-                  >
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
                     <Link
-                      legacyBehavior
                       prefetch={true}
                       href={
                         user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
@@ -892,12 +886,43 @@ const SingleCandidatePageContent = ({
                       }
                       passHref
                     >
-                      <a className="flex items-center space-x-2">
+                      <div
+                        className={classNames(
+                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                          "block px-4 py-2 text-sm",
+                          "flex items-center space-x-2 cursor-pointer"
+                        )}
+                      >
                         <CogIcon className="w-5 h-5 text-neutral-500" />
                         <span>Go to Job Settings</span>
-                      </a>
+                      </div>
                     </Link>
                   </a>
+                  // <a
+                  //   className={classNames(
+                  //     active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                  //     "block px-4 py-2 text-sm"
+                  //   )}
+                  // >
+                  //   <Link
+                  //     legacyBehavior
+                  //     prefetch={true}
+                  //     href={
+                  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                  //         JobUserRole.OWNER ||
+                  //       user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
+                  //         JobUserRole.ADMIN
+                  //         ? Routes.JobSettingsPage({ slug: candidate?.job?.slug! })
+                  //         : Routes.JobSettingsSchedulingPage({ slug: candidate?.job?.slug! })
+                  //     }
+                  //     passHref
+                  //   >
+                  //     <a className="flex items-center space-x-2">
+                  //       <CogIcon className="w-5 h-5 text-neutral-500" />
+                  //       <span>Go to Job Settings</span>
+                  //     </a>
+                  //   </Link>
+                  // </a>
                 )}
               </Menu.Item>
             </div>
