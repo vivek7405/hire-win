@@ -198,8 +198,10 @@ export const Stages = ({
             <div className="space-y-2">
               <div className="w-full relative">
                 <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                  {/* {stage.name} */}
-                  <Link
+                  <div className="pr-20 md:px-20 lg:px-20 text-neutral-700 truncate">
+                    {stage.name}
+                  </div>
+                  {/* <Link
                     legacyBehavior
                     prefetch={true}
                     href={Routes.JobSettingsSingleScoreCardPage({
@@ -214,9 +216,9 @@ export const Stages = ({
                     >
                       {stage.name}
                     </a>
-                  </Link>
+                  </Link> */}
                 </div>
-                {/* <div className="absolute top-0.5 right-0">
+                <div className="absolute top-0.5 right-0">
                   <button
                     id={"edit-" + stage.id}
                     className="float-right text-indigo-600 hover:text-indigo-800"
@@ -234,10 +236,25 @@ export const Stages = ({
                   >
                     <CreditCardIcon className="w-5 h-5" />
                   </button>
-                </div> */}
+                </div>
                 {stage.allowEdit && (
                   <>
-                    <div className="absolute top-0.5 right-0">
+                    <div className="absolute top-0.5 right-6">
+                      <button
+                        id={"edit-" + stage.id}
+                        className="float-right text-indigo-600 hover:text-indigo-800"
+                        title="Edit Stage Name"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setStageToEdit(stage)
+                          setOpenAddNewStage(true)
+                        }}
+                      >
+                        <PencilIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="absolute top-0.5 right-12">
                       <button
                         className="float-right text-red-600 hover:text-red-800"
                         title="Delete Stage"
@@ -253,21 +270,6 @@ export const Stages = ({
                         }}
                       >
                         <XIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <div className="absolute top-0.5 right-7">
-                      <button
-                        id={"edit-" + stage.id}
-                        className="float-right text-indigo-600 hover:text-indigo-800"
-                        title="Edit Stage Name"
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          setStageToEdit(stage)
-                          setOpenAddNewStage(true)
-                        }}
-                      >
-                        <PencilIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </>
@@ -496,7 +498,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                 Add and re-order hiring stages for this job
               </h4>
               <h4 className="text-xs sm:text-sm text-gray-700">
-                Click on the stage name to configure its score card
+                Click on the card icon to configure stage score card
               </h4>
               {activePlanName === PlanName.FREE && (
                 <div className="mt-2">

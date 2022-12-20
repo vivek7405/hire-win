@@ -47,6 +47,7 @@ import JobSettingsLayout from "src/core/layouts/JobSettingsLayout"
 import getJob from "src/jobs/queries/getJob"
 import getStage from "src/stages/queries/getStage"
 import { AuthorizationError } from "blitz"
+import { PencilIcon } from "@heroicons/react/solid"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -210,7 +211,8 @@ export const CardQuestions = ({
               <div className="flex flex-col space-y-2">
                 <div className="w-full relative">
                   <div className="font-bold flex justify-between">
-                    {question.allowEdit ? (
+                    <div className="pr-12 text-neutral-700 truncate">{question.title}</div>
+                    {/* {question.allowEdit ? (
                       <a
                         className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                         onClick={(e) => {
@@ -222,35 +224,40 @@ export const CardQuestions = ({
                         {question.title}
                       </a>
                     ) : (
-                      // <Link legacyBehavior prefetch={true}
-                      //   href={Routes.SingleCardQuestionPage({ slug: question.slug })}
-                      //   passHref
-                      // >
-                      //   <a
-                      //     data-testid={`cardQuestionlink`}
-                      //     className="text-theme-600 hover:text-theme-900"
-                      //   >
-                      //     {question.name}
-                      //   </a>
-                      // </Link>
                       question.title
-                    )}
+                    )} */}
                   </div>
                   {question.allowEdit && scoreCardQuestions?.length > 1 && (
-                    <div className="absolute top-0.5 right-0">
-                      <button
-                        className="float-right text-red-600 hover:text-red-800"
-                        title="Remove Question"
-                        onClick={async (e) => {
-                          e.preventDefault()
-
-                          setScoreCardQuestionToRemove(question)
-                          setOpenConfirm(true)
-                        }}
-                      >
-                        <XIcon className="h-5 w-5" />
-                      </button>
-                    </div>
+                    <>
+                      <div className="absolute top-0.5 right-0">
+                        <button
+                          className="float-right text-red-600 hover:text-red-800"
+                          title="Remove Question"
+                          onClick={async (e) => {
+                            e.preventDefault()
+                            setScoreCardQuestionToRemove(question)
+                            setOpenConfirm(true)
+                          }}
+                        >
+                          <XIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                      <div className="absolute top-0.5 right-6">
+                        <button
+                          id={"edit-" + question.id}
+                          className="float-right text-indigo-600 hover:text-indigo-800"
+                          title="Edit Candidate Pool"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setCardQuestionToEdit(question)
+                            setOpenAddNewCardQuestion(true)
+                          }}
+                        >
+                          <PencilIcon className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
 

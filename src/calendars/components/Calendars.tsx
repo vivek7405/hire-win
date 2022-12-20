@@ -18,6 +18,7 @@ import getDefaultCalendarByUser from "../queries/getDefaultCalendarByUser"
 import AddCalendarForm from "./AddCalendarForm"
 import { z } from "zod"
 import updateCalendarName from "../mutations/updateCalendarName"
+import { PencilIcon } from "@heroicons/react/solid"
 
 type CalendarProps = {
   user: User
@@ -243,8 +244,11 @@ const Calendars = ({ user }: CalendarProps) => {
               <Card key={cal.id}>
                 <div className="space-y-2">
                   <div className="w-full relative">
-                    <div className="flex md:justify-center lg:justify:center items-center">
-                      <button
+                    <div className="flex md:justify-center lg:justify:center items-center font-bold">
+                      <div className="pr-12 md:px-12 lg:px-12 text-neutral-700 truncate">
+                        {cal.name}
+                      </div>
+                      {/* <button
                         onClick={() => {
                           setCalendarToUpdateName(cal as any)
                           setOpenNameUpdateModal(true)
@@ -254,7 +258,7 @@ const Calendars = ({ user }: CalendarProps) => {
                         <span className="cursor-pointer text-theme-600 font-bold hover:text-theme-800">
                           {cal.name}
                         </span>
-                      </button>
+                      </button> */}
                     </div>
                     <div className="absolute top-0.5 right-0">
                       <button
@@ -269,6 +273,21 @@ const Calendars = ({ user }: CalendarProps) => {
                         }}
                       >
                         <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="absolute top-0.5 right-6">
+                      <button
+                        id={"edit-" + cal.id}
+                        className="float-right text-indigo-600 hover:text-indigo-800"
+                        title="Edit Candidate Pool"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCalendarToUpdateName(cal as any)
+                          setOpenNameUpdateModal(true)
+                        }}
+                      >
+                        <PencilIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </div>

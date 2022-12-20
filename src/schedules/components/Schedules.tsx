@@ -1,5 +1,5 @@
-import { useRouter } from "next/router";
-import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc";
+import { useRouter } from "next/router"
+import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc"
 import { TrashIcon } from "@heroicons/react/outline"
 import { DailySchedule, Schedule } from "@prisma/client"
 import Card from "src/core/components/Card"
@@ -28,6 +28,7 @@ import Form from "src/core/components/Form"
 import LabeledReactSelectField from "src/core/components/LabeledReactSelectField"
 import getDefaultScheduleByUser from "../queries/getDefaultScheduleByUser"
 import updateDefaultSchedule from "../mutations/updateDefaultSchedule"
+import { PencilIcon } from "@heroicons/react/solid"
 
 const Schedules = ({ user }) => {
   const [deleteScheduleMutation] = useMutation(deleteSchedule)
@@ -318,7 +319,8 @@ const Schedules = ({ user }) => {
             <div className="space-y-2">
               <div className="w-full relative">
                 <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                  <a
+                  <div className="pr-12 md:px-12 lg:px-12 text-neutral-700 truncate">{s.name}</div>
+                  {/* <a
                     className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
                     onClick={() => {
                       setScheduleToEdit(s)
@@ -326,7 +328,7 @@ const Schedules = ({ user }) => {
                     }}
                   >
                     {s.name}
-                  </a>
+                  </a> */}
                 </div>
                 <div className="absolute top-0.5 right-0">
                   <button
@@ -340,7 +342,22 @@ const Schedules = ({ user }) => {
                       setOpenConfirm(true)
                     }}
                   >
-                    <TrashIcon className="w-5 h-5 md:w-6 md:h-6 lg:w-6 lg:h-6" />
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="absolute top-0.5 right-6">
+                  <button
+                    id={"edit-" + s.id}
+                    className="float-right text-indigo-600 hover:text-indigo-800"
+                    title="Edit Candidate Pool"
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setScheduleToEdit(s)
+                      setOpenAddSchedule(true)
+                    }}
+                  >
+                    <PencilIcon className="w-5 h-5" />
                   </button>
                 </div>
               </div>

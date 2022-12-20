@@ -27,6 +27,7 @@ import updateCategory from "src/categories/mutations/updateCategory"
 import { TrashIcon } from "@heroicons/react/outline"
 import getCategories from "src/categories/queries/getCategories"
 import Pagination from "src/core/components/Pagination"
+import { PencilIcon } from "@heroicons/react/solid"
 
 export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -212,17 +213,17 @@ const Categories = () => {
               <Card isFull={true} key={c.id}>
                 <div className="space-y-2">
                   <div className="w-full relative">
-                    <div className="font-bold flex items-center">
-                      <a
-                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
+                    <div className="font-bold flex items-center text-neutral-600">
+                      {/* <a
+                        className="cursor-pointer text-theme-600 hover:text-theme-800 pr-12 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setCategoryToEdit(c)
                           setOpenModal(true)
                         }}
-                      >
-                        {c.name}
-                      </a>
+                      > */}
+                      <div className="pr-12 text-neutral-700 truncate">{c.name}</div>
+                      {/* </a> */}
                     </div>
                     <div className="absolute top-0.5 right-0">
                       <button
@@ -237,6 +238,21 @@ const Categories = () => {
                         }}
                       >
                         <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="absolute top-0.5 right-6">
+                      <button
+                        id={"edit-" + c.id}
+                        className="float-right text-indigo-600 hover:text-indigo-800"
+                        title="Edit Candidate Pool"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCategoryToEdit(c)
+                          setOpenModal(true)
+                        }}
+                      >
+                        <PencilIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </div>

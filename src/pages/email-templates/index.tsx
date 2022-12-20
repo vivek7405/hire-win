@@ -28,6 +28,7 @@ import Pagination from "src/core/components/Pagination"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import { PlanName } from "types"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
+import { PencilIcon } from "@heroicons/react/solid"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -255,16 +256,16 @@ const EmailTemplates = ({ activePlanName }) => {
                 <div className="space-y-2">
                   <div className="w-full relative">
                     <div className="font-bold flex items-center">
-                      <a
+                      {/* <a
                         className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                         onClick={(e) => {
                           e.preventDefault()
                           setEmailTemplateToEdit(et)
                           setOpenModal(true)
                         }}
-                      >
-                        {et.name}
-                      </a>
+                      > */}
+                      <div className="pr-12 text-neutral-700 truncate">{et.name}</div>
+                      {/* </a> */}
                     </div>
                     <div className="absolute top-0.5 right-0">
                       <button
@@ -279,6 +280,21 @@ const EmailTemplates = ({ activePlanName }) => {
                         }}
                       >
                         <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="absolute top-0.5 right-6">
+                      <button
+                        id={"edit-" + et.id}
+                        className="float-right text-indigo-600 hover:text-indigo-800"
+                        title="Edit Candidate Pool"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setEmailTemplateToEdit(et)
+                          setOpenModal(true)
+                        }}
+                      >
+                        <PencilIcon className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
