@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { useQuery } from "@blitzjs/rpc";
-import { useSession } from "@blitzjs/auth";
-import { useRouter } from "next/router";
+import Link from "next/link"
+import { useQuery } from "@blitzjs/rpc"
+import { useSession } from "@blitzjs/auth"
+import { useRouter } from "next/router"
 import React, { ReactNode, Suspense } from "react"
 import {
   ClockIcon,
@@ -94,7 +94,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
   ]
 
   return (
-    <>
+    <div className="bg-gray-100">
       <JobSettingsBreadcrumbs job={job!} />
       <div className="flex flex-col lg:flex-row mt-6 lg:space-x-4">
         <div className="mb-6 lg:mb-0 w-full lg:w-1/5">
@@ -128,7 +128,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
           <Suspense fallback="Loading">{children}</Suspense>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

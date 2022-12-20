@@ -34,7 +34,7 @@ const AuthLayout = ({
         <title>{title || "hire-win"}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-gray-100">
         {!hideNavbar && (
           <Suspense fallback="Loading...">
             <Navbar
