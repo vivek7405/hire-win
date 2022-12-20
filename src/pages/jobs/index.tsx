@@ -297,9 +297,9 @@ const Jobs = ({
         } else {
           if (activePlanName === PlanName.FREE) {
             if (activeJobsCount >= FREE_JOBS_LIMIT) {
-              setConfirmHeader("Upgrade to lifetime plan")
+              setConfirmHeader("Reached Job Limit!")
               setConfirmMessage(
-                `The free plan allows upto ${FREE_JOBS_LIMIT} jobs to be added. Since this job already has ${FREE_JOBS_LIMIT} jobs added, you can't add a new job.`
+                `The Free Plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since you already have ${FREE_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one or else upgrade to the lifetime plan for having more active jobs.`
               )
               setCancelButtonText("Ok")
               setHideConfirmButton(true)
