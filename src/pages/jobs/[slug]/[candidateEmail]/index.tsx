@@ -846,29 +846,27 @@ const SingleCandidatePageContent = ({
             <div className="py-1">
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
-                    )}
-                  >
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
                     <Link
-                      legacyBehavior
                       prefetch={true}
                       href={Routes.JobDescriptionPage({
                         companySlug: candidate?.job?.company?.slug,
                         jobSlug: candidate?.job?.slug,
                       })}
                       passHref
+                      target="_blank"
+                      rel="noreferrer"
                     >
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-2"
+                      <div
+                        className={classNames(
+                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                          "block px-4 py-2 text-sm",
+                          "flex items-center space-x-2 cursor-pointer"
+                        )}
                       >
                         <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
                         <span>View Job Listing</span>
-                      </a>
+                      </div>
                     </Link>
                   </a>
                 )}
@@ -1629,14 +1627,33 @@ const SingleCandidatePageContent = ({
                     </dl>
                   </div>
 
-                  <div className="my-4 w-full flex items-center justify-center">
+                  <div className="my-4 w-full flex items-center justify-center space-x-2 px-2">
+                    <button
+                      className="bg-white border hover:bg-neutral-500 text-neutral-600 hover:text-white rounded-lg px-4 py-1 text-center"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setOpenEditModal(true)
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="bg-white border hover:bg-red-500 text-red-500 hover:text-white rounded-lg px-4 py-1 text-center"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setCandidateToReject(candidate)
+                        setOpenCandidateRejectConfirm(true)
+                      }}
+                    >
+                      {candidate?.rejected ? "Restore" : "Reject"}
+                    </button>
                     <Link
                       legacyBehavior
                       href={Routes.JobSettingsApplicationFormPage({
                         slug: candidate?.job?.slug || "0",
                       })}
                     >
-                      <a className="bg-theme-600 hover:bg-theme-700 text-white rounded-lg px-4 py-1">
+                      <a className="bg-white border hover:bg-theme-500 text-theme-600 hover:text-white rounded-lg px-4 py-1 text-center truncate">
                         Add more questions
                       </a>
                     </Link>
@@ -2055,14 +2072,22 @@ const SingleCandidatePageContent = ({
                     />
                   )}
                   {candidateStageToggleView === CandidateStageToggleView.Interviews && (
-                    <Suspense fallback="Loading...">
-                      <Interviews
-                        user={user}
-                        stageId={selectedStage?.id || "0"}
-                        candidate={candidate}
-                        key={`${candidate?.id}-${selectedStage?.id}`}
-                      />
-                    </Suspense>
+                    <>
+                      {activePlanName === PlanName.FREE && (
+                        <div className="px-3 py-2 mt-5 mx-3">
+                          <UpgradeMessage message="Upgrade to schedule 1 click interviews with auto-generated meeting links" />
+                        </div>
+                      )}
+                      <Suspense fallback="Loading...">
+                        <Interviews
+                          key={`${candidate?.id}-${selectedStage?.id}`}
+                          user={user}
+                          stageId={selectedStage?.id || "0"}
+                          candidate={candidate}
+                          activePlanName={activePlanName}
+                        />
+                      </Suspense>
+                    </>
                   )}
                   {candidateStageToggleView === CandidateStageToggleView.Comments && (
                     <Comments

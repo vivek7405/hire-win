@@ -72,10 +72,10 @@ export default function Pricing({}) {
                   </div> */}
                 </div>
                 <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
-                  {/* <li className="py-3">
+                  <li className="py-3">
                     <div className="text-neutral-600">Company with Careers Page</div>
                     <div>1 Company</div>
-                  </li> */}
+                  </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
                     <div>{FREE_JOBS_LIMIT} Active Jobs at a time</div>
@@ -169,10 +169,10 @@ export default function Pricing({}) {
                   </div> */}
                 </div>
                 <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
-                  {/* <li className="py-3">
+                  <li className="py-3">
                     <div className="text-neutral-600">Company with Careers Page</div>
-                    <div>1 Company</div>
-                  </li> */}
+                    <div>3 Companies</div>
+                  </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
                     <div>{LIFETIMET1_JOBS_LIMIT} Active Jobs at a time</div>
