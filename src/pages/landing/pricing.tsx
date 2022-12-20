@@ -5,8 +5,10 @@ import { useState } from "react"
 import LandingLayout from "src/core/layouts/LandingLayout"
 import {
   FREE_CANDIDATES_LIMIT,
+  FREE_COMPANIES_LIMIT,
   FREE_JOBS_LIMIT,
   LIFETIMET1_CANDIDATES_LIMIT,
+  LIFETIMET1_COMPANIES_LIMIT,
   LIFETIMET1_FILES_LIMIT,
   LIFETIMET1_JOBS_LIMIT,
   LIFETIMET1_MEMBERS_LIMIT,
@@ -74,7 +76,7 @@ export default function Pricing({}) {
                 <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
                   <li className="py-3">
                     <div className="text-neutral-600">Company with Careers Page</div>
-                    <div>1 Company</div>
+                    <div>{FREE_COMPANIES_LIMIT} Company</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
@@ -171,7 +173,7 @@ export default function Pricing({}) {
                 <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
                   <li className="py-3">
                     <div className="text-neutral-600">Company with Careers Page</div>
-                    <div>3 Companies</div>
+                    <div>{LIFETIMET1_COMPANIES_LIMIT} Companies</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
