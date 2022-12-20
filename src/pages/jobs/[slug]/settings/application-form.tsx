@@ -39,6 +39,8 @@ import updateFormQuestionBehaviour from "src/form-questions/mutations/updateForm
 import { AuthorizationError } from "blitz"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
+import classNames from "src/core/utils/classNames"
+import { PencilIcon } from "@heroicons/react/solid"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -205,15 +207,8 @@ export const JobApplicationForm = ({
               <div className="flex flex-col space-y-2">
                 <div className="w-full relative">
                   <div className="font-bold flex justify-between">
-                    {question.allowEdit ? (
-                      // <Link legacyBehavior prefetch={true} href={Routes.SingleQuestionPage({ slug: fq.question.slug })} passHref>
-                      //   <a
-                      //     data-testid={`questionlink`}
-                      //     className="text-theme-600 hover:text-theme-900"
-                      //   >
-                      //     {fq.question.name}
-                      //   </a>
-                      // </Link>
+                    <div className="pr-12 text-neutral-700 truncate">{question.title}</div>
+                    {/* {question.allowEdit ? (
                       <a
                         className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 truncate"
                         onClick={(e) => {
@@ -226,27 +221,44 @@ export const JobApplicationForm = ({
                       </a>
                     ) : (
                       question.title
-                    )}
+                    )} */}
                   </div>
                   {question.allowEdit && (
-                    <div className="absolute top-0.5 right-0">
-                      <button
-                        className="float-right text-red-600 hover:text-red-800"
-                        title="Remove Question"
-                        onClick={async (e) => {
-                          e.preventDefault()
+                    <>
+                      <div className="absolute top-0.5 right-0">
+                        <button
+                          className="float-right text-red-600 hover:text-red-800"
+                          title="Remove Question"
+                          onClick={async (e) => {
+                            e.preventDefault()
 
-                          if (activePlanName === PlanName.FREE) {
-                            setOpenUpgradeConfirm(true)
-                          } else {
-                            setFormQuestionToRemove(question)
-                            setOpenConfirm(true)
-                          }
-                        }}
-                      >
-                        <XIcon className="h-5 w-5" />
-                      </button>
-                    </div>
+                            if (activePlanName === PlanName.FREE) {
+                              setOpenUpgradeConfirm(true)
+                            } else {
+                              setFormQuestionToRemove(question)
+                              setOpenConfirm(true)
+                            }
+                          }}
+                        >
+                          <XIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                      <div className="absolute top-0.5 right-6">
+                        <button
+                          id={"edit-" + question.id}
+                          className="float-right text-indigo-600 hover:text-indigo-800"
+                          title="Edit Candidate Pool"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setQuestionToEdit(question)
+                            setOpenAddNewQuestion(true)
+                          }}
+                        >
+                          <PencilIcon className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
 
