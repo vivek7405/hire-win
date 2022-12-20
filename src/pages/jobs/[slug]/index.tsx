@@ -220,6 +220,89 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
+const CandidateActions = ({
+  candidate,
+  job,
+  user,
+  setCandidateToEdit,
+  setOpenModal,
+  viewRejected,
+  setCandidateToReject,
+  setOpenCandidateRejectConfirm,
+  setCandidateToMove,
+  setOpenCandidateMoveConfirm,
+}) => {
+  return (
+    <div className="flex items-center justify-between">
+      <Form
+        noFormatting={true}
+        onSubmit={async () => {
+          return
+        }}
+      >
+        <LabeledRatingField
+          name="candidateAverageRating"
+          ratingClass="!flex items-center"
+          height={5}
+          color={candidate.rejected ? "red" : "theme"}
+          value={getScoreAverage(candidate?.scores?.map((score) => score.rating) || [])}
+          disabled={true}
+        />
+      </Form>
+      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.OWNER ||
+        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.ADMIN) && (
+        <div className="flex items-center space-x-2">
+          <span>
+            <button
+              className="float-right text-theme-600 hover:text-theme-800"
+              title={"Edit Candidate"}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                setCandidateToEdit(candidate)
+                setOpenModal(true)
+              }}
+            >
+              <PencilIcon className="w-5 h-5" />
+            </button>
+          </span>
+          <span>
+            <button
+              className="float-right text-red-600 hover:text-red-800"
+              title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                setCandidateToReject(candidate)
+                setOpenCandidateRejectConfirm(true)
+              }}
+            >
+              {viewRejected ? <RefreshIcon className="w-5 h-5" /> : <BanIcon className="w-5 h-5" />}
+            </button>
+          </span>
+          {!viewRejected && (
+            <span>
+              <button
+                className="float-right text-theme-600 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Move to next stage"
+                type="button"
+                disabled={candidate.stage?.order === job?.stages?.length}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setCandidateToMove(candidate)
+                  setOpenCandidateMoveConfirm(true)
+                }}
+              >
+                <ArrowRightIcon className="w-5 h-5" />
+              </button>
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const getBoard = (
   job,
   user,
@@ -277,79 +360,19 @@ const getBoard = (
                   </div>
 
                   <div className="border-b-2 my-2 border-gray-100 w-full"></div>
-                  <div className="flex items-center justify-between">
-                    <Form
-                      noFormatting={true}
-                      onSubmit={async () => {
-                        return
-                      }}
-                    >
-                      <LabeledRatingField
-                        name="candidateAverageRating"
-                        ratingClass="!flex items-center"
-                        height={5}
-                        color={c.rejected ? "red" : "theme"}
-                        value={getScoreAverage(c?.scores?.map((score) => score.rating) || [])}
-                        disabled={true}
-                      />
-                    </Form>
-                    {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                      JobUserRole.OWNER ||
-                      user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                        JobUserRole.ADMIN) && (
-                      <div className="flex items-center space-x-2">
-                        <span>
-                          <button
-                            className="float-right text-theme-600 hover:text-theme-800"
-                            title={"Edit Candidate"}
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setCandidateToEdit(c)
-                              setOpenModal(true)
-                            }}
-                          >
-                            <PencilIcon className="w-5 h-5" />
-                          </button>
-                        </span>
-                        <span>
-                          <button
-                            className="float-right text-red-600 hover:text-red-800"
-                            title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setCandidateToReject(c)
-                              setOpenCandidateRejectConfirm(true)
-                            }}
-                          >
-                            {viewRejected ? (
-                              <RefreshIcon className="w-5 h-5" />
-                            ) : (
-                              <BanIcon className="w-5 h-5" />
-                            )}
-                          </button>
-                        </span>
-                        {!viewRejected && (
-                          <span>
-                            <button
-                              className="float-right text-theme-600 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Move to next stage"
-                              type="button"
-                              disabled={c.stage?.order === job?.stages?.length}
-                              onClick={(e) => {
-                                e.preventDefault()
-                                setCandidateToMove(c)
-                                setOpenCandidateMoveConfirm(true)
-                              }}
-                            >
-                              <ArrowRightIcon className="w-5 h-5" />
-                            </button>
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <CandidateActions
+                    key={c.id}
+                    candidate={c}
+                    job={job}
+                    user={user}
+                    setCandidateToEdit={setCandidateToEdit}
+                    setCandidateToMove={setCandidateToMove}
+                    setCandidateToReject={setCandidateToReject}
+                    setOpenCandidateMoveConfirm={setOpenCandidateMoveConfirm}
+                    setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
+                    setOpenModal={setOpenModal}
+                    viewRejected={viewRejected}
+                  />
 
                   <div className="border-b-2 my-2 border-gray-100 w-full"></div>
                   <div className="flex items-center justify-between">
@@ -465,6 +488,11 @@ const Candidates = (props: CandidateProps) => {
     }
   }
 
+  const userForTable = props.user
+  const setCandidateToEditForTable = props.setCandidateToEdit
+  const setOpenModalForTable = props.setOpenModal
+  const viewRejectedForTable = props.viewRejected
+
   type ColumnType = {
     Header: string
     accessor?: string
@@ -475,6 +503,7 @@ const Candidates = (props: CandidateProps) => {
       Header: "Name",
       accessor: "name",
       Cell: (props) => {
+        const candidate = props.cell.row.original
         return (
           <>
             <Link
@@ -486,9 +515,41 @@ const Candidates = (props: CandidateProps) => {
               })}
               passHref
             >
-              <a className="text-theme-600 hover:text-theme-900">{props.value}</a>
+              <a
+                className={classNames(
+                  candidate?.rejected
+                    ? "text-red-600 hover:text-red-700"
+                    : "text-theme-600 hover:text-theme-700"
+                )}
+              >
+                {props.value}
+              </a>
             </Link>
           </>
+        )
+      },
+    },
+    {
+      Header: "Action",
+      Cell: (props) => {
+        const candidate = props.cell.row.original
+        const job = candidate.job
+        return (
+          <div className="w-52">
+            <CandidateActions
+              key={candidate.id}
+              candidate={candidate}
+              job={job}
+              user={userForTable}
+              setCandidateToEdit={setCandidateToEditForTable}
+              setCandidateToMove={setCandidateToMove}
+              setCandidateToReject={setCandidateToReject}
+              setOpenCandidateMoveConfirm={setOpenCandidateMoveConfirm}
+              setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
+              setOpenModal={setOpenModalForTable}
+              viewRejected={viewRejectedForTable}
+            />
+          </div>
         )
       },
     },
@@ -795,7 +856,7 @@ const Candidates = (props: CandidateProps) => {
             startPage={startPage}
             endPage={endPage}
             noSearch={true}
-            resultName="candidate"
+            resultName={props.viewRejected ? "rejected candidate" : "candidate"}
           />
         </>
       ) : (
@@ -810,7 +871,7 @@ const Candidates = (props: CandidateProps) => {
           startPage={startPage}
           endPage={endPage}
           noSearch={true}
-          resultName="candidate"
+          resultName={props.viewRejected ? "rejected candidate" : "candidate"}
         />
       )}
     </>
@@ -1001,25 +1062,23 @@ const SingleJobPageContent = ({
             <div className="py-1">
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
-                    )}
-                  >
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
                     <Link
-                      legacyBehavior
                       prefetch={true}
                       href={Routes.JobDescriptionPage({
-                        companySlug: job?.company?.slug || "0",
-                        jobSlug: job?.slug || "0",
+                        companySlug: job?.company?.slug,
+                        jobSlug: job?.slug,
                       })}
                       passHref
                     >
                       <a
                         target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-2 whitespace-nowrap"
+                        rel="noreferrer"
+                        className={classNames(
+                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                          "block px-4 py-2 text-sm",
+                          "flex items-center space-x-2 cursor-pointer"
+                        )}
                       >
                         <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
                         <span>View Job Listing</span>
@@ -1030,14 +1089,8 @@ const SingleJobPageContent = ({
               </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm whitespace-nowrap"
-                    )}
-                  >
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
                     <Link
-                      legacyBehavior
                       prefetch={true}
                       href={
                         user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
@@ -1049,10 +1102,16 @@ const SingleJobPageContent = ({
                       }
                       passHref
                     >
-                      <a className="flex items-center space-x-2">
+                      <div
+                        className={classNames(
+                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                          "block px-4 py-2 text-sm",
+                          "flex items-center space-x-2 cursor-pointer"
+                        )}
+                      >
                         <CogIcon className="w-5 h-5 text-neutral-500" />
                         <span>Go to Job Settings</span>
-                      </a>
+                      </div>
                     </Link>
                   </a>
                 )}
@@ -1367,6 +1426,40 @@ const SingleJobPageContent = ({
           {jobSettingsLink} */}
           {newCandidateButton}
         </div>
+      </div>
+
+      <div className="hidden md:flex items-center justify-center space-x-2">
+        <button
+          // className="px-4 py-1 border rounded-lg bg-white hover:bg-neutral-500 hover:text-white"
+          className={classNames(
+            "px-4 py-1 border border-neutral-300 rounded-lg",
+            viewRejected
+              ? "bg-red-500 hover:bg-red-600 text-white"
+              : "text-neutral-600 bg-white hover:bg-neutral-500 hover:text-white"
+          )}
+          onClick={(e) => {
+            e.preventDefault()
+            setViewRejected(!viewRejected)
+          }}
+        >
+          {/* {viewRejected ? "Viewing Rejected" : "View Rejected"} */}
+          <span className="flex items-center justify-center space-x-2">
+            <BanIcon className="w-5 h-5" />
+            <span>{viewRejected ? "Viewing Rejected" : "View Rejected"}</span>
+          </span>
+        </button>
+        <button
+          className="px-4 py-1 border border-neutral-300 text-neutral-600 bg-white rounded-lg hover:bg-neutral-500 hover:text-white"
+          onClick={(e) => {
+            e.preventDefault()
+            setTable(!isTable)
+          }}
+        >
+          <span className="flex items-center justify-center space-x-2">
+            <RefreshIcon className="w-5 h-5" />
+            <span>{isTable ? "Board View" : "Table View"}</span>
+          </span>
+        </button>
       </div>
 
       <Suspense fallback="Loading...">
