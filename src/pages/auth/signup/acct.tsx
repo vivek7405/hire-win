@@ -178,7 +178,7 @@ const OldSignupPage: BlitzPage = () => {
                   window.location.href = url.replace(/&next=/g, "")
                 } else {
                   // router.push("/")
-                  window.location.href = "/jobs"
+                  window.location.href = Routes.JobsHome().pathname
                 }
               }}
             />
@@ -190,7 +190,11 @@ const OldSignupPage: BlitzPage = () => {
             <div className="w-1/2 h-px bg-neutral-300 rounded-full my-7" />
           </div>
 
-          <a href="/api/auth/google">
+          <a
+            href={`/api/auth/google?redirectUrl=${
+              router.query.next ? router.query.next : Routes.JobsHome().pathname
+            }`}
+          >
             <button className="w-full px-4 py-2 rounded bg-white text-neutral-600 border border-theme-600 hover:bg-gray-50">
               <div className="flex items-center justify-between">
                 <Image height={20} width={20} src="/GoogleLogo.png" />

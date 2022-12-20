@@ -28,6 +28,7 @@ import getCompanyUser from "src/companies/queries/getCompanyUser"
 import { CompanyUserRole } from "@prisma/client"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 import { Suspense } from "react"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -41,10 +42,13 @@ export const getServerSideProps = gSSP(async (context) => {
   const company = await getCompany({ where: { id: session.companyId || "0" } }, { ...context.ctx })
 
   if (user && company) {
+    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
     return {
       props: {
         user,
         company,
+        activePlanName,
       },
     }
   } else {
@@ -61,6 +65,7 @@ export const getServerSideProps = gSSP(async (context) => {
 const UserSettingsCompanyPage = ({
   user,
   company,
+  activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
   const [updateCompanyMutation] = useMutation(updateCompany)
@@ -78,6 +83,7 @@ const UserSettingsCompanyPage = ({
           <Suspense fallback="Loading...">
             <UserSettingsLayout>
               <CompanyForm
+                activePlanName={activePlanName}
                 header={`Company & Careers Page (${company?.name || ""})`}
                 subHeader="Update your company details"
                 initialValues={{

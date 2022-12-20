@@ -273,13 +273,13 @@ const NavbarContent = ({
       href: "",
     },
   ]
-  // user &&
-  //   user.role === UserRole.ADMIN &&
-  //   dropDownNav.push({
-  //     name: "Admin",
-  //     href: Routes.Admin().pathname,
-  //     focus: router.route === Routes.Admin().pathname,
-  //   })
+  user &&
+    user.role === UserRole.ADMIN &&
+    dropDownNav.push({
+      name: "Admin",
+      href: Routes.AdminHomePage().pathname,
+      focus: router.route === Routes.AdminHomePage().pathname,
+    })
 
   const [width, setWidth] = useState(window.innerWidth)
   const handleWindowSizeChange = () => {

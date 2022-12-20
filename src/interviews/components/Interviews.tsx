@@ -16,7 +16,7 @@ import ScheduleInterview from "./ScheduleInterview"
 import getStage from "src/stages/queries/getStage"
 import getCandidate from "src/candidates/queries/getCandidate"
 
-const Interviews = ({ user, stageId, candidate }) => {
+const Interviews = ({ user, stageId, candidate, activePlanName }) => {
   const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
   const [cancelInterviewMutation] = useMutation(cancelInterview)
   const [interviewToDelete, setInterviewToDelete] = useState(null as any as Interview)
@@ -50,6 +50,7 @@ const Interviews = ({ user, stageId, candidate }) => {
             stageId={stageId || "0"}
             candidateId={candidate?.id || "0"}
             setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
+            activePlanName={activePlanName}
           />
         </Suspense>
       </Modal>

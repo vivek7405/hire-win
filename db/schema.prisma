@@ -59,6 +59,21 @@ model User {
   createdCandidatePools        CandidatePool[]
   candidateActivitiesPerformed CandidateActivity[]
   candidateUserNotes           CandidateUserNote[]
+  coupons                      Coupon[]
+}
+
+model Coupon {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Tier 1, Tier 2, Tier 3, etc
+  licenseTier Int @default(1)
+
+  redemptionDate DateTime?
+
+  redeemedByUser   User?   @relation(fields: [redeemedByUserId], references: [id])
+  redeemedByUserId String?
 }
 
 enum UserRole {

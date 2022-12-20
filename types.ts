@@ -24,6 +24,8 @@ export enum SubscriptionStatus {
 }
 
 export enum PlanName {
+  FREE,
+  LIFETIMET1,
   PRO,
 }
 

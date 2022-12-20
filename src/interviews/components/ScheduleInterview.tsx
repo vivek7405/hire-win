@@ -20,7 +20,7 @@ import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
 
 import { DatePickerCalendar } from "react-nice-dates"
-import { InterviewDetailType } from "types"
+import { InterviewDetailType, PlanName } from "types"
 import scheduleInterview from "../mutations/scheduleInterview"
 import getCandidateInterviewsByStage from "../queries/getCandidateInterviewsByStage"
 import getTimeSlots from "../queries/getTimeSlots"
@@ -37,12 +37,14 @@ type ScheduleInterviewProps = {
   candidateId: string
   stageId: string
   setOpenScheduleInterviewModal: any
+  activePlanName: PlanName
 }
 export default function ScheduleInterview({
   interviewer,
   candidateId,
   stageId,
   setOpenScheduleInterviewModal,
+  activePlanName,
 }: ScheduleInterviewProps) {
   //   const [meeting] = useQuery(getMeeting, { username: username, slug: meetingSlug })
   // const [interviewDetail] = useQuery(getInterviewDetail, { interviewDetailId })
@@ -82,6 +84,7 @@ export default function ScheduleInterview({
             stageId={stageId}
             candidateId={candidateId}
             setOpenScheduleInterviewModal={setOpenScheduleInterviewModal}
+            activePlanName={activePlanName}
           />
         </Suspense>
       </div>
@@ -97,6 +100,7 @@ const PickAndSchedule = ({
   stageId,
   candidateId,
   setOpenScheduleInterviewModal,
+  activePlanName,
 }) => {
   const [selectedDay, setSelectedDay] = useState<Date>(new Date())
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot>()
@@ -196,6 +200,15 @@ const PickAndSchedule = ({
   const onScheduleClick = async () => {
     if (!selectedTimeSlot || selectedTimeSlot.start < new Date()) {
       toast.error("Please select a time slot. The time slot must be in the future.")
+      return
+    }
+
+    if (activePlanName === PlanName.FREE) {
+      setIsScheduling(false)
+      setOpenScheduleInterviewModal(false)
+      alert(
+        "You can't schedule interviews on the Free Plan. Upgrade to the lifetime plan for scheduling 1 click interviews with auto-generated meeting links."
+      )
       return
     }
 

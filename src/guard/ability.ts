@@ -2,8 +2,10 @@ import db, { CompanyUserRole, JobUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "src/companies/utils/checkPlan"
 import moment from "moment"
-import { SubscriptionStatus } from "types"
+import { PlanName, SubscriptionStatus } from "types"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
 
 type ExtendedResourceTypes =
   | "job"
@@ -44,9 +46,9 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
   async (ctx, { can, cannot }) => {
     cannot("manage", "all")
 
-    // Allow only 25 candidates on the Free plan
+    // Check the current plan and allow candidates accordingly
     // Don't allow if job is archived or expired
-    const isFreePlanCandidateLimitAvailable = async (args) => {
+    const isCandidateLimitAvailable = async (args) => {
       const jobId = args?.jobId
 
       if (!jobId || jobId?.trim() === "") return false
@@ -57,6 +59,8 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       })
 
       if (!job || !job?.company) return false
+
+      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, ctx)
 
       // const currentPlan = checkPlan(job.company)
       // const subscriptionStatus = await getCompanySubscriptionStatus(
@@ -70,11 +74,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       //   }
       // }
 
+      if (
+        (activePlanName === PlanName.FREE && job._count.candidates >= FREE_CANDIDATES_LIMIT) ||
+        (activePlanName === PlanName.LIFETIMET1 &&
+          job._count.candidates >= LIFETIMET1_CANDIDATES_LIMIT)
+      ) {
+        return false
+      }
+
       return true
     }
 
     can("isLimitAvailable", "freeCandidate", async (args) => {
-      return isFreePlanCandidateLimitAvailable(args)
+      return isCandidateLimitAvailable(args)
     })
 
     can("create", "candidate", async (args) => {
@@ -97,11 +109,11 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         return (
           (admins?.some((a) => a.userId === ctx.session.userId) ||
             owner?.userId === ctx.session.userId) &&
-          isFreePlanCandidateLimitAvailable(args)
+          isCandidateLimitAvailable(args)
         )
       } else {
         // if the candidate is applying from careers page, the user won't be logged in
-        return isFreePlanCandidateLimitAvailable(args)
+        return isCandidateLimitAvailable(args)
       }
     })
 
@@ -120,7 +132,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       // const jobExpired = moment(job.validThrough || undefined).diff(moment()) < 0
       if (job.archived) return false
 
-      return isFreePlanCandidateLimitAvailable(args)
+      return isCandidateLimitAvailable(args)
     })
 
     if (ctx.session.$isAuthorized()) {
@@ -133,6 +145,19 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             jobs: true,
           },
         })
+
+        const activePlanName = await getCurrentCompanyOwnerActivePlan({}, ctx)
+        const activeJobsLength = company?.jobs?.filter((job) => job.archived === false)?.length || 0
+
+        if (activePlanName === PlanName.FREE) {
+          if (activeJobsLength >= 3) {
+            return false
+          }
+        } else if (activePlanName === PlanName.LIFETIMET1) {
+          if (activeJobsLength >= 2) {
+            return false
+          }
+        }
 
         // const allUserJobsLength = company?.jobs?.length || 0
         // if (allUserJobsLength >= 1) {

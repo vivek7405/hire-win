@@ -38,10 +38,13 @@ import assignCalendarToJobStage from "src/jobs/mutations/assignCalendarToJobStag
 import getCompany from "src/companies/queries/getCompany"
 import { titleCase } from "src/core/utils/titleCase"
 import addUserToJob from "src/jobs/mutations/addUserToJob"
-import { SubscriptionStatus } from "types"
+import { PlanName, SubscriptionStatus } from "types"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
 import assignInterviewDurationToJobStage from "src/jobs/mutations/assignInterviewDurationToJobStage"
 import { AuthorizationError } from "blitz"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
+import { LIFETIMET1_MEMBERS_LIMIT } from "src/plans/constants"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -95,6 +98,8 @@ export const getServerSideProps = gSSP(async (context) => {
           { ...context.ctx }
         )
 
+        const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
         return {
           props: {
             user,
@@ -102,6 +107,7 @@ export const getServerSideProps = gSSP(async (context) => {
             company,
             canUpdate,
             isOwner,
+            activePlanName,
           } as any,
         }
       } else {
@@ -145,6 +151,7 @@ const JobSettingsHiringTeamPage = ({
   company,
   canUpdate,
   isOwner,
+  activePlanName,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -163,6 +170,12 @@ const JobSettingsHiringTeamPage = ({
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
+
+  const [openUpgradeConfirm, setOpenUpgradeConfirm] = React.useState(false)
+  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to lifetime plan")
+  const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
+    "Upgrade to lifetime plan for adding more members."
+  )
 
   return (
     <AuthLayout title="Hire.win | Hiring Team" user={user}>
@@ -185,6 +198,11 @@ const JobSettingsHiringTeamPage = ({
                     </Link>{" "}
                     from Members Settings
                   </h4>
+                  {activePlanName === PlanName.FREE && (
+                    <div className="mt-2">
+                      <UpgradeMessage message="Upgrade to add more members" />
+                    </div>
+                  )}
                 </div>
                 <Modal
                   header="Add Member to Job"
@@ -224,6 +242,7 @@ const JobSettingsHiringTeamPage = ({
                     }}
                   />
                 </Modal>
+
                 <Confirm
                   open={openConfirmBilling}
                   setOpen={setOpenConfirmBilling}
@@ -235,9 +254,42 @@ const JobSettingsHiringTeamPage = ({
                   Upgrade to the Pro Plan to add unlimited users. You cannot add users on the Free
                   plan.
                 </Confirm>
+
+                <Confirm
+                  open={openUpgradeConfirm}
+                  setOpen={setOpenUpgradeConfirm}
+                  header={upgradeConfirmHeader}
+                  cancelText="Ok"
+                  hideConfirm={true}
+                  onSuccess={async () => {
+                    setOpenUpgradeConfirm(false)
+                  }}
+                >
+                  {upgradeConfirmMessage}
+                </Confirm>
+
                 <button
                   onClick={(e) => {
                     e.preventDefault()
+
+                    if (activePlanName === PlanName.FREE) {
+                      setUpgradeConfirmHeader("Upgrade to lifetime plan")
+                      setUpgradeConfirmMessage("Upgrade to lifetime plan for adding more members.")
+                      setOpenInvite(false)
+                      setOpenUpgradeConfirm(true)
+                      return
+                    } else if (activePlanName === PlanName.LIFETIMET1) {
+                      if (jobData?.users?.length >= LIFETIMET1_MEMBERS_LIMIT) {
+                        setUpgradeConfirmHeader("Members limit reached")
+                        setUpgradeConfirmMessage(
+                          `The lifetime plan allows upto ${LIFETIMET1_MEMBERS_LIMIT} users to collaborate. Since this job already has ${LIFETIMET1_MEMBERS_LIMIT} members added, you can't add a new member.`
+                        )
+                        setOpenInvite(false)
+                        setOpenUpgradeConfirm(true)
+                        return
+                      }
+                    }
+
                     // if (checkSubscription(company)) {
                     setOpenInvite(true)
                     // } else {

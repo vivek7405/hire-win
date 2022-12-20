@@ -23,8 +23,16 @@ export const LoginForm = (props: LoginFormProps) => {
         <h1 className="text-gray-800 text-2xl font-medium">Welcome!</h1>
         <p className="text-gray-500">
           Enter your login details to access your account.
+          {/* Uncomment this when you want to provide Signup */}
           {/* Or{" "}
-          <Link legacyBehavior prefetch={true} href={Routes.OldSignupPage()} passHref>
+          <Link
+            legacyBehavior
+            prefetch={true}
+            href={`${Routes.OldSignupPage().pathname}${
+              router.query.next ? `?next=${router.query.next}` : ""
+            }`}
+            passHref
+          >
             <a
               className="text-theme-600 hover:text-theme-900 font-medium"
               data-testid={`signupLink`}

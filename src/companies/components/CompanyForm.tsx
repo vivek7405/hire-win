@@ -9,6 +9,8 @@ import LabeledReactSelectField from "src/core/components/LabeledReactSelectField
 import { getTailwindColors } from "src/core/utils/themeHelpers"
 import ViewCareersPageButton from "./ViewCareersPageButton"
 import LabeledQuillEditor from "src/core/components/LabeledQuillEditor"
+import { PlanName } from "types"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
 
 type CompanyFormProps = {
   onSuccess?: () => void
@@ -18,6 +20,7 @@ type CompanyFormProps = {
   subHeader?: string
   companySlugForCareersPage?: string
   onlyName?: boolean
+  activePlanName: PlanName
 }
 
 export const CompanyForm = (props: CompanyFormProps) => {
@@ -75,23 +78,31 @@ export const CompanyForm = (props: CompanyFormProps) => {
               />
 
               {/* <ThemePickerField name="theme" label="Careers Page Theme" /> */}
-              <LabeledReactSelectField
-                name="theme"
-                label="Careers Page Theme"
-                options={Object.keys(tailwindColors)?.map((key) => {
-                  return {
-                    label: (
-                      key.replace("-600", "").charAt(0).toUpperCase() +
-                      key.replace("-600", "").slice(1)
-                    )
-                      .replace(/([A-Z])/g, " $1")
-                      .trim(),
-                    value: key.replace("-600", ""),
-                    color: tailwindColors[key],
-                  }
-                })}
-                isColored={true}
-              />
+              <div>
+                <LabeledReactSelectField
+                  name="theme"
+                  label="Careers Page Theme"
+                  disabled={props.activePlanName === PlanName.FREE}
+                  options={Object.keys(tailwindColors)?.map((key) => {
+                    return {
+                      label: (
+                        key.replace("-600", "").charAt(0).toUpperCase() +
+                        key.replace("-600", "").slice(1)
+                      )
+                        .replace(/([A-Z])/g, " $1")
+                        .trim(),
+                      value: key.replace("-600", ""),
+                      color: tailwindColors[key],
+                    }
+                  })}
+                  isColored={true}
+                />
+                {props.activePlanName === PlanName.FREE && (
+                  <div className="mt-2">
+                    <UpgradeMessage message="Upgrade to change Careers Page Theme" />
+                  </div>
+                )}
+              </div>
 
               {props.companySlugForCareersPage && (
                 <div className="float-left">

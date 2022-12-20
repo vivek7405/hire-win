@@ -1,10 +1,10 @@
-import { gSSP } from "src/blitz-server";
-import Link from "next/link";
-import { useSession } from "@blitzjs/auth";
-import { useRouter } from "next/router";
-import { Routes } from "@blitzjs/next";
-import { invalidateQuery, useMutation, usePaginatedQuery, useQuery } from "@blitzjs/rpc";
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { gSSP } from "src/blitz-server"
+import Link from "next/link"
+import { useSession } from "@blitzjs/auth"
+import { useRouter } from "next/router"
+import { Routes } from "@blitzjs/next"
+import { invalidateQuery, useMutation, usePaginatedQuery, useQuery } from "@blitzjs/rpc"
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import Card from "src/core/components/Card"
 import Modal from "src/core/components/Modal"
 import AuthLayout from "src/core/layouts/AuthLayout"
@@ -25,8 +25,11 @@ import deleteEmailTemplate from "src/email-templates/mutations/deleteEmailTempla
 import updateEmailTemplate from "src/email-templates/mutations/updateEmailTemplate"
 import getEmailTemplates from "src/email-templates/queries/getEmailTemplates"
 import Pagination from "src/core/components/Pagination"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import { PlanName } from "types"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
 
-export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
   // https://github.com/blitz-js/blitz/issues/794
   path.resolve("next.config.js")
@@ -37,7 +40,9 @@ export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext
   const user = await getCurrentUserServer({ ...context })
 
   if (user) {
-    return { props: { user: user } }
+    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
+    return { props: { user, activePlanName } }
   } else {
     return {
       redirect: {
@@ -49,7 +54,7 @@ export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext
   }
 })
 
-const EmailTemplates = () => {
+const EmailTemplates = ({ activePlanName }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -61,7 +66,8 @@ const EmailTemplates = () => {
   const [createEmailTemplateMutation] = useMutation(createEmailTemplate)
   const [updateEmailTemplateMutation] = useMutation(updateEmailTemplate)
   const [deleteEmailTemplateMutation] = useMutation(deleteEmailTemplate)
-  const [emailTemplateToEdit, setEmailTemplateToEdit] = useState(null as any as EmailTemplate)
+  const [emailTemplateToEdit, setEmailTemplateToEdit] = useState(null as EmailTemplate | null)
+  const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
 
   const [{ emailTemplates, hasMore, count }] = usePaginatedQuery(getEmailTemplates, {
     where: { ...query, companyId: session.companyId || "0" },
@@ -132,6 +138,19 @@ const EmailTemplates = () => {
         Are you sure you want to delete the email template?
       </Confirm>
 
+      <Confirm
+        open={openUpgradeConfirm}
+        setOpen={setOpenUpgradeConfirm}
+        header="Upgrade to lifetime plan"
+        cancelText="Ok"
+        hideConfirm={true}
+        onSuccess={async () => {
+          setOpenUpgradeConfirm(false)
+        }}
+      >
+        Upgrade to lifetime plan for adding/editing email templates.
+      </Confirm>
+
       <Modal header="Add New Template" open={openModal} setOpen={setOpenModal}>
         <EmailTemplateForm
           header="New Email Template"
@@ -148,6 +167,13 @@ const EmailTemplates = () => {
               : { body: EditorState.createEmpty() }
           }
           onSubmit={async (values) => {
+            if (activePlanName === PlanName.FREE) {
+              setEmailTemplateToEdit(null)
+              setOpenModal(false)
+              setOpenUpgradeConfirm(true)
+              return
+            }
+
             const isEdit = emailTemplateToEdit ? true : false
 
             const toastId = toast.loading(isEdit ? "Updating template" : "Adding template")
@@ -156,19 +182,26 @@ const EmailTemplates = () => {
                 values.body = convertToRaw(values?.body?.getCurrentContent())
               }
 
-              isEdit
-                ? await updateEmailTemplateMutation({
-                    where: { id: emailTemplateToEdit.id },
+              if (isEdit) {
+                if (emailTemplateToEdit) {
+                  await updateEmailTemplateMutation({
+                    where: { id: emailTemplateToEdit?.id },
                     data: { ...values },
                     initial: emailTemplateToEdit,
                   })
-                : await createEmailTemplateMutation({ ...values })
+                } else {
+                  toast.error("No email template is set for editing", { id: toastId })
+                  return
+                }
+              } else {
+                await createEmailTemplateMutation({ ...values })
+              }
               await invalidateQuery(getEmailTemplates)
               toast.success(
                 isEdit ? "Template updated successfully" : "Template added successfully",
                 { id: toastId }
               )
-              setEmailTemplateToEdit(null as any)
+              setEmailTemplateToEdit(null)
               setOpenModal(false)
             } catch (error) {
               toast.error(
@@ -185,7 +218,7 @@ const EmailTemplates = () => {
           className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
           onClick={(e) => {
             e.preventDefault()
-            setEmailTemplateToEdit(null as any)
+            setEmailTemplateToEdit(null)
             setOpenModal(true)
           }}
         >
@@ -263,7 +296,10 @@ const EmailTemplates = () => {
   )
 }
 
-const EmailTemplatesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const EmailTemplatesHome = ({
+  user,
+  activePlanName,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <AuthLayout title="Hire.win | Email Templates" user={user}>
       <div className="mb-6">
@@ -271,10 +307,15 @@ const EmailTemplatesHome = ({ user }: InferGetServerSidePropsType<typeof getServ
         <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
           Add email templates to send an email to candidates with one-click
         </h4>
+        {activePlanName === PlanName.FREE && (
+          <div className="mt-2 w-full md:w-2/3 lg:w-3/5 xl:w-1/2">
+            <UpgradeMessage message="Upgrade to add more Email Templates" />
+          </div>
+        )}
       </div>
 
       <Suspense fallback="Loading...">
-        <EmailTemplates />
+        <EmailTemplates activePlanName={activePlanName} />
       </Suspense>
     </AuthLayout>
   )

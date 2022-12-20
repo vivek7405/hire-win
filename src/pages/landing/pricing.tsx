@@ -3,6 +3,14 @@ import { ArrowNarrowLeftIcon } from "@heroicons/react/outline"
 import Link from "next/link"
 import { useState } from "react"
 import LandingLayout from "src/core/layouts/LandingLayout"
+import {
+  FREE_CANDIDATES_LIMIT,
+  FREE_JOBS_LIMIT,
+  LIFETIMET1_CANDIDATES_LIMIT,
+  LIFETIMET1_FILES_LIMIT,
+  LIFETIMET1_JOBS_LIMIT,
+  LIFETIMET1_MEMBERS_LIMIT,
+} from "src/plans/constants"
 
 export default function Pricing({}) {
   const [licenseTier, setLicenseTier] = useState(1)
@@ -42,14 +50,14 @@ export default function Pricing({}) {
           </div>
         </div>
         <div className="w-full flex items-center justify-center">
-          <section className="w-full xl:w-3/4">
+          <section className="w-full sm:w-2/3 md:w-5/6 lg:w-3/4 xl:w-3/5">
             <div className="w-full text-center mt-4">
               <span className="text-2xl lg:text-3xl bg-yellow-200 px-3 rounded-tl-2xl rounded-br-2xl">
                 Say no to costly subscriptions
               </span>
             </div>
 
-            <div className="w-full md:mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="w-full mt-12 grid grid-cols-1 md:grid-cols-2 gap-10">
               {/* <div className="rounded-lg md:rounded-none md:rounded-l-lg bg-white my-10"> */}
               <div className="rounded-lg bg-white">
                 {/* <div className="w-full p-8 text-center bg-white border-b rounded-t-lg md:rounded-none md:rounded-tl-lg sticky top-0"> */}
@@ -70,15 +78,19 @@ export default function Pricing({}) {
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
-                    <div>3 Active Jobs at a time</div>
+                    <div>{FREE_JOBS_LIMIT} Active Jobs at a time</div>
+                  </li>
+                  <li className="py-3">
+                    <div className="text-neutral-600">Candidates per job</div>
+                    <div>{FREE_CANDIDATES_LIMIT} Candidates</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Team Collaboration</div>
                     <div>No</div>
                   </li>
                   <li className="py-3">
-                    <div className="text-neutral-600">Candidates per job</div>
-                    <div>50 Candidates</div>
+                    <div className="text-neutral-600">Candidate File Uploads</div>
+                    <div>No</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Score Card Customisation</div>
@@ -110,10 +122,6 @@ export default function Pricing({}) {
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Interview Scheduling</div>
-                    <div>No</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate File Uploads</div>
                     <div>No</div>
                   </li>
                   <li className="py-3">
@@ -163,11 +171,11 @@ export default function Pricing({}) {
                 <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
                   <li className="py-3">
                     <div className="text-neutral-600">Company with Careers Page</div>
-                    <div>Unlimited Companies</div>
+                    <div>3 Companies</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
-                    <div>Unlimited Jobs</div>
+                    <div>{LIFETIMET1_JOBS_LIMIT} Active Jobs at a time</div>
                     {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
                       {licenseTier === 1 && <div>5</div>}
                       {licenseTier === 2 && <div>10</div>}
@@ -183,8 +191,18 @@ export default function Pricing({}) {
                     </div> */}
                   </li>
                   <li className="py-3">
+                    <div className="text-neutral-600">Candidates per job</div>
+                    <div>{LIFETIMET1_CANDIDATES_LIMIT} Candidates</div>
+                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
+                      {licenseTier === 1 && <div>100</div>}
+                      {licenseTier === 2 && <div>200</div>}
+                      {licenseTier === 3 && <div>300</div>}
+                      <div>&nbsp;Candidates</div>
+                    </div> */}
+                  </li>
+                  <li className="py-3">
                     <div className="text-neutral-600">Team Collaboration</div>
-                    <div>Unlimited Users</div>
+                    <div>{LIFETIMET1_MEMBERS_LIMIT} Users can Collaborate</div>
                     {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
                       {licenseTier === 1 && <div>5</div>}
                       {licenseTier === 2 && <div>10</div>}
@@ -200,13 +218,13 @@ export default function Pricing({}) {
                     </div> */}
                   </li>
                   <li className="py-3">
-                    <div className="text-neutral-600">Candidates per job</div>
-                    <div>Unlimited Candidates</div>
+                    <div className="text-neutral-600">Candidate File Uploads</div>
+                    <div>{LIFETIMET1_FILES_LIMIT} Files per Candidate</div>
                     {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>100</div>}
-                      {licenseTier === 2 && <div>200</div>}
-                      {licenseTier === 3 && <div>300</div>}
-                      <div>&nbsp;Candidates</div>
+                      {licenseTier === 1 && <div>10</div>}
+                      {licenseTier === 2 && <div>20</div>}
+                      {licenseTier === 3 && <div>30</div>}
+                      <div>&nbsp;Files per candidate</div>
                     </div> */}
                   </li>
                   <li className="py-3">
@@ -240,16 +258,6 @@ export default function Pricing({}) {
                   <li className="py-3">
                     <div className="text-neutral-600">Interview Scheduling</div>
                     <div>Unlimited Interviews</div>
-                  </li>
-                  <li className="py-3">
-                    <div className="text-neutral-600">Candidate File Uploads</div>
-                    <div>Unlimited Files</div>
-                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>10</div>}
-                      {licenseTier === 2 && <div>20</div>}
-                      {licenseTier === 3 && <div>30</div>}
-                      <div>&nbsp;Files per candidate</div>
-                    </div> */}
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Candidate Pools</div>
@@ -385,22 +393,22 @@ export default function Pricing({}) {
               </div> */}
             </div>
 
-            <div className="mt-12 w-full flex flex-col lg:flex-row items-center justify-center space-y-10 lg:space-y-0 lg:space-x-20">
-              <div className="w-96 p-3 flex flex-col items-center justify-center space-y-2 border border-neutral-400 rounded bg-white">
-                <div className="text-xl">What's next?</div>
+            <div className="mt-12 w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-3 flex flex-col items-center justify-center space-y-2 border border-neutral-400 rounded bg-white">
+                <div className="text-xl text-center">What's next?</div>
                 <a
                   target="_blank"
                   rel="self"
                   href="https://roadmap.hire.win/roadmap"
-                  className="text-sm text-indigo-600 hover:text-indigo-800 hover:underline"
+                  className="text-sm text-center text-indigo-600 hover:text-indigo-800 hover:underline"
                 >
                   Check our Roadmap to see upcoming new features!
                 </a>
               </div>
-              <div className="w-96 p-3 flex flex-col items-center justify-center space-y-2 border border-neutral-400 rounded bg-white">
-                <div className="text-xl">Pricing Questions?</div>
+              <div className="p-3 flex flex-col items-center justify-center space-y-2 border border-neutral-400 rounded bg-white">
+                <div className="text-xl text-center">Pricing Questions?</div>
                 <a
-                  className="text-sm text-indigo-600 hover:text-indigo-800 hover:underline"
+                  className="text-sm text-center text-indigo-600 hover:text-indigo-800 hover:underline"
                   href="javascript:void(Tawk_API.maximize())"
                 >
                   Get help from our experts

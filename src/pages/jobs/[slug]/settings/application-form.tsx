@@ -18,7 +18,7 @@ import Table from "src/core/components/Table"
 import toast from "react-hot-toast"
 import createFormQuestion from "src/form-questions/mutations/createFormQuestion"
 import { ArrowUpIcon, ArrowDownIcon, XCircleIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
-import { CardType, DragDirection, ExtendedFormQuestion, ShiftDirection } from "types"
+import { CardType, DragDirection, ExtendedFormQuestion, PlanName, ShiftDirection } from "types"
 import shiftFormQuestion from "src/form-questions/mutations/shiftFormQuestion"
 import Confirm from "src/core/components/Confirm"
 import removeFormQuestionFromJob from "src/form-questions/mutations/removeFormQuestionFromJob"
@@ -37,6 +37,8 @@ import getJobApplicationFormQuestions from "src/form-questions/queries/getJobApp
 import updateFormQuestionOrderBehaviour from "src/form-questions/mutations/updateFormQuestionBehaviour"
 import updateFormQuestionBehaviour from "src/form-questions/mutations/updateFormQuestionBehaviour"
 import { AuthorizationError } from "blitz"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -79,13 +81,16 @@ export const getServerSideProps = gSSP(async (context) => {
             companyId: session?.companyId || "0",
           },
         },
-        { ...context.ctx }
+        context.ctx
       )
+
+      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
 
       return {
         props: {
           user,
           job,
+          activePlanName,
           // canUpdate: canUpdate,
           // form: form,
         } as any,
@@ -115,7 +120,15 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNewQuestion }) => {
+export const JobApplicationForm = ({
+  job,
+  user,
+  setQuestionToEdit,
+  setOpenAddNewQuestion,
+  openUpgradeConfirm,
+  setOpenUpgradeConfirm,
+  activePlanName,
+}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -223,8 +236,12 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
                         onClick={async (e) => {
                           e.preventDefault()
 
-                          setFormQuestionToRemove(question)
-                          setOpenConfirm(true)
+                          if (activePlanName === PlanName.FREE) {
+                            setOpenUpgradeConfirm(true)
+                          } else {
+                            setFormQuestionToRemove(question)
+                            setOpenConfirm(true)
+                          }
                         }}
                       >
                         <XIcon className="h-5 w-5" />
@@ -374,6 +391,22 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
       >
         Are you sure you want to remove this question from the form?
       </Confirm>
+
+      <Confirm
+        open={openUpgradeConfirm}
+        setOpen={setOpenUpgradeConfirm}
+        header="Upgrade to lifetime plan"
+        cancelText="Ok"
+        hideConfirm={true}
+        onSuccess={async () => {
+          setOpenConfirm(false)
+          setOpenUpgradeConfirm(false)
+          setFormQuestionToRemove(null)
+        }}
+      >
+        Upgrade to lifetime plan for customising job application form.
+      </Confirm>
+
       <div className="w-full flex flex-wrap md:flex-nowrap lg:flex-nowrap space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">
         <div className="w-full md:w-1/2 xl:w-3/5 p-3 border-2 border-theme-400 rounded">
           <Cards
@@ -475,6 +508,7 @@ export const JobApplicationForm = ({ job, user, setQuestionToEdit, setOpenAddNew
 const JobSettingsApplicationFormPage = ({
   user,
   job,
+  activePlanName,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [openAddExistingQuestions, setOpenAddExistingQuestions] = React.useState(false)
@@ -489,6 +523,8 @@ const JobSettingsApplicationFormPage = ({
   const [updateFormQuestionMutation] = useMutation(updateFormQuestion)
   const router = useRouter()
 
+  const [openUpgradeConfirm, setOpenUpgradeConfirm] = React.useState(false)
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -499,7 +535,7 @@ const JobSettingsApplicationFormPage = ({
         <JobSettingsLayout job={job!}>
           <div className="space-y-6">
             <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
-              <div>
+              <div className="sm:mr-5">
                 <h2 className="text-lg leading-6 font-medium text-gray-900">
                   Job Application Form
                 </h2>
@@ -512,6 +548,11 @@ const JobSettingsApplicationFormPage = ({
                 <h4 className="text-xs sm:text-sm text-gray-700">
                   Turn off the question to show it internally but not on Careers Page
                 </h4>
+                {activePlanName === PlanName.FREE && (
+                  <div className="mt-2">
+                    <UpgradeMessage message="Upgrade to add more questions" />
+                  </div>
+                )}
               </div>
               <Modal
                 header="Add New Question"
@@ -537,11 +578,16 @@ const JobSettingsApplicationFormPage = ({
                       : {}
                   }
                   onSubmit={async (values) => {
+                    if (activePlanName === PlanName.FREE) {
+                      setQuestionToEdit(null as any)
+                      setOpenAddNewQuestion(false)
+                      setOpenUpgradeConfirm(true)
+                      return
+                    }
+
                     const isEdit = questionToEdit ? true : false
 
-                    const toastId = toast.loading(
-                      isEdit ? "Updating Question" : "Creating Question"
-                    )
+                    const toastId = toast.loading(isEdit ? "Updating Question" : "Adding Question")
                     try {
                       isEdit
                         ? await updateFormQuestionMutation({
@@ -560,28 +606,11 @@ const JobSettingsApplicationFormPage = ({
                       setOpenAddNewQuestion(false)
                     } catch (error) {
                       toast.error(
-                        `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
+                        `Failed to ${isEdit ? "update" : "add new"} question - ${error.toString()}`,
                         { id: toastId }
                       )
                     }
                   }}
-                  // onSubmit={async (values) => {
-                  //   const toastId = toast.loading(() => <span>Adding Question</span>)
-                  //   try {
-                  //     await addNewQuestionToFormMutation({
-                  //       ...values,
-                  //       formId: form?.id as string,
-                  //     })
-                  //     toast.success(() => <span>Question added</span>, {
-                  //       id: toastId,
-                  //     })
-                  //     router.reload()
-                  //   } catch (error) {
-                  //     toast.error(
-                  //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                  //     )
-                  //   }
-                  // }}
                 />
               </Modal>
               <button
@@ -596,92 +625,6 @@ const JobSettingsApplicationFormPage = ({
                 Add New Question
               </button>
             </div>
-            {/* <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
-            <div className="flex flex-row justify-between space-x-3">
-              <Modal
-                header="Add New Question"
-                open={openAddNewQuestion}
-                setOpen={setOpenAddNewQuestion}
-                noOverflow={true}
-              >
-                <QuestionForm
-                  editmode={questionToEdit ? true : false}
-                  header={`${questionToEdit ? "Update" : "Add New"} Question`}
-                  subHeader="Enter question details"
-                  initialValues={
-                    questionToEdit
-                      ? {
-                          title: questionToEdit?.title,
-                          type: questionToEdit?.type,
-                          placeholder: questionToEdit?.placeholder,
-                          acceptedFiles: questionToEdit?.acceptedFiles,
-                          options: questionToEdit?.options?.map((op) => {
-                            return { id: op.id, text: op.text }
-                          }),
-                        }
-                      : {}
-                  }
-                  onSubmit={async (values) => {
-                    const isEdit = questionToEdit ? true : false
-
-                    const toastId = toast.loading(
-                      isEdit ? "Updating Question" : "Creating Question"
-                    )
-                    try {
-                      isEdit
-                        ? await updateFormQuestionMutation({
-                            where: { id: questionToEdit.id },
-                            data: { ...values },
-                          })
-                        : await addNewQuestionToFormMutation({ jobId: job?.id || "0", ...values })
-                      await invalidateQuery(getJobApplicationFormQuestions)
-                      toast.success(
-                        isEdit ? "Question updated successfully" : "Question added successfully",
-                        {
-                          id: toastId,
-                        }
-                      )
-                      setQuestionToEdit(null as any)
-                      setOpenAddNewQuestion(false)
-                    } catch (error) {
-                      toast.error(
-                        `Failed to ${isEdit ? "update" : "add new"} template - ${error.toString()}`,
-                        { id: toastId }
-                      )
-                    }
-                  }}
-                  // onSubmit={async (values) => {
-                  //   const toastId = toast.loading(() => <span>Adding Question</span>)
-                  //   try {
-                  //     await addNewQuestionToFormMutation({
-                  //       ...values,
-                  //       formId: form?.id as string,
-                  //     })
-                  //     toast.success(() => <span>Question added</span>, {
-                  //       id: toastId,
-                  //     })
-                  //     router.reload()
-                  //   } catch (error) {
-                  //     toast.error(
-                  //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                  //     )
-                  //   }
-                  // }}
-                />
-              </Modal>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  setQuestionToEdit(null as any)
-                  setOpenAddNewQuestion(true)
-                }}
-                data-testid={`open-addQuestion-modal`}
-                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
-              >
-                Add New Question
-              </button>
-            </div>
-          </div> */}
 
             <Suspense fallback={<p className="pt-3">Loading...</p>}>
               <JobApplicationForm
@@ -689,6 +632,9 @@ const JobSettingsApplicationFormPage = ({
                 user={user}
                 setQuestionToEdit={setQuestionToEdit}
                 setOpenAddNewQuestion={setOpenAddNewQuestion}
+                openUpgradeConfirm={openUpgradeConfirm}
+                setOpenUpgradeConfirm={setOpenUpgradeConfirm}
+                activePlanName={activePlanName}
               />
             </Suspense>
           </div>

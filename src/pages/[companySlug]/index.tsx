@@ -19,6 +19,7 @@ import {
   DragDirection,
   ExtendedJob,
   Plan,
+  PlanName,
   SubscriptionStatus,
 } from "types"
 import { titleCase } from "src/core/utils/titleCase"
@@ -39,6 +40,12 @@ import getCompanyJobCategoriesForFilter from "src/categories/queries/getCompanyJ
 import getSalaryIntervalFromSalaryType from "src/jobs/utils/getSalaryIntervalFromSalaryType"
 import Stripe from "stripe"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import {
+  FREE_CANDIDATES_LIMIT,
+  FREE_JOBS_LIMIT,
+  LIFETIMET1_CANDIDATES_LIMIT,
+} from "src/plans/constants"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -58,7 +65,9 @@ export const getServerSideProps = gSSP(async (context) => {
   // const user = await getCurrentUserServer({ ...context })
 
   if (company) {
-    return { props: { company } }
+    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
+    return { props: { company, activePlanName } }
   } else {
     return {
       redirect: {
@@ -72,8 +81,9 @@ export const getServerSideProps = gSSP(async (context) => {
 
 type JobsProps = {
   company: Company
+  activePlanName: PlanName
 }
-const Jobs = ({ company }: JobsProps) => {
+const Jobs = ({ company, activePlanName }: JobsProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -161,7 +171,7 @@ const Jobs = ({ company }: JobsProps) => {
         <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
           {jobs?.length > 0 && (
             <>
-              {categories?.filter((c) => c.jobs.find((j) => !j.archived))?.length > 0 && (
+              {categories?.length > 0 && (
                 <div
                   className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
                     selectedCategoryId === null
@@ -175,26 +185,24 @@ const Jobs = ({ company }: JobsProps) => {
                   All
                 </div>
               )}
-              {categories
-                ?.filter((c) => c.jobs.find((j) => !j.archived))
-                ?.map((category) => {
-                  return (
-                    <div
-                      key={category.id}
-                      className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
-                        selectedCategoryId === category.id
-                          ? "bg-theme-700 cursor-default"
-                          : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
-                      }`}
-                      onClick={async () => {
-                        setSelectedCategoryId(category.id)
-                        await invalidateQuery(getCompanyJobsForCareersPage)
-                      }}
-                    >
-                      {category.name}
-                    </div>
-                  )
-                })}
+              {categories?.map((category) => {
+                return (
+                  <div
+                    key={category.id}
+                    className={`capitalize whitespace-nowrap text-white px-2 py-1 border-2 border-neutral-300 ${
+                      selectedCategoryId === category.id
+                        ? "bg-theme-700 cursor-default"
+                        : "bg-theme-500 hover:bg-theme-600 cursor-pointer"
+                    }`}
+                    onClick={async () => {
+                      setSelectedCategoryId(category.id)
+                      await invalidateQuery(getCompanyJobsForCareersPage)
+                    }}
+                  >
+                    {category.name}
+                  </div>
+                )
+              })}
               {/* {categories
                 ?.filter((c) => c.jobs.length > 0)
                 ?.filter((c) => !c.jobs?.some((j) => !currentPlan && j._count.candidates >= 25)) // Filter jobs whose free candidate limit has reached
@@ -250,9 +258,6 @@ const Jobs = ({ company }: JobsProps) => {
 
       <div>
         {jobs?.map((job) => {
-          // Filter jobs whose free candidate limit has reached
-          // if (checkSubscription(company) && job.candidates.length >= 25) return <></>
-
           return (
             <div key={job.id}>
               <div className="bg-white w-full border-2 border-gray-200 hover:border-gray-300 hover:shadow rounded my-4 cursor-pointer px-5 py-3">
@@ -344,7 +349,10 @@ const Jobs = ({ company }: JobsProps) => {
   )
 }
 
-const CareersPage = ({ company }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const CareersPage = ({
+  company,
+  activePlanName,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <JobApplicationLayout company={company} isCareersPage={true}>
       <Suspense fallback="Loading...">
@@ -359,7 +367,7 @@ const CareersPage = ({ company }: InferGetServerSidePropsType<typeof getServerSi
           className="mt-1 mb-8"
           dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
         /> */}
-        <Jobs company={company!} />
+        <Jobs company={company!} activePlanName={activePlanName} />
       </Suspense>
     </JobApplicationLayout>
   )
