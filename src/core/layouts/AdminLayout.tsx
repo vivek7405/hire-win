@@ -35,7 +35,7 @@ const AdminLayout = ({ children }: LayoutProps) => {
   ]
 
   return (
-    <div className="flex flex-col mt-6 md:flex-row md:space-x-4 lg:flex-row lg:space-x-4">
+    <div className="flex flex-col mt-6 md:flex-row md:space-x-4 lg:flex-row lg:space-x-4 bg-gray-100">
       <div className="w-full mb-6 md:mb-0 lg:mb-0 md:w-1/5 lg:w-1/5">
         {subNavigation.map((item) => {
           if (!item) return <></>

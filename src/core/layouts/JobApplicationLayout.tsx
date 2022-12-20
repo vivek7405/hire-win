@@ -9,7 +9,16 @@ import { titleCase } from "../utils/titleCase"
 import draftToHtml from "draftjs-to-html"
 import moment from "moment"
 import { Company, RemoteOption } from "@prisma/client"
-import { BriefcaseIcon, ClockIcon, LocationMarkerIcon } from "@heroicons/react/outline"
+import {
+  ArrowNarrowLeftIcon,
+  BriefcaseIcon,
+  CashIcon,
+  ChevronLeftIcon,
+  ClockIcon,
+  LocationMarkerIcon,
+} from "@heroicons/react/outline"
+import getSymbolFromCurrency from "currency-symbol-map"
+import getSalaryIntervalFromSalaryType from "src/jobs/utils/getSalaryIntervalFromSalaryType"
 
 function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
   return {
@@ -110,7 +119,9 @@ const JobApplicationLayout = ({
           />
         )}
       </Head>
-      <div className={`min-h-screen flex flex-col justify-between space-y-6 theme-${theme}`}>
+      <div
+        className={`min-h-screen flex flex-col justify-between space-y-6 bg-gray-100 theme-${theme}`}
+      >
         <header className="py-10 bg-white">
           <div className="flex justify-center items-center">
             <span className="self-center cursor-pointer">
@@ -130,14 +141,14 @@ const JobApplicationLayout = ({
             </span>
           </div>
           {!isCareersPage && (
-            <div className="mt-6 flex flex-col space-y-2 justify-center items-center">
+            <div className="mt-6 mx-6 flex flex-col space-y-4 justify-center items-center">
               <h3 className="text-2xl font-bold">{job?.title}</h3>
               {job?.remoteOption !== RemoteOption.No_Remote && (
                 <span className="text-xs uppercase font-semibold inline-block py-1 px-2 rounded-full text-pink-600 bg-pink-200 last:mr-0 mr-1">
                   {job?.remoteOption?.replaceAll("_", " ")}
                 </span>
               )}
-              <div className="flex flex-wrap justify-center items-center mx-3">
+              <div className="flex flex-wrap justify-center items-center leading-7 space-x-1">
                 {/* <span>{job?.city},&nbsp;</span>
                 <span>
                   {State.getStateByCodeAndCountry(job?.state!, job?.country!)?.name},&nbsp;
@@ -159,24 +170,54 @@ const JobApplicationLayout = ({
                   </div>
                 )}
                 {(job?.city || job?.state || job?.country) &&
-                  (job?.category || (job?.employmentType && job?.employmentType?.length > 0)) && (
+                  (job?.category ||
+                    (job?.employmentType && job?.employmentType?.length > 0) ||
+                    (job?.showSalary && (job?.minSalary > 0 || job?.maxSalary > 0))) && (
                     <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
                   )}
                 {job?.category && (
-                  <div className="flex flex-nowrap items-center space-x-2">
+                  <div className="flex flex-nowrap items-center justify-center space-x-2">
                     <BriefcaseIcon className="w-5 h-5 text-neutral-700" />
                     <span>{job?.category?.name}</span>
                   </div>
                 )}
-                {job?.category && job?.employmentType && job?.employmentType?.length > 0 && (
-                  <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
-                )}
-                {job?.employmentType && job?.employmentType && job?.employmentType?.length > 0 && (
-                  <div className="flex flex-nowrap items-center space-x-2">
+                {job?.category &&
+                  ((job?.employmentType && job?.employmentType?.length > 0) ||
+                    (job?.showSalary && (job?.minSalary > 0 || job?.maxSalary > 0))) && (
+                    <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+                  )}
+                {job?.employmentType && job?.employmentType?.length > 0 && (
+                  <div className="flex flex-nowrap items-center justify-center space-x-2">
                     <ClockIcon className="w-5 h-5 text-neutral-700" />
                     <span>{titleCase(job?.employmentType?.join(" ")?.replaceAll("_", " "))}</span>
                   </div>
                 )}
+                {job?.employmentType &&
+                  job?.employmentType?.length > 0 &&
+                  job?.showSalary &&
+                  (job?.minSalary > 0 || job?.maxSalary > 0) && (
+                    <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+                  )}
+                {job?.showSalary && (job?.minSalary > 0 || job?.maxSalary > 0) && (
+                  <div className="flex flex-nowrap items-center justify-center space-x-2">
+                    <CashIcon className="w-5 h-5 text-neutral-700" />
+                    <span>
+                      {job?.currency && getSymbolFromCurrency(job?.currency)}
+                      {job?.minSalary > 0 && job?.minSalary}
+                      {job?.minSalary > 0 && job?.maxSalary > 0 && " - "}
+                      {job?.maxSalary > 0 && job?.maxSalary}
+                      {` ${getSalaryIntervalFromSalaryType(job?.salaryType)?.toLowerCase()}`}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-center text-lg">
+                <Link href={Routes.CareersPage({ companySlug: job?.company?.slug || "0" })}>
+                  <a className="flex items-center justify-start space-x-2 text-theme-600 hover:text-theme-800">
+                    <ArrowNarrowLeftIcon className="w-5 h-5" />
+                    <span>All Jobs</span>
+                  </a>
+                </Link>
               </div>
             </div>
           )}

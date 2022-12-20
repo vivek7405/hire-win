@@ -65,6 +65,7 @@ async function getUserJobsByViewTypeAndCategory(
               candidates: true,
               stages: true,
               createdBy: true,
+              company: true,
               // workflow: { include: { stages: { include: { stage: true } } } },
             },
           },

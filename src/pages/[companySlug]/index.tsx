@@ -81,14 +81,21 @@ export const getServerSideProps = gSSP(async (context) => {
 
 type JobsProps = {
   company: Company
-  activePlanName: PlanName
 }
-const Jobs = ({ company, activePlanName }: JobsProps) => {
+const Jobs = ({ company }: JobsProps) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   // const [query, setQuery] = useState({})
   const [searchString, setSearchString] = useState((router.query.search as string) || '""')
+
+  const { embed } = router.query
+
+  const [theme, setTheme] = useState(company?.theme || "indigo")
+  useEffect(() => {
+    const themeName = company?.theme || "indigo"
+    setTheme(themeName)
+  }, [setTheme, company?.theme])
 
   useEffect(() => {
     setSearchString((router.query.search as string) || '""')
@@ -156,7 +163,7 @@ const Jobs = ({ company, activePlanName }: JobsProps) => {
   }
 
   return (
-    <>
+    <div className={`theme-${theme} h-fit`}>
       <div className="flex items-center justify-center mb-4">
         <input
           placeholder="Search"
@@ -270,8 +277,8 @@ const Jobs = ({ company, activePlanName }: JobsProps) => {
                   })}
                   passHref
                 >
-                  <div className="overflow-hidden">
-                    <div className="flex flex-wrap items-center justify-between">
+                  <a className="overflow-hidden" target={embed ? "_blank" : ""} rel="noreferrer">
+                    <div className="flex flex-wrap items-start justify-between">
                       <div className="pb-4">
                         <div className="font-bold text-xl text-theme-700 whitespace-normal">
                           {job?.title}
@@ -294,15 +301,13 @@ const Jobs = ({ company, activePlanName }: JobsProps) => {
                         </p>
                       </div>
                       <div className="pt-2 pb-4">
-                        {job.showSalary && (job.minSalary > 0 || job.maxSalary > 0) && (
+                        {job?.showSalary && (job?.minSalary > 0 || job?.maxSalary > 0) && (
                           <p className="text-gray-500 text-sm">
-                            {job.currency && getSymbolFromCurrency(job.currency)}
-                            {job.minSalary > 0 && job.minSalary}
-                            {job.maxSalary > 0 &&
-                              ` - ${job.currency && getSymbolFromCurrency(job.currency)}${
-                                job.maxSalary
-                              }`}
-                            {` ${getSalaryIntervalFromSalaryType(job.salaryType)?.toLowerCase()}`}
+                            {job?.currency && getSymbolFromCurrency(job?.currency)}
+                            {job?.minSalary > 0 && job?.minSalary}
+                            {job?.minSalary > 0 && job?.maxSalary > 0 && " - "}
+                            {job?.maxSalary > 0 && job?.maxSalary}
+                            {` ${getSalaryIntervalFromSalaryType(job?.salaryType)?.toLowerCase()}`}
                           </p>
                         )}
                       </div>
@@ -338,14 +343,14 @@ const Jobs = ({ company, activePlanName }: JobsProps) => {
                         </span>
                       )}
                     </div>
-                  </div>
+                  </a>
                 </Link>
               </div>
             </div>
           )
         })}
       </div>
-    </>
+    </div>
   )
 }
 
@@ -353,7 +358,14 @@ const CareersPage = ({
   company,
   activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  return (
+  const router = useRouter()
+  const { embed } = router.query
+
+  return embed ? (
+    <div className="p-1">
+      <Jobs company={company!} />
+    </div>
+  ) : (
     <JobApplicationLayout company={company} isCareersPage={true}>
       <Suspense fallback="Loading...">
         <h3 className="text-2xl font-bold">Careers at {titleCase(company?.name)}</h3>
@@ -367,7 +379,7 @@ const CareersPage = ({
           className="mt-1 mb-8"
           dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
         /> */}
-        <Jobs company={company!} activePlanName={activePlanName} />
+        <Jobs company={company!} />
       </Suspense>
     </JobApplicationLayout>
   )
