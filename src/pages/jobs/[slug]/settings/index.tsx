@@ -162,12 +162,17 @@ const JobSettingsPage = ({
                 //   values.description = convertToRaw(values?.description?.getCurrentContent() || {})
                 // }
 
-                await updateJobMutation({
+                const updatedJob = await updateJobMutation({
                   where: { id: job?.id },
                   data: { ...values },
                   initial: job!,
                 })
                 toast.success(() => <span>Job Updated</span>, { id: toastId })
+
+                if (job?.title !== updatedJob?.title) {
+                  router.replace(Routes.JobSettingsPage({ slug: updatedJob?.slug || "0" }))
+                }
+
                 // router.push(Routes.JobsHome())
               } catch (error) {
                 toast.error(
