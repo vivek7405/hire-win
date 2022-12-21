@@ -17,6 +17,7 @@ import createFactoryItems from "./createFactoryItems"
 import updateDefaultSchedule from "src/schedules/mutations/updateDefaultSchedule"
 import createFactoryJob from "src/jobs/mutations/createFactoryJob"
 import { initialInfo } from "src/companies/constants"
+import axios from "axios"
 
 type signupProps = {
   name: string
@@ -114,6 +115,24 @@ export default async function signup(
     // Always keep factory job at last
     await createFactoryJob(compId, ctx)
   }
+
+  try {
+    const sendfoxApiToken = process.env.SENDFOX_API_TOKEN
+    const sendfoxApplicationSignupsListId = process.env.SENDFOX_APPLICATION_SIGNUPS_LIST_ID
+    if (sendfoxApiToken && sendfoxApplicationSignupsListId) {
+      axios.post(
+        "https://api.sendfox.com/contacts",
+        {
+          email,
+          first_name: name,
+          lists: [parseInt(sendfoxApplicationSignupsListId)],
+        },
+        {
+          headers: { Authorization: `Bearer ${sendfoxApiToken}` },
+        }
+      )
+    }
+  } catch {}
 
   return user
 }
