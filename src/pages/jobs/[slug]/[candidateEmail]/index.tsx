@@ -1417,7 +1417,6 @@ const SingleCandidatePageContent = ({
         </div> */}
 
         <div className="flex flex-nowrap items-center justify-center space-x-4">
-          <PopMenu />
           <MoveToNextStageButton
             stagesOpen={stagesOpenMobile}
             setStagesOpen={setStagesOpenMobile}
@@ -1426,6 +1425,7 @@ const SingleCandidatePageContent = ({
             candidatePoolsOpen={candidatePoolsOpenMobile}
             setCandidatePoolsOpen={setCandidatePoolsOpenMobile}
           />
+          <PopMenu />
         </div>
       </div>
 
