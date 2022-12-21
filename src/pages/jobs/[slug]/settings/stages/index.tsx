@@ -263,9 +263,16 @@ export const Stages = ({
 
                           if (activePlanName === PlanName.FREE) {
                             setOpenUpgradeConfirm(true)
-                          } else {
+                            return
+                          }
+
+                          if (stage?.candidates?.length === 0) {
                             setWorkflowStageToRemove(stage)
                             setOpenConfirm(true)
+                          } else {
+                            alert(
+                              "Can't delete the stage as there are some candidates present."
+                            )
                           }
                         }}
                       >
@@ -275,6 +282,7 @@ export const Stages = ({
                   </>
                 )}
               </div>
+
               <div className="hidden md:block lg:block border-b-2 border-gray-50 w-full"></div>
               <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {stage.scoreCardQuestions
@@ -293,6 +301,14 @@ export const Stages = ({
                       </div>
                     )
                   })}
+              </div>
+
+              <div className="hidden md:block lg:block border-b-2 border-gray-50 w-full"></div>
+              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                <div className="text-neutral-500 font-semibold flex">
+                  {stage?.candidates?.length}{" "}
+                  {stage?.candidates?.length === 1 ? "Candidate" : "Candidates"}
+                </div>
               </div>
             </div>
           </>

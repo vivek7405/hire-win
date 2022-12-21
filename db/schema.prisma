@@ -254,7 +254,7 @@ model Job {
   formQuestions FormQuestion[]
 
   // form   Form?   @relation(fields: [formId], references: [id])
-  formId String?
+  // formId String?
 
   // scoreCards ScoreCardJobStage[]
 
@@ -290,7 +290,7 @@ enum RemoteOption {
 //   job   Job    @relation(fields: [jobId], references: [id])
 //   jobId String
 
-//   stage   Stage  @relation(fields: [stageId], references: [id])
+//   stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
 //   stageId String
 
 //   @@unique([jobId, stageId])
@@ -307,7 +307,7 @@ model StageUserScheduleCalendar {
   calendar   Calendar? @relation(fields: [calendarId], references: [id])
   calendarId String?
 
-  stage   Stage  @relation(fields: [stageId], references: [id])
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
   stageId String
 
   user   User   @relation(fields: [userId], references: [id])
@@ -452,7 +452,7 @@ model ScoreCardQuestion {
 
   order Int
 
-  stage   Stage  @relation(fields: [stageId], references: [id])
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
   stageId String
 
   behaviour          Behaviour @default(OPTIONAL)
@@ -471,13 +471,13 @@ model Score {
   rating Int
   note   String?
 
-  scoreCardQuestion   ScoreCardQuestion @relation(fields: [scoreCardQuestionId], references: [id])
+  scoreCardQuestion   ScoreCardQuestion @relation(fields: [scoreCardQuestionId], references: [id], onDelete: Cascade)
   scoreCardQuestionId String
 
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  stage   Stage  @relation(fields: [stageId], references: [id])
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
   stageId String
 
   candidateActivityId String?
@@ -492,7 +492,7 @@ model FormQuestionOption {
 
   text String
 
-  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id])
+  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id], onDelete: Cascade)
   formQuestionId String
 }
 
@@ -543,7 +543,7 @@ model Answer {
 
   value String
 
-  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id])
+  formQuestion   FormQuestion @relation(fields: [formQuestionId], references: [id], onDelete: Cascade)
   formQuestionId String
 
   candidate   Candidate @relation(fields: [candidateId], references: [id])
@@ -561,7 +561,7 @@ model CandidateStageInterviewer {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  stage   Stage  @relation(fields: [stageId], references: [id])
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
   stageId String
 
   interviewer   User   @relation(fields: [interviewerId], references: [id])
@@ -808,7 +808,7 @@ model Comment {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  stage   Stage  @relation(fields: [stageId], references: [id])
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
   stageId String
 
   parentComment   Comment?  @relation(fields: [parentCommentId], references: [id], name: "childComments", onDelete: Cascade)
@@ -852,7 +852,7 @@ model Email {
   candidate   Candidate @relation(fields: [candidateId], references: [id])
   candidateId String
 
-  stage   Stage  @relation(fields: [stageId], references: [id])
+  stage   Stage  @relation(fields: [stageId], references: [id], onDelete: Cascade)
   stageId String
 
   sender   User   @relation(fields: [senderId], references: [id])
