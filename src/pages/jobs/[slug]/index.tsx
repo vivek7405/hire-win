@@ -63,6 +63,7 @@ import Confirm from "src/core/components/Confirm"
 import LabeledRatingField from "src/core/components/LabeledRatingField"
 import getScoreAverage from "src/score-cards/utils/getScoreAverage"
 import {
+  ArchiveIcon,
   ArrowRightIcon,
   BanIcon,
   CheckIcon,
@@ -88,8 +89,19 @@ import classNames from "src/core/utils/classNames"
 import getFirstWordIfLessThan from "src/core/utils/getFirstWordIfLessThan"
 import moment from "moment"
 import { AuthorizationError } from "blitz"
-import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
+import {
+  FREE_CANDIDATES_LIMIT,
+  FREE_JOBS_LIMIT,
+  LIFETIMET1_CANDIDATES_LIMIT,
+  LIFETIMET1_JOBS_LIMIT,
+} from "src/plans/constants"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
+import getActiveJobsCount from "src/jobs/queries/getActiveJobsCount"
+import getUserJobsByViewTypeAndCategory from "src/jobs/queries/getUserJobsByViewTypeAndCategory"
+import getUserJobCategoriesByViewType from "src/categories/queries/getUserJobCategoriesByViewType"
+import setJobArchived from "src/jobs/mutations/setJobArchived"
+import getJob from "src/jobs/queries/getJob"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -959,6 +971,11 @@ const SingleJobPageContent = ({
     `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
   )
 
+  const [setJobArchivedMutation] = useMutation(setJobArchived)
+  const [activeJobsCount] = useQuery(getActiveJobsCount, { companyId: company?.id || "0" })
+  const [openJobArchiveConfirm, setOpenJobArchiveConfirm] = useState(false)
+  const [jobToArchive, setJobToArchive] = useState(null as any)
+
   function PopMenu() {
     return (
       <Menu as="div" className="relative inline-block text-left">
@@ -1031,6 +1048,53 @@ const SingleJobPageContent = ({
                   </a>
                 )}
               </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a
+                    className={classNames(
+                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                      "block px-4 py-2 text-sm cursor-pointer"
+                    )}
+                    onClick={(e) => {
+                      e.preventDefault()
+
+                      // Check for the job limit when the job is being restored
+                      if (job?.archived) {
+                        if (activePlanName === PlanName.FREE) {
+                          if (activeJobsCount >= FREE_JOBS_LIMIT) {
+                            alert(
+                              `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                            )
+                            return
+                          }
+                        } else if (activePlanName === PlanName.LIFETIMET1) {
+                          if (activeJobsCount >= LIFETIMET1_JOBS_LIMIT) {
+                            alert(
+                              `The lifetime plan allows upto ${LIFETIMET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIMET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                            )
+                            return
+                          }
+                        }
+                      }
+
+                      setJobToArchive(job)
+                      setOpenJobArchiveConfirm(true)
+                    }}
+                  >
+                    {job?.archived ? (
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <RefreshIcon className="w-5 h-5 text-theme-600" />
+                        <span>Restore Job</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center space-x-2">
+                        <ArchiveIcon className="w-5 h-5 text-red-600" />
+                        <span>Archive Job</span>
+                      </span>
+                    )}
+                  </a>
+                )}
+              </Menu.Item>
               {/* <Menu.Item>
                 {({ active }) => (
                   <a
@@ -1084,6 +1148,18 @@ const SingleJobPageContent = ({
                         <span>View Job Listing</span>
                       </a>
                     </Link>
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <LinkCopyPopMenuItem
+                      companySlug={company?.slug || "0"}
+                      jobSlug={job?.slug || "0"}
+                      active={active}
+                      label="Copy Job Post Link"
+                    />
                   </a>
                 )}
               </Menu.Item>
@@ -1260,6 +1336,13 @@ const SingleJobPageContent = ({
       onClick={(e) => {
         e.preventDefault()
 
+        if (job?.archived) {
+          alert(
+            "You can't add a new candidate to an archived job. Please restore the job to add more candidates."
+          )
+          return
+        }
+
         if (isCandidateLimitAvailable) {
           // router.push(Routes.NewCandidate({ slug: job?.slug! }))
           setCandidateToEdit(null)
@@ -1290,6 +1373,40 @@ const SingleJobPageContent = ({
 
   return (
     <>
+      <Confirm
+        open={openJobArchiveConfirm}
+        setOpen={setOpenJobArchiveConfirm}
+        header={`${job?.archived ? "Restore" : "Archive"} Job - ${jobToArchive?.title}`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`${job?.archived ? "Restoring" : "Archiving"} Job`)
+          try {
+            await setJobArchivedMutation({
+              where: { id: jobToArchive?.id },
+              archived: !jobToArchive?.archived,
+            })
+
+            toast.success(`Job ${job?.archived ? "Restored" : "Archived"}`, {
+              id: toastId,
+            })
+
+            invalidateQuery(getUserJobsByViewTypeAndCategory)
+            invalidateQuery(getUserJobCategoriesByViewType)
+
+            router.reload()
+          } catch (error) {
+            toast.error(
+              `${job?.archived ? "Restoring" : "Archiving"} job failed - ${error.toString()}`,
+              { id: toastId }
+            )
+          }
+
+          setJobToArchive(null as any)
+          setOpenJobArchiveConfirm(false)
+        }}
+      >
+        Are you sure you want to {job?.archived ? "Restore" : "Archive"} the job?
+      </Confirm>
+
       <Confirm
         open={openUpgradeConfirm}
         setOpen={setOpenUpgradeConfirm}
@@ -1365,10 +1482,19 @@ const SingleJobPageContent = ({
         />
       </Modal>
 
-      {!isCandidateLimitAvailable && (
+      {job?.archived && (
+        <div className="flex flex-col items-center text-red-600">
+          <h1 className="font-semibold">{`This job is Archived`}</h1>
+          <h1 className="text-sm text-center">{`You are viewing an archived job and you can't add more candidates to it. Restore the job again to add more candidates.`}</h1>
+          {/* <h1 className="text-sm">{`Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1> */}
+          <br />
+        </div>
+      )}
+
+      {!job?.archived && !isCandidateLimitAvailable && (
         <div className="flex flex-col items-center text-red-600">
           <h1 className="font-semibold">{`Free Candidate Limit Reached`}</h1>
-          <h1 className="text-sm text-justify">{`Your job listing page has been taken down. Please upgrade to get it up again and keep adding more candidates`}</h1>
+          <h1 className="text-sm text-center">{`Your job listing page has been taken down. Please upgrade to get it up again and keep adding more candidates`}</h1>
           {/* <h1 className="text-sm">{`Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1> */}
           <br />
         </div>

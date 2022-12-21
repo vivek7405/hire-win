@@ -49,7 +49,7 @@
     "@headlessui/react": "1.7.3",
     "@heroicons/react": "v1",
     "@hookform/resolvers": "2.8.3",
-    "@prisma/client": "4.6.0",
+    "@prisma/client": "4.8.0",
     "@radix-ui/react-alert-dialog": "0.1.1",
     "@radix-ui/react-dialog": "0.1.1",
     "@radix-ui/react-dropdown-menu": "0.1.1",
@@ -87,7 +87,6 @@
     "passport-google-oauth20": "2.0.0",
     "postcss": "8.4.6",
     "postmark": "2.7.8",
-    "prisma": "4.6.0",
     "react": "18.2.0",
     "react-beautiful-dnd": "13.1.0",
     "react-dom": "18.2.0",
@@ -137,7 +136,7 @@
     "prettier-plugin-prisma": "4.4.0",
     "pretty-quick": "3.1.2",
     "preview-email": "3.0.5",
-    "prisma": "4.6.0",
+    "prisma": "4.8.0",
     "start-server-and-test": "1.14.0",
     "typescript": "latest"
   }

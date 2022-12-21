@@ -3,6 +3,7 @@ import createJob from "./createJob"
 import db, { Answer, CandidateSource, EmploymentType, RemoteOption, SalaryType } from "db"
 import createCandidate from "src/candidates/mutations/createCandidate"
 import addComment from "src/comments/mutations/addComment"
+import addCandidateToPool from "src/candidate-pools/mutations/addCandidateToPool"
 
 async function createFactoryJob(companyId: string, ctx: Ctx) {
   ctx.session.$authorize()
@@ -51,7 +52,7 @@ async function createFactoryJob(companyId: string, ctx: Ctx) {
       case "Email":
         answers.push({
           formQuestionId: fq.id,
-          value: "angel@sample.com",
+          value: "angel.chris.sample@gmail.com",
         })
         break
       case "Resume":
@@ -86,7 +87,7 @@ async function createFactoryJob(companyId: string, ctx: Ctx) {
   const createdCandidate = await createCandidate(
     {
       name: "Angel (Sample)",
-      email: "angel@sample.com",
+      email: "angel.chris.sample@gmail.com",
       resume: {
         name: "Angel's Resume.pdf",
         key: "Angel's Resume.pdf",
@@ -107,6 +108,17 @@ async function createFactoryJob(companyId: string, ctx: Ctx) {
     },
     ctx
   )
+
+  const candidatePool = await db.candidatePool.findFirst({
+    where: { companyId, name: "Exceptional Talent" },
+  })
+
+  if (candidatePool) {
+    await addCandidateToPool(
+      { candidateId: createdCandidate?.id || "0", poolId: candidatePool.id },
+      ctx
+    )
+  }
 
   return job
 }

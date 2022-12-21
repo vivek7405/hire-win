@@ -1,5 +1,5 @@
 import { Ctx } from "blitz"
-import db from "db"
+import db, { CouponGeneratedFor } from "db"
 import Guard from "src/guard/ability"
 import slugify from "slugify"
 import { findFreeSlug } from "src/core/utils/findFreeSlug"
@@ -9,6 +9,7 @@ type CouponInputType = {
   numberOfCouponsToCreate?: number
   // License Tier 1 by default if value not provided
   licenseTier?: number
+  generatedFor: CouponGeneratedFor
 }
 async function createCoupons(data: CouponInputType, ctx: Ctx) {
   ctx.session.$authorize("ADMIN")
@@ -19,8 +20,8 @@ async function createCoupons(data: CouponInputType, ctx: Ctx) {
   }
 
   const coupons = await db.coupon.createMany({
-    data: arr.map((obj) => {
-      return { licenseTier: data.licenseTier }
+    data: arr.map(() => {
+      return { licenseTier: data.licenseTier, generatedFor: data.generatedFor }
     }),
   })
 

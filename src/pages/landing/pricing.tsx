@@ -95,6 +95,10 @@ export default function Pricing({}) {
                     <div>No</div>
                   </li>
                   <li className="py-3">
+                    <div className="text-neutral-600">Embed Job Posts on Website</div>
+                    <div>Yes</div>
+                  </li>
+                  <li className="py-3">
                     <div className="text-neutral-600">Score Card Customisation</div>
                     <div>Yes</div>
                   </li>
@@ -228,6 +232,10 @@ export default function Pricing({}) {
                       {licenseTier === 3 && <div>30</div>}
                       <div>&nbsp;Files per candidate</div>
                     </div> */}
+                  </li>
+                  <li className="py-3">
+                    <div className="text-neutral-600">Embed Job Posts on Website</div>
+                    <div>Yes</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Score Card Customisation</div>

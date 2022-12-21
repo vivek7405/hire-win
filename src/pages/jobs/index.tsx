@@ -46,6 +46,7 @@ import Cards from "src/core/components/Cards"
 import {
   ArchiveIcon,
   CheckIcon,
+  ClipboardCopyIcon,
   CodeIcon,
   CogIcon,
   DotsVerticalIcon,
@@ -92,6 +93,7 @@ import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompan
 import { FREE_JOBS_LIMIT, LIFETIMET1_JOBS_LIMIT } from "src/plans/constants"
 import { z } from "zod"
 import getActiveJobsCount from "src/jobs/queries/getActiveJobsCount"
+import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -361,6 +363,17 @@ const Jobs = ({
         >
           <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
             <div className="py-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <LinkCopyPopMenuItem
+                      companySlug={company?.slug || "0"}
+                      active={active}
+                      label="Copy Careers Page Link"
+                    />
+                  </a>
+                )}
+              </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
                   <a
@@ -678,6 +691,18 @@ const Jobs = ({
               <Menu.Item>
                 {({ active }) => (
                   <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <LinkCopyPopMenuItem
+                      companySlug={company?.slug || "0"}
+                      jobSlug={job?.slug || "0"}
+                      active={active}
+                      label="Copy Job Post Link"
+                    />
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
                     <Link
                       prefetch={true}
                       href={
@@ -718,10 +743,6 @@ const Jobs = ({
 
     const [copied, setCopied] = useState(false)
     const textareaRef = useRef(null)
-
-    useEffect(() => {
-      setCopied(false)
-    }, [])
 
     return (
       <>
@@ -963,14 +984,14 @@ const Jobs = ({
           pageIndex={tablePage}
           startPage={startPage}
           totalCount={count}
-          resultName="job"
+          resultName={viewType === JobViewType.Archived ? "archived job" : "active job"}
         />
       )}
 
       {!jobUsers ||
         (jobUsers?.length === 0 && (
           <div className="mt-10 w-full border-2 rounded-xl border-neutral-400 py-10 flex flex-col items-center justify-center space-y-5 text-neutral-700">
-            <p>No Jobs</p>
+            <p>{viewType === JobViewType.Archived ? "No Archived Jobs" : "No Active Jobs"}</p>
           </div>
         ))}
 
