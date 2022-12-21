@@ -20,7 +20,7 @@ import { PlanName } from "types"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import getCompanyUsers from "src/companies/queries/getCompanyUsers"
 import { CompanyUserRole } from "@prisma/client"
-import { FREE_COMPANIES_LIMIT, LIFETIMET1_COMPANIES_LIMIT } from "src/plans/constants"
+import { FREE_COMPANIES_LIMIT } from "src/plans/constants"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -97,14 +97,15 @@ const NewCompany = ({
                     )
                     return
                   }
-                } else if (activePlanName === PlanName.LIFETIMET1) {
-                  if (userOwnedCompanies?.length >= LIFETIMET1_COMPANIES_LIMIT) {
-                    alert(
-                      `The lifetime plan allows upto ${LIFETIMET1_COMPANIES_LIMIT} companies with careers page. Since you already have ${LIFETIMET1_COMPANIES_LIMIT} companies added, you cannot add more companies.`
-                    )
-                    return
-                  }
                 }
+                // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                //   if (userOwnedCompanies?.length >= LIFETIME_SET1_COMPANIES_LIMIT) {
+                //     alert(
+                //       `The lifetime plan allows upto ${LIFETIME_SET1_COMPANIES_LIMIT} companies with careers page. Since you already have ${LIFETIME_SET1_COMPANIES_LIMIT} companies added, you cannot add more companies.`
+                //     )
+                //     return
+                //   }
+                // }
 
                 // if (values?.info) {
                 //   values.info = convertToRaw(values?.info?.getCurrentContent())

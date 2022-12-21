@@ -107,7 +107,7 @@ import LabeledQuillEditor from "src/core/components/LabeledQuillEditor"
 import { AuthorizationError } from "blitz"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
-import { FREE_CANDIDATES_LIMIT, LIFETIMET1_FILES_LIMIT } from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
 
 export const getServerSideProps = gSSP(async (context) => {
@@ -574,7 +574,7 @@ const SingleCandidatePageContent = ({
     stageId: candidate?.stageId || "0",
   })
 
-  const [openUpgradeConfirm, setOpenUpgradeConfirm] = React.useState(false)
+  // const [openUpgradeConfirm, setOpenUpgradeConfirm] = React.useState(false)
 
   // const [candidateWorkflowStageInterviewer] = useQuery(getCandidateWorkflowStageInterviewer, {
   //   where: { candidateId: candidate.id, workflowStageId: selectedStage?.id },
@@ -1361,7 +1361,7 @@ const SingleCandidatePageContent = ({
         stage?
       </Confirm>
 
-      <Confirm
+      {/* <Confirm
         open={openUpgradeConfirm}
         setOpen={setOpenUpgradeConfirm}
         header="Files limit reached"
@@ -1371,8 +1371,8 @@ const SingleCandidatePageContent = ({
           setOpenUpgradeConfirm(false)
         }}
       >
-        {`The lifetime plan allows upto ${LIFETIMET1_FILES_LIMIT} file uploads per candidate. Since this candidate already has ${LIFETIMET1_FILES_LIMIT} files uploaded, you can't upload a new file.`}
-      </Confirm>
+        {`The lifetime plan allows upto ${LIFETIME_SET1_FILES_LIMIT} file uploads per candidate. Since this candidate already has ${LIFETIME_SET1_FILES_LIMIT} files uploaded, you can't upload a new file.`}
+      </Confirm> */}
 
       <Confirm
         open={openConfirm}
@@ -1771,6 +1771,14 @@ const SingleCandidatePageContent = ({
                     <button
                       className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => {
+                        // if (
+                        //   activePlanName === PlanName.LIFETIME_SET1 &&
+                        //   candidate?.files?.length >= LIFETIME_SET1_FILES_LIMIT
+                        // ) {
+                        //   setOpenUpgradeConfirm(true)
+                        //   return
+                        // }
+
                         setUploadFileOpen(true)
                       }}
                     >

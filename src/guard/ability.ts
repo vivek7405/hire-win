@@ -5,7 +5,7 @@ import moment from "moment"
 import { PlanName, SubscriptionStatus } from "types"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
-import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 
 type ExtendedResourceTypes =
   | "job"
@@ -74,11 +74,14 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       //   }
       // }
 
-      if (
-        (activePlanName === PlanName.FREE && job._count.candidates >= FREE_CANDIDATES_LIMIT) ||
-        (activePlanName === PlanName.LIFETIMET1 &&
-          job._count.candidates >= LIFETIMET1_CANDIDATES_LIMIT)
-      ) {
+      // if (
+      //   (activePlanName === PlanName.FREE && job._count.candidates >= FREE_CANDIDATES_LIMIT) ||
+      //   (activePlanName === PlanName.LIFETIME_SET1 &&
+      //     job._count.candidates >= LIFETIME_SET1_CANDIDATES_LIMIT)
+      // ) {
+      //   return false
+      // }
+      if (activePlanName === PlanName.FREE && job._count.candidates >= FREE_CANDIDATES_LIMIT) {
         return false
       }
 
@@ -153,7 +156,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
           if (activeJobsLength >= 3) {
             return false
           }
-        } else if (activePlanName === PlanName.LIFETIMET1) {
+        } else if (activePlanName === PlanName.LIFETIME_SET1) {
           if (activeJobsLength >= 2) {
             return false
           }

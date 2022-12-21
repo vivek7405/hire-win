@@ -3,42 +3,33 @@ import { ArrowNarrowLeftIcon } from "@heroicons/react/outline"
 import Link from "next/link"
 import { useState } from "react"
 import LandingLayout from "src/core/layouts/LandingLayout"
-import {
-  FREE_CANDIDATES_LIMIT,
-  FREE_COMPANIES_LIMIT,
-  FREE_JOBS_LIMIT,
-  LIFETIMET1_CANDIDATES_LIMIT,
-  LIFETIMET1_COMPANIES_LIMIT,
-  LIFETIMET1_FILES_LIMIT,
-  LIFETIMET1_JOBS_LIMIT,
-  LIFETIMET1_MEMBERS_LIMIT,
-} from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT, FREE_COMPANIES_LIMIT, FREE_JOBS_LIMIT } from "src/plans/constants"
 
 export default function Pricing({}) {
-  const [licenseTier, setLicenseTier] = useState(1)
+  // const [licenseTier, setLicenseTier] = useState(1)
 
-  const LicenseTierSelect = ({}) => {
-    return (
-      <select
-        className="w-40 px-4 py-1 rounded border-2 border-theme-600"
-        value={licenseTier}
-        onChange={(e) => {
-          setLicenseTier(parseInt(e.target.value || "1"))
-        }}
-      >
-        <option value="1">License Tier 1</option>
-        <option value="2">License Tier 2</option>
-        <option value="3">License Tier 3</option>
-        <option value="4">License Tier 4</option>
-        <option value="5">License Tier 5</option>
-        <option value="6">License Tier 6</option>
-        <option value="7">License Tier 7</option>
-        <option value="8">License Tier 8</option>
-        <option value="9">License Tier 9</option>
-        <option value="10">License Tier 10</option>
-      </select>
-    )
-  }
+  // const LicenseTierSelect = ({}) => {
+  //   return (
+  //     <select
+  //       className="w-40 px-4 py-1 rounded border-2 border-theme-600"
+  //       value={licenseTier}
+  //       onChange={(e) => {
+  //         setLicenseTier(parseInt(e.target.value || "1"))
+  //       }}
+  //     >
+  //       <option value="1">License Tier 1</option>
+  //       <option value="2">License Tier 2</option>
+  //       <option value="3">License Tier 3</option>
+  //       <option value="4">License Tier 4</option>
+  //       <option value="5">License Tier 5</option>
+  //       <option value="6">License Tier 6</option>
+  //       <option value="7">License Tier 7</option>
+  //       <option value="8">License Tier 8</option>
+  //       <option value="9">License Tier 9</option>
+  //       <option value="10">License Tier 10</option>
+  //     </select>
+  //   )
+  // }
 
   return (
     <LandingLayout title="Hire.win | Pricing">
@@ -177,61 +168,23 @@ export default function Pricing({}) {
                 <ul className="w-full px-8 grid grid-cols-1 divide-y divide-gray-300">
                   <li className="py-3">
                     <div className="text-neutral-600">Company with Careers Page</div>
-                    <div>{LIFETIMET1_COMPANIES_LIMIT} Companies</div>
+                    <div>Unlimited Companies</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Jobs per company</div>
-                    <div>{LIFETIMET1_JOBS_LIMIT} Active Jobs at a time</div>
-                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>5</div>}
-                      {licenseTier === 2 && <div>10</div>}
-                      {licenseTier === 3 && <div>15</div>}
-                      {licenseTier === 4 && <div>20</div>}
-                      {licenseTier === 5 && <div>25</div>}
-                      {licenseTier === 6 && <div>30</div>}
-                      {licenseTier === 7 && <div>35</div>}
-                      {licenseTier === 8 && <div>40</div>}
-                      {licenseTier === 9 && <div>45</div>}
-                      {licenseTier === 10 && <div>50</div>}
-                      <div>&nbsp;Active Jobs at a time</div>
-                    </div> */}
+                    <div>Unlimited Jobs</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Candidates per job</div>
-                    <div>{LIFETIMET1_CANDIDATES_LIMIT} Candidates</div>
-                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>100</div>}
-                      {licenseTier === 2 && <div>200</div>}
-                      {licenseTier === 3 && <div>300</div>}
-                      <div>&nbsp;Candidates</div>
-                    </div> */}
+                    <div>Unlimited Candidates</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Team Collaboration</div>
-                    <div>{LIFETIMET1_MEMBERS_LIMIT} Users can Collaborate</div>
-                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>5</div>}
-                      {licenseTier === 2 && <div>10</div>}
-                      {licenseTier === 3 && <div>15</div>}
-                      {licenseTier === 4 && <div>20</div>}
-                      {licenseTier === 5 && <div>25</div>}
-                      {licenseTier === 6 && <div>30</div>}
-                      {licenseTier === 7 && <div>35</div>}
-                      {licenseTier === 8 && <div>40</div>}
-                      {licenseTier === 9 && <div>45</div>}
-                      {licenseTier === 10 && <div>50</div>}
-                      <div>&nbsp;Users can Collaborate</div>
-                    </div> */}
+                    <div>Unlimited Users</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Candidate File Uploads</div>
-                    <div>{LIFETIMET1_FILES_LIMIT} Files per Candidate</div>
-                    {/* <div className="flex items-center flex-nowrap whitespace-nowrap">
-                      {licenseTier === 1 && <div>10</div>}
-                      {licenseTier === 2 && <div>20</div>}
-                      {licenseTier === 3 && <div>30</div>}
-                      <div>&nbsp;Files per candidate</div>
-                    </div> */}
+                    <div>Unlimited Files</div>
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Embed Job Posts on Website</div>
@@ -284,16 +237,7 @@ export default function Pricing({}) {
                 </ul>
                 <div className="sticky bottom-0 bg-white border-t mt-auto rounded-b-lg rounded-t-none overflow-hidden p-6">
                   <div className="w-full pb-3 text-4xl font-bold text-center">
-                    {licenseTier === 1 && <span>$29 Once</span>}
-                    {licenseTier === 2 && <span>$58 Once</span>}
-                    {licenseTier === 3 && <span>$87 Once</span>}
-                    {licenseTier === 4 && <span>$116 Once</span>}
-                    {licenseTier === 5 && <span>$145 Once</span>}
-                    {licenseTier === 6 && <span>$174 Once</span>}
-                    {licenseTier === 7 && <span>$203 Once</span>}
-                    {licenseTier === 8 && <span>$232 Once</span>}
-                    {licenseTier === 9 && <span>$261 Once</span>}
-                    {licenseTier === 10 && <span>$290 Once</span>}
+                    <span>$29 Once</span>
                   </div>
                   <div className="w-full flex items-center justify-center">
                     {/* Uncomment the below line and comment the next one when you want to provide Sign Up */}

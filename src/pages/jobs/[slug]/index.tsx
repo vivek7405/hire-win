@@ -89,12 +89,7 @@ import classNames from "src/core/utils/classNames"
 import getFirstWordIfLessThan from "src/core/utils/getFirstWordIfLessThan"
 import moment from "moment"
 import { AuthorizationError } from "blitz"
-import {
-  FREE_CANDIDATES_LIMIT,
-  FREE_JOBS_LIMIT,
-  LIFETIMET1_CANDIDATES_LIMIT,
-  LIFETIMET1_JOBS_LIMIT,
-} from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT, FREE_JOBS_LIMIT } from "src/plans/constants"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
 import getActiveJobsCount from "src/jobs/queries/getActiveJobsCount"
@@ -1067,14 +1062,15 @@ const SingleJobPageContent = ({
                             )
                             return
                           }
-                        } else if (activePlanName === PlanName.LIFETIMET1) {
-                          if (activeJobsCount >= LIFETIMET1_JOBS_LIMIT) {
-                            alert(
-                              `The lifetime plan allows upto ${LIFETIMET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIMET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                            )
-                            return
-                          }
                         }
+                        // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                        //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
+                        //     alert(
+                        //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                        //     )
+                        //     return
+                        //   }
+                        // }
                       }
 
                       setJobToArchive(job)
@@ -1357,13 +1353,14 @@ const SingleJobPageContent = ({
               `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
             )
             setOpenUpgradeConfirm(true)
-          } else if (activePlanName === PlanName.LIFETIMET1) {
-            setUpgradeConfirmHeader("Candidate limit reached")
-            setUpgradeConfirmMessage(
-              `The lifetime plan allows upto ${LIFETIMET1_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${LIFETIMET1_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
-            )
-            setOpenUpgradeConfirm(true)
           }
+          // else if (activePlanName === PlanName.LIFETIME_SET1) {
+          //   setUpgradeConfirmHeader("Candidate limit reached")
+          //   setUpgradeConfirmMessage(
+          //     `The lifetime plan allows upto ${LIFETIME_SET1_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${LIFETIME_SET1_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+          //   )
+          //   setOpenUpgradeConfirm(true)
+          // }
         }
       }}
     >

@@ -90,7 +90,7 @@ import CouponRedeemedWelcome from "src/coupons/components/CouponRedeemedWelcome"
 import getFirstWord from "src/core/utils/getFirstWordIfLessThan"
 import InvalidCouponMessage from "src/coupons/components/InvalidCouponMessage"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
-import { FREE_JOBS_LIMIT, LIFETIMET1_JOBS_LIMIT } from "src/plans/constants"
+import { FREE_JOBS_LIMIT } from "src/plans/constants"
 import { z } from "zod"
 import getActiveJobsCount from "src/jobs/queries/getActiveJobsCount"
 import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
@@ -153,7 +153,7 @@ export const getServerSideProps = gSSP(async (context) => {
   if (user && companyUser) {
     const { can: canCreate } = await Guard.can("create", "job", { ...context.ctx }, {})
 
-    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, { ...context.ctx })
+    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
 
     return {
       props: {
@@ -319,18 +319,19 @@ const Jobs = ({
               setOpenConfirm(true)
               return
             }
-          } else if (activePlanName === PlanName.LIFETIMET1) {
-            if (activeJobsCount >= LIFETIMET1_JOBS_LIMIT) {
-              setConfirmHeader("Reached Job Limit!")
-              setConfirmMessage(
-                `The Lifetime Plan allows upto ${LIFETIMET1_JOBS_LIMIT} active jobs. Since you already have ${LIFETIMET1_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one.`
-              )
-              setCancelButtonText("Ok")
-              setHideConfirmButton(true)
-              setOpenConfirm(true)
-              return
-            }
           }
+          // else if (activePlanName === PlanName.LIFETIME_SET1) {
+          //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
+          //     setConfirmHeader("Reached Job Limit!")
+          //     setConfirmMessage(
+          //       `The Lifetime Plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since you already have ${LIFETIME_SET1_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one.`
+          //     )
+          //     setCancelButtonText("Ok")
+          //     setHideConfirmButton(true)
+          //     setOpenConfirm(true)
+          //     return
+          //   }
+          // }
 
           setOpenModal(true)
         }
@@ -627,18 +628,19 @@ const Jobs = ({
                             setOpenConfirm(true)
                             return
                           }
-                        } else if (activePlanName === PlanName.LIFETIMET1) {
-                          if (activeJobsCount >= LIFETIMET1_JOBS_LIMIT) {
-                            setConfirmHeader("Reached Job Limit!")
-                            setConfirmMessage(
-                              `The lifetime plan allows upto ${LIFETIMET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIMET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                            )
-                            setCancelButtonText("Ok")
-                            setHideConfirmButton(true)
-                            setOpenConfirm(true)
-                            return
-                          }
                         }
+                        // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                        //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
+                        //     setConfirmHeader("Reached Job Limit!")
+                        //     setConfirmMessage(
+                        //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                        //     )
+                        //     setCancelButtonText("Ok")
+                        //     setHideConfirmButton(true)
+                        //     setOpenConfirm(true)
+                        //     return
+                        //   }
+                        // }
                       }
 
                       setJobToArchive(job)

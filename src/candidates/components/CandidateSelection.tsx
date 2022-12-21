@@ -11,7 +11,7 @@ import { Suspense, useState } from "react"
 import getAllCandidatesByStage from "../queries/getAllCandidatesByStage"
 import getCandidate from "../queries/getCandidate"
 import Confirm from "src/core/components/Confirm"
-import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 import { PlanName } from "types"
 
 type StagesPropsType = {
@@ -216,13 +216,14 @@ const CandidateSelection = ({
                       `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
                     )
                     setOpenUpgradeConfirm(true)
-                  } else if (activePlanName === PlanName.LIFETIMET1) {
-                    setUpgradeConfirmHeader("Candidate limit reached")
-                    setUpgradeConfirmMessage(
-                      `The lifetime plan allows upto ${LIFETIMET1_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${LIFETIMET1_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
-                    )
-                    setOpenUpgradeConfirm(true)
                   }
+                  // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                  //   setUpgradeConfirmHeader("Candidate limit reached")
+                  //   setUpgradeConfirmMessage(
+                  //     `The lifetime plan allows upto ${LIFETIME_SET1_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${LIFETIME_SET1_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
+                  //   )
+                  //   setOpenUpgradeConfirm(true)
+                  // }
                 }
               }}
               className="px-4 py-1 rounded-lg bg-theme-600 hover:bg-theme-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
