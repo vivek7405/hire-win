@@ -155,6 +155,7 @@ type CandidateSelectionPropsType = {
   activePlanName: PlanName
   canAddNewCandidate: boolean
   isCandidateLimitAvailable: boolean
+  isJobArchived: boolean
 }
 const CandidateSelection = ({
   jobId,
@@ -168,6 +169,7 @@ const CandidateSelection = ({
   activePlanName,
   canAddNewCandidate,
   isCandidateLimitAvailable,
+  isJobArchived,
 }: CandidateSelectionPropsType) => {
   const [selectedStageId, setSelectedStageId] = useState(stageId)
   const [viewRejected, setViewRejected] = useState(false)
@@ -196,6 +198,13 @@ const CandidateSelection = ({
             <button
               onClick={(e) => {
                 e.preventDefault()
+
+                if (isJobArchived) {
+                  alert(
+                    "You can't add a new candidate to an archived job. Please restore the job to add more candidates."
+                  )
+                  return
+                }
 
                 if (isCandidateLimitAvailable) {
                   // router.push(Routes.NewCandidate({ slug: job?.slug! }))

@@ -67,6 +67,8 @@ model Coupon {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  generatedFor CouponGeneratedFor @default(SELF)
+
   // Tier 1, Tier 2, Tier 3, etc
   licenseTier Int @default(1)
 
@@ -74,6 +76,11 @@ model Coupon {
 
   redeemedByUser   User?   @relation(fields: [redeemedByUserId], references: [id])
   redeemedByUserId String?
+}
+
+enum CouponGeneratedFor {
+  SELF
+  APP_SUMO
 }
 
 enum UserRole {

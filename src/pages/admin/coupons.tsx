@@ -9,6 +9,8 @@ import createCoupons from "src/coupons/mutations/createCoupons"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import getCoupons from "src/coupons/queries/getCoupons"
+import { CouponGeneratedFor } from "@prisma/client"
+import { titleCase } from "src/core/utils/titleCase"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -42,8 +44,10 @@ const AdminCouponsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
   const [unRedeemedCoupons] = useQuery(getCoupons, { where: { redemptionDate: null } })
   const [redeemedCoupons] = useQuery(getCoupons, { where: { redemptionDate: { not: null } } })
 
-  const [numberOfCouponsToCreate, setNumberOfCouponsToCreateQuantity] = useState(100)
+  const [numberOfCouponsToCreate, setNumberOfCouponsToCreateQuantity] = useState(10)
   const [licenseTier, setLicenseTier] = useState(1)
+
+  const [generatedFor, setGeneratedFor] = useState(CouponGeneratedFor.SELF)
 
   return (
     <AuthLayout title={`Hire.win | Admin Coupons`} user={user}>
@@ -78,6 +82,23 @@ const AdminCouponsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
         />
 
         <br />
+        <label htmlFor="license-tier">Enter the license tier for coupons</label>
+        <select
+          className="ml-2 rounded border border-theme-600 px-4 py-1 w-32"
+          value={generatedFor}
+          onChange={(e) => {
+            const selectedValue = e.target.value
+            if (selectedValue) {
+              setGeneratedFor(CouponGeneratedFor[selectedValue])
+            }
+          }}
+        >
+          {Object.keys(CouponGeneratedFor).map((gFor) => {
+            return <option value={gFor}>{titleCase(gFor?.replaceAll("_", " "))}</option>
+          })}
+        </select>
+
+        <br />
         <button
           className="px-4 py-2 rounded bg-theme-600 hover:bg-theme-800 text-white"
           onClick={async () => {
@@ -86,6 +107,7 @@ const AdminCouponsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
               const coupons = await createCouponsMutation({
                 licenseTier,
                 numberOfCouponsToCreate,
+                generatedFor,
               })
               await invalidateQuery(getCoupons)
               toast.success(`${coupons.count} coupons created`, { id: toastId })

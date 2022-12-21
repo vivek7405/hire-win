@@ -108,6 +108,7 @@ import { AuthorizationError } from "blitz"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import { FREE_CANDIDATES_LIMIT, LIFETIMET1_FILES_LIMIT } from "src/plans/constants"
+import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -170,7 +171,7 @@ export const getServerSideProps = gSSP(async (context) => {
           props: {
             user,
             candidateEmail: candidate?.email as string,
-            jobId: candidate?.jobId,
+            job: candidate?.job,
             stageId: candidate?.stageId,
             activePlanName,
             isCandidateLimitAvailable,
@@ -307,7 +308,7 @@ const SingleCandidatePage = ({
   user,
   error,
   candidateEmail,
-  jobId,
+  job,
   stageId,
   activePlanName,
   isCandidateLimitAvailable,
@@ -373,7 +374,7 @@ const SingleCandidatePage = ({
               <div className="w-full rounded-2xl">
                 <Suspense fallback="Loading...">
                   <CandidateSelection
-                    jobId={jobId || "0"}
+                    jobId={job?.id || "0"}
                     stageId={stageId || "0"}
                     selectedCandidateEmail={selectedCandidateEmail || "0"}
                     setSelectedCandidateEmail={setSelectedCandidateEmail}
@@ -383,12 +384,13 @@ const SingleCandidatePage = ({
                     setUpgradeConfirmMessage={setUpgradeConfirmMessage}
                     activePlanName={activePlanName}
                     canAddNewCandidate={
-                      user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                      user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
                         JobUserRole.OWNER ||
-                      user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
+                      user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
                         JobUserRole.ADMIN
                     }
                     isCandidateLimitAvailable={isCandidateLimitAvailable}
+                    isJobArchived={job?.archived}
                   />
                 </Suspense>
               </div>
@@ -403,7 +405,7 @@ const SingleCandidatePage = ({
               user={user as any}
               error={error as any}
               candidateEmail={selectedCandidateEmail as any}
-              jobId={jobId as any}
+              jobId={job?.id || "0"}
               viewCandidateSelection={viewCandidateSelection}
               setViewCandidateSelection={setViewCandidateSelection}
               openNewCandidateModal={openNewCandidateModal}
@@ -868,6 +870,18 @@ const SingleCandidatePageContent = ({
                         <span>View Job Listing</span>
                       </a>
                     </Link>
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <LinkCopyPopMenuItem
+                      companySlug={candidate?.job?.company?.slug || "0"}
+                      jobSlug={candidate?.job?.slug || "0"}
+                      active={active}
+                      label="Copy Job Post Link"
+                    />
                   </a>
                 )}
               </Menu.Item>
@@ -2074,11 +2088,11 @@ const SingleCandidatePageContent = ({
                   {candidateStageToggleView === CandidateStageToggleView.Interviews && (
                     <>
                       {activePlanName === PlanName.FREE && (
-                        <div className="px-3 py-2 mt-5 mx-3">
+                        <div className="m-6">
                           <UpgradeMessage message="Upgrade to schedule 1 click interviews with auto-generated meeting links" />
                         </div>
                       )}
-                      <Suspense fallback="Loading...">
+                      <Suspense fallback={<p className="p-7">Loading...</p>}>
                         <Interviews
                           key={`${candidate?.id}-${selectedStage?.id}`}
                           user={user}
@@ -2098,7 +2112,7 @@ const SingleCandidatePageContent = ({
                     />
                   )}
                   {candidateStageToggleView === CandidateStageToggleView.Emails && (
-                    <Suspense fallback="Loading...">
+                    <Suspense fallback={<p className="p-7">Loading...</p>}>
                       <Emails
                         user={user}
                         stageId={selectedStage?.id || "0"}

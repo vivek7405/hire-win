@@ -82,6 +82,21 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         />
       </Head>
       <div className="bg-gradient-to-r from-fuchsia-100 via-purple-200 to-indigo-200 leading-relaxed tracking-wide">
+        {/* Uncomment once you want the lifetime banner to appear */}
+        {/* <div className="w-full h-fit px-5 py-5 md:py-3 bg-theme-900 text-white flex flex-col md:flex-row items-center justify-center space-y-5 md:space-y-0 md:space-x-5">
+          <span className="text-5xl">🎉</span>
+          <span className="text-xl text-center">
+            <b>Special Deal</b>: Pay once, get a LIFETIME deal forever <b>for only $29</b>
+          </span>
+          <a
+            href="https://appsumo.com/partners/products/149990/overview"
+            target="_blank"
+            rel="external"
+            className="rounded-full bg-white text-black px-4 py-1 text-lg font-bold"
+          >
+            Click Here
+          </a>
+        </div> */}
         {/* <div className="max-w-8xl mx-auto"> */}
         <div className="flex flex-col min-h-screen">
           <nav id="header" className="w-full z-30 top-0 py-1 px-4">
