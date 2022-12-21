@@ -4,7 +4,7 @@ import Guard from "src/guard/ability"
 import { JobViewType, PlanName } from "types"
 import moment from "moment"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
-import { FREE_CANDIDATES_LIMIT, LIFETIMET1_CANDIDATES_LIMIT } from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 
 interface GetJobsInput extends Pick<Prisma.JobUserFindManyArgs, "orderBy" | "skip" | "take"> {}
 
@@ -43,11 +43,12 @@ async function getCompanyJobsForCareersPage(
     jobIdsWhereCandidateLimitReached = companyJobs
       ?.filter((job) => job._count.candidates >= FREE_CANDIDATES_LIMIT)
       ?.map((job) => job.id)
-  } else if (activePlanName === PlanName.LIFETIMET1) {
-    jobIdsWhereCandidateLimitReached = companyJobs
-      ?.filter((job) => job._count.candidates >= LIFETIMET1_CANDIDATES_LIMIT)
-      ?.map((job) => job.id)
   }
+  // else if (activePlanName === PlanName.LIFETIME_SET1) {
+  //   jobIdsWhereCandidateLimitReached = companyJobs
+  //     ?.filter((job) => job._count.candidates >= LIFETIME_SET1_CANDIDATES_LIMIT)
+  //     ?.map((job) => job.id)
+  // }
 
   const where = {
     id: { notIn: jobIdsWhereCandidateLimitReached },

@@ -67,15 +67,18 @@ model Coupon {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  couponSet    CouponSet          @default(SET_1)
   generatedFor CouponGeneratedFor @default(SELF)
 
-  // Tier 1, Tier 2, Tier 3, etc
-  licenseTier Int @default(1)
+  usdPrice Int @default(0)
 
-  redemptionDate DateTime?
-
-  redeemedByUser   User?   @relation(fields: [redeemedByUserId], references: [id])
+  redeemedByUser   User?     @relation(fields: [redeemedByUserId], references: [id])
   redeemedByUserId String?
+  redemptionDate   DateTime?
+}
+
+enum CouponSet {
+  SET_1
 }
 
 enum CouponGeneratedFor {

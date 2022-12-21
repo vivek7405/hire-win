@@ -232,14 +232,14 @@ export const CardQuestions = ({
                       <div className="absolute top-0.5 right-0">
                         <button
                           className="float-right text-red-600 hover:text-red-800"
-                          title="Remove Question"
+                          title="Delete Question"
                           onClick={async (e) => {
                             e.preventDefault()
                             setScoreCardQuestionToRemove(question)
                             setOpenConfirm(true)
                           }}
                         >
-                          <XIcon className="h-5 w-5" />
+                          <TrashIcon className="h-5 w-5" />
                         </button>
                       </div>
                       <div className="absolute top-0.5 right-6">

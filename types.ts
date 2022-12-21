@@ -25,7 +25,7 @@ export enum SubscriptionStatus {
 
 export enum PlanName {
   FREE,
-  LIFETIMET1,
+  LIFETIME_SET1,
   PRO,
 }
 

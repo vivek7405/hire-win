@@ -1,5 +1,5 @@
 import { Ctx } from "@blitzjs/next"
-import db, { CompanyUserRole } from "db"
+import db, { CompanyUserRole, CouponSet } from "db"
 import { PlanName } from "types"
 
 const getCurrentCompanyOwnerActivePlan = async ({}, ctx: Ctx) => {
@@ -14,29 +14,18 @@ const getCurrentCompanyOwnerActivePlan = async ({}, ctx: Ctx) => {
 
   if (currentCompanyOwner) {
     const coupons = await db.coupon.findMany({
-      where: { redeemedByUserId: currentCompanyOwner.id || "0" },
-      orderBy: { licenseTier: "desc" },
+      where: { redeemedByUserId: currentCompanyOwner.userId },
+      orderBy: { redemptionDate: "desc" },
     })
 
     if (coupons && coupons.length > 0) {
-      // Consider the most recently redeemed highest tier coupon
-      coupons.sort((c1, c2) => {
-        let diff = c1.licenseTier - c2.licenseTier
-
-        if (diff === 0) {
-          diff = (c1.redemptionDate?.getTime() || 0) - (c2.redemptionDate?.getTime() || 0)
-        }
-
-        return diff
-      })
-
       const couponToConsider = coupons[0]
 
-      switch (couponToConsider?.licenseTier) {
-        case 1:
-          return PlanName.LIFETIMET1
+      switch (couponToConsider?.couponSet) {
+        case CouponSet.SET_1:
+          return PlanName.LIFETIME_SET1
         default:
-          return PlanName.LIFETIMET1
+          return PlanName.LIFETIME_SET1
       }
     }
   }

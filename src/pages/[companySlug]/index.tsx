@@ -41,11 +41,7 @@ import getSalaryIntervalFromSalaryType from "src/jobs/utils/getSalaryIntervalFro
 import Stripe from "stripe"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
-import {
-  FREE_CANDIDATES_LIMIT,
-  FREE_JOBS_LIMIT,
-  LIFETIMET1_CANDIDATES_LIMIT,
-} from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT, FREE_JOBS_LIMIT } from "src/plans/constants"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

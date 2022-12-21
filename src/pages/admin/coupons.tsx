@@ -9,7 +9,7 @@ import createCoupons from "src/coupons/mutations/createCoupons"
 import { useState } from "react"
 import toast from "react-hot-toast"
 import getCoupons from "src/coupons/queries/getCoupons"
-import { CouponGeneratedFor } from "@prisma/client"
+import { CouponGeneratedFor, CouponSet } from "@prisma/client"
 import { titleCase } from "src/core/utils/titleCase"
 
 export const getServerSideProps = gSSP(async (context) => {
@@ -45,8 +45,10 @@ const AdminCouponsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
   const [redeemedCoupons] = useQuery(getCoupons, { where: { redemptionDate: { not: null } } })
 
   const [numberOfCouponsToCreate, setNumberOfCouponsToCreateQuantity] = useState(10)
-  const [licenseTier, setLicenseTier] = useState(1)
 
+  const [usdPrice, setUSDPrice] = useState(29)
+
+  const [couponSet, setCouponSet] = useState(CouponSet.SET_1)
   const [generatedFor, setGeneratedFor] = useState(CouponGeneratedFor.SELF)
 
   return (
@@ -70,19 +72,36 @@ const AdminCouponsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
         />
 
         <br />
-        <label htmlFor="license-tier">Enter the license tier for coupons</label>
+        <label htmlFor="license-tier">Enter the price for coupons you are generating</label>
         <input
           id="license-tier"
           className="ml-2 rounded border border-theme-600 px-4 py-1 w-28"
           type="number"
-          value={licenseTier}
+          value={usdPrice}
           onChange={(e) => {
-            setLicenseTier(parseInt(e?.target?.value || "1"))
+            setUSDPrice(parseInt(e?.target?.value || "0"))
           }}
         />
 
         <br />
-        <label htmlFor="license-tier">Enter the license tier for coupons</label>
+        <label htmlFor="license-tier">Which set of coupons are you generating?</label>
+        <select
+          className="ml-2 rounded border border-theme-600 px-4 py-1 w-32"
+          value={couponSet}
+          onChange={(e) => {
+            const selectedValue = e.target.value
+            if (selectedValue) {
+              setGeneratedFor(CouponSet[selectedValue])
+            }
+          }}
+        >
+          {Object.keys(CouponSet).map((cSet) => {
+            return <option value={cSet}>{titleCase(cSet?.replaceAll("_", " "))}</option>
+          })}
+        </select>
+
+        <br />
+        <label htmlFor="license-tier">Who are you generating these coupons for?</label>
         <select
           className="ml-2 rounded border border-theme-600 px-4 py-1 w-32"
           value={generatedFor}
@@ -105,8 +124,9 @@ const AdminCouponsPage = ({ user }: InferGetServerSidePropsType<typeof getServer
             const toastId = toast.loading("Creating coupons")
             try {
               const coupons = await createCouponsMutation({
-                licenseTier,
                 numberOfCouponsToCreate,
+                usdPrice,
+                couponSet,
                 generatedFor,
               })
               await invalidateQuery(getCoupons)

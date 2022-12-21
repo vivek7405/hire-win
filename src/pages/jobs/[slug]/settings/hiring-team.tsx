@@ -44,7 +44,6 @@ import assignInterviewDurationToJobStage from "src/jobs/mutations/assignIntervie
 import { AuthorizationError } from "blitz"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
-import { LIFETIMET1_MEMBERS_LIMIT } from "src/plans/constants"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -278,17 +277,18 @@ const JobSettingsHiringTeamPage = ({
                       setOpenInvite(false)
                       setOpenUpgradeConfirm(true)
                       return
-                    } else if (activePlanName === PlanName.LIFETIMET1) {
-                      if (jobData?.users?.length >= LIFETIMET1_MEMBERS_LIMIT) {
-                        setUpgradeConfirmHeader("Members limit reached")
-                        setUpgradeConfirmMessage(
-                          `The lifetime plan allows upto ${LIFETIMET1_MEMBERS_LIMIT} users to collaborate. Since this job already has ${LIFETIMET1_MEMBERS_LIMIT} members added, you can't add a new member.`
-                        )
-                        setOpenInvite(false)
-                        setOpenUpgradeConfirm(true)
-                        return
-                      }
                     }
+                    // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                    //   if (jobData?.users?.length >= LIFETIME_SET1_MEMBERS_LIMIT) {
+                    //     setUpgradeConfirmHeader("Members limit reached")
+                    //     setUpgradeConfirmMessage(
+                    //       `The lifetime plan allows upto ${LIFETIME_SET1_MEMBERS_LIMIT} users to collaborate. Since this job already has ${LIFETIME_SET1_MEMBERS_LIMIT} members added, you can't add a new member.`
+                    //     )
+                    //     setOpenInvite(false)
+                    //     setOpenUpgradeConfirm(true)
+                    //     return
+                    //   }
+                    // }
 
                     // if (checkSubscription(company)) {
                     setOpenInvite(true)
