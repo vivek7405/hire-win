@@ -218,14 +218,20 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                 <div className="mt-12 mb-6">
                   {/* Uncomment this and comment the line below it once you want to provide signup */}
                   {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
-                  <Link href={Routes.Home()} legacyBehavior>
+                  {/* <Link href={Routes.Home()} legacyBehavior>
                     <a>
                       <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded py-3 lg:py-4 px-8 w-fit">
                         <span className="font-extrabold text-xl">Sign up for Free!</span>
                       </button>
                     </a>
-                  </Link>
-                  <div className="mt-2">
+                  </Link> */}
+                  <a
+                    href="javascript:void(Tawk_API.maximize())"
+                    className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded py-3 lg:py-4 px-8 w-fit font-extrabold text-xl"
+                  >
+                    Contact Us for Signing Up
+                  </a>
+                  <div className="mt-6">
                     <Link href={Routes.CareersPage({ companySlug: "padason" })}>
                       <a
                         target="_blank"
