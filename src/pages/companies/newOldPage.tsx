@@ -15,8 +15,12 @@ import { EditorState, convertToRaw } from "draft-js"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
 import { Suspense } from "react"
 import { initialInfo } from "src/companies/constants"
-import createFactoryJob from "src/jobs/mutations/createFactoryJob"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import { PlanName } from "types"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
+import getCompanyUsers from "src/companies/queries/getCompanyUsers"
+import { CompanyUserRole } from "@prisma/client"
+import { FREE_COMPANIES_LIMIT } from "src/plans/constants"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -42,32 +46,42 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-const FirstCompany = ({
+const NewCompanyOldPage = ({
   user,
   activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const session = useSession()
   const [createCompanyMutation] = useMutation(createCompany)
-  const [createFactoryJobMutation] = useMutation(createFactoryJob)
-  const [companyUser] = useQuery(getCompanyUser, {
+  // const [companyUser] = useQuery(getCompanyUser, {
+  //   where: {
+  //     companyId: session.companyId || "0",
+  //     userId: session.userId || "0",
+  //   },
+  // })
+
+  const [userOwnedCompanies] = useQuery(getCompanyUsers, {
     where: {
-      companyId: session.companyId || "0",
       userId: session.userId || "0",
+      role: CompanyUserRole.OWNER,
     },
   })
 
   return (
     <AuthLayout title="New Company" user={user}>
       <div className="max-w-lg mx-auto">
+        {activePlanName === PlanName.FREE && userOwnedCompanies?.length >= FREE_COMPANIES_LIMIT && (
+          <div className="mt-2">
+            <UpgradeMessage message="Upgrade to add more companies" />
+          </div>
+        )}
         <Suspense fallback="Loading...">
           {/* {companyUser && <Breadcrumbs />} */}
           <div className="mt-6">
             <CompanyForm
               activePlanName={activePlanName}
-              onlyName={true}
-              header="Create a company"
-              subHeader="You may add more companies later"
+              header="Create A New Company"
+              subHeader="Enter your company details"
               initialValues={{
                 name: "",
                 // info: EditorState.createEmpty(),
@@ -76,32 +90,36 @@ const FirstCompany = ({
                 theme: "indigo",
               }}
               onSubmit={async (values) => {
+                if (activePlanName === PlanName.FREE) {
+                  if (userOwnedCompanies?.length >= FREE_COMPANIES_LIMIT) {
+                    alert(
+                      `You can only have ${FREE_COMPANIES_LIMIT} company with careers page on the free plan. Upgrade to the lifetime plan to add more companies.`
+                    )
+                    return
+                  }
+                }
+                // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                //   if (userOwnedCompanies?.length >= LIFETIME_SET1_COMPANIES_LIMIT) {
+                //     alert(
+                //       `The lifetime plan allows upto ${LIFETIME_SET1_COMPANIES_LIMIT} companies with careers page. Since you already have ${LIFETIME_SET1_COMPANIES_LIMIT} companies added, you cannot add more companies.`
+                //     )
+                //     return
+                //   }
+                // }
+
                 // if (values?.info) {
                 //   values.info = convertToRaw(values?.info?.getCurrentContent())
                 // }
 
                 const toastId = toast.loading(() => <span>Creating Company</span>)
                 try {
-                  values["info"] = initialInfo
-
                   values["timezone"] = Intl?.DateTimeFormat()
                     ?.resolvedOptions()
                     ?.timeZone?.replace("Calcutta", "Kolkata")
 
-                  const createdCompany = await createCompanyMutation(values)
-                  if (createdCompany) {
-                    await createFactoryJobMutation(createdCompany.id)
-                  }
-
+                  await createCompanyMutation(values)
                   toast.success(() => <span>Company Created</span>, { id: toastId })
-
-                  // If the user has come from the coupon redemption page,
-                  // redirect back to the redemption page
-                  if (router.query.next && router.query.next?.includes("redeem")) {
-                    router.push(router.query.next as string)
-                  } else {
-                    router.push(Routes.JobsHome())
-                  }
+                  router.push(Routes.JobsHome())
                 } catch (error) {
                   toast.error(
                     "Sorry, we had an unexpected error. Please try again. - " + error.toString()
@@ -116,4 +134,4 @@ const FirstCompany = ({
   )
 }
 
-export default FirstCompany
+export default NewCompanyOldPage

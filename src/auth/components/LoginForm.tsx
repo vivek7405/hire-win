@@ -51,7 +51,7 @@ export const LoginForm = (props: LoginFormProps) => {
           try {
             const companyId = await loginMutation(values)
             if (companyId === "0") {
-              router.push(Routes.FirstCompany())
+              router.push(Routes.NewCompany())
             }
             props.onSuccess?.()
           } catch (error) {

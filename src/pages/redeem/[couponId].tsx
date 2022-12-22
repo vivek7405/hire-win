@@ -69,7 +69,7 @@ export const getServerSideProps = gSSP(async (context) => {
       // and make sure the user redirects back to this page after creating their first company
       return {
         redirect: {
-          destination: `${Routes.FirstCompany().pathname}?next=/redeem/${
+          destination: `${Routes.NewCompany().pathname}?next=/redeem/${
             (context?.params?.couponId as string) || "0"
           }`,
           permanent: false,

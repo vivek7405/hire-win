@@ -58,7 +58,7 @@ export default api(
             done(undefined, {
               publicData,
               // redirectUrl:
-              //   companyId === "0" ? Routes.FirstCompany().pathname : Routes.JobsHome().pathname,
+              //   companyId === "0" ? Routes.NewCompany().pathname : Routes.JobsHome().pathname,
             })
           }
         ),

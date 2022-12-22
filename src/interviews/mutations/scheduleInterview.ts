@@ -129,7 +129,7 @@ export default resolver.pipe(
       throw new NotFoundError()
     }
 
-    // const interviewerCalendar = await invoke(getCalendar, interviewDetail.calendar?.id || 0)
+    // const interviewerCalendar = await invoke(getCalendar, interviewDetail.calendar?.id || "0")
     // if (!interviewerCalendar) {
     //   throw new Error("An error occured: Interviewer doesn't have a connected calendar")
     // }
@@ -148,7 +148,7 @@ export default resolver.pipe(
 
     const organizerCalendar = await invoke(
       getCalendar,
-      scheduleCalendar?.calendarId || organizerDefaultCalendarId || 0
+      scheduleCalendar?.calendarId || organizerDefaultCalendarId || "0"
     )
 
     if (!organizerCalendar) {

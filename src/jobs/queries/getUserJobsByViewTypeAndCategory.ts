@@ -23,8 +23,8 @@ async function getUserJobsByViewTypeAndCategory(
 ) {
   // ctx.session.$authorize()
 
-  const todayDate = new Date(new Date().toDateString())
-  const utcDateNow = moment().utc().toDate()
+  // const todayDate = new Date(new Date().toDateString())
+  // const utcDateNow = moment().utc().toDate()
   // const validThrough = utcDateNow
   //   ? viewType === JobViewType.Expired
   //     ? { lt: utcDateNow }
@@ -32,7 +32,7 @@ async function getUserJobsByViewTypeAndCategory(
   //   : todayDate
 
   const where = {
-    userId: ctx.session.userId || 0,
+    userId: ctx.session.userId || "0",
     job: {
       archived: viewType === JobViewType.Archived,
       // validThrough: viewType === JobViewType.Archived ? {} : validThrough,
