@@ -21,6 +21,7 @@ async function inviteToCompany(
       userId: ctx.session.userId,
       companyId: companyId,
     },
+    include: {user: true}
   })
 
   const company = await db.company.findFirst({
@@ -32,7 +33,7 @@ async function inviteToCompany(
     },
   })
 
-  if (!company || !inviter) return new Error("No company or inviter selected")
+  if (!company || !inviter) return new Error("No company or inviter provided")
 
   const token = generateToken()
   const hashedToken = hash256(token)
@@ -51,7 +52,7 @@ async function inviteToCompany(
     },
   })
 
-  const buildEmail = await inviteToCompanyMailer({ to: email, token, companyId })
+  const buildEmail = await inviteToCompanyMailer({ fromEmail: inviter?.user?.email, fromName: inviter?.user?.name, toEmail: email, token, companyId, companyName: company?.name })
 
   await buildEmail.send()
 
