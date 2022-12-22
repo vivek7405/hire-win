@@ -5,7 +5,7 @@ import moment from "moment"
 import { PlanName, SubscriptionStatus } from "types"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
-import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
+import { FREE_CANDIDATES_LIMIT, FREE_JOBS_LIMIT } from "src/plans/constants"
 
 type ExtendedResourceTypes =
   | "job"
@@ -153,14 +153,15 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         const activeJobsLength = company?.jobs?.filter((job) => job.archived === false)?.length || 0
 
         if (activePlanName === PlanName.FREE) {
-          if (activeJobsLength >= 3) {
-            return false
-          }
-        } else if (activePlanName === PlanName.LIFETIME_SET1) {
-          if (activeJobsLength >= 2) {
+          if (activeJobsLength >= FREE_JOBS_LIMIT) {
             return false
           }
         }
+        // else if (activePlanName === PlanName.LIFETIME_SET1) {
+        //   if (activeJobsLength >= LIFETIME_SET1_JOBS_LIMIT) {
+        //     return false
+        //   }
+        // }
 
         // const allUserJobsLength = company?.jobs?.length || 0
         // if (allUserJobsLength >= 1) {
@@ -190,6 +191,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
         return true
       })
+
       can("read", "job", async (args) => {
         const job = await db.job.findFirst({
           where: args.where,
