@@ -495,7 +495,7 @@ export const CardQuestions = ({
                   toast.error("Can't submit the score in preview mode")
                 }}
                 // scoreCardQuestions={data}
-                userId={user?.id || 0}
+                userId={user?.id || "0"}
               />
             </div>
           </div>
