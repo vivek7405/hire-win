@@ -287,7 +287,7 @@ export default function Home() {
               </div>
 
               <div className="w-full border-t border-gray-300 py-3">
-                <Link href={Routes.CareersPage({ companySlug: "padason" })} legacyBehavior>
+                <Link href={Routes.CareersPage({ companySlug: "acme-inc" })} legacyBehavior>
                   <a
                     target="_blank"
                     rel="noreferrer"
@@ -400,7 +400,7 @@ export default function Home() {
 
         <section id="careers-page" className="mx-3 sm:mx-10 mt-10">
           <h1 className="text-center font-bold text-xl lg:text-2xl">
-            You get an auto-generated Careers Page with{" "}
+            You get an instant Careers Page with{" "}
             <span className="bg-yellow-200 rounded-tl-xl rounded-br-xl px-1">
               customizable theme color
             </span>
@@ -410,7 +410,7 @@ export default function Home() {
             title="Job Posts"
             width="850"
             height="500"
-            src="http://localhost:3000/padason?embed=true"
+            src="http://localhost:3000/acme-inc?embed=true"
           ></iframe> */}
           <div className="mt-4 w-full h-screen rounded-lg drop-shadow-lg">
             <div className="w-full h-8 space-x-2 px-3 rounded-t-lg bg-neutral-100 flex justify-start items-center drop-shadow-sm shadow-sm">
@@ -424,8 +424,8 @@ export default function Home() {
                 rel="noopener noreferrer"
                 href={
                   process.env.NODE_ENV === "production"
-                    ? "https://hire.win/padason"
-                    : "http://localhost:3000/padason"
+                    ? "https://hire.win/acme-inc"
+                    : "http://localhost:3000/acme-inc"
                 }
                 className="text-sm text-neutral-600 hover:underline font-semibold flex items-center justify-center space-x-2"
               >
@@ -437,8 +437,8 @@ export default function Home() {
               <iframe
                 src={
                   process.env.NODE_ENV === "production"
-                    ? "https://hire.win/padason"
-                    : "http://localhost:3000/padason"
+                    ? "https://hire.win/acme-inc"
+                    : "http://localhost:3000/acme-inc"
                 }
                 title="Careers Page"
                 className="w-full h-full rounded-b-lg"

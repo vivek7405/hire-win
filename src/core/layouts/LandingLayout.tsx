@@ -232,7 +232,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                     Contact Us for Signing Up
                   </a>
                   <div className="mt-6">
-                    <Link href={Routes.CareersPage({ companySlug: "padason" })}>
+                    <Link href={Routes.CareersPage({ companySlug: "acme-inc" })}>
                       <a
                         target="_blank"
                         className="text-indigo-600 hover:underline flex items-center justify-center space-x-1"
