@@ -8,16 +8,18 @@ import previewEmail from "preview-email"
 import { convert } from "html-to-text"
 
 type SendCandidateEmailMailerInput = {
-  candidateEmail: string
-  senderName: string
+  companyName: string
+  fromEmail: string
+  toEmail: string
   subject: string
   body: string
   cc: string
 }
 
 export async function sendCandidateEmailMailer({
-  candidateEmail,
-  senderName,
+  companyName,
+  fromEmail,
+  toEmail,
   subject,
   body,
   cc,
@@ -25,8 +27,8 @@ export async function sendCandidateEmailMailer({
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
-    from: `"${senderName}" <noreply@hire.win>`,
-    to: candidateEmail,
+    from: `${companyName} <notifications@hire.win>`,
+    to: toEmail,
     cc,
     subject,
     html: body,
@@ -44,6 +46,7 @@ export async function sendCandidateEmailMailer({
             From: msg.from,
             To: msg.to,
             CC: msg.cc,
+            ReplyTo: fromEmail,
             Subject: msg.subject,
             HtmlBody: msg.html,
             TextBody: convert(msg.html),

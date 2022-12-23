@@ -6,64 +6,97 @@
  */
 import previewEmail from "preview-email"
 import { convert } from "html-to-text"
+import db from "db"
 
-type UserAddedToJobInput = {
+type UserAddedToJobMailerInput = {
+  fromEmail: string
+  fromName: string
   toEmail: string
-  toName: string
-  addedByUserEmail: string
-  addedByUserName: string
-  jobTitle: string
   companyName: string
+  companySlug: string
+  jobSlug: string
+  jobTitle: string
 }
 
 export async function userAddedToJobMailer({
+  fromEmail,
+  fromName,
   toEmail,
-  toName,
-  addedByUserEmail,
-  addedByUserName,
-  jobTitle,
   companyName,
-}: UserAddedToJobInput) {
+  companySlug,
+  jobSlug,
+  jobTitle,
+}: UserAddedToJobMailerInput) {
+  const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
+  // const webhookUrl = `${origin}/api/invitations/company/accept?token=${token}`
+  const jobURL = `${origin}/${companySlug}/${jobSlug}`
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
-
-  const msg = {
-    from: "noreply@hire.win",
-    to: toEmail,
-    subject: "You have been added to a job",
-    html: `
-      Hi ${toName},
-      
-      ${addedByUserName} from ${companyName} added you to the job ${jobTitle}.
-
-      You may reach out to them at ${addedByUserEmail} for any concerns.
-    `,
-  }
 
   return {
     async send() {
-      if (process.env.NODE_ENV === "production" && postmarkServerClient) {
-        // send the production email
-        try {
+      try {
+        if (postmarkServerClient) {
           const postmark = require("postmark")
           const client = new postmark.ServerClient(postmarkServerClient)
 
-          client.sendEmail({
-            From: msg.from,
-            To: msg.to,
-            Subject: msg.subject,
-            HtmlBody: msg.html,
-            TextBody: convert(msg.html),
-            MessageStream: "invite",
-          })
-        } catch (e) {
-          throw new Error(
-            "Something went wrong with email implementation in mailers/inviteToJobMailer"
-          )
+          if (process.env.NODE_ENV === "production") {
+            // send the production email
+            client.sendEmailWithTemplate({
+              From: fromEmail,
+              To: toEmail,
+              TemplateAlias: "added-to-job",
+              TemplateModel: {
+                invite_sender_name: fromName,
+                invite_sender_organization_name: companyName,
+                action_url: jobURL,
+                job_title: jobTitle,
+              },
+              MessageStream: "invite",
+            })
+          } else {
+            // Preview email in the browser
+            const template = await client.getTemplate("added-to-job")
+
+            let subject = replaceForLocal(
+              template?.Subject,
+              fromName,
+              companyName,
+              jobURL,
+              jobTitle
+            )
+            let html = replaceForLocal(template?.HtmlBody, fromName, companyName, jobURL, jobTitle)
+            const msg = {
+              from: fromEmail,
+              to: toEmail,
+              subject: subject || "",
+              html: html || "",
+            }
+
+            await previewEmail(msg)
+          }
+        } else {
+          const msg = {
+            from: fromEmail,
+            to: toEmail,
+            subject: "",
+            html: "",
+          }
+          await previewEmail(msg)
         }
-      } else {
-        // Preview email in the browser
-        await previewEmail(msg)
+      } catch (e) {
+        throw new Error(
+          "Something went wrong with email implementation in mailers/inviteToCompanyMailer"
+        )
       }
     },
   }
+}
+
+function replaceForLocal(msg, fromName, companyName, jobURL, jobTitle) {
+  msg = msg?.replaceAll("{{invite_sender_name}}", fromName)
+  msg = msg?.replaceAll("{{invite_sender_organization_name}}", companyName)
+  msg = msg?.replaceAll("{{action_url}}", jobURL)
+  msg = msg?.replaceAll("{{job_title}}", jobTitle)
+
+  return msg
 }

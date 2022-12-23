@@ -25,12 +25,6 @@ export async function inviteToCompanyMailer({
   companyId,
   companyName,
 }: InviteToCompanyInput) {
-  const company = await db.company.findUnique({
-    where: {
-      id: companyId,
-    },
-  })
-
   const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
   const webhookUrl = `${origin}/api/invitations/company/accept?token=${token}`
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
@@ -60,7 +54,7 @@ export async function inviteToCompanyMailer({
             client.sendEmailWithTemplate({
               From: fromEmail,
               To: toEmail,
-              TemplateAlias: "user-invitation",
+              TemplateAlias: "invite-to-company",
               TemplateModel: {
                 invite_sender_name: fromName,
                 invite_sender_organization_name: companyName,
@@ -79,13 +73,10 @@ export async function inviteToCompanyMailer({
             // })
           } else {
             // Preview email in the browser
-            const template = await client.getTemplate("user-invitation")
-            console.log("TEMPLATE RESPONSE:")
-            console.log(template)
+            const template = await client.getTemplate("invite-to-company")
 
             let subject = replaceForLocal(template?.Subject, fromName, companyName, webhookUrl)
             let html = replaceForLocal(template?.HtmlBody, fromName, companyName, webhookUrl)
-
             const msg = {
               from: fromEmail,
               to: toEmail,

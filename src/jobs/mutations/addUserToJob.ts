@@ -1,5 +1,5 @@
-import { generateToken, hash256 } from "@blitzjs/auth";
-import { Ctx } from "blitz";
+import { generateToken, hash256 } from "@blitzjs/auth"
+import { Ctx } from "blitz"
 import Guard from "src/guard/ability"
 import db, { JobUserRole } from "db"
 import { userAddedToJobMailer } from "mailers/userAddedToJobMailer"
@@ -65,11 +65,12 @@ async function inviteToJob({ jobId, email, jobUserRole }: InviteToJobInput, ctx:
   })
 
   const buildEmail = await userAddedToJobMailer({
-    toName: invitee?.user?.name,
+    fromEmail: inviter?.user?.name,
+    fromName: inviter?.user?.name,
     toEmail: invitee?.user?.email,
-    addedByUserName: inviter?.user?.name,
-    addedByUserEmail: inviter?.user?.email,
     companyName: invitee?.company?.name,
+    companySlug: invitee?.company?.slug,
+    jobSlug: job?.slug,
     jobTitle: job?.title,
   })
 

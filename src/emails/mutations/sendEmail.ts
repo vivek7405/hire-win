@@ -1,6 +1,6 @@
-import { resolver } from "@blitzjs/rpc";
+import { resolver } from "@blitzjs/rpc"
 import { findFreeSlug } from "src/core/utils/findFreeSlug"
-import { Ctx } from "blitz";
+import { Ctx } from "blitz"
 import db, { CandidateActivityType, User } from "db"
 import { sendCandidateEmailMailer } from "mailers/sendCandidateEmailMailer"
 import slugify from "slugify"
@@ -15,7 +15,10 @@ export default resolver.pipe(
       throw new Error("Email body can't be empty")
     }
 
-    const candidate = await db.candidate.findUnique({ where: { id: candidateId } })
+    const candidate = await db.candidate.findUnique({
+      where: { id: candidateId },
+      include: { job: { include: { company: true } } },
+    })
     if (!candidate) {
       throw new Error("No candidate found for the provided id")
     }
@@ -23,8 +26,9 @@ export default resolver.pipe(
     const sender = await db.user.findUnique({ where: { id: ctx.session.userId || "0" } })
 
     const buildEmail = await sendCandidateEmailMailer({
-      candidateEmail: candidate?.email,
-      senderName: sender?.name || "",
+      companyName: candidate?.job?.company?.name,
+      fromEmail: sender?.email || "",
+      toEmail: candidate?.email,
       subject,
       cc,
       body: draftToHtml(body || {}),
