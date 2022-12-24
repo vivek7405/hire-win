@@ -83,20 +83,21 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
       </Head>
       <div className="bg-gradient-to-r from-fuchsia-100 via-purple-200 to-indigo-200 leading-relaxed tracking-wide">
         {/* Uncomment once you want the lifetime banner to appear */}
-        {/* <div className="w-full h-fit px-5 py-5 md:py-3 bg-theme-900 text-white flex flex-col md:flex-row items-center justify-center space-y-5 md:space-y-0 md:space-x-5">
+        <div className="w-full h-fit px-5 py-5 md:py-3 bg-theme-900 text-white flex flex-col md:flex-row items-center justify-center space-y-5 md:space-y-0 md:space-x-5">
           <span className="text-5xl">🎉</span>
           <span className="text-xl text-center">
             <b>Special Deal</b>: Pay once, get a LIFETIME deal forever <b>for only $29</b>
           </span>
           <a
-            href="https://appsumo.com/partners/products/149990/overview"
+            // href="https://appsumo.com/partners/products/149990/overview"
+            href=""
             target="_blank"
             rel="external"
             className="rounded-full bg-white text-black px-4 py-1 text-lg font-bold"
           >
             Click Here
           </a>
-        </div> */}
+        </div>
         {/* <div className="max-w-8xl mx-auto"> */}
         <div className="flex flex-col min-h-screen">
           <nav id="header" className="w-full z-30 top-0 py-1 px-4">
@@ -170,7 +171,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
               >
                 <ul className="list-reset lg:flex justify-end flex-1 items-center">
                   {/* Uncomment when you want the menu to appear */}
-                  {/* <li className="mr-3">
+                  <li className="mr-3">
                     <Link href={Routes.Pricing()}>
                       <a className="font-medium cursor-pointer hover:underline py-2 px-4">
                         Pricing
@@ -183,7 +184,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                         Sign up free
                       </a>
                     </Link>
-                  </li> */}
+                  </li>
                 </ul>
                 <Link prefetch={true} href={Routes.LoginPage()} legacyBehavior>
                   <a>
@@ -217,21 +218,21 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                 </div>
                 <div className="mt-12 mb-6">
                   {/* Uncomment this and comment the line below it once you want to provide signup */}
-                  {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
-                  {/* <Link href={Routes.Home()} legacyBehavior>
+                  {/* <Link href={Routes.Home()} legacyBehavior> */}
+                  <Link href={Routes.OldSignupPage()} legacyBehavior>
                     <a>
                       <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded py-3 lg:py-4 px-8 w-fit">
                         <span className="font-extrabold text-xl">Sign up for Free!</span>
                       </button>
                     </a>
-                  </Link> */}
-                  <a
+                  </Link>
+                  {/* <a
                     href="javascript:void(Tawk_API.maximize())"
                     className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded py-3 lg:py-4 px-8 w-fit font-extrabold text-xl"
                   >
                     Contact Us for Signing Up
-                  </a>
-                  <div className="mt-6">
+                  </a> */}
+                  <div className="mt-2">
                     <Link href={Routes.CareersPage({ companySlug: "acme-inc" })}>
                       <a
                         target="_blank"

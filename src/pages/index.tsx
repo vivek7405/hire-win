@@ -302,7 +302,7 @@ export default function Home() {
           </div> */}
 
           {/* Uncomment this once you want to provide google signup */}
-          {/* <div className="w-full flex items-center justify-center mt-8">
+          <div className="w-full flex items-center justify-center mt-8">
             <div className="w-full sm:w-3/4 md:w-1/2 lg:w-2/5 xl:w-1/3 bg-white rounded-xl p-4">
               <div className="w-full">
                 <Form
@@ -346,7 +346,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-          </div> */}
+          </div>
 
           <div className="mt-8 mb-4 w-full flex items-center justify-center">
             <a

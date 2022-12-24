@@ -24,7 +24,7 @@ export const LoginForm = (props: LoginFormProps) => {
         <p className="text-gray-500">
           Enter your login details to access your account.
           {/* Uncomment this when you want to provide Signup */}
-          {/* Or{" "}
+          Or{" "}
           <Link
             legacyBehavior
             prefetch={true}
@@ -39,7 +39,7 @@ export const LoginForm = (props: LoginFormProps) => {
             >
               Sign Up
             </a>
-          </Link> */}
+          </Link>
         </p>
       </div>
       <AuthForm

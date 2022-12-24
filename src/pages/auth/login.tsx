@@ -152,7 +152,7 @@ const LoginPage: BlitzPage = () => {
           />
 
           {/* Uncomment this once you want to provide Google Login */}
-          {/* <div className="w-full flex items-center justify-center space-x-5">
+          <div className="w-full flex items-center justify-center space-x-5">
             <div className="w-1/2 h-px bg-neutral-300 rounded-full my-7" />
             <div className="text-neutral-400 italic">Or</div>
             <div className="w-1/2 h-px bg-neutral-300 rounded-full my-7" />
@@ -169,7 +169,7 @@ const LoginPage: BlitzPage = () => {
                 <span className="w-full text-center">Login with Google</span>
               </div>
             </button>
-          </a> */}
+          </a>
         </div>
 
         <div>

@@ -138,8 +138,8 @@ export default function Pricing({}) {
                   <div className="w-full pb-3 text-4xl font-bold text-center">Free</div>
                   <div className="w-full flex items-center justify-center">
                     {/* Uncomment the below line and comment the next one when you want to provide Sign Up */}
-                    {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
-                    <Link href={Routes.Home()} legacyBehavior>
+                    {/* <Link href={Routes.Home()} legacyBehavior> */}
+                    <Link href={Routes.OldSignupPage()} legacyBehavior>
                       <a className="w-full text-center px-4 py-1 border-2 rounded border-theme-600 hover:bg-theme-600 hover:text-white">
                         Get Started
                       </a>
@@ -241,8 +241,8 @@ export default function Pricing({}) {
                   </div>
                   <div className="w-full flex items-center justify-center">
                     {/* Uncomment the below line and comment the next one when you want to provide Sign Up */}
-                    {/* <Link href={Routes.OldSignupPage()} legacyBehavior> */}
-                    <Link href={Routes.Home()} legacyBehavior>
+                    {/* <Link href={Routes.Home()} legacyBehavior> */}
+                    <Link href={Routes.OldSignupPage()} legacyBehavior>
                       <a className="w-full text-center px-4 py-1 border-2 border-theme-600 hover:border-theme-700 rounded text-white bg-theme-600 hover:bg-theme-700">
                         Buy Now on App Sumo
                       </a>
