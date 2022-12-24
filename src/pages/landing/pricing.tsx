@@ -243,7 +243,12 @@ export default function Pricing({}) {
                     {/* Uncomment the below line and comment the next one when you want to provide Sign Up */}
                     {/* <Link href={Routes.Home()} legacyBehavior> */}
                     <Link href={Routes.OldSignupPage()} legacyBehavior>
-                      <a className="w-full text-center px-4 py-1 border-2 border-theme-600 hover:border-theme-700 rounded text-white bg-theme-600 hover:bg-theme-700">
+                      <a
+                        href="https://appsumo.com/products/hirewin"
+                        target="_blank"
+                        rel="external"
+                        className="w-full text-center px-4 py-1 border-2 border-theme-600 hover:border-theme-700 rounded text-white bg-theme-600 hover:bg-theme-700"
+                      >
                         Buy Now on App Sumo
                       </a>
                     </Link>
