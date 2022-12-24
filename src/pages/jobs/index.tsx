@@ -804,7 +804,7 @@ const Jobs = ({
     <>
       {activePlanName === PlanName.FREE && (
         <div className="w-full text-center mb-5 lg:mb-0">
-          <a href="" className="text-theme-600 hover:text-theme-800 font-bold">
+          <a href="https://appsumo.com/products/hirewin" className="text-theme-600 hover:text-theme-800 font-bold">
             Upgrade $29 lifetime access!
           </a>
         </div>

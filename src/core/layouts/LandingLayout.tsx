@@ -89,8 +89,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
             <b>Special Deal</b>: Pay once, get a LIFETIME deal forever <b>for only $29</b>
           </span>
           <a
-            // href="https://appsumo.com/partners/products/149990/overview"
-            href=""
+            href="https://appsumo.com/products/hirewin"
             target="_blank"
             rel="external"
             className="rounded-full bg-white text-black px-4 py-1 text-lg font-bold"
