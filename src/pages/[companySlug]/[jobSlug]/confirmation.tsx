@@ -119,7 +119,7 @@ const JobConfirmationPage = ({
     <JobApplicationLayout company={company!} job={job!}>
       <div className="w-full h-auto">
         <div className={`w-full h-full flex items-center justify-center theme-${theme}`}>
-          <div className="w-96 p-6 h-fit bg-white rounded-lg border border-black-600 flex flex-col space-y-7 items-center justify-center">
+          <div className="w-96 p-6 h-fit bg-white rounded-lg border border-black-600 flex flex-col space-y-4 items-center justify-center">
             <p className="text-lg font-bold">We received your application!</p>
             <p className="text-center">
               You shall hear back from our team soon if your application is considered.

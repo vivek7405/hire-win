@@ -1668,7 +1668,7 @@ const SingleCandidatePageContent = ({
                       })}
                     >
                       <a className="bg-white border hover:bg-theme-500 text-theme-600 hover:text-white rounded-lg px-4 py-1 text-center truncate">
-                        Add more questions
+                        Add/edit questions
                       </a>
                     </Link>
                   </div>
