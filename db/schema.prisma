@@ -149,7 +149,7 @@ enum SalaryType {
   YEAR
 }
 
-enum EmploymentType {
+enum JobType {
   FULL_TIME
   PART_TIME
   CONTRACTOR
@@ -238,9 +238,10 @@ model Job {
   maxSalary  Int        @default(0)
   salaryType SalaryType @default(YEAR)
 
-  employmentType EmploymentType[]
   // validThrough   DateTime?
-  description    String?
+
+  jobType     JobType
+  description String?
 
   postToGoogle Boolean @default(false)
 

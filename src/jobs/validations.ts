@@ -1,4 +1,4 @@
-import { EmploymentType, RemoteOption, SalaryType } from "@prisma/client"
+import { JobType, RemoteOption, SalaryType } from "@prisma/client"
 import { StageObj } from "src/stages/validations"
 import { z } from "zod"
 
@@ -13,7 +13,7 @@ export const Job = z.object({
   postToGoogle: z.boolean(),
 
   categoryId: z.string().optional(),
-  employmentType: z.array(z.nativeEnum(EmploymentType)),
+  jobType: z.nativeEnum(JobType),
   // validThrough: z.date(),
 
   country: z.string(),

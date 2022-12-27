@@ -328,9 +328,9 @@ const Jobs = ({ company }: JobsProps) => {
                           {job.category?.name}
                         </span>
                       )}
-                      {job?.employmentType && (
+                      {job?.jobType && (
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                          {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
+                          {titleCase(job.jobType?.replaceAll("_", " "))}
                         </span>
                       )}
                       {job?.remoteOption !== RemoteOption.No_Remote && (

@@ -1,8 +1,8 @@
-import { useQuery } from "@blitzjs/rpc";
+import { useQuery } from "@blitzjs/rpc"
 import { LabeledTextField } from "src/core/components/LabeledTextField"
 import { Job } from "src/jobs/validations"
 import LabeledRichTextField from "src/core/components/LabeledRichTextField"
-import { Category, SalaryType, EmploymentType, RemoteOption } from "@prisma/client"
+import { Category, SalaryType, JobType, RemoteOption } from "@prisma/client"
 import LabeledReactSelectField from "src/core/components/LabeledReactSelectField"
 import { Suspense, useEffect, useState } from "react"
 import { Country, State, City } from "country-state-city"
@@ -124,22 +124,18 @@ export const JobForm = (props: JobFormProps) => {
 
           <div className="w-full md:w-1/3">
             <LabeledReactSelectField
-              name="employmentType"
+              name="jobType"
               label="Employment Type"
               placeholder="Full Time, Part Time, etc."
-              testid="employmentType"
+              testid="jobType"
               //   isMulti={true}
-              options={Object.keys(EmploymentType).map((employmentType) => {
+              options={Object.keys(JobType).map((jobType) => {
                 return {
-                  label: titleCase(employmentType.replaceAll("_", " ")),
-                  value: employmentType,
+                  label: titleCase(jobType.replaceAll("_", " ")),
+                  value: jobType,
                 }
               })}
-              defaultValue={[
-                Object.keys(EmploymentType).find(
-                  (employmentType) => employmentType === "FULL_TIME"
-                ),
-              ]}
+              defaultValue={JobType.FULL_TIME}
             />
           </div>
 

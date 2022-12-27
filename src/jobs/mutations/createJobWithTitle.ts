@@ -1,6 +1,6 @@
 import { Ctx } from "blitz"
 import Guard from "src/guard/ability"
-import { EmploymentType, RemoteOption } from "@prisma/client"
+import { JobType, RemoteOption } from "@prisma/client"
 import createJob from "./createJob"
 
 type JobInput = {
@@ -33,7 +33,7 @@ async function createJobWithTitle({ title }: JobInput, ctx: Ctx) {
       description: "",
       postToGoogle: false,
       // categoryId: undefined,
-      employmentType: [EmploymentType.FULL_TIME],
+      jobType: JobType.FULL_TIME,
       // validThrough,
       country: "",
       state: "",

@@ -1,5 +1,5 @@
 import { Ctx, paginate } from "blitz"
-import db, { CompanyUserRole, EmploymentType, Prisma, RemoteOption } from "db"
+import db, { CompanyUserRole, JobType, Prisma, RemoteOption } from "db"
 import Guard from "src/guard/ability"
 import { JobViewType, PlanName } from "types"
 import moment from "moment"
@@ -82,12 +82,10 @@ async function getJobBoardFilters(
     )
 
   const jobTypes = jobs
-    ?.map((job) => job.employmentType)
-    ?.filter((employmentType) => employmentType !== null)
-    // Since employmentType is an array, convert it to string
-    ?.map((employmentType) => employmentType?.join(" "))
+    ?.map((job) => job.jobType)
+    ?.filter((jobType) => jobType !== null)
     // Get Unique values
-    ?.filter((employmentType, index, self) => self.indexOf(employmentType) == index)
+    ?.filter((jobType, index, self) => self.indexOf(jobType) == index)
 
   const jobLocations = jobs
     ?.filter((job) => job.city || job.state || job.country)

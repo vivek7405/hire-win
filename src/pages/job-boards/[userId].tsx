@@ -247,11 +247,9 @@ const Jobs = ({ companies }: JobsProps) => {
                   className="border border-neutral-300 text-neutral-500 rounded px-2 py-1 w-full lg:w-48 truncate pr-8"
                 >
                   <option value="">All types</option>
-                  {jobBoardFilters?.jobTypes?.map((employmentType) => {
+                  {jobBoardFilters?.jobTypes?.map((jobType) => {
                     return (
-                      <option value={employmentType}>
-                        {titleCase(employmentType?.replaceAll("_", " "))}
-                      </option>
+                      <option value={jobType}>{titleCase(jobType?.replaceAll("_", " "))}</option>
                     )
                   })}
                 </select>
@@ -439,9 +437,9 @@ const Jobs = ({ companies }: JobsProps) => {
                                 {job.category?.name}
                               </span>
                             )}
-                            {job?.employmentType && (
+                            {job?.jobType && (
                               <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                                {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
+                                {titleCase(job.jobType?.replaceAll("_", " "))}
                               </span>
                             )}
                             {job?.remoteOption !== RemoteOption.No_Remote && (

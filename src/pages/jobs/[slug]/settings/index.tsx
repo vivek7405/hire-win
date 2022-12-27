@@ -142,7 +142,7 @@ const JobSettingsPage = ({
               maxSalary: job?.maxSalary,
               salaryType: job?.salaryType,
               showSalary: job?.showSalary,
-              employmentType: job?.employmentType,
+              jobType: job?.jobType,
               // validThrough: job?.validThrough
               //   ? moment(job?.validThrough).local().toDate()
               //   : new Date(),
@@ -202,7 +202,7 @@ const JobSettingsPage = ({
             maxSalary: job?.maxSalary,
             salaryType: job?.salaryType,
             showSalary: job?.showSalary,
-            employmentType: job?.employmentType,
+            jobType: job?.jobType,
             validThrough: moment(job?.validThrough).local().toDate(),
             description: job?.description
               ? EditorState.createWithContent(convertFromRaw(job?.description || {}))

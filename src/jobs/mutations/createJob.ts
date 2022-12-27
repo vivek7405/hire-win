@@ -30,7 +30,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
     maxSalary,
     salaryType,
     showSalary,
-    employmentType,
+    jobType,
     // validThrough,
   } = Job.parse(data)
 
@@ -73,7 +73,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
       maxSalary: maxSalary || 0,
       salaryType: salaryType || SalaryType.YEAR,
       showSalary,
-      employmentType,
+      jobType,
       // validThrough: moment(validThrough || undefined)
       //   .utc()
       //   .toDate(),

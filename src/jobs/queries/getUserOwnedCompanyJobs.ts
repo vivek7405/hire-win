@@ -1,5 +1,5 @@
 import { Ctx, paginate } from "blitz"
-import db, { CompanyUserRole, EmploymentType, Prisma, RemoteOption } from "db"
+import db, { CompanyUserRole, JobType, Prisma, RemoteOption } from "db"
 import Guard from "src/guard/ability"
 import { JobViewType, PlanName } from "types"
 import moment from "moment"
@@ -63,13 +63,13 @@ async function getUserOwnedCompanyJobs(
     },
   } as any
   if (categoryId) jobsWhere["categoryId"] = categoryId
-  if (jobType) jobsWhere["employmentType"] = EmploymentType[jobType]
+  if (jobType) jobsWhere["jobType"] = JobType[jobType]
   if (jobCountry) jobsWhere["country"] = jobCountry
   if (jobState) jobsWhere["state"] = jobState
   if (jobCity) jobsWhere["city"] = jobCity
   if (remoteOption) jobsWhere["remoteOption"] = RemoteOption[remoteOption]
   // categoryId,
-  //   employmentType: jobType ? EmploymentType[jobType] : undefined,
+  //   jobType: jobType ? JobType[jobType] : undefined,
   //   country: jobCountry,
   //   state: jobState,
   //   city: jobCity,

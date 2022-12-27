@@ -1,8 +1,8 @@
-import { useQuery } from "@blitzjs/rpc";
+import { useQuery } from "@blitzjs/rpc"
 import { LabeledTextField } from "src/core/components/LabeledTextField"
 import { Job } from "src/jobs/validations"
 import LabeledRichTextField from "src/core/components/LabeledRichTextField"
-import { Category, SalaryType, EmploymentType } from "@prisma/client"
+import { Category, SalaryType, JobType } from "@prisma/client"
 import LabeledReactSelectField from "src/core/components/LabeledReactSelectField"
 import { Suspense, useEffect, useState } from "react"
 import { Country, State, City } from "country-state-city"
@@ -82,20 +82,18 @@ const Step2Extra = (props: Step2ExtraProps) => {
         </div>
         <div className="w-full md:w-1/3 lg:w-1/3">
           <LabeledReactSelectField
-            name="employmentType"
+            name="jobType"
             label="Employment Type"
             placeholder="Full Time, Part Time, etc."
-            testid="employmentType"
+            testid="jobType"
             isMulti={true}
-            options={Object.keys(EmploymentType).map((employmentType) => {
+            options={Object.keys(JobType).map((jobType) => {
               return {
-                label: titleCase(employmentType.replaceAll("_", " ")),
-                value: employmentType,
+                label: titleCase(jobType.replaceAll("_", " ")),
+                value: jobType,
               }
             })}
-            defaultValue={[
-              Object.keys(EmploymentType).find((employmentType) => employmentType === "FULL_TIME"),
-            ]}
+            defaultValue={JobType.FULL_TIME}
           />
         </div>
         {/* <div className="w-full md:w-1/3 lg:w-1/3">
@@ -508,7 +506,7 @@ export const JobForm = (props: JobFormProps) => {
       id: z.string().optional(),
       slug: z.string().optional(),
       categoryId: z.string().optional(),
-      employmentType: z.array(z.nativeEnum(EmploymentType)),
+      jobType: z.nativeEnum(JobType),
       // validThrough: z.date(),
     }),
   }

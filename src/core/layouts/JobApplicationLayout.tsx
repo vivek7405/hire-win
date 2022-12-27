@@ -33,7 +33,7 @@ function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
     },
     datePosted: moment(job?.createdAt).format("YYYY-MM-DD"),
     // validThrough: moment(job?.validThrough).format("YYYY-MM-DDT00:00"),
-    employmentType: job?.employmentType,
+    jobType: job?.jobType,
     hiringOrganization: {
       "@type": "Organization",
       name: company?.name,
@@ -171,7 +171,7 @@ const JobApplicationLayout = ({
                 )}
                 {(job?.city || job?.state || job?.country) &&
                   (job?.category ||
-                    (job?.employmentType && job?.employmentType?.length > 0) ||
+                    (job?.jobType && job?.jobType?.length > 0) ||
                     (job?.showSalary && (job?.minSalary > 0 || job?.maxSalary > 0))) && (
                     <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
                   )}
@@ -182,18 +182,18 @@ const JobApplicationLayout = ({
                   </div>
                 )}
                 {job?.category &&
-                  ((job?.employmentType && job?.employmentType?.length > 0) ||
+                  ((job?.jobType && job?.jobType?.length > 0) ||
                     (job?.showSalary && (job?.minSalary > 0 || job?.maxSalary > 0))) && (
                     <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
                   )}
-                {job?.employmentType && job?.employmentType?.length > 0 && (
+                {job?.jobType && job?.jobType?.length > 0 && (
                   <div className="flex flex-nowrap items-center justify-center space-x-2">
                     <ClockIcon className="w-5 h-5 text-neutral-700" />
-                    <span>{titleCase(job?.employmentType?.join(" ")?.replaceAll("_", " "))}</span>
+                    <span>{titleCase(job?.jobType?.replaceAll("_", " "))}</span>
                   </div>
                 )}
-                {job?.employmentType &&
-                  job?.employmentType?.length > 0 &&
+                {job?.jobType &&
+                  job?.jobType?.length > 0 &&
                   job?.showSalary &&
                   (job?.minSalary > 0 || job?.maxSalary > 0) && (
                     <span>&nbsp;&nbsp;·&nbsp;&nbsp;</span>
