@@ -223,7 +223,11 @@ const JobApplicationLayout = ({
           )}
         </header>
 
-        <div className="w-full md:w-3/5 lg:w-3/5 xl:w-3/5 2xl:w-3/5 max-w-7xl mx-auto sm:px-6 lg:px-8 bg-gray-100">
+        <div
+          className={`w-full ${
+            isCareersPage ? "md:w-5/6 lg:w-3/4 xl:w-3/4 2xl:w-3/5" : "md:w-3/5"
+          } max-w-7xl mx-auto sm:px-6 lg:px-8 bg-gray-100`}
+        >
           <div className="px-4 sm:px-0">
             <main>{children}</main>
           </div>

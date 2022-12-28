@@ -1,5 +1,5 @@
 import { Ctx, paginate } from "blitz"
-import db, { Prisma } from "db"
+import db, { JobType, Prisma, RemoteOption } from "db"
 import Guard from "src/guard/ability"
 import { JobViewType, PlanName } from "types"
 import moment from "moment"
@@ -13,13 +13,23 @@ async function getCompanyJobsForCareersPage(
     orderBy,
     skip = 0,
     take = 100,
-    categoryId,
-    searchString,
     companyId,
+    categoryId,
+    jobType,
+    jobCountry,
+    jobState,
+    jobCity,
+    remoteOption,
+    searchString,
   }: GetJobsInput & {
+    companyId: string
+    categoryId: string
+    jobType: string
+    jobCountry: string
+    jobState: string
+    jobCity: string
+    remoteOption: string
     searchString: string
-    categoryId: string | null
-    companyId: string | null
   },
   ctx: Ctx
 ) {
@@ -50,18 +60,35 @@ async function getCompanyJobsForCareersPage(
   //     ?.map((job) => job.id)
   // }
 
-  const where = {
+  // const where = {
+  //   id: { notIn: jobIdsWhereCandidateLimitReached },
+  //   archived: false,
+  //   hidden: false,
+  //   // validThrough,
+  //   companyId: companyId || "0",
+  //   // categoryId: categoryId || {},
+  //   title: {
+  //     contains: JSON.parse(searchString),
+  //     mode: "insensitive",
+  //   },
+  // } as any
+
+  let jobsWhere = {
     id: { notIn: jobIdsWhereCandidateLimitReached },
+    companyId: companyId || "0",
     archived: false,
     hidden: false,
-    // validThrough,
-    companyId: companyId || "0",
-    categoryId: categoryId || {},
     title: {
       contains: JSON.parse(searchString),
       mode: "insensitive",
     },
   } as any
+  if (categoryId) jobsWhere["categoryId"] = categoryId
+  if (jobType) jobsWhere["jobType"] = JobType[jobType]
+  if (jobCountry) jobsWhere["country"] = jobCountry
+  if (jobState) jobsWhere["state"] = jobState
+  if (jobCity) jobsWhere["city"] = jobCity
+  if (remoteOption) jobsWhere["remoteOption"] = RemoteOption[remoteOption]
 
   const {
     items: jobs,
@@ -70,11 +97,11 @@ async function getCompanyJobsForCareersPage(
   } = await paginate({
     skip,
     take,
-    count: () => db.job.count({ where }),
+    count: () => db.job.count({ where: jobsWhere }),
     query: (paginateArgs) =>
       db.job.findMany({
         ...paginateArgs,
-        where,
+        where: jobsWhere,
         orderBy,
         include: {
           category: true,

@@ -7,29 +7,21 @@ import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompan
 import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 import getJobFilters from "../utils/getJobFilters"
 
-async function getJobBoardFilters({ userId }, ctx: Ctx) {
-  const companyUsers = await db.companyUser.findMany({
-    where: { userId },
+async function getCareersPageFilters({ companyId }, ctx: Ctx) {
+  const companyJobs = await db.job.findMany({
+    where: {
+      companyId: companyId || "0",
+    },
     include: {
-      company: {
-        include: {
-          jobs: {
-            include: {
-              _count: { select: { candidates: true } },
-            },
-          },
-        },
-      },
+      _count: { select: { candidates: true } },
     },
   })
-
-  const userOwnedCompanyJobs = companyUsers.map((cu) => cu.company.jobs)?.flat()
 
   const activePlanName = await getCurrentCompanyOwnerActivePlan({}, ctx)
 
   let jobIdsWhereCandidateLimitReached: string[] = []
   if (activePlanName === PlanName.FREE) {
-    jobIdsWhereCandidateLimitReached = userOwnedCompanyJobs
+    jobIdsWhereCandidateLimitReached = companyJobs
       ?.filter((job) => job._count.candidates >= FREE_CANDIDATES_LIMIT)
       ?.map((job) => job.id)
   }
@@ -39,7 +31,7 @@ async function getJobBoardFilters({ userId }, ctx: Ctx) {
   //     ?.map((job) => job.id)
   // }
 
-  const jobIdsToConsider = userOwnedCompanyJobs
+  const jobIdsToConsider = companyJobs
     ?.map((job) => job.id)
     ?.filter((id) => !jobIdsWhereCandidateLimitReached?.includes(id))
 
@@ -102,4 +94,4 @@ async function getJobBoardFilters({ userId }, ctx: Ctx) {
   return getJobFilters(jobs)
 }
 
-export default getJobBoardFilters
+export default getCareersPageFilters

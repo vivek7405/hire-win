@@ -205,7 +205,7 @@ const Jobs = ({ companies }: JobsProps) => {
             resultName="job opening"
           />
         </div>
-        <div className="w-full lg:w-3/4 flex flex-col space-y-5 md:space-y-0 md:space-x-5 md:flex-row">
+        <div className="w-full lg:w-3/4 flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">
           <div>
             <div className="flex flex-col space-y-5">
               <div className="w-full">
