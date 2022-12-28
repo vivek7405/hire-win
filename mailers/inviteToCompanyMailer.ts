@@ -52,8 +52,9 @@ export async function inviteToCompanyMailer({
           if (process.env.NODE_ENV === "production") {
             // send the production email
             client.sendEmailWithTemplate({
-              From: fromEmail,
+              From: `${companyName} <notifications@hire.win>`,
               To: toEmail,
+              ReplyTo: fromEmail,
               TemplateAlias: "invite-to-company",
               TemplateModel: {
                 invite_sender_name: fromName,
@@ -78,7 +79,7 @@ export async function inviteToCompanyMailer({
             let subject = replaceForLocal(template?.Subject, fromName, companyName, webhookUrl)
             let html = replaceForLocal(template?.HtmlBody, fromName, companyName, webhookUrl)
             const msg = {
-              from: fromEmail,
+              from: `${companyName} <notifications@hire.win>`,
               to: toEmail,
               subject: subject || "",
               html: html || "",

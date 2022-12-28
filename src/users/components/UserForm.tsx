@@ -47,8 +47,8 @@ export const UserForm = (props: UserFormProps) => {
             name="jobBoardName"
             label="Job Board Name"
             placeholder="Parent company or staffing company name"
-            subLabel="If provided, it shall be displayed as Job Board Header"
-            subLabel2="Job Board lists jobs from all the companies you own"
+            subLabel="If provided, it shall be displayed as Job Board Header."
+            subLabel2="Job Board lists jobs from all the companies where you are an owner."
             testid="userUpdateName"
           />
 
