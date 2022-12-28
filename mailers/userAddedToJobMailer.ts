@@ -42,8 +42,9 @@ export async function userAddedToJobMailer({
           if (process.env.NODE_ENV === "production") {
             // send the production email
             client.sendEmailWithTemplate({
-              From: fromEmail,
+              From: `${companyName} <notifications@hire.win>`,
               To: toEmail,
+              ReplyTo: fromEmail,
               TemplateAlias: "added-to-job",
               TemplateModel: {
                 invite_sender_name: fromName,
@@ -66,7 +67,7 @@ export async function userAddedToJobMailer({
             )
             let html = replaceForLocal(template?.HtmlBody, fromName, companyName, jobURL, jobTitle)
             const msg = {
-              from: fromEmail,
+              from: `${companyName} <notifications@hire.win>`,
               to: toEmail,
               subject: subject || "",
               html: html || "",
