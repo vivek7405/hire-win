@@ -394,6 +394,41 @@ const Jobs = ({
                   </a>
                 )}
               </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <Link
+                      prefetch={true}
+                      href={Routes.CompanyJobBoard({ userId: user?.id || "0" })}
+                      passHref
+                    >
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        className={classNames(
+                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                          "block px-4 py-2 text-sm",
+                          "flex items-center space-x-2 cursor-pointer"
+                        )}
+                      >
+                        <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
+                        <span>View Job Board</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <LinkCopyPopMenuItem
+                      userId={user?.id || "0"}
+                      active={active}
+                      label="Copy Job Board Link"
+                    />
+                  </a>
+                )}
+              </Menu.Item>
             </div>
             {/* <div className="py-1">
               <Menu.Item>

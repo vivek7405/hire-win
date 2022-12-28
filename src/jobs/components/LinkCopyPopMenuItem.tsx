@@ -5,10 +5,17 @@ import classNames from "src/core/utils/classNames"
 type LinkCopyPopMenuItemProps = {
   companySlug?: string
   jobSlug?: string
+  userId?: string
   active: boolean
   label: string
 }
-const LinkCopyPopMenuItem = ({ companySlug, jobSlug, active, label }: LinkCopyPopMenuItemProps) => {
+const LinkCopyPopMenuItem = ({
+  companySlug,
+  jobSlug,
+  userId,
+  active,
+  label,
+}: LinkCopyPopMenuItemProps) => {
   const [copied, setCopied] = useState(false)
 
   return (
@@ -20,12 +27,17 @@ const LinkCopyPopMenuItem = ({ companySlug, jobSlug, active, label }: LinkCopyPo
           const baseURL =
             process.env.NODE_ENV === "production" ? "https://hire.win" : "http://localhost:3000"
 
-          const companySlugAppend = companySlug ? `/${companySlug}` : ""
-          const jobSlugAppend = jobSlug ? `/${jobSlug}` : ""
+          let copyLink = ""
+          if (userId) {
+            copyLink = `${baseURL}/job-boards/${userId}`
+          } else {
+            const companySlugAppend = companySlug ? `/${companySlug}` : ""
+            const jobSlugAppend = jobSlug ? `/${jobSlug}` : ""
 
-          const jobPostLink = `${baseURL}${companySlugAppend}${jobSlugAppend}`
+            copyLink = `${baseURL}${companySlugAppend}${jobSlugAppend}`
+          }
 
-          navigator.clipboard.writeText(jobPostLink)
+          navigator.clipboard.writeText(copyLink)
           setCopied(true)
         }}
       >
