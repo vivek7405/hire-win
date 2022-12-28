@@ -494,8 +494,14 @@ const CompanyJobBoard = ({
       </div>
 
       <div className="w-full flex items-center justify-center mt-10">
-        <Link href={Routes.Home()}>
-          <a className="border rounded-lg px-4 py-2">Powered by hire.win</a>
+        <Link href={Routes.Home()} legacyBehavior passHref>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            className="border rounded-lg px-4 py-2 hover:bg-neutral-50"
+          >
+            Powered by hire.win
+          </a>
         </Link>
       </div>
     </div>
