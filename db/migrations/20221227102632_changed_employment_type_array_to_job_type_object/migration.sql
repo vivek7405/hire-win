@@ -10,7 +10,7 @@ CREATE TYPE "JobType" AS ENUM ('FULL_TIME', 'PART_TIME', 'CONTRACTOR', 'TEMPORAR
 
 -- AlterTable
 ALTER TABLE "Job" DROP COLUMN "employmentType",
-ADD COLUMN     "jobType" "JobType" NOT NULL;
+ADD COLUMN     "jobType" "JobType" NOT NULL DEFAULT E'FULL_TIME';
 
 -- DropEnum
 DROP TYPE "EmploymentType";
