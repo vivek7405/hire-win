@@ -125,7 +125,7 @@ export const JobForm = (props: JobFormProps) => {
           <div className="w-full md:w-1/3">
             <LabeledReactSelectField
               name="jobType"
-              label="Employment Type"
+              label="Job Type"
               placeholder="Full Time, Part Time, etc."
               testid="jobType"
               //   isMulti={true}
@@ -276,9 +276,15 @@ export const JobForm = (props: JobFormProps) => {
               placeholder="Currency for salary"
               options={[
                 { label: "Select Currency", value: "" },
-                ...Country.getAllCountries().map((c) => {
-                  return { label: c.currency, value: c.currency }
-                }),
+                ...Country.getAllCountries()
+                  // Unique Values
+                  ?.filter(
+                    (country, index, self) =>
+                      self.findIndex((cont) => cont?.currency === country?.currency) === index
+                  )
+                  ?.map((c) => {
+                    return { label: c.currency, value: c.currency }
+                  }),
               ]}
             />
           </div>

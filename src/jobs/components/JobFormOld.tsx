@@ -83,7 +83,7 @@ const Step2Extra = (props: Step2ExtraProps) => {
         <div className="w-full md:w-1/3 lg:w-1/3">
           <LabeledReactSelectField
             name="jobType"
-            label="Employment Type"
+            label="Job Type"
             placeholder="Full Time, Part Time, etc."
             testid="jobType"
             isMulti={true}
