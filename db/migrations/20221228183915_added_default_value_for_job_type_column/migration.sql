@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Job" ALTER COLUMN "jobType" SET DEFAULT 'FULL_TIME';

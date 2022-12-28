@@ -242,7 +242,7 @@ model Job {
 
   // validThrough   DateTime?
 
-  jobType     JobType
+  jobType     JobType @default(FULL_TIME)
   description String?
 
   postToGoogle Boolean @default(false)
