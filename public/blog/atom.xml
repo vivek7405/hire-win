@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://localhost:3000/blog</id>
     <title>Hire.win Blog | RSS Feed</title>
-    <updated>2022-12-22T12:06:16.304Z</updated>
+    <updated>2022-12-27T11:17:17.276Z</updated>
     <generator>Feed for Node.js</generator>
     <link rel="alternate" href="http://localhost:3000/blog"/>
     <link rel="self" href="http://localhost:3000/blog/atom.xml"/>

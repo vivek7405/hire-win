@@ -1,6 +1,6 @@
 import { Ctx } from "blitz"
 import createJob from "./createJob"
-import db, { Answer, CandidateSource, EmploymentType, RemoteOption, SalaryType } from "db"
+import db, { Answer, CandidateSource, JobType, RemoteOption, SalaryType } from "db"
 import createCandidate from "src/candidates/mutations/createCandidate"
 import addComment from "src/comments/mutations/addComment"
 import addCandidateToPool from "src/candidate-pools/mutations/addCandidateToPool"
@@ -27,7 +27,7 @@ async function createFactoryJob(companyId: string, ctx: Ctx) {
       maxSalary: 80000,
       salaryType: SalaryType.YEAR,
       showSalary: true,
-      employmentType: [EmploymentType.FULL_TIME],
+      jobType: JobType.FULL_TIME,
     },
     ctx
   )

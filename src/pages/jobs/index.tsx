@@ -394,6 +394,41 @@ const Jobs = ({
                   </a>
                 )}
               </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <Link
+                      prefetch={true}
+                      href={Routes.CompanyJobBoard({ userId: user?.id || "0" })}
+                      passHref
+                    >
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        className={classNames(
+                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                          "block px-4 py-2 text-sm",
+                          "flex items-center space-x-2 cursor-pointer"
+                        )}
+                      >
+                        <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
+                        <span>View Job Board</span>
+                      </a>
+                    </Link>
+                  </a>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
+                    <LinkCopyPopMenuItem
+                      userId={user?.id || "0"}
+                      active={active}
+                      label="Copy Job Board Link"
+                    />
+                  </a>
+                )}
+              </Menu.Item>
             </div>
             {/* <div className="py-1">
               <Menu.Item>
@@ -893,22 +928,24 @@ const Jobs = ({
       <div className="hidden md:flex lg:flex items-center w-full justify-between">
         <div className="flex items-center">
           {searchInput}
-          <Form
-            noFormatting={true}
-            onSubmit={(value) => {
-              return value
-            }}
-          >
-            <RadioGroupField
-              name="View"
-              isBorder={false}
-              options={[JobViewType.Active, JobViewType.Archived]}
-              initialValue={JobViewType.Active}
-              onChange={(value) => {
-                setViewType(value)
+          <div className="ml-2">
+            <Form
+              noFormatting={true}
+              onSubmit={(value) => {
+                return value
               }}
-            />
-          </Form>
+            >
+              <RadioGroupField
+                name="View"
+                isBorder={false}
+                options={[JobViewType.Active, JobViewType.Archived]}
+                initialValue={JobViewType.Active}
+                onChange={(value) => {
+                  setViewType(value)
+                }}
+              />
+            </Form>
+          </div>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -1180,9 +1217,9 @@ const Jobs = ({
                           {job.category?.name}
                         </span>
                       )}
-                      {job?.employmentType && (
+                      {job?.jobType && (
                         <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                          {titleCase(job.employmentType?.join(" ")?.replaceAll("_", " "))}
+                          {titleCase(job.jobType?.replaceAll("_", " "))}
                         </span>
                       )}
                       {job?.remoteOption !== RemoteOption.No_Remote && (

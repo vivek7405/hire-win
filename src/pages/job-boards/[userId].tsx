@@ -42,7 +42,9 @@ import Stripe from "stripe"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import { FREE_CANDIDATES_LIMIT, FREE_JOBS_LIMIT } from "src/plans/constants"
-import getCareersPageFilters from "src/jobs/queries/getCareersPageFilters"
+import getUserOwnedCompanyJobs from "src/jobs/queries/getUserOwnedCompanyJobs"
+import getAllUserOwnedCompanies from "src/companies/queries/getAllUserOwnedCompanies"
+import getJobBoardFilters from "src/jobs/queries/getJobBoardFilters"
 import JobFilters from "src/jobs/components/JobFilters"
 import JobPost from "src/jobs/components/JobPost"
 
@@ -54,19 +56,17 @@ export const getServerSideProps = gSSP(async (context) => {
   path.resolve(".next/blitz/db.js")
   // End anti-tree-shaking
 
-  const company = await getCompany(
-    {
-      where: { slug: context?.params?.companySlug as string },
-    },
-    { ...context.ctx }
-  )
-
   // const user = await getCurrentUserServer({ ...context })
 
-  if (company) {
-    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+  const user = await getUser(
+    {
+      where: { id: (context?.params?.userId as string) || "0" },
+    },
+    context.ctx
+  )
 
-    return { props: { company, activePlanName } }
+  if (user) {
+    return { props: { user } }
   } else {
     return {
       redirect: {
@@ -78,23 +78,20 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-type JobsProps = {
-  company: Company
-}
-const Jobs = ({ company }: JobsProps) => {
+const Jobs = ({}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
   // const [query, setQuery] = useState({})
   const [searchString, setSearchString] = useState((router.query.search as string) || '""')
 
-  const { embed } = router.query
+  const { embed, userId } = router.query
 
-  const [theme, setTheme] = useState(company?.theme || "indigo")
-  useEffect(() => {
-    const themeName = company?.theme || "indigo"
-    setTheme(themeName)
-  }, [setTheme, company?.theme])
+  // const [theme, setTheme] = useState(company?.theme || "indigo")
+  // useEffect(() => {
+  //   const themeName = company?.theme || "indigo"
+  //   setTheme(themeName)
+  // }, [setTheme, company?.theme])
 
   useEffect(() => {
     setSearchString((router.query.search as string) || '""')
@@ -111,12 +108,8 @@ const Jobs = ({ company }: JobsProps) => {
   //   searchString,
   //   companyId: company?.id,
   // })
-  // const [selectedCategoryId, setSelectedCategoryId] = useState(null as string | null)
 
-  const [careersPageFilters] = useQuery(getCareersPageFilters, {
-    companyId: (company?.id as string) || "0",
-  })
-
+  const [companyId, setCompanyId] = useState("" as string)
   const [categoryId, setCategoryId] = useState("" as string)
   const [jobType, setJobType] = useState("" as string)
   const [remoteOption, setRemoteOption] = useState("" as string)
@@ -127,10 +120,12 @@ const Jobs = ({ company }: JobsProps) => {
 
   const [searchjobTitle, setSearchJobTitle] = useState("")
 
-  const [{ jobs, hasMore, count }] = usePaginatedQuery(getCompanyJobsForCareersPage, {
+  const [jobBoardFilters] = useQuery(getJobBoardFilters, { userId: (userId as string) || "0" })
+
+  const [{ jobs, hasMore, count }] = usePaginatedQuery(getUserOwnedCompanyJobs, {
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
-    companyId: company?.id || "0",
+    companyId,
     categoryId,
     jobType,
     jobCountry,
@@ -138,6 +133,7 @@ const Jobs = ({ company }: JobsProps) => {
     jobCity,
     remoteOption,
     searchString,
+    userId: (userId as string) || "0",
   })
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
@@ -181,8 +177,8 @@ const Jobs = ({ company }: JobsProps) => {
   }
 
   return (
-    <div className={`theme-${theme} h-fit`}>
-      <div className="flex items-center justify-center">
+    <div className={`h-fit`}>
+      <div className="mt-8 flex items-center justify-center">
         <input
           placeholder="Search job title"
           type="text"
@@ -196,89 +192,96 @@ const Jobs = ({ company }: JobsProps) => {
         />
       </div>
 
-      <Pagination
-        endPage={endPage}
-        hasNext={hasMore}
-        hasPrevious={tablePage !== 0}
-        pageIndex={tablePage}
-        startPage={startPage}
-        totalCount={count}
-        resultName="job opening"
-      />
-
-      <div className="w-full flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5 mb-4">
-        <JobFilters
-          categoryId={categoryId}
-          filters={careersPageFilters}
-          isJobBoard={false}
-          jobType={jobType}
-          remoteOption={remoteOption}
-          setCategoryId={setCategoryId}
-          setJobCity={setJobCity}
-          setJobCountry={setJobCountry}
-          setJobState={setJobState}
-          setJobType={setJobType}
-          setRemoteOption={setRemoteOption}
-          setSearchJobTitle={setSearchJobTitle}
-          setSearchString={setSearchString}
-        />
-        <div
-          className={`w-full flex flex-col space-y-5 ${
-            jobs?.length === 0 ? "border border-neutral-300 rounded p-2" : ""
-          }`}
-        >
-          {jobs?.length === 0 && (
-            <p className="text-neutral-600 w-full h-full flex items-center justify-center">
-              No Jobs
-            </p>
-          )}
-          {jobs?.length > 0 &&
-            jobs?.map((job) => {
-              return (
-                <JobPost
-                  key={job?.id}
-                  job={job}
-                  embed={embed}
-                  companySlug={company?.slug}
-                  isJobBoard={false}
-                />
-              )
-            })}
+      <div className="w-full flex flex-col items-center justify-center">
+        <div className="w-full lg:w-3/4">
+          <Pagination
+            endPage={endPage}
+            hasNext={hasMore}
+            hasPrevious={tablePage !== 0}
+            pageIndex={tablePage}
+            startPage={startPage}
+            totalCount={count}
+            resultName="job opening"
+          />
+        </div>
+        <div className="mb-4 w-full lg:w-3/4 flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">
+          <JobFilters
+            filters={jobBoardFilters}
+            companyId={companyId}
+            categoryId={categoryId}
+            isJobBoard={true}
+            jobType={jobType}
+            remoteOption={remoteOption}
+            setCompanyId={setCompanyId}
+            setCategoryId={setCategoryId}
+            setJobCity={setJobCity}
+            setJobCountry={setJobCountry}
+            setJobState={setJobState}
+            setJobType={setJobType}
+            setRemoteOption={setRemoteOption}
+            setSearchJobTitle={setSearchJobTitle}
+            setSearchString={setSearchString}
+          />
+          <div
+            className={`w-full flex flex-col space-y-5 ${
+              jobs?.length === 0 ? "border rounded p-2" : ""
+            }`}
+          >
+            {jobs?.length === 0 && (
+              <p className="text-neutral-600 w-full h-full flex items-center justify-center">
+                No Jobs
+              </p>
+            )}
+            {jobs?.length > 0 &&
+              jobs?.map((job) => {
+                return (
+                  <JobPost
+                    key={job?.id}
+                    job={job}
+                    embed={embed}
+                    companySlug={job?.company?.slug}
+                    isJobBoard={true}
+                  />
+                )
+              })}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-const CareersPage = ({
-  company,
-  activePlanName,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const CompanyJobBoard = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const { embed } = router.query
 
   return embed ? (
     <div className="p-1">
-      <Jobs company={company!} />
+      <Jobs />
     </div>
   ) : (
-    <JobApplicationLayout company={company} isCareersPage={true}>
-      <Suspense fallback="Loading...">
-        <h3 className="text-2xl font-bold">Careers at {titleCase(company?.name)}</h3>
-        <div
-          className="quill-container-output mt-1 mb-8"
-          dangerouslySetInnerHTML={{
-            __html: (company?.info || "") as string,
-          }}
-        />
-        {/* <div
-          className="mt-1 mb-8"
-          dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
-        /> */}
-        <Jobs company={company!} />
-      </Suspense>
-    </JobApplicationLayout>
+    <div className="flex flex-col min-h-screen p-10">
+      <h3 className="text-2xl font-bold text-center top-0">{user?.jobBoardName || ""} Job Board</h3>
+
+      <div className="mb-auto">
+        <Suspense fallback="Loading...">
+          <Jobs />
+        </Suspense>
+      </div>
+
+      <div className="w-full flex items-center justify-center mt-10">
+        <Link href={Routes.Home()} legacyBehavior passHref>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            className="border rounded-lg px-4 py-2 hover:bg-neutral-50"
+          >
+            Powered by hire.win
+          </a>
+        </Link>
+      </div>
+    </div>
   )
 }
 
-export default CareersPage
+export default CompanyJobBoard

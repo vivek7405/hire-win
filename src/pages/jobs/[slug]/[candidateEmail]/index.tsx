@@ -516,6 +516,7 @@ const SingleCandidatePageContent = ({
   // }, [candidate?.stage])
 
   const [file, setFile] = useState(null as any)
+  const [loadingResume, setLoadingResume] = useState(false)
   // const [cards, setCards] = useState(getCards(candidate!))
   // useEffect(() => {
   //   setCards(getCards(candidate!))
@@ -546,12 +547,15 @@ const SingleCandidatePageContent = ({
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
     if (resume?.key) {
+      setLoadingResume(true)
       getResume(resume?.key).then((response) => {
         const file = response?.data?.Body
         setFile(file)
+        setLoadingResume(false)
       })
     } else {
       setFile(null)
+      setLoadingResume(false)
     }
   }, [resume.key])
 
@@ -1700,9 +1704,25 @@ const SingleCandidatePageContent = ({
                   {file && <PDFViewer file={file} />}
                   {!(candidate?.resume as AttachmentObject)?.key && (
                     <div className="text-center my-3 px-2">
-                      No Resume Uploaded. Upload one by clicking on the Edit Candidate menu.
+                      No resume uploaded. Click on the button below to upload a resume.
                     </div>
                   )}
+                  <div className="flex items-center justify-center">
+                    {loadingResume ? (
+                      <div>
+                        <p>Loading...</p>
+                      </div>
+                    ) : (
+                      <button
+                        className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => {
+                          setOpenEditModal(true)
+                        }}
+                      >
+                        {file ? "Edit Resume" : "Upload Resume"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
               {candidateDetailToggleView === CandidateDetailToggleView.Files &&

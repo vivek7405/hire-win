@@ -31,7 +31,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     maxSalary,
     salaryType,
     showSalary,
-    employmentType,
+    jobType,
     // validThrough,
     // scoreCards,
   } = Job.parse(data)
@@ -66,7 +66,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
       maxSalary: maxSalary || 0,
       salaryType: salaryType || SalaryType.YEAR,
       showSalary,
-      employmentType,
+      jobType,
       // validThrough: moment(validThrough || undefined)
       //   .utc()
       //   .toDate(),

@@ -25,6 +25,8 @@ model User {
   sessions       Session[]
   isFirstSignup  Boolean   @default(true)
 
+  jobBoardName String?
+
   companies CompanyUser[]
   jobs      JobUser[]
 
@@ -149,7 +151,7 @@ enum SalaryType {
   YEAR
 }
 
-enum EmploymentType {
+enum JobType {
   FULL_TIME
   PART_TIME
   CONTRACTOR
@@ -238,9 +240,10 @@ model Job {
   maxSalary  Int        @default(0)
   salaryType SalaryType @default(YEAR)
 
-  employmentType EmploymentType[]
   // validThrough   DateTime?
-  description    String?
+
+  jobType     JobType
+  description String?
 
   postToGoogle Boolean @default(false)
 
