@@ -893,22 +893,24 @@ const Jobs = ({
       <div className="hidden md:flex lg:flex items-center w-full justify-between">
         <div className="flex items-center">
           {searchInput}
-          <Form
-            noFormatting={true}
-            onSubmit={(value) => {
-              return value
-            }}
-          >
-            <RadioGroupField
-              name="View"
-              isBorder={false}
-              options={[JobViewType.Active, JobViewType.Archived]}
-              initialValue={JobViewType.Active}
-              onChange={(value) => {
-                setViewType(value)
+          <div className="ml-2">
+            <Form
+              noFormatting={true}
+              onSubmit={(value) => {
+                return value
               }}
-            />
-          </Form>
+            >
+              <RadioGroupField
+                name="View"
+                isBorder={false}
+                options={[JobViewType.Active, JobViewType.Archived]}
+                initialValue={JobViewType.Active}
+                onChange={(value) => {
+                  setViewType(value)
+                }}
+              />
+            </Form>
+          </div>
         </div>
 
         <div className="flex items-center space-x-2">
