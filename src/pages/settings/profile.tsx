@@ -65,11 +65,13 @@ const UserSettingsProfilePage = ({
       <Suspense fallback="Loading...">
         <UserSettingsLayout>
           <UserForm
+            userId={user?.id}
             header="Profile"
             subHeader="Update your profile details"
             initialValues={{
               name: user?.name || "",
               email: user?.email || "",
+              jobBoardName: user?.jobBoardName || "",
               // logo: company?.logo,
               // info: company?.info
               //   ? EditorState.createWithContent(convertFromRaw(company?.info || {}))

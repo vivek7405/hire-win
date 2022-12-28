@@ -25,6 +25,8 @@ model User {
   sessions       Session[]
   isFirstSignup  Boolean   @default(true)
 
+  jobBoardName String?
+
   companies CompanyUser[]
   jobs      JobUser[]
 

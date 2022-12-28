@@ -56,17 +56,17 @@ export const getServerSideProps = gSSP(async (context) => {
   path.resolve(".next/blitz/db.js")
   // End anti-tree-shaking
 
-  const companies = await getAllUserOwnedCompanies(
-    { userId: context?.params?.userId as string },
-    { ...context.ctx }
-  )
-
   // const user = await getCurrentUserServer({ ...context })
 
-  if (companies) {
-    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+  const user = await getUser(
+    {
+      where: { id: (context?.params?.userId as string) || "0" },
+    },
+    context.ctx
+  )
 
-    return { props: { companies, activePlanName } }
+  if (user) {
+    return { props: { user } }
   } else {
     return {
       redirect: {
@@ -78,10 +78,7 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-type JobsProps = {
-  companies: Company[]
-}
-const Jobs = ({ companies }: JobsProps) => {
+const Jobs = ({}) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -392,35 +389,21 @@ const Jobs = ({ companies }: JobsProps) => {
   )
 }
 
-const CompanyJobBoard = ({
-  companies,
-  activePlanName,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const CompanyJobBoard = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const { embed } = router.query
 
   return embed ? (
     <div className="p-1">
-      <Jobs companies={companies!} />
+      <Jobs />
     </div>
   ) : (
-    // <JobApplicationLayout company={company} isCareersPage={true}>
     <div className="flex flex-col min-h-screen p-10">
-      <h3 className="text-2xl font-bold text-center top-0">Job Board</h3>
+      <h3 className="text-2xl font-bold text-center top-0">{user?.jobBoardName || ""} Job Board</h3>
 
       <div className="mb-auto">
         <Suspense fallback="Loading...">
-          {/* <div
-        className="quill-container-output mt-1 mb-8"
-        dangerouslySetInnerHTML={{
-          __html: (company?.info || "") as string,
-        }}
-      /> */}
-          {/* <div
-          className="mt-1 mb-8"
-          dangerouslySetInnerHTML={{ __html: draftToHtml(company?.info || {}) }}
-        /> */}
-          <Jobs companies={companies!} />
+          <Jobs />
         </Suspense>
       </div>
 
