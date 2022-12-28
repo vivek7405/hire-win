@@ -77,7 +77,7 @@ export async function userAddedToJobMailer({
           }
         } else {
           const msg = {
-            from: fromEmail,
+            from: `${companyName} <notifications@hire.win>`,
             to: toEmail,
             subject: "",
             html: "",
