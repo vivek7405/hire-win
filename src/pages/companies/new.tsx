@@ -19,6 +19,9 @@ import createFactoryJob from "src/jobs/mutations/createFactoryJob"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import getCompanyUsers from "src/companies/queries/getCompanyUsers"
 import { CompanyUserRole } from "@prisma/client"
+import { PlanName } from "types"
+import { FREE_COMPANIES_LIMIT } from "src/plans/constants"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -63,6 +66,11 @@ const NewCompany = ({
   return (
     <AuthLayout title="New Company" user={user}>
       <div className="max-w-lg mx-auto">
+        {activePlanName === PlanName.FREE && companyUsers?.length >= FREE_COMPANIES_LIMIT && (
+          <div className="mt-2">
+            <UpgradeMessage message="Upgrade to add more companies" />
+          </div>
+        )}
         <Suspense fallback="Loading...">
           {/* {companyUser && <Breadcrumbs />} */}
           <div className="mt-6">
@@ -79,6 +87,17 @@ const NewCompany = ({
                 theme: "indigo",
               }}
               onSubmit={async (values) => {
+                if (companyUsers?.length >= 1) {
+                  if (activePlanName === PlanName.FREE) {
+                    if (companyUsers?.length >= FREE_COMPANIES_LIMIT) {
+                      alert(
+                        `You can only have ${FREE_COMPANIES_LIMIT} company with careers page on the free plan. Upgrade to the lifetime plan to add more companies.`
+                      )
+                      return
+                    }
+                  }
+                }
+
                 // if (values?.info) {
                 //   values.info = convertToRaw(values?.info?.getCurrentContent())
                 // }
