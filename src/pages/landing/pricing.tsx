@@ -46,7 +46,7 @@ export default function Pricing({}) {
           <section className="w-full sm:w-2/3 md:w-5/6 lg:w-3/4 xl:w-3/5">
             <div className="w-full text-center mt-4">
               <span className="text-2xl lg:text-3xl bg-yellow-200 px-3 rounded-tl-2xl rounded-br-2xl">
-                Say no to costly subscriptions
+                Our pricing is as simple as our product!
               </span>
             </div>
 
