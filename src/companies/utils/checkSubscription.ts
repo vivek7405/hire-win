@@ -1,30 +1,28 @@
 import { SubscriptionObject, SubscriptionStatus } from "types"
-import { Company } from "db"
+import { User } from "db"
 import moment from "moment"
 
-export const checkSubscription = (
-  company: Company | null | undefined
-): SubscriptionObject | null => {
-  if (company && company?.stripePriceId) {
+export const checkSubscription = (user: User | null | undefined): SubscriptionObject | null => {
+  if (user && user?.stripePriceId) {
     if (
-      company.stripeTrialEnd &&
-      moment(company.stripeTrialEnd).local().toDate().getTime() > Date.now()
+      user.stripeTrialEnd &&
+      moment(user.stripeTrialEnd).local().toDate().getTime() > Date.now()
     ) {
       return {
         status: SubscriptionStatus.TRIALING,
-        daysLeft: moment(company.stripeTrialEnd)
+        daysLeft: moment(user.stripeTrialEnd)
           .local()
           .diff(moment({ hours: 0 }), "days"),
       }
     }
 
     if (
-      company.stripeCurrentPeriodEnd &&
-      moment(company.stripeCurrentPeriodEnd).local().toDate().getTime() > Date.now()
+      user.stripeCurrentPeriodEnd &&
+      moment(user.stripeCurrentPeriodEnd).local().toDate().getTime() > Date.now()
     ) {
       return {
         status: SubscriptionStatus.ACTIVE,
-        daysLeft: moment(company.stripeCurrentPeriodEnd)
+        daysLeft: moment(user.stripeCurrentPeriodEnd)
           .local()
           .diff(moment({ hours: 0 }), "days"),
       }

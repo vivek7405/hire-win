@@ -7,7 +7,7 @@ interface ISession {
   id: string
   customer: string
   metadata: {
-    companyId: string
+    userId: string
   }
   subscription: string
 }
@@ -55,9 +55,9 @@ export default async (req, res) => {
   ) {
     const subscription = await stripe.subscriptions.retrieve(session.subscription || session.id)
 
-    await db.company.update({
+    await db.user.update({
       where: {
-        id: session.metadata.companyId || "0",
+        id: session.metadata.userId || "0",
       },
       data: {
         stripeCurrentPeriodEnd: moment.unix(subscription.current_period_end)?.utc()?.toDate(),
@@ -77,7 +77,7 @@ export default async (req, res) => {
   if (event.type === "invoice.payment_succeeded") {
     const subscription = await stripe.subscriptions.retrieve(session.subscription || session.id)
 
-    await db.company.update({
+    await db.user.update({
       where: {
         stripeSubscriptionId: subscription.id,
       },

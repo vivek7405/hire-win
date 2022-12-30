@@ -274,12 +274,12 @@ const UserSettingsMembersPage = ({
                 <Confirm
                   open={openConfirmBilling}
                   setOpen={setOpenConfirmBilling}
-                  header="Upgrade to the Pro Plan?"
+                  header="Upgrade to the Recruiter Plan?"
                   onSuccess={async () => {
                     router.push(Routes.UserSettingsBillingPage())
                   }}
                 >
-                  Upgrade to the Pro Plan to invite unlimited users. You cannot invite users on the
+                  Upgrade to the Recruiter Plan to invite unlimited users. You cannot invite users on the
                   Free plan.
                 </Confirm>
 

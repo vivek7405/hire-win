@@ -1483,7 +1483,7 @@ const SingleJobPageContent = ({
         <div className="flex flex-col items-center text-red-600">
           <h1 className="font-semibold">{`This job is Archived`}</h1>
           <h1 className="text-sm text-center">{`You are viewing an archived job and you can't add more candidates to it. Restore the job again to add more candidates.`}</h1>
-          {/* <h1 className="text-sm">{`Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1> */}
+          {/* <h1 className="text-sm">{`Please upgrade to the Recruiter plan to get it up again and keep adding more candidates`}</h1> */}
           <br />
         </div>
       )}
@@ -1492,7 +1492,7 @@ const SingleJobPageContent = ({
         <div className="flex flex-col items-center text-red-600">
           <h1 className="font-semibold">{`Free Candidate Limit Reached`}</h1>
           <h1 className="text-sm text-center">{`Your job listing page has been taken down. Please upgrade to get it up again and keep adding more candidates`}</h1>
-          {/* <h1 className="text-sm">{`Please upgrade to the PRO plan to get it up again and keep adding more candidates`}</h1> */}
+          {/* <h1 className="text-sm">{`Please upgrade to the Recruiter plan to get it up again and keep adding more candidates`}</h1> */}
           <br />
         </div>
       )}

@@ -1,19 +1,14 @@
-import aedPlans from "./aedPlans"
-import audPlans from "./audPlans"
-import cadPlans from "./cadPlans"
-import eurPlans from "./eurPlans"
-import gbpPlans from "./gbpPlans"
-import inrPlans from "./inrPlans"
-import usdPlans from "./usdPlans"
+import { Plan, PlanFrequency, PlanName } from "types"
 
 const allPlans = [
-  ...aedPlans,
-  ...audPlans,
-  ...cadPlans,
-  ...eurPlans,
-  ...gbpPlans,
-  ...inrPlans,
-  ...usdPlans,
+  {
+    name: PlanName.RECRUITER,
+    priceId: process.env.RECRUITER_PLAN || "",
+    title: "Recruiter Plan",
+    frequency: PlanFrequency.MONTHLY,
+    pricePerMonth: 29,
+    currencySymbol: "USD $",
+  } as Plan,
 ]
 
 export default allPlans

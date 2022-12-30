@@ -1,27 +1,26 @@
 import { Ctx } from "blitz"
 import db from "db"
 import stripe from "src/core/utils/stripe"
-import { Plan } from "types"
 
 interface CreateStripeCheckoutSessionInput {
-  companyId: string
+  userId: string
   priceId: string
   quantity: number
 }
 
 async function createStripeCheckoutSession(
-  { companyId, priceId, quantity }: CreateStripeCheckoutSessionInput,
+  { userId, priceId, quantity }: CreateStripeCheckoutSessionInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
 
-  const company = await db.company.findFirst({
+  const user = await db.user.findFirst({
     where: {
-      id: companyId,
+      id: userId,
     },
   })
 
-  if (!company || ctx.session.companyId !== company?.id || !priceId) return null
+  if (!user || ctx.session.userId !== user?.id || !priceId) return null
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -33,7 +32,7 @@ async function createStripeCheckoutSession(
       },
     ],
     metadata: {
-      companyId,
+      userId,
     },
     allow_promotion_codes: true,
     billing_address_collection: "auto",

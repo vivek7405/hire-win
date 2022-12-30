@@ -46,7 +46,7 @@ const NavbarContent = ({
   const [profileOpen, setProfileOpen] = useState(false)
   const router = useRouter()
   const session = useSession()
-  const [openConfirm, setOpenConfirm] = useState(false)
+  // const [openConfirm, setOpenConfirm] = useState(false)
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
   })
@@ -443,18 +443,18 @@ const NavbarContent = ({
 
   return (
     <>
-      <Confirm
+      {/* <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
-        header="Upgrade all companies to the Pro Plan"
+        header="Upgrade all companies to the Recruiter Plan"
         onSuccess={async () => {
           router.push(Routes.UserSettingsBillingPage())
         }}
         hideConfirm={true}
         cancelText={"Ok"}
       >
-        All existing companies should be on PRO plan to add a new company
-      </Confirm>
+        All existing companies should be on Recruiter plan to add a new company
+      </Confirm> */}
 
       <nav className="bg-theme-600 py-2">
         <div className="max-w-8xl px-4 lg:px-6 mx-auto flex space-x-6 justify-between">

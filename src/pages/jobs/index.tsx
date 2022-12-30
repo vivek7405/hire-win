@@ -255,7 +255,7 @@ const Jobs = ({
 
   const [openConfirm, setOpenConfirm] = useState(false)
   const [confirmMessage, setConfirmMessage] = useState(
-    "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+    "Upgrade to the Recruiter Plan to create unlimited jobs. You can create only 1 job on the Free plan."
   )
   const [viewType, setViewType] = useState(JobViewType.Active)
 
@@ -289,7 +289,7 @@ const Jobs = ({
 
   const [hideConfirmButton, setHideConfirmButton] = useState(false)
   const [cancelButtonText, setCancelButtonText] = useState("Cancel")
-  const [confirmHeader, setConfirmHeader] = useState("Upgrade to the Pro Plan?")
+  const [confirmHeader, setConfirmHeader] = useState("Upgrade to the Recruiter Plan?")
 
   const newJobButton = (
     <button
@@ -1101,7 +1101,7 @@ const Jobs = ({
                               e.preventDefault()
                               // if (job.hasByPassedPlanLimit) {
                               //   setConfirmMessage(
-                              //     "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
+                              //     "Upgrade to the Recruiter Plan to view this job since you've bypassed the 1 job limit on Free plan."
                               //   )
                               //   setOpenConfirm(true)
                               // } else {
@@ -1141,7 +1141,7 @@ const Jobs = ({
                             e.preventDefault()
                             // if (job.hasByPassedPlanLimit) {
                             //   setConfirmMessage(
-                            //     "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
+                            //     "Upgrade to the Recruiter Plan to update this job since you've bypassed the 1 job limit on Free plan."
                             //   )
                             //   setOpenConfirm(true)
                             // } else {

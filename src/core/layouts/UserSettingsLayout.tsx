@@ -71,14 +71,14 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
       current: router.route === Routes.UserSettingsCalendarsPage().pathname,
       icon: CalendarIcon,
     },
-    // companyUser?.role === CompanyUserRole.OWNER
-    //   ? {
-    //       name: "Billing",
-    //       href: `/settings/billing`,
-    //       current: router.route === `/settings/billing`,
-    //       icon: CreditCardIcon,
-    //     }
-    //   : null,
+    companyUser?.role === CompanyUserRole.OWNER
+      ? {
+          name: "Billing",
+          href: `/settings/billing`,
+          current: router.route === `/settings/billing`,
+          icon: CreditCardIcon,
+        }
+      : null,
   ]
 
   return (

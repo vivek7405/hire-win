@@ -16,7 +16,7 @@ import { EditorState, convertFromRaw, convertToRaw } from "draft-js"
 import { getColorValueFromTheme, getThemeFromColorValue } from "src/core/utils/themeHelpers"
 import UserSettingsLayout from "src/core/layouts/UserSettingsLayout"
 import SubscribeButton from "src/users/components/SubscribeButton"
-import { Currency, Plan, PlanFrequency, SubscriptionStatus } from "types"
+import { Currency, Plan, PlanFrequency, PlanName, SubscriptionStatus } from "types"
 import { CheckIcon, CurrencyEuroIcon } from "@heroicons/react/outline"
 import createStripeBillingPortal from "src/companies/mutations/createStripeBillingPortal"
 import { checkPlan } from "src/companies/utils/checkPlan"
@@ -29,10 +29,10 @@ import LocaleCurrency from "locale-currency"
 import Form from "src/core/components/Form"
 import LabeledToggleGroupField from "src/core/components/LabeledToggleGroupField"
 import { Suspense, useEffect, useState } from "react"
-import getPlansByCurrency from "src/plans/queries/getPlansByCurrency"
+import getAllPlans from "src/plans/queries/getAllPlans"
 import proPlanFeatures from "src/plans/utils/proPlanFeatures"
 import { data } from "cheerio/lib/api/attributes"
-import getCompanySubscription from "src/companies/queries/getCompanySubscription"
+import getUserSubscription from "src/companies/queries/getUserSubscription"
 import moment from "moment"
 
 export const getServerSideProps = gSSP(async (context) => {
@@ -52,10 +52,7 @@ export const getServerSideProps = gSSP(async (context) => {
     { ...context.ctx }
   )
 
-  const subscription = await getCompanySubscription(
-    { companyId: company?.id || "0" },
-    { ...context.ctx }
-  )
+  const subscription = await getUserSubscription({ userId: user?.id || "0" }, { ...context.ctx })
 
   if (user && company) {
     return {
@@ -78,11 +75,8 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-const Plans = ({ user, selectedCurrency }) => {
-  const [plans] = useQuery(getPlansByCurrency, { currency: selectedCurrency })
-  useEffect(() => {
-    invalidateQuery(getPlansByCurrency)
-  }, [selectedCurrency])
+const Plans = ({ user }) => {
+  const [plans] = useQuery(getAllPlans, {})
 
   return (
     <>
@@ -99,7 +93,10 @@ const Plans = ({ user, selectedCurrency }) => {
                   </span>
                   <span className="ml-1 text-lg text-gray-400">/month</span>
                 </p>
-                {plan.frequency === PlanFrequency.YEARLY && (
+                <p className="mt-2 text-xs text-neutral-600">
+                  Rounded off to your local currency if available
+                </p>
+                {/* {plan.frequency === PlanFrequency.YEARLY && (
                   <p className="mt-4 flex items-baseline text-gray-900">
                     <span className="text-xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">
                       {plan.currencySymbol}
@@ -107,7 +104,7 @@ const Plans = ({ user, selectedCurrency }) => {
                     </span>
                     <span className="ml-1 text-lg text-gray-400">/year</span>
                   </p>
-                )}
+                )} */}
                 {/* <p className="mt-6 text-gray-800">{plan.description}</p> */}
                 {/* <ul className="mt-6 space-y-4">
                                 {plan.features.map((feature, j) => (
@@ -149,10 +146,6 @@ const UserSettingsBillingPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const session = useSession()
   const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
-
-  // const localeCurrency = LocaleCurrency.getCurrency(navigator.language || "en-US") || Currency.USD
-  const localeCurrency = Currency.USD
-  const [selectedCurrency, setSelectedCurrency] = useState(Currency[localeCurrency] || Currency.USD)
 
   return (
     <>
@@ -209,8 +202,8 @@ const UserSettingsBillingPage = ({
                             ) : (
                               <span>
                                 You are subscribed to the{" "}
-                                <span className="capitalize">{`${subscription?.items?.data[0]?.price?.recurring?.interval}ly`}</span>{" "}
-                                Plan
+                                {/* <span className="capitalize">{`${subscription?.items?.data[0]?.price?.recurring?.interval}ly`}</span>{" "} */}
+                                Recruiter Plan 🚀
                               </span>
                             )}
                           </h3>
@@ -232,7 +225,7 @@ const UserSettingsBillingPage = ({
                                   e.preventDefault()
                                   try {
                                     const url = await createStripeBillingPortalMutation({
-                                      companyId: session.companyId || "0",
+                                      userId: session.userId || "0",
                                     })
 
                                     if (url) window.location.href = url
@@ -264,7 +257,7 @@ const UserSettingsBillingPage = ({
                         </Form>
                         <br /> */}
                           <Suspense fallback="Loading...">
-                            <Plans selectedCurrency={selectedCurrency} user={user} />
+                            <Plans user={user} />
                           </Suspense>
                         </>
                       )}
