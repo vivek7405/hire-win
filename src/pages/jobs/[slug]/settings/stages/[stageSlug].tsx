@@ -227,22 +227,9 @@ export const CardQuestions = ({
                       question.title
                     )} */}
                   </div>
-                  {question.allowEdit && scoreCardQuestions?.length > 1 && (
+                  {question.allowEdit && (
                     <>
                       <div className="absolute top-0.5 right-0">
-                        <button
-                          className="float-right text-red-600 hover:text-red-800"
-                          title="Delete Question"
-                          onClick={async (e) => {
-                            e.preventDefault()
-                            setScoreCardQuestionToRemove(question)
-                            setOpenConfirm(true)
-                          }}
-                        >
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
-                      </div>
-                      <div className="absolute top-0.5 right-6">
                         <button
                           id={"edit-" + question.id}
                           className="float-right text-indigo-600 hover:text-indigo-800"
@@ -257,6 +244,21 @@ export const CardQuestions = ({
                           <PencilIcon className="w-5 h-5" />
                         </button>
                       </div>
+                      {scoreCardQuestions?.length > 1 && (
+                        <div className="absolute top-0.5 right-6">
+                          <button
+                            className="float-right text-red-600 hover:text-red-800"
+                            title="Delete Question"
+                            onClick={async (e) => {
+                              e.preventDefault()
+                              setScoreCardQuestionToRemove(question)
+                              setOpenConfirm(true)
+                            }}
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

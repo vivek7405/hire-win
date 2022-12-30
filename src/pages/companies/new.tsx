@@ -17,6 +17,8 @@ import { Suspense } from "react"
 import { initialInfo } from "src/companies/constants"
 import createFactoryJob from "src/jobs/mutations/createFactoryJob"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import getCompanyUsers from "src/companies/queries/getCompanyUsers"
+import { CompanyUserRole } from "@prisma/client"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -50,10 +52,11 @@ const NewCompany = ({
   const session = useSession()
   const [createCompanyMutation] = useMutation(createCompany)
   const [createFactoryJobMutation] = useMutation(createFactoryJob)
-  const [companyUser] = useQuery(getCompanyUser, {
+  const [companyUsers] = useQuery(getCompanyUsers, {
     where: {
-      companyId: session.companyId || "0",
+      // companyId: session.companyId || "0",
       userId: session.userId || "0",
+      role: CompanyUserRole.OWNER,
     },
   })
 
@@ -89,7 +92,7 @@ const NewCompany = ({
                     ?.timeZone?.replace("Calcutta", "Kolkata")
 
                   const createdCompany = await createCompanyMutation(values)
-                  if (createdCompany) {
+                  if (createdCompany && companyUsers?.length === 0) {
                     await createFactoryJobMutation(createdCompany.id)
                   }
 
