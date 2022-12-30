@@ -2,11 +2,11 @@ import { Plan, PlanFrequency, PlanName } from "types"
 
 export const plansOld: Plan[] = [
   {
-    name: PlanName.PRO,
-    priceId: process.env.PRO_PLAN || "",
-    title: "Pro Plan",
+    name: PlanName.RECRUITER,
+    priceId: process.env.RECRUITER_PLAN || "",
+    title: "Recruiter Plan",
     pricePerMonth: 24.99,
-    pricePerYear: 0,
+    // pricePerYear: 0,
     frequency: PlanFrequency.MONTHLY,
     currencySymbol: "₹",
     // description: "The essentials to provide your best work for clients.",

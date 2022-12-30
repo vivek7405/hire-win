@@ -211,7 +211,7 @@ const CandidateSelection = ({
                   setOpenNewCandidateModal(true)
                 } else {
                   if (activePlanName === PlanName.FREE) {
-                    setUpgradeConfirmHeader("Upgrade to lifetime plan")
+                    setUpgradeConfirmHeader("Upgrade to recruiter plan")
                     setUpgradeConfirmMessage(
                       `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
                     )

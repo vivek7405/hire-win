@@ -138,7 +138,7 @@ export const getServerSideProps = gSSP(async (context) => {
   } else {
     return {
       redirect: {
-        destination: `/auth/login?next=/jobs/${context?.params?.slug}/settings/members`,
+        destination: `/auth/login?next=/settings/members`,
         permanent: false,
       },
       props: {},
@@ -170,9 +170,9 @@ const UserSettingsMembersPage = ({
   )
   const [tokenToDelete, setTokenToDelete] = useState(null as Token | null)
   const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
-  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to lifetime plan")
+  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to recruiter plan")
   const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
-    "Upgrade to lifetime plan for adding more members."
+    "Upgrade to recruiter plan for adding more members."
   )
 
   if (error) {
@@ -231,9 +231,9 @@ const UserSettingsMembersPage = ({
                     initialValues={{ email: "" }}
                     onSubmit={async (values) => {
                       if (activePlanName === PlanName.FREE) {
-                        setUpgradeConfirmHeader("Upgrade to lifetime plan")
+                        setUpgradeConfirmHeader("Upgrade to recruiter plan")
                         setUpgradeConfirmMessage(
-                          "Upgrade to lifetime plan for adding more members."
+                          "Upgrade to recruiter plan for adding more members."
                         )
                         setOpenInvite(false)
                         setOpenUpgradeConfirm(true)
@@ -274,13 +274,13 @@ const UserSettingsMembersPage = ({
                 <Confirm
                   open={openConfirmBilling}
                   setOpen={setOpenConfirmBilling}
-                  header="Upgrade to the Pro Plan?"
+                  header="Upgrade to the Recruiter Plan?"
                   onSuccess={async () => {
                     router.push(Routes.UserSettingsBillingPage())
                   }}
                 >
-                  Upgrade to the Pro Plan to invite unlimited users. You cannot invite users on the
-                  Free plan.
+                  Upgrade to the Recruiter Plan to invite unlimited users. You cannot invite users
+                  on the Free plan.
                 </Confirm>
 
                 <button

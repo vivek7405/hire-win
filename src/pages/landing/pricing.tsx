@@ -152,11 +152,11 @@ export default function Pricing({}) {
               <div className="rounded-lg bg-white md:drop-shadow-2xl md:z-10">
                 <div className="-mt-5 flex items-center justify-center">
                   <div className="px-4 py-2 bg-indigo-600 text-white rounded-t-lg w-fit">
-                    Limited Time
+                    Recommended
                   </div>
                 </div>
                 <div className="w-full p-8 text-center bg-white border-b sticky top-0 rounded-t-lg">
-                  <span className="text-3xl font-bold">💝 Lifetime</span>
+                  <span className="text-3xl font-bold">🚀 Recruiter</span>
                   <br />
                   <div className="mt-2">
                     <span className="text-lg whitespace-nowrap">All the app features</span>
@@ -237,19 +237,16 @@ export default function Pricing({}) {
                 </ul>
                 <div className="sticky bottom-0 bg-white border-t mt-auto rounded-b-lg rounded-t-none overflow-hidden p-6">
                   <div className="w-full pb-3 text-4xl font-bold text-center">
-                    <span>$29 Once</span>
+                    <span>
+                      Flat $29<span className="text-lg">/month</span>
+                    </span>
                   </div>
                   <div className="w-full flex items-center justify-center">
                     {/* Uncomment the below line and comment the next one when you want to provide Sign Up */}
                     {/* <Link href={Routes.Home()} legacyBehavior> */}
-                    <Link href={Routes.OldSignupPage()} legacyBehavior>
-                      <a
-                        href="https://appsumo.com/products/hirewin"
-                        target="_blank"
-                        rel="external"
-                        className="w-full text-center px-4 py-1 border-2 border-theme-600 hover:border-theme-700 rounded text-white bg-theme-600 hover:bg-theme-700"
-                      >
-                        Buy Now on App Sumo
+                    <Link href={Routes.UserSettingsBillingPage()} legacyBehavior passHref>
+                      <a className="w-full text-center px-4 py-1 border-2 border-theme-600 hover:border-theme-700 rounded text-white bg-theme-600 hover:bg-theme-700">
+                        Subscribe Now
                       </a>
                     </Link>
                   </div>

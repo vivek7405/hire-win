@@ -81,10 +81,10 @@ export default function Beta({}) {
                   <span className="bg-yellow-300">
                     coupon code <span className="font-bold">BETA30</span>
                   </span>{" "}
-                  while subscribing to the PRO plan and get{" "}
+                  while subscribing to the Recruiter plan and get{" "}
                   <span className="font-bold">30% off for 3 consecutive months</span>. This coupon
                   code can be applied anytime before the BETA period ends. Consider it as a token of
-                  appreciation for subscribing to the PRO plan while we are running on beta.
+                  appreciation for subscribing to the Recruiter plan while we are running on beta.
                 </li>
                 <li>
                   - Lastly, you may report us any bugs that you encounter by writing to{" "}

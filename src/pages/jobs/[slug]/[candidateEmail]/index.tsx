@@ -205,7 +205,7 @@ export const getServerSideProps = gSSP(async (context) => {
   } else {
     return {
       redirect: {
-        destination: `/auth/login?next=jobs/${context?.params?.slug}/candidates/${context?.params?.candidateEmail}`,
+        destination: `/auth/login?next=/jobs/${context?.params?.slug}/candidates/${context?.params?.candidateEmail}`,
         permanent: false,
       },
       props: {},
@@ -318,7 +318,7 @@ const SingleCandidatePage = ({
   const [openNewCandidateModal, setOpenNewCandidateModal] = useState(false)
 
   const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
-  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to lifetime plan")
+  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to recruiter plan")
   const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
     `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
   )

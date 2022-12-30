@@ -86,16 +86,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         <div className="w-full h-fit px-5 py-5 md:py-3 bg-theme-900 text-white flex flex-col md:flex-row items-center justify-center space-y-5 md:space-y-0 md:space-x-5">
           <span className="text-5xl">🎉</span>
           <span className="text-xl text-center">
-            <b>Special Deal</b>: Pay once, get a LIFETIME deal forever <b>for only $29</b>
+            <b>Lifetime 50% off</b> on the Recruiter Plan. Apply Coupon <b>CHRISTMAS50</b>
           </span>
-          <a
-            href="https://appsumo.com/products/hirewin"
-            target="_blank"
-            rel="external"
-            className="rounded-full bg-white text-black px-4 py-1 text-lg font-bold"
-          >
-            Click Here
-          </a>
+          <Link href={Routes.UserSettingsBillingPage()} legacyBehavior passHref>
+            <a className="rounded-full bg-white text-black px-4 py-1 text-lg font-bold">
+              Click Here
+            </a>
+          </Link>
         </div>
         {/* <div className="max-w-8xl mx-auto"> */}
         <div className="flex flex-col min-h-screen">

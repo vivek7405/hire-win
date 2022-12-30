@@ -26,7 +26,7 @@ export enum SubscriptionStatus {
 export enum PlanName {
   FREE,
   LIFETIME_SET1,
-  PRO,
+  RECRUITER,
 }
 
 export enum DragDirection {
@@ -71,7 +71,7 @@ export type Plan = {
   priceId: string
   title: string
   pricePerMonth: number
-  pricePerYear: number
+  // pricePerYear: number
   // price: number
   frequency: PlanFrequency
   currencySymbol: string

@@ -2,16 +2,16 @@ import { Plan } from "types"
 import { Company, User } from "db"
 import allPlans from "src/plans/utils/allPlans"
 
-export const checkPlan = (company: Company | null): Plan | null => {
+export const checkPlan = (user: User | null): Plan | null => {
   if (
-    !company ||
-    !company.stripePriceId ||
-    !company.stripeCurrentPeriodEnd ||
-    company.stripeCurrentPeriodEnd.getTime() < Date.now()
+    !user ||
+    !user.stripePriceId ||
+    !user.stripeCurrentPeriodEnd ||
+    user.stripeCurrentPeriodEnd.getTime() < Date.now()
   ) {
     return null
   } else {
-    const plan = allPlans.find((plan) => plan.priceId === company.stripePriceId)
+    const plan = allPlans.find((plan) => plan.priceId === user.stripePriceId)
     return plan || null
   }
 }

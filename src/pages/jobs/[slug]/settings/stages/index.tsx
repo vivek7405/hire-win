@@ -373,7 +373,7 @@ export const Stages = ({
       <Confirm
         open={openUpgradeConfirm}
         setOpen={setOpenUpgradeConfirm}
-        header="Upgrade to lifetime plan"
+        header="Upgrade to recruiter plan"
         cancelText="Ok"
         hideConfirm={true}
         onSuccess={async () => {
@@ -382,7 +382,7 @@ export const Stages = ({
           setWorkflowStageToRemove(null)
         }}
       >
-        Upgrade to lifetime plan for customising hiring stages.
+        Upgrade to recruiter plan for customising hiring stages.
       </Confirm>
 
       <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">

@@ -14,14 +14,14 @@ async function getCompanyUser({ where }: GetCompanyUserInput, ctx: Ctx) {
     include: { company: true, user: true },
   })) as any
 
-  if (companyUser && companyUser.company) {
-    // companyUser.currentPlan = checkPlan(companyUser.company)
-    // companyUser.subscriptionStatus = await getCompanySubscriptionStatus(
-    //   { companyId: companyUser?.companyId },
-    //   ctx
-    // )
-    companyUser.subscription = checkSubscription(companyUser.company)
-  }
+  // if (companyUser && companyUser.company) {
+  //   // companyUser.currentPlan = checkPlan(companyUser.company)
+  //   // companyUser.subscriptionStatus = await getUserSubscriptionStatus(
+  //   //   { companyId: companyUser?.companyId },
+  //   //   ctx
+  //   // )
+  //   companyUser.subscription = checkSubscription(companyUser.user)
+  // }
 
   // if (!companyUser) throw new NotFoundError()
 

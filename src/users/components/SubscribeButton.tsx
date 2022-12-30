@@ -1,10 +1,10 @@
-import { useSession } from "@blitzjs/auth";
-import { useRouter } from "next/router";
-import { useMutation } from "@blitzjs/rpc";
+import { useSession } from "@blitzjs/auth"
+import { useRouter } from "next/router"
+import { useMutation } from "@blitzjs/rpc"
 import { loadStripe } from "@stripe/stripe-js"
 import createStripeCheckoutSession from "src/companies/mutations/createStripeCheckoutSession"
 import updateStripeSubscription from "src/companies/mutations/updateStripeSubscription"
-import { Plan, PlanFrequency } from "types"
+import { PlanFrequency } from "types"
 import { toast } from "react-hot-toast"
 
 export default function SubscribeButton({
@@ -13,7 +13,6 @@ export default function SubscribeButton({
   frequency,
   quantity,
   type,
-  testid,
 }: {
   userId: string
   priceId: string
@@ -31,7 +30,7 @@ export default function SubscribeButton({
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
     const sessionId = await createStripeSessionMutation({
       priceId,
-      companyId: session?.companyId || "0",
+      userId: session?.userId || "0",
       quantity,
     })
 
@@ -44,7 +43,7 @@ export default function SubscribeButton({
   const updateSubscription = async () => {
     const toastId = toast.loading(() => <span>Upgrading Subscription</span>)
     try {
-      await updateStripeSubscriptionMutation({ priceId, companyId: session.companyId || "0" })
+      await updateStripeSubscriptionMutation({ priceId, userId: session.userId || "0" })
       toast.success(() => <span>Subscription Updated</span>, { id: toastId })
       router.reload()
     } catch (error) {
@@ -55,7 +54,6 @@ export default function SubscribeButton({
   return (
     <button
       className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 capitalize whitespace-nowrap"
-      data-testid={`${testid && `${testid}-`}upgradeButton`}
       onClick={(e) => {
         e.preventDefault()
         return type === "new" ? createSubscription() : updateSubscription()

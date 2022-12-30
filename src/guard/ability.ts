@@ -63,7 +63,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
       const activePlanName = await getCurrentCompanyOwnerActivePlan({}, ctx)
 
       // const currentPlan = checkPlan(job.company)
-      // const subscriptionStatus = await getCompanySubscriptionStatus(
+      // const subscriptionStatus = await getUserSubscriptionStatus(
       //   { companyId: job.companyId },
       //   ctx
       // )
@@ -167,7 +167,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // if (allUserJobsLength >= 1) {
         //   // const currentPlan = checkPlan(company)
         //   // if (!currentPlan) return false
-        //   // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   // const subscriptionStatus = await getUserSubscriptionStatus(
         //   //   { companyId: company?.id || "0" },
         //   //   ctx
         //   // )
@@ -217,7 +217,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // if (allCompanyJobsLength > 1) {
         //   // const currentPlan = checkPlan(company)
         //   // if (!currentPlan) return false
-        //   // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   // const subscriptionStatus = await getUserSubscriptionStatus(
         //   //   { companyId: company?.id || "0" },
         //   //   ctx
         //   // )
@@ -261,7 +261,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         // if (allCompanyJobsLength > 1) {
         //   // const currentPlan = checkPlan(company)
         //   // if (!currentPlan) return false
-        //   // const subscriptionStatus = await getCompanySubscriptionStatus(
+        //   // const subscriptionStatus = await getUserSubscriptionStatus(
         //   //   { companyId: company?.id || "0" },
         //   //   ctx
         //   // )
@@ -297,7 +297,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
         // const currentPlan = checkPlan(company)
         // if (!currentPlan) return false
-        // const subscriptionStatus = await getCompanySubscriptionStatus(
+        // const subscriptionStatus = await getUserSubscriptionStatus(
         //   { companyId: company?.id || "0" },
         //   ctx
         // )
@@ -394,7 +394,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
 
       //     // let allCompaniesOnProPlan = true
       //     // for (const cu of companyUsers) {
-      //     //   const subscriptionStatus = await getCompanySubscriptionStatus(
+      //     //   const subscriptionStatus = await getUserSubscriptionStatus(
       //     //     { companyId: cu.companyId },
       //     //     ctx
       //     //   )
@@ -435,7 +435,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         })
         // const currentPlan = checkPlan(company)
         // if (!currentPlan) return false
-        // const subscriptionStatus = await getCompanySubscriptionStatus(
+        // const subscriptionStatus = await getUserSubscriptionStatus(
         //   { companyId: company?.id || "0" },
         //   ctx
         // )

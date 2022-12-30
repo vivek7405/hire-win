@@ -255,7 +255,7 @@ const Jobs = ({
 
   const [openConfirm, setOpenConfirm] = useState(false)
   const [confirmMessage, setConfirmMessage] = useState(
-    "Upgrade to the Pro Plan to create unlimited jobs. You can create only 1 job on the Free plan."
+    "Upgrade to the Recruiter Plan to create unlimited jobs. You can create only 1 job on the Free plan."
   )
   const [viewType, setViewType] = useState(JobViewType.Active)
 
@@ -289,7 +289,7 @@ const Jobs = ({
 
   const [hideConfirmButton, setHideConfirmButton] = useState(false)
   const [cancelButtonText, setCancelButtonText] = useState("Cancel")
-  const [confirmHeader, setConfirmHeader] = useState("Upgrade to the Pro Plan?")
+  const [confirmHeader, setConfirmHeader] = useState("Upgrade to the Recruiter Plan?")
 
   const newJobButton = (
     <button
@@ -312,7 +312,7 @@ const Jobs = ({
             if (activeJobsCount >= FREE_JOBS_LIMIT) {
               setConfirmHeader("Reached Job Limit!")
               setConfirmMessage(
-                `The Free Plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since you already have ${FREE_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one or else upgrade to the lifetime plan for having more active jobs.`
+                `The Free Plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since you already have ${FREE_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one or else upgrade to the recruiter plan for having more active jobs.`
               )
               setCancelButtonText("Ok")
               setHideConfirmButton(true)
@@ -839,14 +839,11 @@ const Jobs = ({
     <>
       {activePlanName === PlanName.FREE && (
         <div className="w-full text-center mb-5 lg:mb-0">
-          <a
-            href="https://appsumo.com/products/hirewin"
-            target="_blank"
-            rel="external"
-            className="text-theme-600 hover:text-theme-800 font-bold"
-          >
-            Upgrade $29 lifetime access!
-          </a>
+          <Link href={Routes.UserSettingsBillingPage()} legacyBehavior passHref>
+            <a className="text-theme-600 hover:text-theme-800 font-bold">
+              Upgrade to Recruiter Plan!
+            </a>
+          </Link>
         </div>
       )}
 
@@ -1101,7 +1098,7 @@ const Jobs = ({
                               e.preventDefault()
                               // if (job.hasByPassedPlanLimit) {
                               //   setConfirmMessage(
-                              //     "Upgrade to the Pro Plan to view this job since you've bypassed the 1 job limit on Free plan."
+                              //     "Upgrade to the Recruiter Plan to view this job since you've bypassed the 1 job limit on Free plan."
                               //   )
                               //   setOpenConfirm(true)
                               // } else {
@@ -1141,7 +1138,7 @@ const Jobs = ({
                             e.preventDefault()
                             // if (job.hasByPassedPlanLimit) {
                             //   setConfirmMessage(
-                            //     "Upgrade to the Pro Plan to update this job since you've bypassed the 1 job limit on Free plan."
+                            //     "Upgrade to the Recruiter Plan to update this job since you've bypassed the 1 job limit on Free plan."
                             //   )
                             //   setOpenConfirm(true)
                             // } else {

@@ -30,7 +30,7 @@ export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext
   } else {
     return {
       redirect: {
-        destination: "/auth/login?next=settings/security",
+        destination: "/auth/login?next=/settings/security",
         permanent: false,
       },
       props: {},

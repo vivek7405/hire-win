@@ -14,7 +14,7 @@ import LabeledToggleGroupField from "src/core/components/LabeledToggleGroupField
 import Form from "src/core/components/Form"
 import { Currency, PlanFrequency } from "types"
 import LocaleCurrency from "locale-currency"
-import getPlansByCurrency from "src/plans/queries/getPlansByCurrency"
+import getAllPlans from "src/plans/queries/getAllPlans"
 import getCurrencySymbol from "src/plans/utils/getCurrencySymbol"
 import { getCalApi } from "@calcom/embed-react"
 import {
@@ -53,9 +53,9 @@ import { useRouter } from "next/router"
 // }
 
 // const Plans = ({ selectedCurrency, selectedFrequency }) => {
-//   const [plans] = useQuery(getPlansByCurrency, { currency: selectedCurrency })
+//   const [plans] = useQuery(getAllPlans, { })
 //   useEffect(() => {
-//     invalidateQuery(getPlansByCurrency)
+//     invalidateQuery(getAllPlans)
 //   }, [selectedCurrency])
 
 //   return (

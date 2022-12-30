@@ -62,6 +62,13 @@ model User {
   candidateActivitiesPerformed CandidateActivity[]
   candidateUserNotes           CandidateUserNote[]
   coupons                      Coupon[]
+
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+  stripeTrialStart       DateTime?
+  stripeTrialEnd         DateTime?
 }
 
 model Coupon {
@@ -208,13 +215,6 @@ model Company {
   categories     Category[]
   emailTemplates EmailTemplate[]
   candidatePools CandidatePool[]
-
-  stripeCustomerId       String?   @unique
-  stripeSubscriptionId   String?   @unique
-  stripePriceId          String?
-  stripeCurrentPeriodEnd DateTime?
-  stripeTrialStart       DateTime?
-  stripeTrialEnd         DateTime?
 }
 
 model Job {

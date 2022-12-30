@@ -207,7 +207,7 @@ const PickAndSchedule = ({
       setIsScheduling(false)
       setOpenScheduleInterviewModal(false)
       alert(
-        "You can't schedule interviews on the Free Plan. Upgrade to the lifetime plan for scheduling 1 click interviews with auto-generated meeting links."
+        "You can't schedule interviews on the Free Plan. Upgrade to the recruiter plan for scheduling 1 click interviews with auto-generated meeting links."
       )
       return
     }

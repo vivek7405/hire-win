@@ -171,9 +171,9 @@ const JobSettingsHiringTeamPage = ({
   }
 
   const [openUpgradeConfirm, setOpenUpgradeConfirm] = React.useState(false)
-  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to lifetime plan")
+  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to recruiter plan")
   const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
-    "Upgrade to lifetime plan for adding more members."
+    "Upgrade to recruiter plan for adding more members."
   )
 
   return (
@@ -245,12 +245,12 @@ const JobSettingsHiringTeamPage = ({
                 <Confirm
                   open={openConfirmBilling}
                   setOpen={setOpenConfirmBilling}
-                  header="Upgrade to the Pro Plan?"
+                  header="Upgrade to the Recruiter Plan?"
                   onSuccess={async () => {
                     router.push(Routes.UserSettingsBillingPage())
                   }}
                 >
-                  Upgrade to the Pro Plan to add unlimited users. You cannot add users on the Free
+                  Upgrade to the Recruiter Plan to add unlimited users. You cannot add users on the Free
                   plan.
                 </Confirm>
 
@@ -272,8 +272,8 @@ const JobSettingsHiringTeamPage = ({
                     e.preventDefault()
 
                     if (activePlanName === PlanName.FREE) {
-                      setUpgradeConfirmHeader("Upgrade to lifetime plan")
-                      setUpgradeConfirmMessage("Upgrade to lifetime plan for adding more members.")
+                      setUpgradeConfirmHeader("Upgrade to recruiter plan")
+                      setUpgradeConfirmMessage("Upgrade to recruiter plan for adding more members.")
                       setOpenInvite(false)
                       setOpenUpgradeConfirm(true)
                       return
