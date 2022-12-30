@@ -218,13 +218,13 @@ export default function Home() {
       <div className="h-full">
         <section className="text-center px-4">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-black">
-            Interview Kit with Careers Page
+            The Most Simple, Yet Powerful Hiring Solution
           </h1>
           <p className="mt-2 text-gray-800 text-base md:text-xl lg:text-2xl">
             The simplest way to list jobs, receive applicants and conduct interviews!
           </p>
           <p className="mt-8 text-gray-800 text-sm md:text-lg lg:text-xl italic">
-            Traditionally known as an Applicant Tracking System (ATS)
+            Traditionally, an Applicant Tracking System (ATS)
           </p>
 
           <div className="w-full flex items-center justify-center my-8">
@@ -355,7 +355,10 @@ export default function Home() {
               href="https://www.indeed.com/hire/c/info/creating-an-interview-kit"
               className="text-xl lg:text-2xl text-black font-bold hover:underline flex items-center justify-center space-x-2"
             >
-              <span>Click here to read the significance of Interview Kit (by Indeed)</span>
+              <span>
+                You get a pre-built Interview Kit that can be fully customized. Click to read its
+                significance
+              </span>
               <ArrowNarrowRightIcon className="hidden md:block w-7 h-7" />
             </a>
           </div>

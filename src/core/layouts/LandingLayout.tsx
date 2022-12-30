@@ -59,7 +59,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         src="https://embed.tawk.to/6364c8c8b0d6371309cd3d09/1gh0r0k2g"
       />
       <Head>
-        <title>{title || "Hire.win | Interview Kit with Careers Page"}</title>
+        <title>{title || "Hire.win | Simple Yet Powerful Hiring Solution"}</title>
         <link rel="icon" href="/favicon.ico" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -68,7 +68,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         <meta property="og:image" content="/logo-whitebg.png" key="ogimage" />
         <meta
           property="og:title"
-          content={title || "Hire.win | Interview Kit with Careers Page"}
+          content={title || "Hire.win | Simple Yet Powerful Hiring Solution"}
           key="ogtitle"
         />
         <meta
@@ -167,6 +167,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
               >
                 <ul className="list-reset lg:flex justify-end flex-1 items-center">
                   {/* Uncomment when you want the menu to appear */}
+                  {/* <li className="mr-3">
+                    <Link href={Routes.Blog()}>
+                      <a className="font-medium cursor-pointer hover:underline py-2 px-4">
+                        Articles
+                      </a>
+                    </Link>
+                  </li> */}
                   <li className="mr-3">
                     <Link href={Routes.Pricing()}>
                       <a className="font-medium cursor-pointer hover:underline py-2 px-4">
@@ -207,9 +214,11 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
               <div className="w-full text-center pt-4">
                 <div className="mt-1">
                   <span className="text-xl lg:text-2xl text-neutral-600">
-                    Get your{" "}
-                    <span className="font-semibold italic">Interview Kit with Careers Page</span> up
-                    and running now!
+                    Get started with the most{" "}
+                    <span className="font-semibold italic">
+                      Simple Yet Powerful Hiring Solution
+                    </span>
+                    .
                   </span>
                 </div>
                 <div className="mt-12 mb-6">
@@ -255,12 +264,12 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   </Link>
                 </div>
 
-                <iframe
+                {/* <iframe
                   src="https://hirewin.instatus.com/embed-status/light-sm"
                   className="border-0 w-56 h-12 rounded-lg"
                   frameBorder="0"
                   scrolling="no"
-                />
+                /> */}
 
                 <div className="flex space-x-4 font-bold">
                   <Link prefetch={true} href={Routes.Terms()} legacyBehavior>
