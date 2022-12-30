@@ -142,14 +142,14 @@ const EmailTemplates = ({ activePlanName }) => {
       <Confirm
         open={openUpgradeConfirm}
         setOpen={setOpenUpgradeConfirm}
-        header="Upgrade to lifetime plan"
+        header="Upgrade to recruiter plan"
         cancelText="Ok"
         hideConfirm={true}
         onSuccess={async () => {
           setOpenUpgradeConfirm(false)
         }}
       >
-        Upgrade to lifetime plan for adding/editing email templates.
+        Upgrade to recruiter plan for adding/editing email templates.
       </Confirm>
 
       <Modal header="Add New Template" open={openModal} setOpen={setOpenModal}>

@@ -407,7 +407,7 @@ export const JobApplicationForm = ({
       <Confirm
         open={openUpgradeConfirm}
         setOpen={setOpenUpgradeConfirm}
-        header="Upgrade to lifetime plan"
+        header="Upgrade to recruiter plan"
         cancelText="Ok"
         hideConfirm={true}
         onSuccess={async () => {
@@ -416,7 +416,7 @@ export const JobApplicationForm = ({
           setFormQuestionToRemove(null)
         }}
       >
-        Upgrade to lifetime plan for customising job application form.
+        Upgrade to recruiter plan for customising job application form.
       </Confirm>
 
       <div className="w-full flex flex-wrap md:flex-nowrap lg:flex-nowrap space-y-6 md:space-y-0 lg:space-y-0 md:space-x-8 lg:space-x-8">

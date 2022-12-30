@@ -961,7 +961,7 @@ const SingleJobPageContent = ({
   const [updateCandidateMutation] = useMutation(updateCandidate)
 
   const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
-  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to lifetime plan")
+  const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to recruiter plan")
   const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
     `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
   )
@@ -1348,7 +1348,7 @@ const SingleJobPageContent = ({
           setOpenModal(false)
 
           if (activePlanName === PlanName.FREE) {
-            setUpgradeConfirmHeader("Upgrade to lifetime plan")
+            setUpgradeConfirmHeader("Upgrade to recruiter plan")
             setUpgradeConfirmMessage(
               `The free plan allows upto ${FREE_CANDIDATES_LIMIT} candidates to be added. Since this job already has ${FREE_CANDIDATES_LIMIT} candidates added, you can't add a new candidate.`
             )

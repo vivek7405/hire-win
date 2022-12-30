@@ -312,7 +312,7 @@ const Jobs = ({
             if (activeJobsCount >= FREE_JOBS_LIMIT) {
               setConfirmHeader("Reached Job Limit!")
               setConfirmMessage(
-                `The Free Plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since you already have ${FREE_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one or else upgrade to the lifetime plan for having more active jobs.`
+                `The Free Plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since you already have ${FREE_JOBS_LIMIT} active jobs, archive one of your jobs to create a new one or else upgrade to the recruiter plan for having more active jobs.`
               )
               setCancelButtonText("Ok")
               setHideConfirmButton(true)
@@ -839,14 +839,11 @@ const Jobs = ({
     <>
       {activePlanName === PlanName.FREE && (
         <div className="w-full text-center mb-5 lg:mb-0">
-          <a
-            href="https://appsumo.com/products/hirewin"
-            target="_blank"
-            rel="external"
-            className="text-theme-600 hover:text-theme-800 font-bold"
-          >
-            Upgrade $29 lifetime access!
-          </a>
+          <Link href={Routes.UserSettingsBillingPage()} legacyBehavior passHref>
+            <a className="text-theme-600 hover:text-theme-800 font-bold">
+              Upgrade to Recruiter Plan!
+            </a>
+          </Link>
         </div>
       )}
 

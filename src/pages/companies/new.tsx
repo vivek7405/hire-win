@@ -91,7 +91,7 @@ const NewCompany = ({
                   if (activePlanName === PlanName.FREE) {
                     if (companyUsers?.length >= FREE_COMPANIES_LIMIT) {
                       alert(
-                        `You can only have ${FREE_COMPANIES_LIMIT} company with careers page on the free plan. Upgrade to the lifetime plan to add more companies.`
+                        `You can only have ${FREE_COMPANIES_LIMIT} company with careers page on the free plan. Upgrade to the recruiter plan to add more companies.`
                       )
                       return
                     }
