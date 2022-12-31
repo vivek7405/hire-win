@@ -36,7 +36,7 @@ async function createStripeCheckoutSession(
     },
     allow_promotion_codes: true,
     billing_address_collection: "auto",
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?recruiterSubscribed=true`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
   })
 
