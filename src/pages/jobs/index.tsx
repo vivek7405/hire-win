@@ -1249,7 +1249,7 @@ const JobsHome = ({
   const [openWelcomeModal, setOpenWelcomeModal] = useState(false)
   useEffect(() => {
     setOpenWelcomeModal(user?.isFirstSignup || false)
-  }, [])
+  }, [user?.isFirstSignup])
 
   // used useEffect for setting couponRedeemed to avoid Hydration error
   const [couponRedeemed, setCouponRedeemed] = useState(false)

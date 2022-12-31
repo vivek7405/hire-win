@@ -59,7 +59,8 @@ export default function SubscribeButton({
         return type === "new" ? createSubscription() : updateSubscription()
       }}
     >
-      {type === "new" ? `Subscribe ${frequency?.toLowerCase()}` : "Upgrade"}
+      {/* {type === "new" ? `Subscribe ${frequency?.toLowerCase()}` : "Upgrade"} */}
+      {type === "new" ? `Subscribe Now` : "Upgrade"}
     </button>
   )
 }
