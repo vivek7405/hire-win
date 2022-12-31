@@ -34,6 +34,7 @@ import proPlanFeatures from "src/plans/utils/proPlanFeatures"
 import { data } from "cheerio/lib/api/attributes"
 import getUserSubscription from "src/companies/queries/getUserSubscription"
 import moment from "moment"
+import RecruiterSubscribedWelcome from "src/coupons/components/RecruiterSubscribedWelcome"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -145,7 +146,14 @@ const UserSettingsBillingPage = ({
   companyUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const session = useSession()
+  const router = useRouter()
   const [createStripeBillingPortalMutation] = useMutation(createStripeBillingPortal)
+
+  // used useEffect for setting couponRedeemed to avoid Hydration error
+  const [recruiterSubscribed, setRecruiterSubscribed] = useState(false)
+  useEffect(() => {
+    setRecruiterSubscribed(router.query.recruiterSubscribed ? true : false)
+  }, [])
 
   return (
     <>
@@ -155,6 +163,13 @@ const UserSettingsBillingPage = ({
           <Suspense fallback="Loading...">
             <UserSettingsLayout>
               <Suspense fallback="Loading...">
+                {recruiterSubscribed && (
+                  <RecruiterSubscribedWelcome
+                    setRecruiterSubscribed={setRecruiterSubscribed}
+                    userName={user?.name || ""}
+                    userId={user?.id}
+                  />
+                )}
                 <div className="bg-white md:col-span-2">
                   <div className="sm:overflow-hidden">
                     <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
