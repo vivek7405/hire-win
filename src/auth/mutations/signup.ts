@@ -18,6 +18,8 @@ import updateDefaultSchedule from "src/schedules/mutations/updateDefaultSchedule
 import createFactoryJob from "src/jobs/mutations/createFactoryJob"
 import { initialInfo } from "src/companies/constants"
 import axios from "axios"
+import { welcomeToHireWinMailer } from "mailers/welcomeToHireWinMailer"
+import sendWelcomeEmailAndAddToSendfox from "./sendWelcomeEmailAndAddToSendfox"
 
 type signupProps = {
   name: string
@@ -90,7 +92,13 @@ export default async function signup(
         },
       },
     },
-    select: { id: true, email: true, role: true, companies: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      companies: { include: { company: true } },
+    },
   })
 
   const compId =
@@ -117,21 +125,12 @@ export default async function signup(
   }
 
   try {
-    const sendfoxApiToken = process.env.SENDFOX_API_TOKEN
-    const sendfoxApplicationSignupsListId = process.env.SENDFOX_APPLICATION_SIGNUPS_LIST_ID
-    if (sendfoxApiToken && sendfoxApplicationSignupsListId) {
-      axios.post(
-        "https://api.sendfox.com/contacts",
-        {
-          email,
-          first_name: name,
-          lists: [parseInt(sendfoxApplicationSignupsListId)],
-        },
-        {
-          headers: { Authorization: `Bearer ${sendfoxApiToken}` },
-        }
-      )
-    }
+    const companySlug =
+      existingCompany?.slug || (user.companies && (user.companies[0]?.company?.slug || "0")) || "0"
+    await sendWelcomeEmailAndAddToSendfox(
+      { name: user?.name, email: user?.email, companySlug },
+      ctx
+    )
   } catch {}
 
   return user

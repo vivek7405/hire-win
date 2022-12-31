@@ -22,6 +22,7 @@ import { CompanyUserRole } from "@prisma/client"
 import { PlanName } from "types"
 import { FREE_COMPANIES_LIMIT } from "src/plans/constants"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
+import sendWelcomeEmailAndAddToSendfox from "src/auth/mutations/sendWelcomeEmailAndAddToSendfox"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -55,6 +56,7 @@ const NewCompany = ({
   const session = useSession()
   const [createCompanyMutation] = useMutation(createCompany)
   const [createFactoryJobMutation] = useMutation(createFactoryJob)
+  const [sendWelcomeEmailAndAddToSendfoxMutation] = useMutation(sendWelcomeEmailAndAddToSendfox)
   const [companyUsers] = useQuery(getCompanyUsers, {
     where: {
       // companyId: session.companyId || "0",
@@ -111,8 +113,14 @@ const NewCompany = ({
                     ?.timeZone?.replace("Calcutta", "Kolkata")
 
                   const createdCompany = await createCompanyMutation(values)
+                  // If first company of user
                   if (createdCompany && companyUsers?.length === 0) {
                     await createFactoryJobMutation(createdCompany.id)
+                    await sendWelcomeEmailAndAddToSendfoxMutation({
+                      name: user?.name,
+                      email: user?.email,
+                      companySlug: createdCompany?.slug,
+                    })
                   }
 
                   toast.success(() => <span>Company Created</span>, { id: toastId })
