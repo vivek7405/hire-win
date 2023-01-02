@@ -250,8 +250,8 @@ const JobSettingsHiringTeamPage = ({
                     router.push(Routes.UserSettingsBillingPage())
                   }}
                 >
-                  Upgrade to the Recruiter Plan to add unlimited users. You cannot add users on the Free
-                  plan.
+                  Upgrade to the Recruiter Plan to add unlimited users. You cannot add users on the
+                  Free plan.
                 </Confirm>
 
                 <Confirm
@@ -433,9 +433,14 @@ const JobSettingsHiringTeamPage = ({
 
               <div className="overflow-auto">
                 <div className="mt-10 mb-6 w-full">
-                  <h3 className="font-semibold text-lg flex justify-center whitespace-nowrap">
-                    Interview Duration & Interviewers
+                  <h3 className="font-semibold text-lg flex justify-center">
+                    Interview Duration & Evaluators (Interviewers)
                   </h3>
+                  <p className="text-sm text-neutral-600 text-center">
+                    These evaluators shall be assigned to candidate by default when moved to that
+                    particular stage. You can always change the evaluator for a particular candidate
+                    stage from the candidate details page.
+                  </p>
                   <div className="flex flex-col space-y-20 md:flex-row md:space-y-0 lg:flex-row lg:space-y-0 mt-6 items-center md:justify-center lg:justify-center">
                     {jobData?.stages?.map((stage, index) => {
                       // const existingInterviewDetail = stage.interviewDetails?.find(
@@ -513,7 +518,7 @@ const JobSettingsHiringTeamPage = ({
                             }
                             onChange={async (e) => {
                               const selectedInterviewerId = e.target.value
-                              const toastId = toast.loading(() => <span>Updating Interviewer</span>)
+                              const toastId = toast.loading(() => <span>Updating Evaluator</span>)
                               try {
                                 const updatedStage = await assignInterviewerToJobStageMutation({
                                   stageId: stage.id,
@@ -524,7 +529,7 @@ const JobSettingsHiringTeamPage = ({
                                   setJobData(jobData)
                                 }
 
-                                toast.success(() => <span>Interviewer assigned to stage</span>, {
+                                toast.success(() => <span>Evaluator assigned to stage</span>, {
                                   id: toastId,
                                 })
                               } catch (error) {

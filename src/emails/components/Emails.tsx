@@ -1,7 +1,7 @@
-import { useSession } from "@blitzjs/auth";
-import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc";
+import { useSession } from "@blitzjs/auth"
+import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc"
 import { ChevronDownIcon, TrashIcon } from "@heroicons/react/outline"
-import { Candidate, Email, EmailTemplate, JobUser, User } from "@prisma/client"
+import { Candidate, Email, EmailTemplate, JobUser, JobUserRole, User } from "@prisma/client"
 import Confirm from "src/core/components/Confirm"
 import Modal from "src/core/components/Modal"
 import moment from "moment"
@@ -20,6 +20,8 @@ import { JsonValue } from "aws-sdk/clients/glue"
 import getCandidateInterviewer from "src/candidates/queries/getCandidateInterviewer"
 import getStage from "src/stages/queries/getStage"
 import getCandidate from "src/candidates/queries/getCandidate"
+import getCompany from "src/companies/queries/getCompany"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 interface ETValues {
   [key: string]: string
@@ -53,6 +55,19 @@ const Emails = ({ user, stageId, candidate }) => {
     stageId: stageId || "0",
   })
 
+  const [company] = useQuery(getCompany, {
+    where: {
+      id: session?.companyId || "0",
+    },
+  })
+
+  const [jobUser] = useQuery(getJobUser, {
+    where: {
+      jobId: candidate?.jobId || "0",
+      userId: user?.id || "0",
+    },
+  })
+
   const replaceEmailTemplatePlaceHolders = (body: JSON) => {
     if (body) {
       let stringifiedBody = JSON.stringify(body)
@@ -64,9 +79,7 @@ const Emails = ({ user, stageId, candidate }) => {
             etValues[etPlaceholder] = candidate?.name
             break
           case EmailTemplatePlaceholders.Company_Name:
-            etValues[etPlaceholder] = user?.companies?.find(
-              (cu) => cu.company?.id === session?.companyId
-            )?.company?.name
+            etValues[etPlaceholder] = company?.name || ""
             break
           case EmailTemplatePlaceholders.Interviewer_Name:
             etValues[etPlaceholder] = interviewer?.name || ""
@@ -197,10 +210,7 @@ const Emails = ({ user, stageId, candidate }) => {
                 // selectedWorkflowStage?.interviewDetails?.find(
                 //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                 // )?.interviewerId !== user?.id &&
-                interviewer?.id !== user?.id &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                  "OWNER" &&
-                user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+                interviewer?.id !== user?.id && jobUser?.role === JobUserRole.USER
               }
               onClick={() => {
                 setSelectedEmailTemplate(null as any)
@@ -224,11 +234,7 @@ const Emails = ({ user, stageId, candidate }) => {
                   // selectedWorkflowStage?.interviewDetails?.find(
                   //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                   // )?.interviewerId !== user?.id &&
-                  interviewer?.id !== user?.id &&
-                  user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                    "OWNER" &&
-                  user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                    "ADMIN"
+                  interviewer?.id !== user?.id && jobUser?.role === JobUserRole.USER
                 }
               >
                 {/* <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-100">
@@ -240,11 +246,7 @@ const Emails = ({ user, stageId, candidate }) => {
                     // selectedWorkflowStage?.interviewDetails?.find(
                     //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
                     // )?.interviewerId !== user?.id &&
-                    interviewer?.id !== user?.id &&
-                    user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                      "OWNER" &&
-                    user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !==
-                      "ADMIN"
+                    interviewer?.id !== user?.id && jobUser?.role === JobUserRole.USER
                   }
                 >
                   <ChevronDownIcon className="w-5 h-5" />

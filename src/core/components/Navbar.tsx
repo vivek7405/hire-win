@@ -16,7 +16,7 @@ import {
   PlusCircleIcon,
   PlusIcon,
 } from "@heroicons/react/outline"
-import { ExtendedUser, IntroHint, IntroStep, SubscriptionStatus } from "types"
+import { IntroHint, IntroStep, SubscriptionStatus } from "types"
 import logout from "src/auth/mutations/logout"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import Logo from "src/assets/Logo"
@@ -26,9 +26,10 @@ import updateCompanySession from "src/companies/mutations/updateCompanySession"
 import { CompanyUserRole, UserRole } from "@prisma/client"
 import Confirm from "./Confirm"
 import canCreateNewCompany from "src/companies/queries/canCreateNewCompany"
+import getCurrentUserServer from "src/users/queries/getCurrentUserServer"
 
 type NavbarProps = {
-  user?: ExtendedUser | null
+  user?: Awaited<ReturnType<typeof getCurrentUserServer>> | null
   showEmptyNavbar?: boolean
   setNavbarIntroSteps?: (steps: IntroStep[]) => void
   setNavbarIntroHints?: (hints: IntroHint[]) => void

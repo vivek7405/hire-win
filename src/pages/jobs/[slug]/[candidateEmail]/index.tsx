@@ -109,6 +109,8 @@ import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompan
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
+import StageEvaluator from "src/stages/components/StageEvaluator"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -167,9 +169,20 @@ export const getServerSideProps = gSSP(async (context) => {
       )
 
       if (candidate) {
+        const jobUser = await getJobUser(
+          {
+            where: {
+              jobId: job?.id || "0",
+              userId: user?.id || "0",
+            },
+          },
+          context.ctx
+        )
+
         return {
           props: {
             user,
+            jobUser,
             candidateEmail: candidate?.email as string,
             job: candidate?.job,
             stageId: candidate?.stageId,
@@ -306,6 +319,7 @@ const getCards = (candidate: ExtendedCandidate) => {
 
 const SingleCandidatePage = ({
   user,
+  jobUser,
   error,
   candidateEmail,
   job,
@@ -383,12 +397,7 @@ const SingleCandidatePage = ({
                     setUpgradeConfirmHeader={setUpgradeConfirmHeader}
                     setUpgradeConfirmMessage={setUpgradeConfirmMessage}
                     activePlanName={activePlanName}
-                    canAddNewCandidate={
-                      user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                        JobUserRole.OWNER ||
-                      user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                        JobUserRole.ADMIN
-                    }
+                    canAddNewCandidate={jobUser?.role !== JobUserRole.USER}
                     isCandidateLimitAvailable={isCandidateLimitAvailable}
                     isJobArchived={job?.archived}
                   />
@@ -543,6 +552,13 @@ const SingleCandidatePageContent = ({
   const [openConfirm, setOpenConfirm] = useState(false)
 
   const [createCandidateFileMutation] = useMutation(createCandidateFile)
+
+  const [jobUser] = useQuery(getJobUser, {
+    where: {
+      jobId: jobId || "0",
+      userId: user?.id || "0",
+    },
+  })
 
   const resume = candidate?.resume as AttachmentObject
   useMemo(() => {
@@ -796,10 +812,7 @@ const SingleCandidatePageContent = ({
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            {(user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-              JobUserRole.OWNER ||
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-                JobUserRole.ADMIN) && (
+            {jobUser?.role !== JobUserRole.USER && (
               <div className="py-1">
                 <Menu.Item>
                   {({ active }) => (
@@ -895,10 +908,7 @@ const SingleCandidatePageContent = ({
                     <Link
                       prefetch={true}
                       href={
-                        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-                          JobUserRole.OWNER ||
-                        user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-                          JobUserRole.ADMIN
+                        jobUser?.role !== JobUserRole.USER
                           ? Routes.JobSettingsPage({ slug: candidate?.job?.slug! })
                           : Routes.JobSettingsSchedulingPage({ slug: candidate?.job?.slug! })
                       }
@@ -967,10 +977,7 @@ const SingleCandidatePageContent = ({
   // )
 
   const MoveToNextStageButton = ({ stagesOpen, setStagesOpen }) => {
-    return user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-      JobUserRole.OWNER ||
-      user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-        JobUserRole.ADMIN ? (
+    return jobUser?.role !== JobUserRole.USER ? (
       <div className="cursor-pointer flex justify-center">
         <button
           className="text-white bg-theme-600 px-4 py-2 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
@@ -1045,10 +1052,7 @@ const SingleCandidatePageContent = ({
   }
 
   const AddToPoolButton = ({ candidatePoolsOpen, setCandidatePoolsOpen }) => {
-    return user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-      JobUserRole.OWNER ||
-      user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role ===
-        JobUserRole.ADMIN ? (
+    return jobUser?.role !== JobUserRole.USER ? (
       <DropdownMenu.Root
         modal={false}
         open={candidatePoolsOpen}
@@ -1645,37 +1649,39 @@ const SingleCandidatePageContent = ({
                     </dl>
                   </div>
 
-                  <div className="my-4 w-full flex items-center justify-center space-x-2 px-2">
-                    <button
-                      className="bg-white border hover:bg-neutral-500 text-neutral-600 hover:text-white rounded-lg px-4 py-1 text-center"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setOpenEditModal(true)
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="bg-white border hover:bg-red-500 text-red-500 hover:text-white rounded-lg px-4 py-1 text-center"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setCandidateToReject(candidate)
-                        setOpenCandidateRejectConfirm(true)
-                      }}
-                    >
-                      {candidate?.rejected ? "Restore" : "Reject"}
-                    </button>
-                    <Link
-                      legacyBehavior
-                      href={Routes.JobSettingsApplicationFormPage({
-                        slug: candidate?.job?.slug || "0",
-                      })}
-                    >
-                      <a className="bg-white border hover:bg-theme-500 text-theme-600 hover:text-white rounded-lg px-4 py-1 text-center truncate">
-                        Add/edit questions
-                      </a>
-                    </Link>
-                  </div>
+                  {jobUser?.role !== JobUserRole.USER && (
+                    <div className="my-4 w-full flex items-center justify-center space-x-2 px-2">
+                      <button
+                        className="bg-white border hover:bg-neutral-500 text-neutral-600 hover:text-white rounded-lg px-4 py-1 text-center"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setOpenEditModal(true)
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-white border hover:bg-red-500 text-red-500 hover:text-white rounded-lg px-4 py-1 text-center"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCandidateToReject(candidate)
+                          setOpenCandidateRejectConfirm(true)
+                        }}
+                      >
+                        {candidate?.rejected ? "Restore" : "Reject"}
+                      </button>
+                      <Link
+                        legacyBehavior
+                        href={Routes.JobSettingsApplicationFormPage({
+                          slug: candidate?.job?.slug || "0",
+                        })}
+                      >
+                        <a className="bg-white border hover:bg-theme-500 text-theme-600 hover:text-white rounded-lg px-4 py-1 text-center truncate">
+                          Add/edit questions
+                        </a>
+                      </Link>
+                    </div>
+                  )}
                 </div>
                 // <div className="flex flex-wrap justify-center px-2 md:px-0 lg:px-0">
                 //   {candidate?.job?.formQuestions?.map((question) => {
@@ -1978,7 +1984,14 @@ const SingleCandidatePageContent = ({
                     )
                   })}
                 </div>
-                <div className="w-full flex items-center justify-center mt-5">
+                <div className="flex items-center justify-center mt-5 mx-5">
+                  <Suspense
+                    fallback={<div className="flex items-center justify-center">Loading...</div>}
+                  >
+                    <StageEvaluator candidate={candidate} stage={selectedStage} />
+                  </Suspense>
+                </div>
+                <div className="w-full flex items-center justify-center mt-5 px-5">
                   <Form noFormatting={true} onSubmit={async (values) => {}}>
                     <LabeledToggleGroupField
                       name={`candidateStageToggleView`}
@@ -2017,10 +2030,7 @@ const SingleCandidatePageContent = ({
                       candidate={candidate}
                       header="Score Card"
                       headerComponent={
-                        user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
-                          JobUserRole.OWNER ||
-                        user?.jobs?.find((jobUser) => jobUser.jobId === jobId)?.role ===
-                          JobUserRole.ADMIN ? (
+                        jobUser?.role !== JobUserRole.USER ? (
                           <div className="flex items-center space-x-2">
                             <h2 className="text-lg font-medium text-gray-900 whitespace-nowrap">
                               Score Card
@@ -2032,7 +2042,10 @@ const SingleCandidatePageContent = ({
                                 stageSlug: selectedStage?.slug || "0",
                               })}
                             >
-                              <a className="text-theme-600 hover:text-theme-800">
+                              <a
+                                title="Configure Score Card"
+                                className="text-theme-600 hover:text-theme-800"
+                              >
                                 <CogIcon className="w-5 h-5" />
                               </a>
                             </Link>

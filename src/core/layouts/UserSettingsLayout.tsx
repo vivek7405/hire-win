@@ -12,7 +12,6 @@ import {
   OfficeBuildingIcon,
   UserCircleIcon,
 } from "@heroicons/react/outline"
-import { ExtendedUser } from "types"
 import { ClockIcon } from "@heroicons/react/solid"
 import getUser from "src/users/queries/getUser"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
@@ -88,7 +87,14 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
           if (!item) return <></>
 
           return (
-            <Link prefetch={true} href={item.href} passHref key={item.name} legacyBehavior>
+            <Link
+              replace={true}
+              prefetch={true}
+              href={item.href}
+              passHref
+              key={item.name}
+              legacyBehavior
+            >
               <a
                 data-testid={`${item.name}-userSettingsLink`}
                 className={`${

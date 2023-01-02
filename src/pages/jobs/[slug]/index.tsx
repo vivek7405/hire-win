@@ -97,6 +97,7 @@ import getUserJobsByViewTypeAndCategory from "src/jobs/queries/getUserJobsByView
 import getUserJobCategoriesByViewType from "src/categories/queries/getUserJobCategoriesByViewType"
 import setJobArchived from "src/jobs/mutations/setJobArchived"
 import getJob from "src/jobs/queries/getJob"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -230,7 +231,7 @@ export const getServerSideProps = gSSP(async (context) => {
 const CandidateActions = ({
   candidate,
   job,
-  user,
+  jobUser,
   setCandidateToEdit,
   setOpenModal,
   viewRejected,
@@ -256,8 +257,7 @@ const CandidateActions = ({
           disabled={true}
         />
       </Form>
-      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.OWNER ||
-        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.ADMIN) && (
+      {jobUser?.role !== JobUserRole.USER && (
         <div className="flex items-center space-x-2">
           <span>
             <button
@@ -312,7 +312,7 @@ const CandidateActions = ({
 
 const getBoard = (
   job,
-  user,
+  jobUser,
   candidates,
   viewRejected,
   setCandidateToReject,
@@ -371,7 +371,7 @@ const getBoard = (
                     key={c.id}
                     candidate={c}
                     job={job}
-                    user={user}
+                    jobUser={jobUser}
                     setCandidateToEdit={setCandidateToEdit}
                     setCandidateToMove={setCandidateToMove}
                     setCandidateToReject={setCandidateToReject}
@@ -408,16 +408,17 @@ const getBoard = (
 
 type CandidateProps = {
   job: ExtendedJob
-  user:
-    | (User & {
-        companies: (CompanyUser & {
-          company: Company
-        })[]
-        jobs: (JobUser & {
-          job: Job
-        })[]
-      })
-    | undefined
+  // user:
+  //   | (User & {
+  //       companies: (CompanyUser & {
+  //         company: Company
+  //       })[]
+  //       jobs: (JobUser & {
+  //         job: Job
+  //       })[]
+  //     })
+  //   | undefined
+  jobUser: Awaited<ReturnType<typeof getJobUser>>
   isTable: boolean
   viewRejected: boolean
   enableDrag: boolean
@@ -495,7 +496,7 @@ const Candidates = (props: CandidateProps) => {
     }
   }
 
-  const userForTable = props.user
+  const userForTable = props.jobUser
   const setCandidateToEditForTable = props.setCandidateToEdit
   const setOpenModalForTable = props.setOpenModal
   const viewRejectedForTable = props.viewRejected
@@ -547,7 +548,7 @@ const Candidates = (props: CandidateProps) => {
               key={candidate.id}
               candidate={candidate}
               job={job}
-              user={userForTable}
+              jobUser={props.jobUser}
               setCandidateToEdit={setCandidateToEditForTable}
               setCandidateToMove={setCandidateToMove}
               setCandidateToReject={setCandidateToReject}
@@ -683,7 +684,7 @@ const Candidates = (props: CandidateProps) => {
   const [board, setBoard] = useState(
     getBoard(
       props.job,
-      props.user,
+      props.jobUser,
       candidates,
       props.viewRejected,
       setCandidateToReject,
@@ -700,7 +701,7 @@ const Candidates = (props: CandidateProps) => {
     setBoard(
       getBoard(
         props.job,
-        props.user,
+        props.jobUser,
         candidates,
         props.viewRejected,
         setCandidateToReject,
@@ -715,7 +716,7 @@ const Candidates = (props: CandidateProps) => {
     )
   }, [
     props.job,
-    props.user,
+    props.jobUser,
     candidates,
     props.viewRejected,
     setCandidateToReject,
@@ -971,6 +972,13 @@ const SingleJobPageContent = ({
   const [openJobArchiveConfirm, setOpenJobArchiveConfirm] = useState(false)
   const [jobToArchive, setJobToArchive] = useState(null as any)
 
+  const [jobUser] = useQuery(getJobUser, {
+    where: {
+      jobId: job?.id || "0",
+      userId: user?.id || "0",
+    },
+  })
+
   function PopMenu() {
     return (
       <Menu as="div" className="relative inline-block text-left">
@@ -1043,54 +1051,56 @@ const SingleJobPageContent = ({
                   </a>
                 )}
               </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault()
+              {jobUser?.role !== JobUserRole.USER && (
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
 
-                      // Check for the job limit when the job is being restored
-                      if (job?.archived) {
-                        if (activePlanName === PlanName.FREE) {
-                          if (activeJobsCount >= FREE_JOBS_LIMIT) {
-                            alert(
-                              `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                            )
-                            return
+                        // Check for the job limit when the job is being restored
+                        if (job?.archived) {
+                          if (activePlanName === PlanName.FREE) {
+                            if (activeJobsCount >= FREE_JOBS_LIMIT) {
+                              alert(
+                                `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                              )
+                              return
+                            }
                           }
+                          // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                          //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
+                          //     alert(
+                          //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                          //     )
+                          //     return
+                          //   }
+                          // }
                         }
-                        // else if (activePlanName === PlanName.LIFETIME_SET1) {
-                        //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
-                        //     alert(
-                        //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                        //     )
-                        //     return
-                        //   }
-                        // }
-                      }
 
-                      setJobToArchive(job)
-                      setOpenJobArchiveConfirm(true)
-                    }}
-                  >
-                    {job?.archived ? (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <RefreshIcon className="w-5 h-5 text-theme-600" />
-                        <span>Restore Job</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center space-x-2">
-                        <ArchiveIcon className="w-5 h-5 text-red-600" />
-                        <span>Archive Job</span>
-                      </span>
-                    )}
-                  </a>
-                )}
-              </Menu.Item>
+                        setJobToArchive(job)
+                        setOpenJobArchiveConfirm(true)
+                      }}
+                    >
+                      {job?.archived ? (
+                        <span className="flex items-center space-x-2 whitespace-nowrap">
+                          <RefreshIcon className="w-5 h-5 text-theme-600" />
+                          <span>Restore Job</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center space-x-2">
+                          <ArchiveIcon className="w-5 h-5 text-red-600" />
+                          <span>Archive Job</span>
+                        </span>
+                      )}
+                    </a>
+                  )}
+                </Menu.Item>
+              )}
               {/* <Menu.Item>
                 {({ active }) => (
                   <a
@@ -1165,10 +1175,7 @@ const SingleJobPageContent = ({
                     <Link
                       prefetch={true}
                       href={
-                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                          JobUserRole.OWNER ||
-                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                          JobUserRole.ADMIN
+                        jobUser?.role !== JobUserRole.USER
                           ? Routes.JobSettingsPage({ slug: job?.slug! })
                           : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
                       }
@@ -1232,8 +1239,7 @@ const SingleJobPageContent = ({
 
   const enableDragToggle = (
     <>
-      {(user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.OWNER ||
-        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.ADMIN) && (
+      {jobUser?.role !== JobUserRole.USER && (
         <div className="text-theme-600 py-2 flex items-center justify-center">
           <Form
             noFormatting={true}
@@ -1321,14 +1327,9 @@ const SingleJobPageContent = ({
   const newCandidateButton = (
     <button
       className={`${
-        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.USER
-          ? "hidden"
-          : "block"
+        jobUser?.role === JobUserRole.USER ? "hidden" : "block"
       } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap`}
-      // disabled={
-      //   user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.OWNER &&
-      //   user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role !== JobUserRole.ADMIN
-      // }
+      // disabled={jobUser?.role === JobUserRole.USER}
       onClick={(e) => {
         e.preventDefault()
 
@@ -1588,14 +1589,10 @@ const SingleJobPageContent = ({
       <Suspense fallback="Loading...">
         <Candidates
           job={job as any}
-          user={user}
+          jobUser={jobUser}
           isTable={isTable}
           viewRejected={viewRejected}
-          enableDrag={
-            user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role === JobUserRole.USER
-              ? false
-              : enableDrag
-          }
+          enableDrag={jobUser?.role === JobUserRole.USER ? false : enableDrag}
           setCandidateToEdit={setCandidateToEdit}
           setOpenModal={setOpenModal}
           session={session}

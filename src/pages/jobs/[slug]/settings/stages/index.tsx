@@ -30,7 +30,7 @@ import StageForm from "src/stages/components/StageForm"
 import addNewStageToJob from "src/stages/mutations/addNewStageToJob"
 import Debouncer from "src/core/utils/debouncer"
 import Cards from "src/core/components/Cards"
-import { Stage } from "@prisma/client"
+import { JobUserRole, Stage } from "@prisma/client"
 import updateStage from "src/stages/mutations/updateStage"
 import getJob from "src/jobs/queries/getJob"
 import JobSettingsLayout from "src/core/layouts/JobSettingsLayout"
@@ -38,6 +38,7 @@ import { PencilIcon } from "@heroicons/react/solid"
 import { AuthorizationError } from "blitz"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 export const getServerSideProps = gSSP(async (context) => {
   path.resolve("next.config.js")
@@ -80,16 +81,40 @@ export const getServerSideProps = gSSP(async (context) => {
         { ...context.ctx }
       )
 
-      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+      const jobUser = await getJobUser(
+        {
+          where: {
+            jobId: job?.id || "0",
+            userId: user?.id || "0",
+          },
+        },
+        context.ctx
+      )
+      let canAccess = true
+      if (jobUser?.role === JobUserRole.USER) {
+        canAccess = false
+      }
 
-      return {
-        props: {
-          user: user,
-          job: job,
-          activePlanName,
-          //   canUpdate: canUpdate,
-          //   workflow: workflow,
-        } as any,
+      if (canAccess) {
+        const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+        return {
+          props: {
+            user: user,
+            job: job,
+            activePlanName,
+            //   canUpdate: canUpdate,
+            //   workflow: workflow,
+          } as any,
+        }
+      } else {
+        return {
+          props: {
+            error: {
+              statusCode: 403,
+              message: "You don't have permission",
+            },
+          },
+        }
       }
     } catch (error) {
       if (error instanceof AuthorizationError) {
@@ -270,9 +295,7 @@ export const Stages = ({
                             setWorkflowStageToRemove(stage)
                             setOpenConfirm(true)
                           } else {
-                            alert(
-                              "Can't delete the stage as there are some candidates present."
-                            )
+                            alert("Can't delete the stage as there are some candidates present.")
                           }
                         }}
                       >
