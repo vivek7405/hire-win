@@ -103,7 +103,14 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
 
             return (
               item.canView && (
-                <Link prefetch={true} href={item.href} passHref key={item.name} legacyBehavior>
+                <Link
+                  replace={true}
+                  prefetch={true}
+                  href={item.href}
+                  passHref
+                  key={item.name}
+                  legacyBehavior
+                >
                   <a
                     data-testid={`${item.name}-jobSettingsLink`}
                     className={`${

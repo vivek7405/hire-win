@@ -16,7 +16,6 @@ import Table from "src/core/components/Table"
 
 import getUser from "src/users/queries/getUser"
 import SingleFileUploadField from "src/core/components/SingleFileUploadField"
-import { AttachmentObject, ExtendedJob, ExtendedUser, SubscriptionStatus } from "types"
 import LabeledRichTextField from "src/core/components/LabeledRichTextField"
 import { Form } from "src/core/components/Form"
 import getJob from "src/jobs/queries/getJob"

@@ -23,7 +23,13 @@ import shiftFormQuestion from "src/form-questions/mutations/shiftFormQuestion"
 import Confirm from "src/core/components/Confirm"
 import removeFormQuestionFromJob from "src/form-questions/mutations/removeFormQuestionFromJob"
 import ApplicationForm from "src/candidates/components/ApplicationForm"
-import { Behaviour, FormQuestion, FormQuestionOption, FormQuestionType } from "@prisma/client"
+import {
+  Behaviour,
+  FormQuestion,
+  FormQuestionOption,
+  FormQuestionType,
+  JobUserRole,
+} from "@prisma/client"
 import LabeledToggleGroupField from "src/core/components/LabeledToggleGroupField"
 import Form from "src/core/components/Form"
 import updateFormQuestion from "src/form-questions/mutations/updateFormQuestion"
@@ -41,6 +47,7 @@ import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompan
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import classNames from "src/core/utils/classNames"
 import { PencilIcon } from "@heroicons/react/solid"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -86,16 +93,40 @@ export const getServerSideProps = gSSP(async (context) => {
         context.ctx
       )
 
-      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+      const jobUser = await getJobUser(
+        {
+          where: {
+            jobId: job?.id || "0",
+            userId: user?.id || "0",
+          },
+        },
+        context.ctx
+      )
+      let canAccess = true
+      if (jobUser?.role === JobUserRole.USER) {
+        canAccess = false
+      }
 
-      return {
-        props: {
-          user,
-          job,
-          activePlanName,
-          // canUpdate: canUpdate,
-          // form: form,
-        } as any,
+      if (canAccess) {
+        const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+        return {
+          props: {
+            user,
+            job,
+            activePlanName,
+            // canUpdate: canUpdate,
+            // form: form,
+          } as any,
+        }
+      } else {
+        return {
+          props: {
+            error: {
+              statusCode: 403,
+              message: "You don't have permission",
+            },
+          },
+        }
       }
     } catch (error) {
       if (error instanceof AuthorizationError) {

@@ -615,7 +615,7 @@ const JobSettingsSchedulingPage = ({
                     job={job}
                     user={user}
                     stages={job?.stages?.filter((stage) => stage.interviewerId === user?.id)}
-                    header="Stages assigned to you"
+                    header="Stages where you are the Interviewer"
                     noStagesMsg="There are no stages assigned to you for interview"
                   />
                 </div>

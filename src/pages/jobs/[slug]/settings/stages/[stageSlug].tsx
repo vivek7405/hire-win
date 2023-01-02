@@ -40,7 +40,7 @@ import CardQuestionForm from "src/score-cards/components/ScoreCardQuestionForm"
 import addNewCardQuestionToScoreCard from "src/score-cards/mutations/addNewCardQuestionToScoreCard"
 import Cards from "src/core/components/Cards"
 import Debouncer from "src/core/utils/debouncer"
-import { ScoreCardQuestion, Behaviour } from "@prisma/client"
+import { ScoreCardQuestion, Behaviour, JobUserRole } from "@prisma/client"
 import updateScoreCardQuestionName from "src/score-cards/mutations/updateScoreCardQuestionName"
 import getScoreCardQuestions from "src/score-cards/queries/getScoreCardQuestions"
 import JobSettingsLayout from "src/core/layouts/JobSettingsLayout"
@@ -48,6 +48,7 @@ import getJob from "src/jobs/queries/getJob"
 import getStage from "src/stages/queries/getStage"
 import { AuthorizationError } from "blitz"
 import { PencilIcon } from "@heroicons/react/solid"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -82,29 +83,43 @@ export const getServerSideProps = gSSP(async (context) => {
 
   if (user && job) {
     try {
-      //   const scoreCard = await invokeWithMiddleware(
-      //     getScoreCard,
-      //     {
-      //       where: {
-      //         slug: context?.params?.slug!,
-      //         companyId: session?.companyId || "0",
-      //       },
-      //     },
-      //     { ...context }
-      //   )
-      const stage = await getStage(
-        { where: { slug: (context?.params?.stageSlug as string) || "0", jobId: job.id } },
-        { ...context.ctx }
+      const jobUser = await getJobUser(
+        {
+          where: {
+            jobId: job?.id || "0",
+            userId: user?.id || "0",
+          },
+        },
+        context.ctx
       )
+      let canAccess = true
+      if (jobUser?.role === JobUserRole.USER) {
+        canAccess = false
+      }
 
-      return {
-        props: {
-          user: user,
-          job,
-          stage: stage || null,
-          //   canUpdate: canUpdate,
-          //   scoreCard: scoreCard,
-        } as any,
+      if (canAccess) {
+        const stage = await getStage(
+          { where: { slug: (context?.params?.stageSlug as string) || "0", jobId: job.id } },
+          { ...context.ctx }
+        )
+        return {
+          props: {
+            user: user,
+            job,
+            stage: stage || null,
+            //   canUpdate: canUpdate,
+            //   scoreCard: scoreCard,
+          } as any,
+        }
+      } else {
+        return {
+          props: {
+            error: {
+              statusCode: 403,
+              message: "You don't have permission",
+            },
+          },
+        }
       }
     } catch (error) {
       if (error instanceof AuthorizationError) {

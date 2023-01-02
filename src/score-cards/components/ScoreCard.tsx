@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@blitzjs/rpc";
+import { useMutation, useQuery } from "@blitzjs/rpc"
 import { LabeledTextField } from "src/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "src/core/components/LabeledTextAreaField"
 import { Form } from "src/core/components/Form"
@@ -115,6 +115,11 @@ export const ScoreCard = (props: ScoreCardProps) => {
         subHeader={props.subHeader}
         key={`${props.candidate?.id}-${props.stageId}`}
       >
+        {disabled && (
+          <p className="text-neutral-600 text-sm italic">
+            You can't edit the score since you are not assigned as the evaluator for this stage.
+          </p>
+        )}
         {data.map((question) => {
           if (question.behaviour === "OFF") {
             return

@@ -1,14 +1,15 @@
 import Head from "next/head"
 import { ReactNode, Suspense } from "react"
 import Navbar from "src/core/components/Navbar"
-import { ExtendedUser, IntroHint, IntroStep } from "types"
+import { IntroHint, IntroStep } from "types"
 import Link from "next/link"
 import Script from "next/script"
+import getCurrentUserServer from "src/users/queries/getCurrentUserServer"
 
 type LayoutProps = {
   title?: string
   children: ReactNode
-  user?: ExtendedUser | null
+  user?: Awaited<ReturnType<typeof getCurrentUserServer>> | null
   hideNavbar?: boolean
   isMax8xl?: boolean
   setNavbarIntroSteps?: (steps: IntroStep[]) => void

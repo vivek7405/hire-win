@@ -15,6 +15,7 @@ import getCandidateInterviewsByStage from "../queries/getCandidateInterviewsBySt
 import ScheduleInterview from "./ScheduleInterview"
 import getStage from "src/stages/queries/getStage"
 import getCandidate from "src/candidates/queries/getCandidate"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 const Interviews = ({ user, stageId, candidate, activePlanName }) => {
   const [openScheduleInterviewModal, setOpenScheduleInterviewModal] = useState(false)
@@ -25,15 +26,22 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
     candidateId: candidate?.id || "0",
     stageId: stageId || "0",
   })
-  const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
+  // const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
 
-  const session = useSession()
-  const [jobUsers] = useQuery(getJobMembers, { where: { id: candidate.jobId } })
-  const [setCandidateInterviewerMutation] = useMutation(setCandidateInterviewer)
+  // const session = useSession()
+  // const [jobUsers] = useQuery(getJobMembers, { where: { id: candidate.jobId } })
+  // const [setCandidateInterviewerMutation] = useMutation(setCandidateInterviewer)
 
   const [interviewer] = useQuery(getCandidateInterviewer, {
     candidateId: candidate?.id || "0",
     stageId: stageId || "0",
+  })
+
+  const [jobUser] = useQuery(getJobUser, {
+    where: {
+      jobId: candidate?.jobId || "0",
+      userId: user?.id || "0",
+    },
   })
 
   return (
@@ -82,7 +90,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
       </Confirm>
 
       <div className="m-6">
-        <div className="flex items-center justify-center space-x-2">
+        {/* <div className="flex items-center justify-center space-x-2">
           <label className="text-neutral-600">Interviewer:</label>
           <select
             className="border border-gray-300 px-2 py-1 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed truncate pr-7"
@@ -124,7 +132,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
               )
             })}
           </select>
-        </div>
+        </div> */}
         <div className="flex items-center mt-6">
           <div className="font-bold text-lg w-full">Interviews</div>
           <button
@@ -133,9 +141,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
               // selectedWorkflowStage?.interviewDetails?.find(
               //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
               // )?.interviewerId !== user?.id &&
-              interviewer?.id !== user?.id &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "OWNER" &&
-              user?.jobs?.find((jobUser) => jobUser.jobId === candidate?.jobId)?.role !== "ADMIN"
+              interviewer?.id !== user?.id && jobUser?.role === JobUserRole.USER
             }
             onClick={() => {
               setOpenScheduleInterviewModal(true)

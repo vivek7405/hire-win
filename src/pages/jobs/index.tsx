@@ -375,25 +375,27 @@ const Jobs = ({
                   </a>
                 )}
               </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setOpenEmbedModal(true)
-                    }}
-                  >
-                    <span className="flex items-center space-x-2 whitespace-nowrap">
-                      <CodeIcon className="w-5 h-5 text-neutral-600" />
-                      <span>Embed Job Posts</span>
-                    </span>
-                  </a>
-                )}
-              </Menu.Item>
+              {companyUserRole !== CompanyUserRole.USER && (
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setOpenEmbedModal(true)
+                      }}
+                    >
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <CodeIcon className="w-5 h-5 text-neutral-600" />
+                        <span>Embed Job Posts</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+              )}
               <Menu.Item>
                 {({ active }) => (
                   <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
@@ -556,7 +558,7 @@ const Jobs = ({
     invalidateQuery(getUserJobsByViewTypeAndCategory)
   }, [viewType])
 
-  function PopMenu({ job, user }) {
+  function PopMenu({ job, jobUser }) {
     return (
       <Menu as="div" className="relative inline-block text-left">
         <div>
@@ -743,10 +745,7 @@ const Jobs = ({
                     <Link
                       prefetch={true}
                       href={
-                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                          JobUserRole.OWNER ||
-                        user?.jobs?.find((jobUser) => jobUser.jobId === job?.id)?.role ===
-                          JobUserRole.ADMIN
+                        jobUser?.role !== JobUserRole.USER
                           ? Routes.JobSettingsPage({ slug: job?.slug! })
                           : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
                       }
@@ -1068,7 +1067,7 @@ const Jobs = ({
         {jobUsers
           .map((jobUser) => {
             return {
-              ...jobUser.job,
+              ...jobUser,
               hasByPassedPlanLimit: false,
               // hasByPassedPlanLimit:
               //   !(
@@ -1078,7 +1077,9 @@ const Jobs = ({
               canUpdate: jobUser.role === "OWNER" || jobUser.role === "ADMIN",
             }
           })
-          ?.map((job) => {
+          ?.map((jobUser) => {
+            const job = jobUser.job
+
             const stages: Stage[] =
               job?.stages?.sort((a, b) => {
                 return a?.order - b?.order
@@ -1142,7 +1143,7 @@ const Jobs = ({
                             //   )
                             //   setOpenConfirm(true)
                             // } else {
-                            job.canUpdate
+                            jobUser.canUpdate
                               ? router.push(Routes.JobSettingsPage({ slug: job.slug }))
                               : router.push(Routes.JobSettingsSchedulingPage({ slug: job.slug }))
                             // }
@@ -1151,7 +1152,7 @@ const Jobs = ({
                           <CogIcon className="h-6 w-6" />
                         </a>
 
-                        {job.canUpdate && <PopMenu job={job} user={user} />}
+                        {jobUser.canUpdate && <PopMenu job={job} jobUser={jobUser} />}
                       </div>
                     </div>
 
