@@ -145,45 +145,6 @@ const UserSettingsSubCompaniesPage = ({
         <Suspense fallback="Loading...">
           <UserSettingsLayout>
             <ParentCompanySettingsLayout>
-              <div className="p-6 bg-white">
-                <p className="text-neutral-600 text-center text-lg font-medium">
-                  All Sub Companies under{" "}
-                  {user?.id === companyOwner?.id
-                    ? "your Parent Company"
-                    : `${company?.name} Company Holder (${companyOwner?.name}'s) Parent Company`}
-                </p>
-                <div className="flex items-center justify-center my-5">
-                  <button
-                    className="px-4 py-2 bg-theme-600 hover:bg-theme-800 rounded text-white"
-                    onClick={() => {
-                      setOpenCreateCompanyModal(true)
-                    }}
-                  >
-                    Add New Company
-                  </button>
-                </div>
-                <div className="flex flex-col space-y-3 items-center justify-center">
-                  {subCompanies?.map((subCompany) => {
-                    return (
-                      <div className="px-4 py-1 rounded-lg bg-theme-50 w-64">
-                        <p className="text-neutral-700 truncate">{subCompany.name}</p>
-
-                        {subCompany.createdBy && (
-                          <p className="text-sm text-neutral-600 italic truncate">
-                            Created by {subCompany.createdBy?.name}
-                          </p>
-                        )}
-
-                        {subCompany.createdAt && (
-                          <p className="text-xs text-neutral-600 italic truncate">
-                            {moment(subCompany.createdAt).local().fromNow()}
-                          </p>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
               <Modal
                 header="Create company under parent company"
                 open={openCreateCompanyModal}
@@ -242,6 +203,47 @@ const UserSettingsSubCompaniesPage = ({
                   }}
                 />
               </Modal>
+              <div className="p-6 bg-white">
+                <p className="text-neutral-600 text-center text-lg font-medium">
+                  All Sub Companies under{" "}
+                  {user?.id === companyOwner?.id
+                    ? "your Parent Company"
+                    : `${company?.name} Company Holder (${companyOwner?.name}'s) Parent Company`}
+                </p>
+                <div className="flex items-center justify-center my-5">
+                  <button
+                    className="px-4 py-2 bg-theme-600 hover:bg-theme-800 rounded text-white"
+                    onClick={() => {
+                      setOpenCreateCompanyModal(true)
+                    }}
+                  >
+                    Add New Company
+                  </button>
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {subCompanies?.map((subCompany) => {
+                      return (
+                        <div className="px-4 py-1 rounded-lg bg-theme-50 w-64">
+                          <p className="text-neutral-700 truncate">{subCompany.name}</p>
+
+                          {subCompany.createdBy && (
+                            <p className="text-sm text-neutral-600 italic truncate">
+                              Created by {subCompany.createdBy?.name}
+                            </p>
+                          )}
+
+                          {subCompany.createdAt && (
+                            <p className="text-xs text-neutral-600 italic truncate">
+                              {moment(subCompany.createdAt).local().fromNow()}
+                            </p>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
             </ParentCompanySettingsLayout>
           </UserSettingsLayout>
         </Suspense>
