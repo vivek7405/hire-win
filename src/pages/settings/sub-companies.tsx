@@ -210,7 +210,7 @@ const UserSettingsSubCompaniesPage = ({
                     ? "your Parent Company"
                     : `${company?.name} Company Holder (${companyOwner?.name}'s) Parent Company`}
                 </p>
-                <div className="flex items-center justify-center my-5">
+                {/* <div className="flex items-center justify-center my-5">
                   <button
                     className="px-4 py-2 bg-theme-600 hover:bg-theme-800 rounded text-white"
                     onClick={() => {
@@ -219,13 +219,13 @@ const UserSettingsSubCompaniesPage = ({
                   >
                     Add New Company
                   </button>
-                </div>
-                <div className="flex items-center justify-center">
+                </div> */}
+                <div className="flex items-center justify-center mt-10">
                   <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                     {subCompanies?.map((subCompany) => {
                       return (
-                        <div className="px-4 py-1 rounded-lg bg-theme-50 w-64">
-                          <p className="text-neutral-700 truncate">{subCompany.name}</p>
+                        <div className="px-4 py-2 rounded-lg bg-theme-50 w-64 border border-theme-500">
+                          <p className="text-neutral-700 font-medium truncate">{subCompany.name}</p>
 
                           {subCompany.createdBy && (
                             <p className="text-sm text-neutral-600 italic truncate">
@@ -241,6 +241,14 @@ const UserSettingsSubCompaniesPage = ({
                         </div>
                       )
                     })}
+                    <button
+                      className="px-4 py-2 rounded-lg w-64 flex items-center justify-center border-2 border-dashed border-neutral-400 text-neutral-700 hover:bg-gray-50"
+                      onClick={() => {
+                        setOpenCreateCompanyModal(true)
+                      }}
+                    >
+                      Add new company
+                    </button>
                   </div>
                 </div>
               </div>
