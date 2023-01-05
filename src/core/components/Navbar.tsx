@@ -23,10 +23,11 @@ import Logo from "src/assets/Logo"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
 import getCompanyUsers from "src/companies/queries/getCompanyUsers"
 import updateCompanySession from "src/companies/mutations/updateCompanySession"
-import { CompanyUserRole, UserRole } from "@prisma/client"
+import { CompanyUserRole, ParentCompanyUserRole, UserRole } from "@prisma/client"
 import Confirm from "./Confirm"
 import canCreateNewCompany from "src/companies/queries/canCreateNewCompany"
 import getCurrentUserServer from "src/users/queries/getCurrentUserServer"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 
 type NavbarProps = {
   user?: Awaited<ReturnType<typeof getCurrentUserServer>> | null
@@ -51,6 +52,14 @@ const NavbarContent = ({
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
   })
+
+  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
+    where: {
+      parentCompanyId: companyUser?.company?.parentCompanyId || "0",
+      userId: session?.userId || "0",
+    },
+  })
+
   // const [canCreateCompany] = useQuery(canCreateNewCompany, null)
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState(companyUser)
@@ -60,8 +69,9 @@ const NavbarContent = ({
 
   const [logoutMutation] = useMutation(logout)
 
-  const isOwnerOrAdmin =
-    companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
+  const isCompanyOwnerOrAdmin = companyUser?.role !== CompanyUserRole.USER
+
+  const isParentCompanyOwnerOrAdmin = parentCompanyUser && parentCompanyUser?.role !== ParentCompanyUserRole.USER
 
   const nav = [
     {
@@ -91,103 +101,37 @@ const NavbarContent = ({
       } as IntroStep,
     },
   ]
-  if (isOwnerOrAdmin) {
-    nav.push(
-      {
-        name: "Categories",
-        href: Routes.CategoriesHome().pathname,
-        focus: router.route.includes(Routes.CategoriesHome().pathname),
-        introStep: {
-          element: "#selectorCategoriesMenuStep",
-          title: "Categories",
-          intro: (
-            <span>
-              <p>
-                Categories are broadly the <b>departments in your company</b>, like IT, Marketing,
-                Engineering, etc.
-              </p>
-              <br />
-              <p>
-                The jobs are <b>listed by category</b> on careers page.
-              </p>
-              <br />
-              <p>
-                Candidates can <b>filter</b> the job openings <b>by categories</b>.
-              </p>
-            </span>
-          ),
-        },
+
+  if (isCompanyOwnerOrAdmin) {
+    nav.push({
+      name: "Categories",
+      href: Routes.CategoriesHome().pathname,
+      focus: router.route.includes(Routes.CategoriesHome().pathname),
+      introStep: {
+        element: "#selectorCategoriesMenuStep",
+        title: "Categories",
+        intro: (
+          <span>
+            <p>
+              Categories are broadly the <b>departments in your company</b>, like IT, Marketing,
+              Engineering, etc.
+            </p>
+            <br />
+            <p>
+              The jobs are <b>listed by category</b> on careers page.
+            </p>
+            <br />
+            <p>
+              Candidates can <b>filter</b> the job openings <b>by categories</b>.
+            </p>
+          </span>
+        ),
       },
-      // {
-      //   name: "Workflows",
-      //   href: Routes.WorkflowsHome().pathname,
-      //   focus:
-      //     router.route.includes(Routes.WorkflowsHome().pathname) ||
-      //     router.route.includes(Routes.StagesHome().pathname),
-      //   introStep: {
-      //     element: "#selectorWorkflowsMenuStep",
-      //     title: "Workflows",
-      //     intro: (
-      //       <span>
-      //         <p>
-      //           Workflows are the <b>interviewing stages</b>.
-      //         </p>
-      //         <br />
-      //         <p>
-      //           Typically a company has different workflows for different jobs. You may{" "}
-      //           <b>create and assign worklows to jobs</b> as per your requirement.
-      //         </p>
-      //       </span>
-      //     ),
-      //   },
-      // },
-      // {
-      //   name: "Forms",
-      //   href: Routes.FormsHome().pathname,
-      //   focus:
-      //     router.route.includes(Routes.FormsHome().pathname) ||
-      //     router.route.includes(Routes.QuestionsHome().pathname),
-      //   introStep: {
-      //     element: "#selectorFormsMenuStep",
-      //     title: "Forms",
-      //     intro: (
-      //       <span>
-      //         <p>
-      //           Forms are the <b>application forms through which the candidate applies to a job</b>.
-      //         </p>
-      //         <br />
-      //         <p>
-      //           Create and assign forms to jobs so that you have all the{" "}
-      //           <b>information you need from a candidate for a particular job</b>.
-      //         </p>
-      //       </span>
-      //     ),
-      //   },
-      // },
-      // {
-      //   name: "Score Cards",
-      //   href: Routes.ScoreCardsHome().pathname,
-      //   focus:
-      //     router.route.includes(Routes.ScoreCardsHome().pathname) ||
-      //     router.route.includes(Routes.CardQuestionsHome().pathname),
-      //   introStep: {
-      //     element: "#selectorScoreCardsMenuStep",
-      //     title: "Score Cards",
-      //     intro: (
-      //       <span>
-      //         <p>
-      //           Score cards are used by interviewers to{" "}
-      //           <b>rate the {`candidate's`} performance in a particular interview stage</b>.
-      //         </p>
-      //         <br />
-      //         <p>
-      //           Create score cards and{" "}
-      //           <b>assign them to the workflow (interviewing stages) while creating a job</b>.
-      //         </p>
-      //       </span>
-      //     ),
-      //   },
-      // },
+    })
+  }
+
+  if (isCompanyOwnerOrAdmin || isParentCompanyOwnerOrAdmin) {
+    nav.push(
       {
         name: "Email Templates",
         href: Routes.EmailTemplatesHome().pathname,

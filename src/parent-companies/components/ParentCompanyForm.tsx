@@ -32,23 +32,27 @@ export const ParentCompanyForm = (props: ParentCompanyFormProps) => {
         >
           <LabeledTextField name="name" label="Name" placeholder="Enter parent company name" />
 
-          <div className="float-left">
-            <Link
-              prefetch={true}
-              href={Routes.ParentCompanyJobBoard({ parentCompanyId: props.parentCompanyId || "0" })}
-              passHref
-              legacyBehavior
-            >
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex whitespace-nowrap items-center underline text-theme-600 hover:text-theme-800`}
+          {(props.initialValues as any)?.name && (
+            <div className="float-left">
+              <Link
+                prefetch={true}
+                href={Routes.ParentCompanyJobBoard({
+                  parentCompanyId: props.parentCompanyId || "0",
+                })}
+                passHref
+                legacyBehavior
               >
-                <span>View Job Board</span>
-                <ExternalLinkIcon className="w-4 h-4 ml-1" />
-              </a>
-            </Link>
-          </div>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex whitespace-nowrap items-center underline text-theme-600 hover:text-theme-800`}
+                >
+                  <span>View Job Board</span>
+                  <ExternalLinkIcon className="w-4 h-4 ml-1" />
+                </a>
+              </Link>
+            </div>
+          )}
         </Form>
       </div>
     </>

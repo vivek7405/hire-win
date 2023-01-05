@@ -227,6 +227,9 @@ model ParentCompany {
   users     ParentCompanyUser[]
   companies Company[]
   tokens    Token[]
+
+  emailTemplates EmailTemplate[]
+  candidatePools CandidatePool[]
 }
 
 model Company {
@@ -875,12 +878,16 @@ model EmailTemplate {
   subject String
   body    Json
 
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
+  parentCompany   ParentCompany? @relation(fields: [parentCompanyId], references: [id])
+  parentCompanyId String?
 
   emails Email[]
 
   @@unique([companyId, slug])
+  @@unique([parentCompanyId, slug])
 }
 
 model Email {
@@ -915,10 +922,14 @@ model CandidatePool {
   name String
   slug String
 
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+
+  parentCompany   ParentCompany? @relation(fields: [parentCompanyId], references: [id])
+  parentCompanyId String?
 
   candidates Candidate[]
 
   @@unique([companyId, slug])
+  @@unique([parentCompanyId, slug])
 }

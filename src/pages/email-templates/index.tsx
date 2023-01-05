@@ -2,7 +2,7 @@ import { gSSP } from "src/blitz-server"
 import Link from "next/link"
 import { useSession } from "@blitzjs/auth"
 import { useRouter } from "next/router"
-import { Routes } from "@blitzjs/next"
+import { ErrorComponent, Routes } from "@blitzjs/next"
 import { invalidateQuery, useMutation, usePaginatedQuery, useQuery } from "@blitzjs/rpc"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import Card from "src/core/components/Card"
@@ -18,8 +18,8 @@ import { Suspense, useEffect, useState } from "react"
 import toast from "react-hot-toast"
 
 import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
-import { TrashIcon } from "@heroicons/react/outline"
-import { EmailTemplate } from "@prisma/client"
+import { LibraryIcon, TrashIcon } from "@heroicons/react/outline"
+import { CompanyUserRole, EmailTemplate, ParentCompanyUserRole } from "@prisma/client"
 import Confirm from "src/core/components/Confirm"
 import deleteEmailTemplate from "src/email-templates/mutations/deleteEmailTemplate"
 import updateEmailTemplate from "src/email-templates/mutations/updateEmailTemplate"
@@ -29,6 +29,11 @@ import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompan
 import { PlanName } from "types"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import { PencilIcon } from "@heroicons/react/solid"
+import classNames from "src/core/utils/classNames"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
+import getCompany from "src/companies/queries/getCompany"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
+import getCompanyUser from "src/companies/queries/getCompanyUser"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -43,7 +48,71 @@ export const getServerSideProps = gSSP(async (context) => {
   if (user) {
     const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
 
-    return { props: { user, activePlanName } }
+    const company = await getCompany(
+      {
+        where: { id: context?.ctx?.session?.companyId || "0" },
+      },
+      context.ctx
+    )
+
+    const companyUser = await getCompanyUser(
+      {
+        where: {
+          companyId: company?.id || "0",
+          userId: user?.id || "0",
+        },
+      },
+      context.ctx
+    )
+
+    const parentCompany = await getParentCompany(
+      {
+        where: { id: company?.parentCompanyId || "0" },
+      },
+      context.ctx
+    )
+
+    const parentCompanyUser = await getParentCompanyUser(
+      {
+        where: {
+          parentCompanyId: parentCompany?.id || "0",
+          userId: context?.ctx?.session?.userId || "0",
+        },
+      },
+      context.ctx
+    )
+
+    const isCompanyOwnerOrAdmin =
+      (companyUser && companyUser?.role !== CompanyUserRole.USER) || false
+
+    const isParentCompanyOwnerOrAdmin =
+      (parentCompany?.name &&
+        parentCompanyUser &&
+        parentCompanyUser?.role !== ParentCompanyUserRole.USER) ||
+      false
+
+    if (!isCompanyOwnerOrAdmin && !isParentCompanyOwnerOrAdmin) {
+      return {
+        props: {
+          error: {
+            statusCode: 403,
+            message: "You don't have permission",
+          },
+        },
+      } as any
+    }
+
+    return {
+      props: {
+        isCompanyOwnerOrAdmin,
+        isParentCompanyOwnerOrAdmin,
+        user,
+        activePlanName,
+        companyUser,
+        parentCompany,
+        parentCompanyUser,
+      },
+    }
   } else {
     return {
       redirect: {
@@ -55,7 +124,16 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-const EmailTemplates = ({ activePlanName }) => {
+const EmailTemplates = ({
+  isCompanyOwnerOrAdmin,
+  isParentCompanyOwnerOrAdmin,
+  user,
+  error,
+  activePlanName,
+  companyUser,
+  parentCompany,
+  parentCompanyUser,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -70,8 +148,14 @@ const EmailTemplates = ({ activePlanName }) => {
   const [emailTemplateToEdit, setEmailTemplateToEdit] = useState(null as EmailTemplate | null)
   const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
 
+  const [viewParent, setViewParent] = useState(isParentCompanyOwnerOrAdmin)
+
   const [{ emailTemplates, hasMore, count }] = usePaginatedQuery(getEmailTemplates, {
-    where: { ...query, companyId: session.companyId || "0" },
+    where: {
+      ...query,
+      companyId: isParentCompanyOwnerOrAdmin && viewParent ? null : session.companyId || "0",
+      parentCompanyId: isParentCompanyOwnerOrAdmin && viewParent ? parentCompany?.id || "0" : null,
+    },
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
   })
@@ -155,7 +239,7 @@ const EmailTemplates = ({ activePlanName }) => {
       <Modal header="Add New Template" open={openModal} setOpen={setOpenModal}>
         <EmailTemplateForm
           header="New Email Template"
-          subHeader="HTML Template"
+          subHeader={viewParent ? "Parent Company Email Template" : "Company Email Template"}
           initialValues={
             emailTemplateToEdit
               ? {
@@ -181,6 +265,10 @@ const EmailTemplates = ({ activePlanName }) => {
             try {
               if (values?.body) {
                 values.body = convertToRaw(values?.body?.getCurrentContent())
+              }
+
+              if (isParentCompanyOwnerOrAdmin && viewParent) {
+                values["parentCompanyId"] = parentCompany?.id || "0"
               }
 
               if (isEdit) {
@@ -226,6 +314,7 @@ const EmailTemplates = ({ activePlanName }) => {
           New Email Template
         </button>
       </div>
+
       <div className="flex mb-2">
         <input
           placeholder="Search"
@@ -238,6 +327,34 @@ const EmailTemplates = ({ activePlanName }) => {
         />
       </div>
 
+      {isCompanyOwnerOrAdmin && isParentCompanyOwnerOrAdmin && (
+        <div className="flex items-center justify-center mt-5">
+          <button
+            // className="px-4 py-1 border rounded-lg bg-white hover:bg-neutral-500 hover:text-white"
+            className={classNames(
+              "px-4 py-1 border border-neutral-300 rounded-lg",
+              viewParent
+                ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                : "text-neutral-600 bg-white hover:bg-neutral-500 hover:text-white"
+            )}
+            onClick={(e) => {
+              e.preventDefault()
+              setViewParent(!viewParent)
+            }}
+          >
+            {/* {viewRejected ? "Viewing Rejected" : "View Rejected"} */}
+            <span className="flex items-center justify-center space-x-2">
+              <LibraryIcon className="w-5 h-5" />
+              <span>
+                {viewParent
+                  ? "Viewing Parent Company Email Templates"
+                  : "View Parent Company Email Templates"}
+              </span>
+            </span>
+          </button>
+        </div>
+      )}
+
       <Pagination
         endPage={endPage}
         hasNext={hasMore}
@@ -245,7 +362,7 @@ const EmailTemplates = ({ activePlanName }) => {
         pageIndex={tablePage}
         startPage={startPage}
         totalCount={count}
-        resultName="email template"
+        resultName={viewParent ? "parent company email template" : "company email template"}
       />
 
       {emailTemplates?.length > 0 && (
@@ -313,9 +430,19 @@ const EmailTemplates = ({ activePlanName }) => {
 }
 
 const EmailTemplatesHome = ({
+  isCompanyOwnerOrAdmin,
+  isParentCompanyOwnerOrAdmin,
   user,
+  error,
   activePlanName,
+  companyUser,
+  parentCompany,
+  parentCompanyUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
+
   return (
     <AuthLayout title="Hire.win | Email Templates" user={user}>
       <div className="mb-6">
@@ -331,7 +458,15 @@ const EmailTemplatesHome = ({
       </div>
 
       <Suspense fallback="Loading...">
-        <EmailTemplates activePlanName={activePlanName} />
+        <EmailTemplates
+          isCompanyOwnerOrAdmin={isCompanyOwnerOrAdmin}
+          isParentCompanyOwnerOrAdmin={isParentCompanyOwnerOrAdmin}
+          user={user}
+          activePlanName={activePlanName}
+          companyUser={companyUser}
+          parentCompany={parentCompany}
+          parentCompanyUser={parentCompanyUser}
+        />
       </Suspense>
     </AuthLayout>
   )

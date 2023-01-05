@@ -7,6 +7,7 @@ export const EmailTemplateObj = z.object({
   slug: z.string().optional(),
   body: z.any(),
   userId: z.string().optional(),
+  parentCompanyId: z.string().optional(),
 })
 
 export type EmailTemplateInputType = z.infer<typeof EmailTemplateObj>

@@ -1128,6 +1128,7 @@ const SingleCandidatePageContent = ({
               </DropdownMenu.Item>
             )
           })}
+          <DropdownMenu.Separator className="bg-neutral-300 h-px" />
           <DropdownMenu.Item
             onSelect={async (e) => {
               e.preventDefault()

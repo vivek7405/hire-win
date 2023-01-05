@@ -219,6 +219,7 @@ const UserSettingsSubCompaniesPage = ({
                         ?.resolvedOptions()
                         ?.timeZone?.replace("Calcutta", "Kolkata")
                       values["parentCompanyId"] = parentCompany?.id
+                      setOpenCreateCompanyModal(false)
                       await createCompanyMutation(values)
                       // If first company of user
                       // if (createdCompany && companyUsers?.length === 0) {
@@ -233,7 +234,9 @@ const UserSettingsSubCompaniesPage = ({
                       router.push(Routes.JobsHome())
                     } catch (error) {
                       toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
                       )
                     }
                   }}

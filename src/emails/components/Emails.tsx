@@ -1,7 +1,15 @@
 import { useSession } from "@blitzjs/auth"
 import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc"
 import { ChevronDownIcon, TrashIcon } from "@heroicons/react/outline"
-import { Candidate, Email, EmailTemplate, JobUser, JobUserRole, User } from "@prisma/client"
+import {
+  Candidate,
+  Email,
+  EmailTemplate,
+  JobUser,
+  JobUserRole,
+  ParentCompanyUserRole,
+  User,
+} from "@prisma/client"
 import Confirm from "src/core/components/Confirm"
 import Modal from "src/core/components/Modal"
 import moment from "moment"
@@ -24,6 +32,8 @@ import getCompany from "src/companies/queries/getCompany"
 import getJobUser from "src/jobs/queries/getJobUser"
 import { useRouter } from "next/router"
 import { Routes } from "@blitzjs/next"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 
 interface ETValues {
   [key: string]: string
@@ -41,12 +51,35 @@ const Emails = ({ user, stageId, candidate }) => {
     candidateId: candidate?.id || "0",
     stageId,
   })
+
+  const [company] = useQuery(getCompany, {
+    where: { id: session?.companyId || "0" },
+  })
+
+  const [parentCompany] = useQuery(getParentCompany, {
+    where: { id: company?.parentCompanyId || "0" },
+  })
+
+  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
+    where: {
+      parentCompanyId: company?.parentCompanyId || "0",
+      userId: session?.userId || "0",
+    },
+  })
+
+  const isParentCompanyUser = (parentCompany?.name && !!parentCompanyUser) || false
+
   // const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
 
   const [sendEmailMutation] = useMutation(sendEmail)
   const [emailTemplatesOpen, setEmailTemplatesOpen] = useState(false)
   const [emailTemplates] = useQuery(getEmailTemplatesWOPagination, {
-    where: { companyId: session.companyId || "0" },
+    where: {
+      OR: [
+        { companyId: session.companyId || "0" },
+        { parentCompanyId: company?.parentCompanyId || "0" },
+      ],
+    },
   })
   const [selectedEmailTemplate, setSelectedEmailTemplate] = useState(null as any as EmailTemplate)
   // const interviewDetailId =
@@ -56,12 +89,6 @@ const Emails = ({ user, stageId, candidate }) => {
   const [interviewer] = useQuery(getCandidateInterviewer, {
     candidateId: candidate?.id || "0",
     stageId: stageId || "0",
-  })
-
-  const [company] = useQuery(getCompany, {
-    where: {
-      id: session?.companyId || "0",
-    },
   })
 
   const [jobUser] = useQuery(getJobUser, {
@@ -269,22 +296,55 @@ const Emails = ({ user, stageId, candidate }) => {
                     No templates available
                   </DropdownMenu.Item>
                 )}
-                {emailTemplates.map((et) => {
-                  return (
-                    <DropdownMenu.Item
-                      key={et.id}
-                      onSelect={(e) => {
-                        e.preventDefault()
-                        setSelectedEmailTemplate(et)
-                        setEmailToView(null as any)
-                        setOpenModal(true)
-                      }}
-                      className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
-                    >
-                      {et.name}
-                    </DropdownMenu.Item>
-                  )
-                })}
+
+                {/* Parent Company Email Templates */}
+                {isParentCompanyUser &&
+                  emailTemplates
+                    ?.filter((et) => et.parentCompanyId)
+                    ?.map((et) => {
+                      return (
+                        <DropdownMenu.Item
+                          key={et.id}
+                          onSelect={(e) => {
+                            e.preventDefault()
+                            setSelectedEmailTemplate(et)
+                            setEmailToView(null as any)
+                            setOpenModal(true)
+                          }}
+                          className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                        >
+                          {et.name}
+                        </DropdownMenu.Item>
+                      )
+                    })}
+
+                {/* Company Email Templates */}
+                {emailTemplates
+                  ?.filter((et) => !et.parentCompanyId)
+                  ?.map((et, index) => {
+                    return (
+                      <>
+                        {index === 0 &&
+                          isParentCompanyUser &&
+                          emailTemplates?.filter((et) => et.parentCompanyId)?.length > 0 && (
+                            <DropdownMenu.Separator className="bg-neutral-300 h-px" />
+                          )}
+                        <DropdownMenu.Item
+                          key={et.id}
+                          onSelect={(e) => {
+                            e.preventDefault()
+                            setSelectedEmailTemplate(et)
+                            setEmailToView(null as any)
+                            setOpenModal(true)
+                          }}
+                          className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                        >
+                          {et.name}
+                        </DropdownMenu.Item>
+                      </>
+                    )
+                  })}
+                <DropdownMenu.Separator className="bg-neutral-300 h-px" />
                 <DropdownMenu.Item
                   onSelect={(e) => {
                     e.preventDefault()
