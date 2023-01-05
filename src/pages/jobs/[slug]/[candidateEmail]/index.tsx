@@ -55,6 +55,7 @@ import {
   MenuIcon,
   PaperClipIcon,
   PencilAltIcon,
+  PlusIcon,
   ReceiptRefundIcon,
   RefreshIcon,
   StarIcon,
@@ -1081,9 +1082,10 @@ const SingleCandidatePageContent = ({
               <DropdownMenu.Item
                 key={cp.id}
                 onSelect={async (e) => {
+                  e.preventDefault()
+
                   const isRemove = !!cp.candidates.find((c) => c.id === candidate.id)
 
-                  e.preventDefault()
                   const toastId = toast.loading(
                     `${isRemove ? "Removing candidate from" : "Adding candidate to"} pool "${
                       cp.name
@@ -1126,6 +1128,16 @@ const SingleCandidatePageContent = ({
               </DropdownMenu.Item>
             )
           })}
+          <DropdownMenu.Item
+            onSelect={async (e) => {
+              e.preventDefault()
+              router.push(Routes.CandidatePoolsHome())
+            }}
+            className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+          >
+            <PlusIcon className="w-5 h-5 text-theme-600" />
+            <span>Add New Pool</span>
+          </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Root>
     ) : (

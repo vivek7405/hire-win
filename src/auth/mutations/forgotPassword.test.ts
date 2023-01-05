@@ -1,7 +1,7 @@
 import { hash256 } from "@blitzjs/auth";
 import { Ctx } from "blitz";
 import forgotPassword from "./forgotPassword"
-import db from "db"
+import db, { TokenType } from "db"
 import previewEmail from "preview-email"
 
 beforeEach(async () => {
@@ -31,7 +31,7 @@ describe("forgotPassword mutation", () => {
         tokens: {
           // Create old token to ensure it's deleted
           create: {
-            type: "RESET_PASSWORD",
+            type: TokenType.RESET_PASSWORD,
             hashedToken: "token",
             expiresAt: new Date(),
             sentTo: "user@example.com",

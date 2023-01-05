@@ -13,7 +13,7 @@ import AuthLayout from "src/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "src/guard/ability"
 
-import InvitationForm from "src/jobs/components/InvitationForm"
+import JobInvitationForm from "src/jobs/components/JobInvitationForm"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 // import inviteToJob from "src/jobs/mutations/inviteToJob"
 import removeFromJob from "src/jobs/mutations/removeFromJob"
@@ -209,12 +209,11 @@ const JobSettingsHiringTeamPage = ({
                   setOpen={setOpenInvite}
                   noOverflow={true}
                 >
-                  <InvitationForm
+                  <JobInvitationForm
                     header="Add Team Member"
                     subHeader="Add an existing company user to this job"
                     submitText="Add"
                     jobId={job?.id || "0"}
-                    isJobInvitation={true}
                     initialValues={{ email: "" }}
                     onSubmit={async (values) => {
                       const toastId = toast.loading(() => <span>Inviting {values.email}</span>)

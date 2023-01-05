@@ -1,5 +1,5 @@
 import { hash256 } from "@blitzjs/auth";
-import db from "db"
+import db, { TokenType } from "db"
 
 export const checkToken = async (req, res, { PUBLIC }) => {
   const PUBLIC_KEY = req.query.PUBLIC_KEY
@@ -9,7 +9,7 @@ export const checkToken = async (req, res, { PUBLIC }) => {
     where: {
       hashedToken: PUBLIC_KEY,
       AND: {
-        type: "PUBLIC_KEY",
+        type: TokenType.PUBLIC_KEY,
       },
     },
     include: {
@@ -25,7 +25,7 @@ export const checkToken = async (req, res, { PUBLIC }) => {
     where: {
       hashedToken: hash256(SECRET_KEY),
       AND: {
-        type: "SECRET_KEY",
+        type: TokenType.SECRET_KEY,
       },
     },
     include: {

@@ -1,6 +1,6 @@
 import { SecurePassword, hash256 } from "@blitzjs/auth";
 import { resolver } from "@blitzjs/rpc";
-import db from "db"
+import db, { TokenType } from "db"
 import { ResetPassword } from "../validations"
 import login from "./login"
 
@@ -13,7 +13,7 @@ export default resolver.pipe(resolver.zod(ResetPassword), async ({ password, tok
   // 1. Try to find this token in the database
   const hashedToken = hash256(token)
   const possibleToken = await db.token.findFirst({
-    where: { hashedToken, type: "RESET_PASSWORD" },
+    where: { hashedToken, type: TokenType.RESET_PASSWORD },
     include: {
       user: {
         select: {

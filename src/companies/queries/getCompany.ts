@@ -12,6 +12,7 @@ async function getCompany({ where }: GetCompanyInput, ctx: Ctx) {
           user: true,
         },
       },
+      parentCompany: true
     },
   })
 

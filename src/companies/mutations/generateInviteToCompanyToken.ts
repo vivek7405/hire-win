@@ -1,7 +1,7 @@
 import { generateToken, hash256 } from "@blitzjs/auth"
 import { Ctx } from "blitz"
 import Guard from "src/guard/ability"
-import db from "db"
+import db, { TokenType } from "db"
 
 interface GenerateTokenInput {
   companyId: string
@@ -26,7 +26,7 @@ async function generateInviteToCompanyToken({ companyId }: GenerateTokenInput, c
   const findPastPublicKey = await db.token.findFirst({
     where: {
       companyId: companyId,
-      type: "PUBLIC_KEY",
+      type: TokenType.PUBLIC_KEY,
     },
   })
 
@@ -39,7 +39,7 @@ async function generateInviteToCompanyToken({ companyId }: GenerateTokenInput, c
   if (!findPastPublicKey) {
     await db.token.create({
       data: {
-        type: "PUBLIC_KEY",
+        type: TokenType.PUBLIC_KEY,
         hashedToken: generatePublicToken,
         expiresAt,
         user: {
@@ -58,7 +58,7 @@ async function generateInviteToCompanyToken({ companyId }: GenerateTokenInput, c
 
   await db.token.create({
     data: {
-      type: "SECRET_KEY",
+      type: TokenType.SECRET_KEY,
       hashedToken: hash256(generatePrivateToken),
       lastFour: `${generatePrivateToken
         .split("")

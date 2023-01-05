@@ -22,6 +22,7 @@ import { Suspense } from "react"
 import Calendars from "src/calendars/components/Calendars"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 import getUser from "src/users/queries/getUser"
+import SchedulingSettingsLayout from "src/core/layouts/SchedulingSettingsLayout"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -58,20 +59,22 @@ const UserSettingsCalendarsPage = ({
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>
-          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
-            <div>
-              <h2 className="text-lg leading-6 font-medium text-gray-900">Your Calendars</h2>
-              <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
-                Your availability shall be checked across all the calendars you add
-              </h4>
-              <h4 className="text-xs sm:text-sm text-gray-700">
-                The default calendar you set shall be used for booking interviews
-              </h4>
+          <SchedulingSettingsLayout>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+              <div>
+                <h2 className="text-lg leading-6 font-medium text-gray-900">Your Calendars</h2>
+                <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+                  Your availability shall be checked across all the calendars you add
+                </h4>
+                <h4 className="text-xs sm:text-sm text-gray-700">
+                  The default calendar you set shall be used for booking interviews
+                </h4>
+              </div>
             </div>
-          </div>
-          <Suspense fallback="Loading...">
-            <Calendars user={user as any} />
-          </Suspense>
+            <Suspense fallback="Loading...">
+              <Calendars user={user as any} />
+            </Suspense>
+          </SchedulingSettingsLayout>
         </UserSettingsLayout>
       </Suspense>
     </AuthLayout>

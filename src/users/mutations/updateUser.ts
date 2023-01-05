@@ -10,11 +10,11 @@ type UpdateUserInput = Pick<Prisma.UserUpdateArgs, "where" | "data"> & {
 async function updateUser({ where, data, initial }: UpdateUserInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name, email, jobBoardName } = UserObj.parse(data) as any
+  const { name, email } = UserObj.parse(data) as any
 
   const user = await db.user.update({
     where,
-    data: { name, email, jobBoardName },
+    data: { name, email },
   })
 
   return user

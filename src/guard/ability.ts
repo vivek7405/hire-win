@@ -1,4 +1,4 @@
-import db, { CompanyUserRole, JobUserRole } from "db"
+import db, { CompanyUserRole, JobUserRole, ParentCompanyUserRole } from "db"
 import { GuardBuilder } from "@blitz-guard/core"
 import { checkPlan } from "src/companies/utils/checkPlan"
 import moment from "moment"
@@ -32,6 +32,7 @@ type ExtendedResourceTypes =
   | "companyUser"
   | "jobListing"
   | "freeCandidate"
+  | "parentCompanySettings"
 
 type ExtendedAbilityTypes =
   | "access"
@@ -433,6 +434,7 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
             users: true,
           },
         })
+
         // const currentPlan = checkPlan(company)
         // if (!currentPlan) return false
         // const subscriptionStatus = await getUserSubscriptionStatus(
@@ -443,12 +445,71 @@ const Guard = GuardBuilder<ExtendedResourceTypes, ExtendedAbilityTypes>(
         //   return false
         // }
 
-        const owner = company?.users.find((u) => u.role === CompanyUserRole.OWNER)
-        const admins = company?.users.filter((u) => u.role === CompanyUserRole.ADMIN)
+        // const owner = company?.users.find((u) => u.role === CompanyUserRole.OWNER)
+        // const admins = company?.users.filter((u) => u.role === CompanyUserRole.ADMIN)
+
+        const companyUser = await db.companyUser.findFirst({
+          where: {
+            userId: ctx?.session?.userId || "0",
+            companyId: company?.id || "0",
+          },
+        })
+
+        return companyUser?.role !== CompanyUserRole.USER
+      })
+
+      can("access", "parentCompanySettings", async (args) => {
+        // const companyUser = await db.companyUser.findFirst({
+        //   where: {
+        //     companyId: ctx?.session?.companyId || "0",
+        //     userId: ctx?.session?.userId || "0",
+        //   },
+        // })
+
+        // return companyUser?.role === CompanyUserRole.OWNER
+
+        const company = await db.company.findFirst({
+          where: { id: ctx?.session?.companyId || "0" },
+          include: {
+            users: true,
+          },
+        })
+
+        // Check user plan and don't allow to invite to job
+        // if the user is running on the Free Plan
+        const parentCompany = await db.parentCompany.findFirst({
+          where: { id: company?.parentCompanyId || "0" },
+          include: {
+            users: true,
+          },
+        })
+
+        // const currentPlan = checkPlan(company)
+        // if (!currentPlan) return false
+        // const subscriptionStatus = await getUserSubscriptionStatus(
+        //   { companyId: company?.id || "0" },
+        //   ctx
+        // )
+        // if (!checkSubscription) {
+        //   return false
+        // }
+
+        const parentCompanyUser = await db.parentCompanyUser.findFirst({
+          where: {
+            userId: ctx?.session?.userId || "0",
+            parentCompanyId: parentCompany?.id || "0",
+          },
+          include: {
+            parentCompany: true,
+          },
+        })
 
         return (
-          admins?.some((a) => a.userId === ctx.session.userId) ||
-          owner?.userId === ctx.session.userId
+          (parentCompanyUser &&
+            (parentCompanyUser?.parentCompany?.name
+              ? parentCompanyUser?.role !== ParentCompanyUserRole.USER
+              : parentCompanyUser?.role === ParentCompanyUserRole.OWNER)) ||
+          false
         )
       })
 

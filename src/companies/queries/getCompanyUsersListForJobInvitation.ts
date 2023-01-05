@@ -2,7 +2,7 @@ import Guard from "src/guard/ability"
 import { Ctx } from "blitz";
 import db, { Prisma } from "db"
 
-async function getCompanyUsersListForInvitation({ jobId }, ctx: Ctx) {
+async function getCompanyUsersListForJobInvitation({ jobId }, ctx: Ctx) {
   ctx.session.$authorize()
 
   const jobUsers = await db.jobUser?.findMany({
@@ -22,4 +22,4 @@ async function getCompanyUsersListForInvitation({ jobId }, ctx: Ctx) {
   return companyUsers
 }
 
-export default getCompanyUsersListForInvitation
+export default getCompanyUsersListForJobInvitation

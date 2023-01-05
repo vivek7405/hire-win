@@ -22,6 +22,7 @@ import { Suspense } from "react"
 import AddScheduleModal from "src/schedules/components/AddScheduleModal"
 import Schedules from "src/schedules/components/Schedules"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
+import SchedulingSettingsLayout from "src/core/layouts/SchedulingSettingsLayout"
 
 export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -56,20 +57,22 @@ const UserSettingsAvailabilitiesPage = ({
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>
-          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
-            <div>
-              <h2 className="text-lg leading-6 font-medium text-gray-900">Your Availabilities</h2>
-              <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
-                Add your availability to conduct interviews
-              </h4>
-              <h4 className="text-xs sm:text-sm text-gray-700">
-                You can map these availabilities to job stages
-              </h4>
+          <SchedulingSettingsLayout>
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+              <div>
+                <h2 className="text-lg leading-6 font-medium text-gray-900">Your Availabilities</h2>
+                <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
+                  Add your availability to conduct interviews
+                </h4>
+                <h4 className="text-xs sm:text-sm text-gray-700">
+                  You can map these availabilities to job stages
+                </h4>
+              </div>
             </div>
-          </div>
-          <Suspense fallback="Loading...">
-            <Schedules user={user} />
-          </Suspense>
+            <Suspense fallback="Loading...">
+              <Schedules user={user} />
+            </Suspense>
+          </SchedulingSettingsLayout>
         </UserSettingsLayout>
       </Suspense>
     </AuthLayout>

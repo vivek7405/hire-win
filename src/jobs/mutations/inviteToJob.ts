@@ -1,7 +1,7 @@
 import { generateToken, hash256 } from "@blitzjs/auth";
 import { Ctx } from "blitz";
 import Guard from "src/guard/ability"
-import db from "db"
+import db, { TokenType } from "db"
 import { inviteToJobMailer } from "mailers/inviteToJobMailer"
 
 interface InviteToJobInput {
@@ -38,7 +38,7 @@ async function inviteToJob({ jobId, email }: InviteToJobInput, ctx: Ctx) {
   await db.token.create({
     data: {
       userId: inviter.userId,
-      type: "INVITE_TO_JOB",
+      type: TokenType.INVITE_TO_JOB,
       expiresAt,
       hashedToken,
       sentTo: email,

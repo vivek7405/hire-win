@@ -8,7 +8,7 @@ import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 
 interface GetJobsInput extends Pick<Prisma.JobUserFindManyArgs, "orderBy" | "skip" | "take"> {}
 
-async function getUserOwnedCompanyJobs(
+async function getCompanyJobsByParentCompany(
   {
     orderBy,
     skip = 0,
@@ -21,7 +21,7 @@ async function getUserOwnedCompanyJobs(
     jobCity,
     remoteOption,
     searchString,
-    userId,
+    parentCompanyId,
   }: GetJobsInput & {
     companyId: string
     categoryId: string
@@ -31,7 +31,7 @@ async function getUserOwnedCompanyJobs(
     jobCity: string
     remoteOption: string
     searchString: string
-    userId: string
+    parentCompanyId: string
   },
   ctx: Ctx
 ) {
@@ -49,8 +49,8 @@ async function getUserOwnedCompanyJobs(
   //   })
 
   let companyUsersWhere = {
-    userId,
     role: CompanyUserRole.OWNER,
+    company: { parentCompanyId },
   }
   if (companyId) companyUsersWhere["companyId"] = companyId
 
@@ -143,4 +143,4 @@ async function getUserOwnedCompanyJobs(
   }
 }
 
-export default getUserOwnedCompanyJobs
+export default getCompanyJobsByParentCompany

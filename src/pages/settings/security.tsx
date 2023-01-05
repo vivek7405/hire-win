@@ -16,6 +16,7 @@ import { getColorValueFromTheme, getThemeFromColorValue } from "src/core/utils/t
 import UserSettingsLayout from "src/core/layouts/UserSettingsLayout"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 import { Suspense } from "react"
+import ProfileSettingsLayout from "src/core/layouts/ProfileSettingsLayout"
 
 export const getServerSideProps = gSSP(async (context: GetServerSidePropsContext) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -50,26 +51,28 @@ const UserSettingsSecurityPage = ({
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>
-          <SecurityForm
-            user={user}
-            header="Security"
-            subHeader="Update your account password"
-            onSubmit={async (values) => {
-              const toastId = toast.loading(() => <span>Updating password</span>)
-              try {
-                await changePasswordMutation({
-                  currentPassword: values.currentPassword,
-                  newPassword: values.newPassword,
-                })
-                toast.success(() => <span>Password Updated</span>, { id: toastId })
-                router.push(Routes.JobsHome())
-              } catch (error) {
-                toast.error(
-                  "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                )
-              }
-            }}
-          />
+          <ProfileSettingsLayout>
+            <SecurityForm
+              user={user}
+              header="Security"
+              subHeader="Update your account password"
+              onSubmit={async (values) => {
+                const toastId = toast.loading(() => <span>Updating password</span>)
+                try {
+                  await changePasswordMutation({
+                    currentPassword: values.currentPassword,
+                    newPassword: values.newPassword,
+                  })
+                  toast.success(() => <span>Password Updated</span>, { id: toastId })
+                  router.push(Routes.JobsHome())
+                } catch (error) {
+                  toast.error(
+                    "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                  )
+                }
+              }}
+            />
+          </ProfileSettingsLayout>
         </UserSettingsLayout>
       </Suspense>
     </AuthLayout>

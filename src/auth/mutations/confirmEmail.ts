@@ -1,7 +1,7 @@
 import { resolver } from "@blitzjs/rpc";
 import { generateToken, hash256 } from "@blitzjs/auth";
 import { Ctx } from "blitz";
-import db from "db"
+import db, { TokenType } from "db"
 import { confirmEmailMailer } from "mailers/confirmEmailMailer"
 import { z } from "zod"
 
@@ -21,7 +21,7 @@ async function confirmEmail({ email }, ctx: Ctx) {
 
   await db.token.create({
     data: {
-      type: "CONFIRM_EMAIL",
+      type: TokenType.CONFIRM_EMAIL,
       expiresAt,
       hashedToken,
       sentTo: email,

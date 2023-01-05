@@ -2,13 +2,13 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://localhost:3000/blog</id>
     <title>Hire.win Blog | RSS Feed</title>
-    <updated>2022-12-27T11:17:17.276Z</updated>
+    <updated>2023-01-05T09:33:36.499Z</updated>
     <generator>Feed for Node.js</generator>
     <link rel="alternate" href="http://localhost:3000/blog"/>
     <link rel="self" href="http://localhost:3000/blog/atom.xml"/>
     <subtitle>Don't just hire, Hire better!</subtitle>
     <icon>http://localhost:3000/favicon.ico</icon>
-    <rights>Copyright ©2022 hire.win - All rights reserved</rights>
+    <rights>Copyright ©2023 hire.win - All rights reserved</rights>
     <entry>
         <title type="html"><![CDATA[Why use an Interview Kit?]]></title>
         <id>http://localhost:3000/blog/why-use-interview-kit</id>

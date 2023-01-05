@@ -22,12 +22,15 @@ import getStage from "src/stages/queries/getStage"
 import getCandidate from "src/candidates/queries/getCandidate"
 import getCompany from "src/companies/queries/getCompany"
 import getJobUser from "src/jobs/queries/getJobUser"
+import { useRouter } from "next/router"
+import { Routes } from "@blitzjs/next"
 
 interface ETValues {
   [key: string]: string
 }
 
 const Emails = ({ user, stageId, candidate }) => {
+  const router = useRouter()
   const session = useSession()
   const [openModal, setOpenModal] = useState(false)
   const [deleteEmailMutation] = useMutation(deleteEmail)
@@ -255,6 +258,17 @@ const Emails = ({ user, stageId, candidate }) => {
 
               <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
                 <DropdownMenu.Arrow className="fill-current" offset={10} />
+                {emailTemplates?.length === 0 && (
+                  <DropdownMenu.Item
+                    disabled={true}
+                    onSelect={(e) => {
+                      e.preventDefault()
+                    }}
+                    className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
+                  >
+                    No templates available
+                  </DropdownMenu.Item>
+                )}
                 {emailTemplates.map((et) => {
                   return (
                     <DropdownMenu.Item
@@ -271,6 +285,15 @@ const Emails = ({ user, stageId, candidate }) => {
                     </DropdownMenu.Item>
                   )
                 })}
+                <DropdownMenu.Item
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    router.push(Routes.EmailTemplatesHome())
+                  }}
+                  className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                >
+                  + Add New
+                </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Root>
           </div>

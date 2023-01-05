@@ -4,10 +4,10 @@
         <title>Hire.win Blog | RSS Feed</title>
         <link>http://localhost:3000/blog</link>
         <description>Don't just hire, Hire better!</description>
-        <lastBuildDate>Tue, 27 Dec 2022 11:17:17 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 05 Jan 2023 09:33:36 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
-        <copyright>Copyright ©2022 hire.win - All rights reserved</copyright>
+        <copyright>Copyright ©2023 hire.win - All rights reserved</copyright>
         <item>
             <title><![CDATA[Why use an Interview Kit?]]></title>
             <link>http://localhost:3000/blog/why-use-interview-kit</link>

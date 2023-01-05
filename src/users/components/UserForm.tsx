@@ -43,19 +43,11 @@ export const UserForm = (props: UserFormProps) => {
             placeholder="Enter your email"
             testid="userUpdateEmail"
           />
-          <LabeledTextField
-            name="jobBoardName"
-            label="Job Board Name"
-            placeholder="Parent company or staffing company name"
-            subLabel="If provided, it shall be displayed as Job Board Header."
-            subLabel2="Job Board lists jobs from all the companies where you are the owner."
-            testid="userUpdateName"
-          />
 
-          <div className="float-left">
+          {/* <div className="float-left">
             <Link
               prefetch={true}
-              href={Routes.CompanyJobBoard({ userId: props.userId || "0" })}
+              href={Routes.ParentCompanyJobBoard({ userId: props.userId || "0" })}
               passHref
               legacyBehavior
             >
@@ -68,7 +60,7 @@ export const UserForm = (props: UserFormProps) => {
                 <ExternalLinkIcon className="w-4 h-4 ml-1" />
               </a>
             </Link>
-          </div>
+          </div> */}
         </Form>
       </div>
     </>

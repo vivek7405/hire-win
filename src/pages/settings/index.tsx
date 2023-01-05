@@ -29,6 +29,8 @@ import { CompanyUserRole } from "@prisma/client"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 import { Suspense } from "react"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import CompanySettingsLayout from "src/core/layouts/CompanySettingsLayout"
+import db from "db"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -42,14 +44,27 @@ export const getServerSideProps = gSSP(async (context) => {
   const company = await getCompany({ where: { id: session.companyId || "0" } }, { ...context.ctx })
 
   if (user && company) {
-    const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+    const companyUser = await db.companyUser.findFirst({
+      where: { userId: user?.id || "0", companyId: company?.id || "0" },
+    })
 
-    return {
-      props: {
-        user,
-        company,
-        activePlanName,
-      },
+    if (companyUser?.role !== CompanyUserRole.USER) {
+      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+      return {
+        props: {
+          user,
+          company,
+          activePlanName,
+        },
+      }
+    } else {
+      return {
+        redirect: {
+          destination: Routes.UserSettingsProfilePage().pathname,
+          permanent: false,
+        },
+        props: {},
+      }
     }
   } else {
     return {
@@ -82,41 +97,44 @@ const UserSettingsCompanyPage = ({
           <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
           <Suspense fallback="Loading...">
             <UserSettingsLayout>
-              <CompanyForm
-                activePlanName={activePlanName}
-                header={`Company & Careers Page (${company?.name || ""})`}
-                subHeader="Update your company details"
-                initialValues={{
-                  name: company?.name || "",
-                  logo: company?.logo,
-                  info: company?.info,
-                  // ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
-                  // : EditorState.createEmpty(),
-                  website: company?.website || "",
-                  theme: company?.theme || "indigo",
-                }}
-                companySlugForCareersPage={company?.slug || "0"}
-                onSubmit={async (values) => {
-                  // if (values?.info) {
-                  //   values.info = convertToRaw(values?.info?.getCurrentContent())
-                  // }
+              <CompanySettingsLayout>
+                <CompanyForm
+                  activePlanName={activePlanName}
+                  header={`Company & Careers Page (${company?.name || ""})`}
+                  subHeader="Update your company details"
+                  initialValues={{
+                    name: company?.name || "",
+                    logo: company?.logo,
+                    info: company?.info,
+                    // ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
+                    // : EditorState.createEmpty(),
+                    website: company?.website || "",
+                    theme: company?.theme || "indigo",
+                  }}
+                  companySlugForCareersPage={company?.slug || "0"}
+                  onSubmit={async (values) => {
+                    // if (values?.info) {
+                    //   values.info = convertToRaw(values?.info?.getCurrentContent())
+                    // }
 
-                  const toastId = toast.loading(() => <span>Updating Company details</span>)
-                  try {
-                    await updateCompanyMutation({
-                      where: { id: company?.id },
-                      data: { ...values },
-                      initial: company!,
-                    })
-                    toast.success(() => <span>Company details Updated</span>, { id: toastId })
-                  } catch (error) {
-                    toast.error(
-                      "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
-                      { id: toastId }
-                    )
-                  }
-                }}
-              />
+                    const toastId = toast.loading(() => <span>Updating Company details</span>)
+                    try {
+                      await updateCompanyMutation({
+                        where: { id: company?.id },
+                        data: { ...values },
+                        initial: company!,
+                      })
+                      toast.success(() => <span>Company details Updated</span>, { id: toastId })
+                    } catch (error) {
+                      toast.error(
+                        "Sorry, we had an unexpected error. Please try again. - " +
+                          error.toString(),
+                        { id: toastId }
+                      )
+                    }
+                  }}
+                />
+              </CompanySettingsLayout>
             </UserSettingsLayout>
           </Suspense>
         </AuthLayout>

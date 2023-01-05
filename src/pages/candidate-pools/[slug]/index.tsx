@@ -25,6 +25,7 @@ import Breadcrumbs from "src/core/components/Breadcrumbs"
 import getCandidatesWOAbility from "src/candidates/queries/getCandidatesWOAbility"
 import getCandidate from "src/candidates/queries/getCandidate"
 import { AuthorizationError } from "blitz"
+import CandidatePoolLayout from "src/core/layouts/CandidatePoolLayout"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -171,12 +172,16 @@ export const Candidates = ({ slug }) => {
         Are you sure you want to remove the candidate from pool?
       </Confirm>
 
-      <div className="flex mb-2">
+      <p className="font-bold text-xl text-neutral-700 capitalize text-center mb-5">
+        {slug?.replaceAll("-", " ")}
+      </p>
+
+      <div className="flex items-center justify-center mb-10">
         <input
           placeholder="Search"
           type="text"
           defaultValue={router.query.search?.toString().replaceAll('"', "") || ""}
-          className={`border border-gray-300 md:mr-2 lg:mr-2 lg:w-1/4 px-2 py-2 w-full rounded`}
+          className={`border border-gray-300 lg:w-1/4 px-2 py-2 w-full rounded`}
           onChange={(e) => {
             execDebouncer(e)
           }}
@@ -192,6 +197,7 @@ export const Candidates = ({ slug }) => {
           startPage={startPage}
           totalCount={count}
           resultName="candidate"
+          hideIfSinglePage={true}
         />
       )}
 
@@ -201,9 +207,6 @@ export const Candidates = ({ slug }) => {
         </div>
       ) : (
         <>
-          <p className="font-bold text-xl text-neutral-700 capitalize text-center mb-10">
-            {slug?.replaceAll("-", " ")}
-          </p>
           <div className="flex flex-wrap justify-center">
             {candidates.map((candidate) => {
               return (
@@ -282,10 +285,12 @@ const SingleCandidatePoolPage = ({
   return (
     <AuthLayout title="Hire.win | Candidate Pool" user={user}>
       <Breadcrumbs />
-      <br />
-      <Suspense fallback="Loading...">
-        <Candidates slug={slug} />
-      </Suspense>
+      <CandidatePoolLayout>
+        <br />
+        <Suspense fallback="Loading...">
+          <Candidates slug={slug} />
+        </Suspense>
+      </CandidatePoolLayout>
     </AuthLayout>
   )
 }
