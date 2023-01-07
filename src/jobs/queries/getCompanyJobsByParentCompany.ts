@@ -21,7 +21,7 @@ async function getCompanyJobsByParentCompany(
     jobCity,
     remoteOption,
     searchString,
-    parentCompanyId,
+    slug,
   }: GetJobsInput & {
     companyId: string
     categoryId: string
@@ -31,7 +31,7 @@ async function getCompanyJobsByParentCompany(
     jobCity: string
     remoteOption: string
     searchString: string
-    parentCompanyId: string
+    slug: string
   },
   ctx: Ctx
 ) {
@@ -48,9 +48,13 @@ async function getCompanyJobsByParentCompany(
   //     },
   //   })
 
+  const parentCompany = await db.parentCompany.findFirst({
+    where: { slug },
+  })
+
   let companyUsersWhere = {
     role: CompanyUserRole.OWNER,
-    company: { parentCompanyId },
+    company: { parentCompanyId: parentCompany?.id || "0" },
   }
   if (companyId) companyUsersWhere["companyId"] = companyId
 

@@ -1,4 +1,4 @@
-import { resolver } from "@blitzjs/rpc";
+import { resolver } from "@blitzjs/rpc"
 import Guard from "src/guard/ability"
 import db, { Prisma } from "db"
 
@@ -17,4 +17,5 @@ const getCandidatePoolsWOPagination = resolver.pipe(
   }
 )
 
-export default Guard.authorize("readAll", "candidatePool", getCandidatePoolsWOPagination)
+export default getCandidatePoolsWOPagination
+// export default Guard.authorize("readAll", "candidatePool", getCandidatePoolsWOPagination)

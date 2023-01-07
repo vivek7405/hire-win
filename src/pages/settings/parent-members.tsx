@@ -143,6 +143,8 @@ const UserSettingsParentMembersPage = ({
 
   const [parentCompanyData, setParentCompanyData] = useState(parentCompany)
 
+  const [memberToDelete, setMemberToDelete] = useState(null as any)
+
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
@@ -245,6 +247,40 @@ const UserSettingsParentMembersPage = ({
                     }}
                   >
                     {upgradeConfirmMessage}
+                  </Confirm>
+
+                  <Confirm
+                    open={openConfirmDelete}
+                    setOpen={setOpenConfirmDelete}
+                    header={"Delete Member?"}
+                    onSuccess={async () => {
+                      if (!memberToDelete) {
+                        toast.error("No member selected to remove")
+                        return
+                      }
+
+                      const toastId = toast.loading(`Removing ${memberToDelete?.user?.email}`)
+                      try {
+                        await removeFromParentCompanyMutation({
+                          parentCompanyId: parentCompanyData?.id as string,
+                          userId: memberToDelete?.user?.id,
+                        })
+                        toast.success(`User removed`, {
+                          id: toastId,
+                        })
+                        router.reload()
+                      } catch (error) {
+                        toast.error(
+                          `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
+                          { id: toastId }
+                        )
+                      }
+
+                      setMemberToDelete(null)
+                    }}
+                  >
+                    Are you sure you want to remove this user ({memberToDelete?.user?.name}) from
+                    the parent company?
                   </Confirm>
 
                   <button
@@ -366,39 +402,13 @@ const UserSettingsParentMembersPage = ({
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200">
                               {canUpdate && user?.id !== m.user.id && m.role !== "OWNER" && (
                                 <>
-                                  <Confirm
-                                    open={openConfirmDelete}
-                                    setOpen={setOpenConfirmDelete}
-                                    header={"Delete Member?"}
-                                    onSuccess={async () => {
-                                      const toastId = toast.loading(`Removing ${m.user.email}`)
-                                      try {
-                                        await removeFromParentCompanyMutation({
-                                          parentCompanyId: parentCompanyData?.id as string,
-                                          userId: m.user.id,
-                                        })
-                                        toast.success(`User removed`, {
-                                          id: toastId,
-                                        })
-                                        router.reload()
-                                      } catch (error) {
-                                        toast.error(
-                                          `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
-                                          { id: toastId }
-                                        )
-                                      }
-                                    }}
-                                  >
-                                    Are you sure you want to remove this user from the parent
-                                    company?
-                                  </Confirm>
-
                                   <button
                                     data-testid={`remove-${m.user.email}-fromParentCompany`}
                                     title="Remove User"
                                     className="text-red-600 hover:text-red-800"
                                     onClick={async (e) => {
                                       e.preventDefault()
+                                      setMemberToDelete(m)
                                       setOpenConfirmDelete(true)
                                     }}
                                   >

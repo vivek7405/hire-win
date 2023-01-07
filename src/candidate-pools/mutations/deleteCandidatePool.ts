@@ -12,4 +12,5 @@ async function deleteCandidatePool({ where }: DeleteCandidatePoolInput, ctx: Ctx
   return candidatePool
 }
 
-export default Guard.authorize("read", "candidatePool", deleteCandidatePool)
+export default deleteCandidatePool
+// export default Guard.authorize("read", "candidatePool", deleteCandidatePool)

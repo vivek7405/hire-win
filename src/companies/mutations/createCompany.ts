@@ -47,13 +47,23 @@ export default resolver.pipe(
       include: { company: true },
     })
 
+    const parentCompanyUserWhereOwner = await db.parentCompanyUser.findFirst({
+      where: { userId: ctx?.session?.userId || "0", role: ParentCompanyUserRole.OWNER },
+    })
+
     const parentCompanyIdToUse =
-      parentCompanyId || existingCompanyUserWhereOwner?.company?.parentCompanyId || "0"
+      parentCompanyId ||
+      parentCompanyUserWhereOwner?.parentCompanyId ||
+      existingCompanyUserWhereOwner?.company?.parentCompanyId ||
+      "0"
 
     let isCompanyCreatedForOthersParentCompany = false
     if (
       parentCompanyId &&
-      parentCompanyId !== (existingCompanyUserWhereOwner?.company?.parentCompanyId || "0")
+      parentCompanyId !==
+        (parentCompanyUserWhereOwner?.parentCompanyId ||
+          existingCompanyUserWhereOwner?.company?.parentCompanyId ||
+          "0")
     ) {
       isCompanyCreatedForOthersParentCompany = true
     }

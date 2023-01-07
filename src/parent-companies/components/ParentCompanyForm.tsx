@@ -14,7 +14,7 @@ type ParentCompanyFormProps = {
   onSubmit: any
   header?: string
   subHeader?: string
-  parentCompanyId?: string
+  slug?: string
 }
 
 export const ParentCompanyForm = (props: ParentCompanyFormProps) => {
@@ -37,7 +37,7 @@ export const ParentCompanyForm = (props: ParentCompanyFormProps) => {
               <Link
                 prefetch={true}
                 href={Routes.ParentCompanyJobBoard({
-                  parentCompanyId: props.parentCompanyId || "0",
+                  slug: props.slug || "0",
                 })}
                 passHref
                 legacyBehavior

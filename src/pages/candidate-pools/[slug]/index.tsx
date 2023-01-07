@@ -1,7 +1,7 @@
 import { gSSP } from "src/blitz-server"
 import Link from "next/link"
 import { getSession, useSession } from "@blitzjs/auth"
-import { usePaginatedQuery, useMutation, invalidateQuery } from "@blitzjs/rpc"
+import { usePaginatedQuery, useMutation, invalidateQuery, useQuery } from "@blitzjs/rpc"
 import { useRouter } from "next/router"
 import { Routes, ErrorComponent } from "@blitzjs/next"
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next"
@@ -9,7 +9,7 @@ import { useEffect, useState, Suspense } from "react"
 import AuthLayout from "src/core/layouts/AuthLayout"
 import getCurrentUserServer from "src/users/queries/getCurrentUserServer"
 import path from "path"
-import { Candidate, Job } from "@prisma/client"
+import { Candidate, CompanyUserRole, Job, ParentCompanyUserRole } from "@prisma/client"
 import Debouncer from "src/core/utils/debouncer"
 import toast from "react-hot-toast"
 import Confirm from "src/core/components/Confirm"
@@ -26,6 +26,13 @@ import getCandidatesWOAbility from "src/candidates/queries/getCandidatesWOAbilit
 import getCandidate from "src/candidates/queries/getCandidate"
 import { AuthorizationError } from "blitz"
 import CandidatePoolLayout from "src/core/layouts/CandidatePoolLayout"
+import getCompany from "src/companies/queries/getCompany"
+import getCompanyUser from "src/companies/queries/getCompanyUser"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
+import db from "db"
+import getCandidatePoolsWOPagination from "src/candidate-pools/queries/getCandidatePoolsWOPagination"
+import switchCompany from "src/auth/mutations/switchCompany"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -40,17 +47,81 @@ export const getServerSideProps = gSSP(async (context) => {
   // const session = await getSession(context.req, context.res)
 
   if (user) {
-    try {
-      await getCandidatePool(
-        {
-          where: {
-            slug: (context?.params?.slug as string) || "0",
-            companyId: session?.companyId || "0",
+    const company = await getCompany(
+      {
+        where: { id: context?.ctx?.session?.companyId || "0" },
+      },
+      context.ctx
+    )
+
+    const companyUser = await getCompanyUser(
+      {
+        where: {
+          companyId: company?.id || "0",
+          userId: user?.id || "0",
+        },
+      },
+      context.ctx
+    )
+
+    const parentCompany = await getParentCompany(
+      {
+        where: { id: company?.parentCompanyId || "0" },
+      },
+      context.ctx
+    )
+
+    const parentCompanyUser = await getParentCompanyUser(
+      {
+        where: {
+          parentCompanyId: parentCompany?.id || "0",
+          userId: context?.ctx?.session?.userId || "0",
+        },
+      },
+      context.ctx
+    )
+
+    const isCompanyOwnerOrAdmin =
+      (companyUser && companyUser?.role !== CompanyUserRole.USER) || false
+
+    const isParentCompanyOwnerOrAdmin =
+      (parentCompany?.name &&
+        parentCompanyUser &&
+        parentCompanyUser?.role !== ParentCompanyUserRole.USER) ||
+      false
+
+    if (
+      (!isCompanyOwnerOrAdmin && !isParentCompanyOwnerOrAdmin) ||
+      (context?.query?.isParent && !isParentCompanyOwnerOrAdmin) ||
+      (!context?.query?.isParent && !isCompanyOwnerOrAdmin)
+    ) {
+      return {
+        props: {
+          error: {
+            statusCode: 403,
+            message: "You don't have permission",
           },
         },
-        { ...context.ctx }
-      )
-      return { props: { user: user, slug: context?.params?.slug } }
+      } as any
+    }
+
+    try {
+      // await getCandidatePool(
+      //   {
+      //     where: {
+      //       slug: (context?.params?.slug as string) || "0",
+      //       companyId: session?.companyId || "0",
+      //     },
+      //   },
+      //   { ...context.ctx }
+      // )
+      return {
+        props: {
+          user: user,
+          slug: context?.params?.slug,
+          parentCompanyId: parentCompany?.id || "0",
+        },
+      }
     } catch (error) {
       if (error instanceof AuthorizationError) {
         return {
@@ -76,7 +147,7 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-export const Candidates = ({ slug }) => {
+export const Candidates = ({ slug, parentCompanyId }) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const session = useSession()
@@ -87,6 +158,11 @@ export const Candidates = ({ slug }) => {
     null as (Candidate & { job: Pick<Job, "slug"> }) | null
   )
   const [removeCandidateFromPoolMutation] = useMutation(removeCandidateFromPool)
+
+  const [openSwitchCompanyConfirm, setOpenSwitchCompanyConfirm] = useState(false)
+  const [candidateToSwitchCompany, setCandidateToSwitchCompany] = useState(
+    null as (Candidate & { job: Job }) | null
+  )
 
   useEffect(() => {
     const search = router.query.search
@@ -119,12 +195,21 @@ export const Candidates = ({ slug }) => {
     return debouncer.execute(e)
   }
 
+  const { isParent } = router.query
+
+  const [candidatePool] = useQuery(getCandidatePool, {
+    where: {
+      slug,
+      companyId: (isParent as string) === "true" ? null : session?.companyId || "0",
+      parentCompanyId: (isParent as string) === "true" ? parentCompanyId || "0" : null,
+    },
+  })
+
   const [{ candidates, hasMore, count }] = usePaginatedQuery(getCandidatesWOAbility, {
     where: {
       candidatePools: {
         some: {
-          slug,
-          companyId: session?.companyId || "0",
+          id: candidatePool?.id || "0",
         },
       },
       ...query,
@@ -141,6 +226,8 @@ export const Candidates = ({ slug }) => {
     endPage = count
   }
 
+  const [switchCompanyMutation] = useMutation(switchCompany)
+
   return (
     <>
       <Confirm
@@ -155,8 +242,9 @@ export const Candidates = ({ slug }) => {
             }
             await removeCandidateFromPoolMutation({
               candidateId: candidateToRemoveFromPool.id,
-              candidatePoolSlug: slug,
+              poolId: candidatePool?.id || "0",
             })
+            invalidateQuery(getCandidatePoolsWOPagination)
             invalidateQuery(getCandidatesWOAbility)
             invalidateQuery(getCandidate)
             toast.success("Candidate removed from Pool", { id: toastId })
@@ -170,6 +258,47 @@ export const Candidates = ({ slug }) => {
         }}
       >
         Are you sure you want to remove the candidate from pool?
+      </Confirm>
+
+      <Confirm
+        open={openSwitchCompanyConfirm}
+        setOpen={setOpenSwitchCompanyConfirm}
+        header={`Switch Company?`}
+        onSuccess={async () => {
+          const toastId = toast.loading(`Switching Company...`)
+          try {
+            if (!candidateToSwitchCompany) {
+              throw new Error("No candidate set")
+            }
+
+            try {
+              setOpenSwitchCompanyConfirm(false)
+
+              await switchCompanyMutation({
+                companyId: candidateToSwitchCompany?.job?.companyId || "0",
+              })
+
+              router.push(
+                Routes.SingleCandidatePage({
+                  slug: candidateToSwitchCompany?.job?.slug,
+                  candidateEmail: candidateToSwitchCompany?.email,
+                })
+              )
+
+              toast.success("Company switched", { id: toastId })
+            } catch (error) {
+              toast.error(error?.message, { id: toastId })
+            }
+          } catch (error) {
+            toast.error(`Unable to view candidate - ${error.toString()}`, {
+              id: toastId,
+            })
+          }
+
+          setCandidateToSwitchCompany(null)
+        }}
+      >
+        The candidate is from a different company, are you sure you want to switch the company?
       </Confirm>
 
       <p className="font-bold text-xl text-neutral-700 capitalize text-center mb-5">
@@ -213,8 +342,8 @@ export const Candidates = ({ slug }) => {
                 <Card key={candidate.id}>
                   <div className="space-y-2">
                     <div className="w-full relative">
-                      <div className="font-bold flex md:justify-center lg:justify:center items-center">
-                        <Link
+                      <div className="flex items-center md:justify-center">
+                        {/* <Link
                           legacyBehavior
                           prefetch={true}
                           href={Routes.SingleCandidatePage({
@@ -222,11 +351,26 @@ export const Candidates = ({ slug }) => {
                             candidateEmail: candidate?.email,
                           })}
                           passHref
+                        > */}
+                        <button
+                          className="font-bold cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
+                          onClick={async () => {
+                            if (session.companyId !== candidate?.job?.companyId) {
+                              setCandidateToSwitchCompany(candidate)
+                              setOpenSwitchCompanyConfirm(true)
+                            } else {
+                              router.push(
+                                Routes.SingleCandidatePage({
+                                  slug: candidate?.job?.slug,
+                                  candidateEmail: candidate?.email,
+                                })
+                              )
+                            }
+                          }}
                         >
-                          <a className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate">
-                            {candidate.name}
-                          </a>
-                        </Link>
+                          {candidate.name}
+                        </button>
+                        {/* </Link> */}
                       </div>
                       <div className="absolute top-0.5 right-0">
                         <button
@@ -278,6 +422,7 @@ const SingleCandidatePoolPage = ({
   error,
   user,
   slug,
+  parentCompanyId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -286,9 +431,8 @@ const SingleCandidatePoolPage = ({
     <AuthLayout title="Hire.win | Candidate Pool" user={user}>
       <Breadcrumbs />
       <CandidatePoolLayout>
-        <br />
         <Suspense fallback="Loading...">
-          <Candidates slug={slug} />
+          <Candidates slug={slug} parentCompanyId={parentCompanyId} />
         </Suspense>
       </CandidatePoolLayout>
     </AuthLayout>

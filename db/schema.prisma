@@ -223,6 +223,7 @@ model ParentCompany {
   updatedAt DateTime @updatedAt
 
   name String?
+  slug String? @unique
 
   users     ParentCompanyUser[]
   companies Company[]

@@ -71,7 +71,8 @@ const NavbarContent = ({
 
   const isCompanyOwnerOrAdmin = companyUser?.role !== CompanyUserRole.USER
 
-  const isParentCompanyOwnerOrAdmin = parentCompanyUser && parentCompanyUser?.role !== ParentCompanyUserRole.USER
+  const isParentCompanyOwnerOrAdmin =
+    parentCompanyUser && parentCompanyUser?.role !== ParentCompanyUserRole.USER
 
   const nav = [
     {
@@ -255,59 +256,60 @@ const NavbarContent = ({
               {selectedCompanyUser?.company?.name}
             </div>
           </DropdownMenu.Trigger>
-
-          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-            <DropdownMenu.Arrow className="fill-current" offset={10} />
-            <DropdownMenu.RadioGroup
-              value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
-              onValueChange={async (companyId) => {
-                if (companyId === "new_company") {
-                  router.push(Routes.NewCompany())
-                } else {
-                  const cu = companyUsers?.find(
-                    (cu) => cu.userId === user?.id && cu.companyId === companyId
-                  )
-                  setSelectedCompanyUser(cu!)
-                  await updateCompanySessionMutation(companyId || "0")
-                  router.pathname === Routes.JobsHome().pathname
-                    ? router.reload()
-                    : router.push(Routes.JobsHome())
-                }
-              }}
-            >
-              {companyUsers?.map((cu) => {
-                return (
-                  <div key={cu.companyId}>
-                    <DropdownMenu.RadioItem
-                      value={cu.company?.id?.toString()}
-                      className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
-                    >
-                      <DropdownMenu.ItemIndicator className="flex items-center">
-                        <CheckIcon className="w-4 h-4 absolute left-2" />
-                      </DropdownMenu.ItemIndicator>
-                      <div className="ml-2 flex flex-nowrap space-x-1 items-center">
-                        {/* <div className="flex">
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+              <DropdownMenu.Arrow className="fill-current" />
+              <DropdownMenu.RadioGroup
+                value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
+                onValueChange={async (companyId) => {
+                  if (companyId === "new_company") {
+                    router.push(Routes.NewCompany())
+                  } else {
+                    const cu = companyUsers?.find(
+                      (cu) => cu.userId === user?.id && cu.companyId === companyId
+                    )
+                    setSelectedCompanyUser(cu!)
+                    await updateCompanySessionMutation(companyId || "0")
+                    router.pathname === Routes.JobsHome().pathname
+                      ? router.reload()
+                      : router.push(Routes.JobsHome())
+                  }
+                }}
+              >
+                {companyUsers?.map((cu) => {
+                  return (
+                    <div key={cu.companyId}>
+                      <DropdownMenu.RadioItem
+                        value={cu.company?.id?.toString()}
+                        className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
+                      >
+                        <DropdownMenu.ItemIndicator className="flex items-center">
+                          <CheckIcon className="w-4 h-4 absolute left-2" />
+                        </DropdownMenu.ItemIndicator>
+                        <div className="ml-2 flex flex-nowrap space-x-1 items-center">
+                          {/* <div className="flex">
                           {cu.subscription && <BadgeCheckIcon width={18} height={18} />}
                           {!cu.subscription && <MinusCircleIcon width={18} height={18} />}
                         </div> */}
-                        <div>{cu.company?.name}</div>
-                        <div className="lowercase">({cu.role})</div>
-                      </div>
-                    </DropdownMenu.RadioItem>
+                          <div>{cu.company?.name}</div>
+                          <div className="lowercase">({cu.role})</div>
+                        </div>
+                      </DropdownMenu.RadioItem>
+                    </div>
+                  )
+                })}
+                <DropdownMenu.RadioItem
+                  value="new_company"
+                  className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
+                >
+                  <div className="ml-2 flex flex-nowrap space-x-1 items-center">
+                    <PlusIcon className="w-4 h-4 absolute left-2" />
+                    <div>Add New Company</div>
                   </div>
-                )
-              })}
-              <DropdownMenu.RadioItem
-                value="new_company"
-                className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
-              >
-                <div className="ml-2 flex flex-nowrap space-x-1 items-center">
-                  <PlusIcon className="w-4 h-4 absolute left-2" />
-                  <div>Add New Company</div>
-                </div>
-              </DropdownMenu.RadioItem>
-            </DropdownMenu.RadioGroup>
-          </DropdownMenu.Content>
+                </DropdownMenu.RadioItem>
+              </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
         </DropdownMenu.Root>
       </div>
     )
@@ -469,10 +471,10 @@ const NavbarContent = ({
                         {user?.name.charAt(0).toUpperCase()}
                       </div>
                     </DropdownMenu.Trigger>
-
-                    <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-                      <DropdownMenu.Arrow className="fill-current" offset={10} />
-                      {/* <DropdownMenu.Item
+                    <DropdownMenu.Portal>
+                      <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+                        <DropdownMenu.Arrow className="fill-current" />
+                        {/* <DropdownMenu.Item
                         onSelect={(e) => {
                           e.preventDefault()
                           // if (canCreateCompany) {
@@ -485,24 +487,25 @@ const NavbarContent = ({
                       >
                         Add Company
                       </DropdownMenu.Item> */}
-                      {dropDownNav.map((item, i) => {
-                        if (!item) return <></>
+                        {dropDownNav.map((item, i) => {
+                          if (!item) return <></>
 
-                        return (
-                          <DropdownMenu.Item
-                            key={i}
-                            data-testid={`${item.name}-navLink`}
-                            onSelect={(e) => {
-                              e.preventDefault()
-                              item.href.length ? router.push(item.href) : item.action!()
-                            }}
-                            className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
-                          >
-                            {item.name}
-                          </DropdownMenu.Item>
-                        )
-                      })}
-                    </DropdownMenu.Content>
+                          return (
+                            <DropdownMenu.Item
+                              key={i}
+                              data-testid={`${item.name}-navLink`}
+                              onSelect={(e) => {
+                                e.preventDefault()
+                                item.href.length ? router.push(item.href) : item.action!()
+                              }}
+                              className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                            >
+                              {item.name}
+                            </DropdownMenu.Item>
+                          )
+                        })}
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
                   </DropdownMenu.Root>
                 </div>
               </div>

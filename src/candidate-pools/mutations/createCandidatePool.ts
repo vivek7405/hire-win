@@ -1,4 +1,4 @@
-import { Ctx } from "blitz";
+import { Ctx, NotFoundError } from "blitz"
 import db from "db"
 import { CandidatePoolObj, CandidatePoolInputType } from "src/candidate-pools/validations"
 import Guard from "src/guard/ability"
@@ -8,7 +8,16 @@ import { findFreeSlug } from "src/core/utils/findFreeSlug"
 async function createCandidatePool(data: CandidatePoolInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name } = CandidatePoolObj.parse(data)
+  const { name, parentCompanyId } = CandidatePoolObj.parse(data)
+
+  if (parentCompanyId) {
+    const parentCompany = await db.parentCompany.findUnique({
+      where: { id: parentCompanyId || "0" },
+    })
+    if (!parentCompany) {
+      throw new NotFoundError("Parent company with provided id not found")
+    }
+  }
 
   const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
@@ -20,16 +29,9 @@ async function createCandidatePool(data: CandidatePoolInputType, ctx: Ctx) {
     data: {
       name: name,
       slug,
-      company: {
-        connect: {
-          id: ctx.session.companyId || "0",
-        },
-      },
-      createdBy: {
-        connect: {
-          id: ctx.session.userId || "0",
-        },
-      },
+      companyId: parentCompanyId ? null : ctx.session.companyId || "0",
+      parentCompanyId: parentCompanyId || null,
+      createdById: ctx.session.userId || "0",
     },
   })
 

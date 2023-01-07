@@ -1,6 +1,6 @@
 import { useSession } from "@blitzjs/auth"
 import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc"
-import { ChevronDownIcon, TrashIcon } from "@heroicons/react/outline"
+import { ChevronDownIcon, ChevronRightIcon, TrashIcon } from "@heroicons/react/outline"
 import {
   Candidate,
   Email,
@@ -282,25 +282,24 @@ const Emails = ({ user, stageId, candidate }) => {
                   <ChevronDownIcon className="w-5 h-5" />
                 </button>
               </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+                  <DropdownMenu.Arrow className="fill-current" />
+                  {emailTemplates?.length === 0 && (
+                    <DropdownMenu.Item
+                      disabled={true}
+                      onSelect={(e) => {
+                        e.preventDefault()
+                      }}
+                      className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
+                    >
+                      No templates available
+                    </DropdownMenu.Item>
+                  )}
 
-              <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-                <DropdownMenu.Arrow className="fill-current" offset={10} />
-                {emailTemplates?.length === 0 && (
-                  <DropdownMenu.Item
-                    disabled={true}
-                    onSelect={(e) => {
-                      e.preventDefault()
-                    }}
-                    className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
-                  >
-                    No templates available
-                  </DropdownMenu.Item>
-                )}
-
-                {/* Parent Company Email Templates */}
-                {isParentCompanyUser &&
-                  emailTemplates
-                    ?.filter((et) => et.parentCompanyId)
+                  {/* Company Email Templates */}
+                  {emailTemplates
+                    ?.filter((et) => !et.parentCompanyId)
                     ?.map((et) => {
                       return (
                         <DropdownMenu.Item
@@ -318,43 +317,57 @@ const Emails = ({ user, stageId, candidate }) => {
                       )
                     })}
 
-                {/* Company Email Templates */}
-                {emailTemplates
-                  ?.filter((et) => !et.parentCompanyId)
-                  ?.map((et, index) => {
-                    return (
-                      <>
-                        {index === 0 &&
-                          isParentCompanyUser &&
-                          emailTemplates?.filter((et) => et.parentCompanyId)?.length > 0 && (
-                            <DropdownMenu.Separator className="bg-neutral-300 h-px" />
-                          )}
-                        <DropdownMenu.Item
-                          key={et.id}
-                          onSelect={(e) => {
-                            e.preventDefault()
-                            setSelectedEmailTemplate(et)
-                            setEmailToView(null as any)
-                            setOpenModal(true)
-                          }}
-                          className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
-                        >
-                          {et.name}
-                        </DropdownMenu.Item>
-                      </>
-                    )
-                  })}
-                <DropdownMenu.Separator className="bg-neutral-300 h-px" />
-                <DropdownMenu.Item
-                  onSelect={(e) => {
-                    e.preventDefault()
-                    router.push(Routes.EmailTemplatesHome())
-                  }}
-                  className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
-                >
-                  + Add New
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
+                  {/* Parent Company Email Templates */}
+                  {isParentCompanyUser &&
+                    emailTemplates?.filter((et) => et.parentCompanyId)?.length > 0 && (
+                      <DropdownMenu.Sub>
+                        <DropdownMenu.SubTrigger className="flex items-center justify-center space-x-2 text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900">
+                          <div>Parent Company</div>
+                          <div>
+                            <ChevronRightIcon className="w-4 h-4" />
+                          </div>
+                        </DropdownMenu.SubTrigger>
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.SubContent className="w-auto bg-white text-white p-1 shadow-md rounded">
+                            {emailTemplates
+                              ?.filter((et) => et.parentCompanyId)
+                              ?.map((et) => {
+                                return (
+                                  <DropdownMenu.Item
+                                    key={et.id}
+                                    onSelect={(e) => {
+                                      e.preventDefault()
+                                      setSelectedEmailTemplate(et)
+                                      setEmailToView(null as any)
+                                      setOpenModal(true)
+                                    }}
+                                    className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                                  >
+                                    {et.name}
+                                  </DropdownMenu.Item>
+                                )
+                              })}
+                          </DropdownMenu.SubContent>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Sub>
+                    )}
+
+                  {jobUser?.role !== JobUserRole.USER && (
+                    <>
+                      <DropdownMenu.Separator className="bg-neutral-300 h-px" />
+                      <DropdownMenu.Item
+                        onSelect={(e) => {
+                          e.preventDefault()
+                          router.push(Routes.EmailTemplatesHome())
+                        }}
+                        className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                      >
+                        + Add New
+                      </DropdownMenu.Item>
+                    </>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
             </DropdownMenu.Root>
           </div>
         </div>
@@ -371,6 +384,7 @@ const Emails = ({ user, stageId, candidate }) => {
                   setEmailToDelete={setEmailToDelete}
                   setEmailToView={setEmailToView}
                   setOpenModal={setOpenModal}
+                  jobUser={jobUser}
                 />
               </>
             )
@@ -390,6 +404,7 @@ type CandidateEmailProps = {
   setEmailToDelete: any
   setEmailToView: any
   setOpenModal: any
+  jobUser: Awaited<ReturnType<typeof getJobUser>>
 }
 const CandidateEmail = ({
   email,
@@ -398,16 +413,13 @@ const CandidateEmail = ({
   setEmailToDelete,
   setEmailToView,
   setOpenModal,
+  jobUser,
 }: CandidateEmailProps) => {
   return (
     <div key={email.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
       <button
         className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={
-          user?.id !== email?.senderId &&
-          user?.jobUsers?.find((jobUser) => jobUser.jobId === email?.candidate?.jobId)?.role !==
-            "OWNER"
-        }
+        disabled={user?.id !== email?.senderId && jobUser?.role !== JobUserRole.OWNER}
         onClick={() => {
           setOpenConfirm(true)
           setEmailToDelete(email)

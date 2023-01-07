@@ -7,9 +7,12 @@ import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompan
 import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 import getJobFilters from "../utils/getJobFilters"
 
-async function getJobBoardFilters({ parentCompanyId }, ctx: Ctx) {
+async function getJobBoardFilters({ slug }, ctx: Ctx) {
+  const parentCompany = await db.parentCompany.findFirst({
+    where: { slug },
+  })
   const companyUsers = await db.companyUser.findMany({
-    where: { role: CompanyUserRole.OWNER, company: { parentCompanyId } },
+    where: { role: CompanyUserRole.OWNER, company: { parentCompanyId: parentCompany?.id || "0" } },
     include: {
       company: {
         include: {

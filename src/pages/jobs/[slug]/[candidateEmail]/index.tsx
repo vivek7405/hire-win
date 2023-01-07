@@ -20,6 +20,7 @@ import PDFViewer from "src/core/components/PDFViewer"
 import {
   CandidateActivityType,
   CandidateFile,
+  CandidatePool,
   CandidateSource,
   FormQuestion,
   FormQuestionType,
@@ -43,6 +44,7 @@ import {
   ChatIcon,
   CheckIcon,
   ChevronDownIcon,
+  ChevronRightIcon,
   ClockIcon,
   CogIcon,
   CollectionIcon,
@@ -112,6 +114,9 @@ import { FREE_CANDIDATES_LIMIT } from "src/plans/constants"
 import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
 import StageEvaluator from "src/stages/components/StageEvaluator"
 import getJobUser from "src/jobs/queries/getJobUser"
+import getCompany from "src/companies/queries/getCompany"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -534,8 +539,31 @@ const SingleCandidatePageContent = ({
 
   const session = useSession()
   const [updateCandidateScoresMutation] = useMutation(updateCandidateScores)
+
+  const [company] = useQuery(getCompany, {
+    where: { id: session.companyId || "0" },
+  })
+
+  const [parentCompany] = useQuery(getParentCompany, {
+    where: { id: company?.parentCompanyId || "0" },
+  })
+
+  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
+    where: {
+      parentCompanyId: company?.parentCompanyId || "0",
+      userId: session?.userId || "0",
+    },
+  })
+
+  const isParentCompanyUser = (parentCompany?.name && !!parentCompanyUser) || false
+
   const [candidatePools] = useQuery(getCandidatePoolsWOPagination, {
-    where: { companyId: session.companyId || "0" },
+    where: {
+      OR: [
+        { companyId: session.companyId || "0" },
+        { parentCompanyId: company?.parentCompanyId || "0" },
+      ],
+    },
   })
   const [addCandidateToPoolMutation] = useMutation(addCandidateToPool)
   const [removeCandidateFromPoolMutation] = useMutation(removeCandidateFromPool)
@@ -1010,41 +1038,45 @@ const SingleCandidatePageContent = ({
               <ChevronDownIcon className="w-5 h-5" />
             </button>
           </DropdownMenu.Trigger>
-          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-            <DropdownMenu.Arrow className="fill-current" offset={10} />
-            {candidate?.job?.stages?.length === 0 && (
-              <DropdownMenu.Item
-                disabled={true}
-                onSelect={(e) => {
-                  e.preventDefault()
-                }}
-                className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
-              >
-                No stages
-              </DropdownMenu.Item>
-            )}
-            {candidate?.job?.stages.map((stage) => {
-              return (
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+              <DropdownMenu.Arrow className="fill-current" />
+              {candidate?.job?.stages?.length === 0 && (
                 <DropdownMenu.Item
-                  key={stage.id}
-                  onSelect={async (e) => {
+                  disabled={true}
+                  onSelect={(e) => {
                     e.preventDefault()
-
-                    if (candidate?.stage?.id === stage?.id) {
-                      toast.error(`The candidate is already in the ${candidate?.stage?.name} stage`)
-                    } else {
-                      setCandidateToMove(candidate)
-                      setMoveToStage(stage)
-                      setOpenCandidateMoveConfirm(true)
-                    }
                   }}
-                  className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                  className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
                 >
-                  {stage?.name?.length > 30 ? `${stage?.name?.substring(0, 30)}...` : stage?.name}
+                  No stages
                 </DropdownMenu.Item>
-              )
-            })}
-          </DropdownMenu.Content>
+              )}
+              {candidate?.job?.stages.map((stage) => {
+                return (
+                  <DropdownMenu.Item
+                    key={stage.id}
+                    onSelect={async (e) => {
+                      e.preventDefault()
+
+                      if (candidate?.stage?.id === stage?.id) {
+                        toast.error(
+                          `The candidate is already in the ${candidate?.stage?.name} stage`
+                        )
+                      } else {
+                        setCandidateToMove(candidate)
+                        setMoveToStage(stage)
+                        setOpenCandidateMoveConfirm(true)
+                      }
+                    }}
+                    className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                  >
+                    {stage?.name?.length > 30 ? `${stage?.name?.substring(0, 30)}...` : stage?.name}
+                  </DropdownMenu.Item>
+                )
+              })}
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
         </DropdownMenu.Root>
       </div>
     ) : (
@@ -1053,6 +1085,66 @@ const SingleCandidatePageContent = ({
   }
 
   const AddToPoolButton = ({ candidatePoolsOpen, setCandidatePoolsOpen }) => {
+    type CandidateDropdownItemType = {
+      cp: CandidatePool & {
+        _count: {
+          candidates: number
+        }
+        candidates: {
+          id: string
+        }[]
+      }
+    }
+    const CandidatePoolDropdownItem = ({ cp }: CandidateDropdownItemType) => {
+      return (
+        <DropdownMenu.Item
+          key={cp.id}
+          onSelect={async (e) => {
+            e.preventDefault()
+
+            const isRemove = !!cp.candidates.find((c) => c.id === candidate.id)
+
+            const toastId = toast.loading(
+              `${isRemove ? "Removing candidate from" : "Adding candidate to"} pool "${cp.name}"`
+            )
+            try {
+              if (isRemove) {
+                await removeCandidateFromPoolMutation({
+                  candidateId: candidate.id,
+                  poolId: cp.id,
+                })
+                invalidateQuery(getCandidate)
+              } else {
+                await addCandidateToPoolMutation({
+                  candidateId: candidate?.id,
+                  poolId: cp.id,
+                })
+              }
+              invalidateQuery(getCandidatePoolsWOPagination)
+              invalidateQuery(getCandidate)
+              toast.success(
+                `Candidate ${isRemove ? "removed from" : "added to"} pool "${cp.name}"`,
+                { id: toastId }
+              )
+            } catch (error) {
+              toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
+                id: toastId,
+              })
+            }
+            setCandidatePoolsOpen(false)
+          }}
+          className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+        >
+          {cp.candidates.find((c) => c.id === candidate.id) ? (
+            <CheckIcon className="w-5 h-5 text-theme-600" />
+          ) : (
+            <div className="w-5 h-5"></div>
+          )}
+          <span>{cp.name?.length > 30 ? `${cp.name?.substring(0, 30)}...` : cp.name}</span>
+        </DropdownMenu.Item>
+      )
+    }
+
     return jobUser?.role !== JobUserRole.USER ? (
       <DropdownMenu.Root
         modal={false}
@@ -1064,82 +1156,63 @@ const SingleCandidatePageContent = ({
             Pools <ChevronDownIcon className="w-5 h-5 ml-1" />
           </button>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-          <DropdownMenu.Arrow className="fill-current" offset={10} />
-          {candidatePools?.length === 0 && (
-            <DropdownMenu.Item
-              disabled={true}
-              onSelect={(e) => {
-                e.preventDefault()
-              }}
-              className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
-            >
-              No more pools to add
-            </DropdownMenu.Item>
-          )}
-          {candidatePools.map((cp) => {
-            return (
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+            <DropdownMenu.Arrow className="fill-current" />
+            {candidatePools?.length === 0 && (
               <DropdownMenu.Item
-                key={cp.id}
-                onSelect={async (e) => {
+                disabled={true}
+                onSelect={(e) => {
                   e.preventDefault()
-
-                  const isRemove = !!cp.candidates.find((c) => c.id === candidate.id)
-
-                  const toastId = toast.loading(
-                    `${isRemove ? "Removing candidate from" : "Adding candidate to"} pool "${
-                      cp.name
-                    }"`
-                  )
-                  try {
-                    if (isRemove) {
-                      await removeCandidateFromPoolMutation({
-                        candidateId: candidate.id,
-                        candidatePoolSlug: cp.slug,
-                      })
-                      invalidateQuery(getCandidate)
-                    } else {
-                      await addCandidateToPoolMutation({
-                        candidateId: candidate?.id,
-                        poolId: cp.id,
-                      })
-                    }
-                    invalidateQuery(getCandidatePoolsWOPagination)
-                    invalidateQuery(getCandidate)
-                    toast.success(
-                      `Candidate ${isRemove ? "removed from" : "added to"} pool "${cp.name}"`,
-                      { id: toastId }
-                    )
-                  } catch (error) {
-                    toast.error(`Failed adding candidate to pool - ${error.toString()}`, {
-                      id: toastId,
-                    })
-                  }
-                  setCandidatePoolsOpen(false)
                 }}
-                className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
               >
-                {cp.candidates.find((c) => c.id === candidate.id) ? (
-                  <CheckIcon className="w-5 h-5 text-theme-600" />
-                ) : (
-                  <div className="w-5 h-5"></div>
-                )}
-                <span>{cp.name?.length > 30 ? `${cp.name?.substring(0, 30)}...` : cp.name}</span>
+                No more pools to add
               </DropdownMenu.Item>
-            )
-          })}
-          <DropdownMenu.Separator className="bg-neutral-300 h-px" />
-          <DropdownMenu.Item
-            onSelect={async (e) => {
-              e.preventDefault()
-              router.push(Routes.CandidatePoolsHome())
-            }}
-            className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
-          >
-            <PlusIcon className="w-5 h-5 text-theme-600" />
-            <span>Add New Pool</span>
-          </DropdownMenu.Item>
-        </DropdownMenu.Content>
+            )}
+
+            {/* Company Candidate Pools */}
+            {candidatePools
+              ?.filter((cp) => !cp.parentCompanyId)
+              ?.map((cp) => {
+                return <CandidatePoolDropdownItem cp={cp} />
+              })}
+
+            {/* Parent Company Candidate Pools */}
+            {isParentCompanyUser && candidatePools?.filter((cp) => cp.parentCompanyId)?.length > 0 && (
+              <DropdownMenu.Sub>
+                <DropdownMenu.SubTrigger className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900">
+                  <div className="w-5 h-5"></div>
+                  <div>Parent Company</div>
+                  <div>
+                    <ChevronRightIcon className="w-4 h-4" />
+                  </div>
+                </DropdownMenu.SubTrigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.SubContent className="w-auto bg-white text-white p-1 shadow-md rounded">
+                    {candidatePools
+                      ?.filter((cp) => cp.parentCompanyId)
+                      ?.map((cp) => {
+                        return <CandidatePoolDropdownItem cp={cp} />
+                      })}
+                  </DropdownMenu.SubContent>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Sub>
+            )}
+
+            <DropdownMenu.Separator className="bg-neutral-300 h-px" />
+            <DropdownMenu.Item
+              onSelect={async (e) => {
+                e.preventDefault()
+                router.push(Routes.CandidatePoolsHome())
+              }}
+              className="text-left w-full whitespace-nowrap cursor-pointer flex items-center space-x-2 pr-4 pl-1 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+            >
+              <PlusIcon className="w-5 h-5 text-theme-600" />
+              <span>Add New Pool</span>
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
       </DropdownMenu.Root>
     ) : (
       <></>
@@ -1723,7 +1796,9 @@ const SingleCandidatePageContent = ({
                   {file && <PDFViewer file={file} />}
                   {!(candidate?.resume as AttachmentObject)?.key && (
                     <div className="text-center my-3 px-2">
-                      No resume uploaded. Click on the button below to upload a resume.
+                      No resume uploaded.
+                      {jobUser?.role !== JobUserRole.USER &&
+                        " Click on the button below to upload a resume."}
                     </div>
                   )}
                   <div className="flex items-center justify-center">
@@ -1732,14 +1807,16 @@ const SingleCandidatePageContent = ({
                         <p>Loading...</p>
                       </div>
                     ) : (
-                      <button
-                        className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        onClick={() => {
-                          setOpenEditModal(true)
-                        }}
-                      >
-                        {file ? "Edit Resume" : "Upload Resume"}
-                      </button>
+                      jobUser?.role !== JobUserRole.USER && (
+                        <button
+                          className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => {
+                            setOpenEditModal(true)
+                          }}
+                        >
+                          {file ? "Edit Resume" : "Upload Resume"}
+                        </button>
+                      )
                     )}
                   </div>
                 </div>
@@ -1753,7 +1830,9 @@ const SingleCandidatePageContent = ({
                   <div className="flex flex-col items-center">
                     {candidate?.files?.length === 0 ? (
                       <div className="text-center my-3 px-2">
-                        No files uploaded. Click on the button below to upload a file.
+                        No files uploaded.
+                        {jobUser?.role !== JobUserRole.USER &&
+                          " Click on the button below to upload a file."}
                       </div>
                     ) : (
                       <div className="my-1 flex flex-wrap justify-center px-2 max-w-md mx-auto">
@@ -1807,22 +1886,24 @@ const SingleCandidatePageContent = ({
                         })}
                       </div>
                     )}
-                    <button
-                      className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => {
-                        // if (
-                        //   activePlanName === PlanName.LIFETIME_SET1 &&
-                        //   candidate?.files?.length >= LIFETIME_SET1_FILES_LIMIT
-                        // ) {
-                        //   setOpenUpgradeConfirm(true)
-                        //   return
-                        // }
+                    {jobUser?.role !== JobUserRole.USER && (
+                      <button
+                        className="my-2 text-white bg-theme-600 px-4 py-1 rounded-lg hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => {
+                          // if (
+                          //   activePlanName === PlanName.LIFETIME_SET1 &&
+                          //   candidate?.files?.length >= LIFETIME_SET1_FILES_LIMIT
+                          // ) {
+                          //   setOpenUpgradeConfirm(true)
+                          //   return
+                          // }
 
-                        setUploadFileOpen(true)
-                      }}
-                    >
-                      Upload File
-                    </button>
+                          setUploadFileOpen(true)
+                        }}
+                      >
+                        Upload File
+                      </button>
+                    )}
                     <Modal header="Upload File" open={uploadFileOpen} setOpen={setUploadFileOpen}>
                       <Form
                         schema={CandidateFileObj}

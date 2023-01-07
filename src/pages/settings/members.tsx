@@ -293,6 +293,41 @@ const UserSettingsMembersPage = ({
                     on the Free plan.
                   </Confirm>
 
+                  <Confirm
+                    open={openConfirmDelete}
+                    setOpen={setOpenConfirmDelete}
+                    header={`Delete Member - ${memberToDelete?.user?.name}?`}
+                    onSuccess={async () => {
+                      if (!memberToDelete) {
+                        toast.error("No member selected to remove")
+                        return
+                      }
+
+                      const toastId = toast.loading(() => (
+                        <span>Removing {memberToDelete?.user?.name}</span>
+                      ))
+                      try {
+                        await removeFromCompanyMutation({
+                          companyId: company?.id || "0",
+                          userId: memberToDelete?.user?.id || "0",
+                        })
+                        toast.success(`${memberToDelete?.user?.name} removed`, {
+                          id: toastId,
+                        })
+                      } catch (error) {
+                        toast.error(
+                          `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
+                          { id: toastId }
+                        )
+                      }
+                      setMemberToDelete(null as any)
+                      router.reload()
+                    }}
+                  >
+                    Are you sure you want to remove this user ({memberToDelete?.user?.name}) from
+                    the company?
+                  </Confirm>
+
                   <button
                     onClick={(e) => {
                       e.preventDefault()
@@ -389,35 +424,6 @@ const UserSettingsMembersPage = ({
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200">
                               {canUpdate && user?.id !== m.user.id && m.role !== "OWNER" && (
                                 <>
-                                  <Confirm
-                                    open={openConfirmDelete}
-                                    setOpen={setOpenConfirmDelete}
-                                    header={`Delete Member - ${memberToDelete?.user?.name}?`}
-                                    onSuccess={async () => {
-                                      const toastId = toast.loading(() => (
-                                        <span>Removing {memberToDelete?.user?.name}</span>
-                                      ))
-                                      try {
-                                        await removeFromCompanyMutation({
-                                          companyId: company?.id || "0",
-                                          userId: memberToDelete?.user?.id || "0",
-                                        })
-                                        toast.success(`${memberToDelete?.user?.name} removed`, {
-                                          id: toastId,
-                                        })
-                                      } catch (error) {
-                                        toast.error(
-                                          `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
-                                          { id: toastId }
-                                        )
-                                      }
-                                      setMemberToDelete(null as any)
-                                      router.reload()
-                                    }}
-                                  >
-                                    Are you sure you want to remove this user from the company?
-                                  </Confirm>
-
                                   <button
                                     title="Remove User"
                                     className="text-red-600 hover:text-red-800"

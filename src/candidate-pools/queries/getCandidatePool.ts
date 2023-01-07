@@ -11,7 +11,7 @@ const getCandidatePool = async ({ where }: GetCandidatePoolInput, ctx: Ctx) => {
 
   const candidatePool = await db.candidatePool.findFirst({
     where,
-    include: { candidates: { include: { job: { select: { slug: true } } } } },
+    // include: { candidates: { include: { job: { select: { slug: true } } } } },
   })
 
   if (!candidatePool) throw new NotFoundError()
@@ -19,5 +19,5 @@ const getCandidatePool = async ({ where }: GetCandidatePoolInput, ctx: Ctx) => {
   return candidatePool
 }
 
-export default Guard.authorize("read", "candidatePool", getCandidatePool)
-// export default getCandidatePool
+// export default Guard.authorize("read", "candidatePool", getCandidatePool)
+export default getCandidatePool

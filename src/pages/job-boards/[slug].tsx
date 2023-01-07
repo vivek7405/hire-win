@@ -66,9 +66,9 @@ export const getServerSideProps = gSSP(async (context) => {
   //   context.ctx
   // )
 
-  const parentCompanyId = context?.params?.parentCompanyId as string
+  const slug = context?.params?.slug as string
   const parentCompany = await db.parentCompany.findFirst({
-    where: { id: parentCompanyId },
+    where: { slug },
   })
 
   if (parentCompany) {
@@ -91,7 +91,7 @@ const Jobs = ({}) => {
   // const [query, setQuery] = useState({})
   const [searchString, setSearchString] = useState((router.query.search as string) || '""')
 
-  const { embed, parentCompanyId } = router.query
+  const { embed, slug } = router.query
 
   // const [theme, setTheme] = useState(company?.theme || "indigo")
   // useEffect(() => {
@@ -127,7 +127,7 @@ const Jobs = ({}) => {
   const [searchjobTitle, setSearchJobTitle] = useState("")
 
   const [jobBoardFilters] = useQuery(getJobBoardFilters, {
-    parentCompanyId: (parentCompanyId as string) || "0",
+    slug: (slug as string) || "0",
   })
 
   const [{ jobs, hasMore, count }] = usePaginatedQuery(getCompanyJobsByParentCompany, {
@@ -141,7 +141,7 @@ const Jobs = ({}) => {
     jobCity,
     remoteOption,
     searchString,
-    parentCompanyId: (parentCompanyId as string) || "0",
+    slug: (slug as string) || "0",
   })
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1

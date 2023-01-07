@@ -3,7 +3,7 @@ import Link from "next/link"
 import { useSession } from "@blitzjs/auth"
 import { usePaginatedQuery, useQuery, useMutation, invalidateQuery } from "@blitzjs/rpc"
 import { useRouter } from "next/router"
-import { Routes } from "@blitzjs/next"
+import { ErrorComponent, Routes } from "@blitzjs/next"
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next"
 import { useEffect, useState, useMemo, Suspense } from "react"
 import AuthLayout from "src/core/layouts/AuthLayout"
@@ -12,7 +12,7 @@ import path from "path"
 import getCandidatePoolsWOPagination from "src/candidate-pools/queries/getCandidatePoolsWOPagination"
 import Table from "src/core/components/Table"
 
-import { CandidatePool, Job } from "@prisma/client"
+import { CandidatePool, CompanyUserRole, Job, ParentCompanyUserRole } from "@prisma/client"
 import { CardType, DragDirection, ExtendedCandidatePool, PlanName } from "types"
 import Debouncer from "src/core/utils/debouncer"
 import Cards from "src/core/components/Cards"
@@ -24,13 +24,18 @@ import updateCandidatePool from "src/candidate-pools/mutations/updateCandidatePo
 import deleteCandidatePool from "src/candidate-pools/mutations/deleteCandidatePool"
 import Confirm from "src/core/components/Confirm"
 import Card from "src/core/components/Card"
-import { TrashIcon } from "@heroicons/react/outline"
+import { LibraryIcon, TrashIcon } from "@heroicons/react/outline"
 import getCandidatePools from "src/candidate-pools/queries/getCandidatePools"
 import Pagination from "src/core/components/Pagination"
 import { PencilIcon } from "@heroicons/react/solid"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import { e } from "@blitzjs/auth/dist/index-834e37b5"
+import getCompany from "src/companies/queries/getCompany"
+import getCompanyUser from "src/companies/queries/getCompanyUser"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
+import classNames from "src/core/utils/classNames"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -45,7 +50,71 @@ export const getServerSideProps = gSSP(async (context) => {
   if (user) {
     const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
 
-    return { props: { user, activePlanName } }
+    const company = await getCompany(
+      {
+        where: { id: context?.ctx?.session?.companyId || "0" },
+      },
+      context.ctx
+    )
+
+    const companyUser = await getCompanyUser(
+      {
+        where: {
+          companyId: company?.id || "0",
+          userId: user?.id || "0",
+        },
+      },
+      context.ctx
+    )
+
+    const parentCompany = await getParentCompany(
+      {
+        where: { id: company?.parentCompanyId || "0" },
+      },
+      context.ctx
+    )
+
+    const parentCompanyUser = await getParentCompanyUser(
+      {
+        where: {
+          parentCompanyId: parentCompany?.id || "0",
+          userId: context?.ctx?.session?.userId || "0",
+        },
+      },
+      context.ctx
+    )
+
+    const isCompanyOwnerOrAdmin =
+      (companyUser && companyUser?.role !== CompanyUserRole.USER) || false
+
+    const isParentCompanyOwnerOrAdmin =
+      (parentCompany?.name &&
+        parentCompanyUser &&
+        parentCompanyUser?.role !== ParentCompanyUserRole.USER) ||
+      false
+
+    if (!isCompanyOwnerOrAdmin && !isParentCompanyOwnerOrAdmin) {
+      return {
+        props: {
+          error: {
+            statusCode: 403,
+            message: "You don't have permission",
+          },
+        },
+      } as any
+    }
+
+    return {
+      props: {
+        isCompanyOwnerOrAdmin,
+        isParentCompanyOwnerOrAdmin,
+        user,
+        activePlanName,
+        companyUser,
+        parentCompany,
+        parentCompanyUser,
+      },
+    }
   } else {
     return {
       redirect: {
@@ -57,7 +126,16 @@ export const getServerSideProps = gSSP(async (context) => {
   }
 })
 
-const CandidatePools = ({ activePlanName }) => {
+const CandidatePools = ({
+  error,
+  isCompanyOwnerOrAdmin,
+  isParentCompanyOwnerOrAdmin,
+  user,
+  activePlanName,
+  companyUser,
+  parentCompany,
+  parentCompanyUser,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const ITEMS_PER_PAGE = 12
   const router = useRouter()
   const tablePage = Number(router.query.page) || 0
@@ -72,8 +150,14 @@ const CandidatePools = ({ activePlanName }) => {
   const [candidatePoolToDelete, setCandidatePoolToDelete] = useState(null as CandidatePool | null)
   const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
 
+  const [viewParent, setViewParent] = useState(isParentCompanyOwnerOrAdmin)
+
   const [{ candidatePools, hasMore, count }] = usePaginatedQuery(getCandidatePools, {
-    where: { companyId: session.companyId || "0", ...query },
+    where: {
+      ...query,
+      companyId: isParentCompanyOwnerOrAdmin && viewParent ? null : session.companyId || "0",
+      parentCompanyId: isParentCompanyOwnerOrAdmin && viewParent ? parentCompany?.id || "0" : null,
+    },
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
   })
@@ -173,6 +257,10 @@ const CandidatePools = ({ activePlanName }) => {
               isEdit ? "Updating Candidate Pool" : "Creating Candidate Pool"
             )
             try {
+              if (isParentCompanyOwnerOrAdmin && viewParent) {
+                values["parentCompanyId"] = parentCompany?.id || "0"
+              }
+
               if (isEdit) {
                 if (candidatePoolToEdit) {
                   await updateCandidatePoolMutation({
@@ -230,6 +318,34 @@ const CandidatePools = ({ activePlanName }) => {
         />
       </div>
 
+      {isCompanyOwnerOrAdmin && isParentCompanyOwnerOrAdmin && (
+        <div className="flex items-center justify-center mt-5">
+          <button
+            // className="px-4 py-1 border rounded-lg bg-white hover:bg-neutral-500 hover:text-white"
+            className={classNames(
+              "px-4 py-1 border border-neutral-300 rounded-lg",
+              viewParent
+                ? "bg-yellow-600 hover:bg-yellow-700 text-white"
+                : "text-neutral-600 bg-white hover:bg-neutral-500 hover:text-white"
+            )}
+            onClick={(e) => {
+              e.preventDefault()
+              setViewParent(!viewParent)
+            }}
+          >
+            {/* {viewRejected ? "Viewing Rejected" : "View Rejected"} */}
+            <span className="flex items-center justify-center space-x-2">
+              <LibraryIcon className="w-5 h-5" />
+              <span>
+                {viewParent
+                  ? "Viewing Parent Company Candidate Pools"
+                  : "View Parent Company Candidate Pools"}
+              </span>
+            </span>
+          </button>
+        </div>
+      )}
+
       <Pagination
         endPage={endPage}
         hasNext={hasMore}
@@ -237,7 +353,7 @@ const CandidatePools = ({ activePlanName }) => {
         pageIndex={tablePage}
         startPage={startPage}
         totalCount={count}
-        resultName="candidate pool"
+        resultName={viewParent ? "parent company candidate pool" : "company candidate pool"}
       />
 
       {candidatePools?.length > 0 && (
@@ -250,7 +366,16 @@ const CandidatePools = ({ activePlanName }) => {
                     <div className="font-bold flex items-center">
                       <Link
                         prefetch={true}
-                        href={Routes.SingleCandidatePoolPage({ slug: cp.slug })}
+                        href={
+                          viewParent
+                            ? Routes.SingleCandidatePoolPage({
+                                slug: cp.slug,
+                                isParent: viewParent,
+                              })
+                            : Routes.SingleCandidatePoolPage({
+                                slug: cp.slug,
+                              })
+                        }
                         passHref
                         legacyBehavior
                       >
@@ -305,9 +430,18 @@ const CandidatePools = ({ activePlanName }) => {
 }
 
 const CandidatePoolsHome = ({
+  error,
+  isCompanyOwnerOrAdmin,
+  isParentCompanyOwnerOrAdmin,
   user,
   activePlanName,
+  companyUser,
+  parentCompany,
+  parentCompanyUser,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  if (error) {
+    return <ErrorComponent statusCode={error.statusCode} title={error.message} />
+  }
   return (
     <AuthLayout title="Hire.win | Candidate Pools" user={user}>
       <div className="mb-6">
@@ -327,7 +461,16 @@ const CandidatePoolsHome = ({
       </div>
 
       <Suspense fallback="Loading...">
-        <CandidatePools activePlanName={activePlanName} />
+        <CandidatePools
+          error={error}
+          isCompanyOwnerOrAdmin={isCompanyOwnerOrAdmin}
+          isParentCompanyOwnerOrAdmin={isParentCompanyOwnerOrAdmin}
+          user={user}
+          activePlanName={activePlanName}
+          companyUser={companyUser}
+          parentCompany={parentCompany}
+          parentCompanyUser={parentCompanyUser}
+        />
       </Suspense>
     </AuthLayout>
   )

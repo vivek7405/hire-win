@@ -185,7 +185,7 @@ const ParentCompanyFormComponent = ({ user, company, companyOwner, parentCompany
   return (
     <>
       <ParentCompanyForm
-        parentCompanyId={parentCompany?.id}
+        slug={parentCompany?.slug}
         header={
           user?.id === companyOwner?.id
             ? "Your Parent Company"
