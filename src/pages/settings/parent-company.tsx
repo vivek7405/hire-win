@@ -158,7 +158,8 @@ const UserSettingsParentCompanyPage = ({
               <div className="bg-white p-6">
                 <div className="text-neutral-600 italic">
                   If you are a staffing agency or a group of companies, you can setup a Parent
-                  Company to use common tools across multiple companies.
+                  Company to use common tools like email templates & candidate pools across multiple
+                  companies.
                 </div>
                 <div className="mt-6">
                   <button

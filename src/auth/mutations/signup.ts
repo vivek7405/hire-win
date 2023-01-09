@@ -110,6 +110,11 @@ export default async function signup(
   })
 
   if (!existingCompany) {
+    await db.company.update({
+      where: { slug: newSlug },
+      data: { createdById: user?.id },
+    })
+
     await db.parentCompanyUser.create({
       data: {
         role: ParentCompanyUserRole.OWNER,
