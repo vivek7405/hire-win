@@ -41,6 +41,7 @@ import { AuthorizationError } from "blitz"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import UserSettingsLayout from "src/core/layouts/UserSettingsLayout"
+import updateAutoAddMembers from "src/parent-companies/mutations/updateAutoAddMembers"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -75,17 +76,12 @@ export const getServerSideProps = gSSP(async (context) => {
         //   include: { company: true },
         // })
 
-        const parentCompany = await getParentCompany(
-          { where: { id: company?.parentCompanyId || "0" } },
-          context.ctx
-        )
-
         const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
 
         return {
           props: {
             user,
-            parentCompany,
+            parentCompanyId: company?.parentCompanyId || "0",
             canUpdate,
             activePlanName,
           } as any,
@@ -127,7 +123,7 @@ export const getServerSideProps = gSSP(async (context) => {
 
 const UserSettingsParentMembersPage = ({
   user,
-  parentCompany,
+  parentCompanyId,
   canUpdate,
   activePlanName,
   error,
@@ -141,9 +137,13 @@ const UserSettingsParentMembersPage = ({
   const [changePermissionMutation] = useMutation(updateParentCompanyUser)
   const [openConfirmBilling, setOpenConfirmBilling] = useState(false)
 
-  const [parentCompanyData, setParentCompanyData] = useState(parentCompany)
-
   const [memberToDelete, setMemberToDelete] = useState(null as any)
+
+  const [parentCompany] = useQuery(getParentCompany, {
+    where: { id: parentCompanyId || "0" },
+  })
+
+  const [updateAutoAddMembersMutation] = useMutation(updateAutoAddMembers)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -206,7 +206,7 @@ const UserSettingsParentMembersPage = ({
                           //   email: values.email,
                           // })
                           await addUserToParentCompanyMutation({
-                            parentCompanyId: parentCompanyData?.id as string,
+                            parentCompanyId: parentCompany?.id as string,
                             email: values.email,
                             parentCompanyUserRole: values.parentCompanyUserRole,
                           })
@@ -262,7 +262,7 @@ const UserSettingsParentMembersPage = ({
                       const toastId = toast.loading(`Removing ${memberToDelete?.user?.email}`)
                       try {
                         await removeFromParentCompanyMutation({
-                          parentCompanyId: parentCompanyData?.id as string,
+                          parentCompanyId: parentCompany?.id as string,
                           userId: memberToDelete?.user?.id,
                         })
                         toast.success(`User removed`, {
@@ -322,7 +322,37 @@ const UserSettingsParentMembersPage = ({
                 </div>
 
                 <div className="overflow-auto">
-                  <table className="table min-w-full border border-gray-200">
+                  <div className="flex items-center space-x-2 text-neutral-700">
+                    <input
+                      id="auto-add-checkbox"
+                      type="checkbox"
+                      checked={parentCompany?.autoAddUsersToCompanies || false}
+                      className="border rounded"
+                      onChange={async (e) => {
+                        const isAutoAdd = e.target.checked
+                        const toastId = toast.loading("Updating auto add")
+
+                        try {
+                          await updateAutoAddMembersMutation({
+                            parentCompanyId,
+                            autoAddUsersToCompanies: isAutoAdd,
+                          })
+
+                          await invalidateQuery(getParentCompany)
+
+                          toast.success(isAutoAdd ? "Auto add turned on" : "Auto add turned off", {
+                            id: toastId,
+                          })
+                        } catch (error) {
+                          toast.error(`Something went wrong - ${error.toString()}`, { id: toastId })
+                        }
+                      }}
+                    />
+                    <label htmlFor="auto-add-checkbox">
+                      Auto add all parent company members as admins to newly created companies
+                    </label>
+                  </div>
+                  <table className="table min-w-full border border-gray-200 mt-6">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -343,7 +373,7 @@ const UserSettingsParentMembersPage = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {parentCompanyData?.users?.map((m, i) => {
+                      {parentCompany?.users?.map((m, i) => {
                         return (
                           <tr className="bg-white" key={i}>
                             <td

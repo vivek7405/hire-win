@@ -138,6 +138,27 @@ export default resolver.pipe(
       })
     }
 
+    // auto add parent company members to company as admins
+    // if they are not already an active member in the company
+    const companyUsers = await db.companyUser.findMany({
+      where: { companyId: company?.id || "0" },
+    })
+    const parentCompanyUsersToAddToCompany = await db.parentCompanyUser.findMany({
+      where: {
+        parentCompanyId: company?.parentCompanyId || "0",
+        userId: { notIn: companyUsers?.map((cu) => cu.userId) },
+      },
+    })
+    await db.companyUser.createMany({
+      data: parentCompanyUsersToAddToCompany?.map((pcu) => {
+        return {
+          companyId: company?.id || "0",
+          userId: pcu.userId,
+          role: CompanyUserRole.ADMIN,
+        }
+      }),
+    })
+
     const companyId = company?.id || "0"
 
     await ctx.session.$setPublicData({ companyId: company.id || "0" })

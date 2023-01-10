@@ -44,7 +44,7 @@ export const ParentCompanyUserInvitationForm = (props: InvitationFormProps) => {
         <>
           <Link href={Routes.UserSettingsMembersPage()} legacyBehavior>
             <a className="w-fit flex items-center space-x-2 text-sm text-theme-600 hover:text-theme-800">
-              <div>View/Invite Parent Company Users</div>
+              <div>View/Invite Company Users</div>
               <ArrowRightIcon className="w-4 h-4" />
             </a>
           </Link>

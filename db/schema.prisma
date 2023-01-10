@@ -225,6 +225,8 @@ model ParentCompany {
   name String?
   slug String? @unique
 
+  autoAddUsersToCompanies Boolean @default(true)
+
   users     ParentCompanyUser[]
   companies Company[]
   tokens    Token[]
