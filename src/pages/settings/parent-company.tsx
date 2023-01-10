@@ -27,6 +27,9 @@ import ParentCompanyForm from "src/parent-companies/components/ParentCompanyForm
 import db from "db"
 import updateParentCompany from "src/parent-companies/mutations/updateParentCompany"
 import Guard from "src/guard/ability"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
+import { PlanName } from "types"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -78,8 +81,18 @@ export const getServerSideProps = gSSP(async (context) => {
         context.ctx
       )
 
+      const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
       if (parentCompanyUser && parentCompanyUser?.role !== ParentCompanyUserRole.USER) {
-        return { props: { user, company, companyOwner: ownerCompanyUser?.user, parentCompany } }
+        return {
+          props: {
+            user,
+            company,
+            companyOwner: ownerCompanyUser?.user,
+            parentCompany,
+            activePlanName,
+          },
+        }
       } else {
         return {
           props: {
@@ -117,6 +130,7 @@ const UserSettingsParentCompanyPage = ({
   companyOwner,
   parentCompany,
   error,
+  activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
 
@@ -156,16 +170,23 @@ const UserSettingsParentCompanyPage = ({
               />
             ) : (
               <div className="bg-white p-6">
-                <div className="text-neutral-600 italic">
+                {activePlanName === PlanName.FREE && (
+                  <UpgradeMessage message="Upgrade to setup parent company" />
+                )}
+                <div className="text-neutral-600 italic mt-6">
                   If you are a staffing agency or a group of companies, you can setup a Parent
                   Company to use common tools like email templates & candidate pools across multiple
-                  companies.
+                  companies and to gain more control over sub companies.
                 </div>
                 <div className="mt-6">
                   <button
                     className="px-4 py-2 rounded bg-theme-600 hover:bg-theme-800 text-white"
                     onClick={() => {
-                      setShowForm(true)
+                      if (activePlanName !== PlanName.FREE) {
+                        setShowForm(true)
+                      } else {
+                        alert("You must upgrade to the Recruiter Plan to setup parent company.")
+                      }
                     }}
                   >
                     Setup Parent Company

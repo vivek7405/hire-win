@@ -32,4 +32,5 @@ async function updateCandidatePool({ where, data, initial }: UpdateCandidatePool
   return candidatePool
 }
 
-export default Guard.authorize("read", "candidatePool", updateCandidatePool)
+export default updateCandidatePool
+// export default Guard.authorize("read", "candidatePool", updateCandidatePool)

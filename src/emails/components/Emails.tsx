@@ -99,6 +99,8 @@ const Emails = ({ user, stageId, candidate }) => {
   })
 
   const replaceEmailTemplatePlaceHolders = (body: JSON) => {
+    const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
+
     if (body) {
       let stringifiedBody = JSON.stringify(body)
 
@@ -123,6 +125,22 @@ const Emails = ({ user, stageId, candidate }) => {
           case EmailTemplatePlaceholders.Sender_Name:
             etValues[etPlaceholder] = user?.name
             break
+          case EmailTemplatePlaceholders.Job_Listing_Link:
+            etValues[
+              etPlaceholder
+            ] = `${origin}/${candidate?.job?.company?.slug}/${candidate?.job?.slug}`
+            break
+          case EmailTemplatePlaceholders.Careers_Page_Link:
+            etValues[etPlaceholder] = `${origin}/${candidate?.job?.company?.slug}`
+            break
+          case EmailTemplatePlaceholders.Parent_Company_Name:
+            etValues[etPlaceholder] = candidate?.job?.company?.parentCompany?.name
+            break
+          case EmailTemplatePlaceholders.Job_Board_Link:
+            etValues[
+              etPlaceholder
+            ] = `${origin}/job-boards/${candidate?.job?.company?.parentCompany?.slug}`
+            break
         }
       })
 
@@ -140,7 +158,7 @@ const Emails = ({ user, stageId, candidate }) => {
 
   return (
     <>
-      <Modal noOverflow={true} header="Send Email" open={openModal} setOpen={setOpenModal}>
+      <Modal header="Send Email" open={openModal} setOpen={setOpenModal}>
         <EmailForm
           disabled={emailToView ? true : false}
           header={`${emailToView ? "" : "Send "}Email to ${candidate?.name}`}

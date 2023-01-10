@@ -158,7 +158,7 @@ export default resolver.pipe(
       await updateDefaultSchedule(schedule.id || "0", ctx)
     }
 
-    await createFactoryItems({ companyId }, ctx)
+    await createFactoryItems({ companyId, parentCompanyId: company?.parentCompanyId || "0" }, ctx)
     // await createFactoryJob(companyId, ctx)
 
     // await provideTrail(ctx?.session?.userId || "0", company.id || "0")

@@ -133,24 +133,48 @@ const CandidatePoolLayout = ({ children }: LayoutProps) => {
   return (
     <div className="bg-gray-100 flex flex-col mt-6 md:flex-row md:space-x-4 lg:flex-row lg:space-x-4">
       <div className="w-full mb-6 md:mb-0 lg:mb-0 md:w-1/5 lg:w-1/5">
-        {subNavigation
-          ?.filter((navItem) => navItem.isParent)
-          .map((item) => {
-            if (!item) return <></>
-            return <NavLink item={item} />
-          })}
+        {subNavigation?.filter((navItem) => navItem.isParent)?.length > 0 ? (
+          <>
+            {subNavigation?.filter((navItem) => navItem.isParent)?.length > 0 && (
+              <div>
+                <p className="text-xs text-neutral-600 uppercase">Parent Company Pools</p>
+                <hr className="my-1" />
+                <div>
+                  {subNavigation
+                    ?.filter((navItem) => navItem.isParent)
+                    .map((item) => {
+                      if (!item) return <></>
+                      return <NavLink item={item} />
+                    })}
+                </div>
+              </div>
+            )}
 
-        {subNavigation?.filter((navItem) => navItem.isParent)?.length > 0 &&
-          subNavigation?.filter((navItem) => !navItem.isParent)?.length > 0 && (
-            <div className="h-px bg-neutral-400" />
-          )}
-
-        {subNavigation
-          ?.filter((navItem) => !navItem.isParent)
-          .map((item) => {
-            if (!item) return <></>
-            return <NavLink item={item} />
-          })}
+            {subNavigation?.filter((navItem) => !navItem.isParent)?.length > 0 && (
+              <div className="mt-10">
+                <p className="text-xs text-neutral-600 uppercase">Company Pools</p>
+                <hr className="my-1" />
+                <div>
+                  {subNavigation
+                    ?.filter((navItem) => !navItem.isParent)
+                    .map((item) => {
+                      if (!item) return <></>
+                      return <NavLink item={item} />
+                    })}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {subNavigation
+              ?.filter((navItem) => !navItem.isParent)
+              .map((item) => {
+                if (!item) return <></>
+                return <NavLink item={item} />
+              })}
+          </>
+        )}
       </div>
       <div className="w-full md:w-4/5 lg:w-4/5">{children}</div>
     </div>

@@ -128,6 +128,11 @@ export default async function signup(
   const compId =
     existingCompany?.id || (user.companies && (user.companies[0]?.companyId || "0")) || "0"
 
+  const parentCompId =
+    existingCompany?.parentCompanyId ||
+    (user.companies && (user.companies[0]?.company?.parentCompanyId || "0")) ||
+    "0"
+
   await ctx.session.$create({ userId: user.id, role: user.role as UserRole, companyId: compId })
 
   const schedule = await addSchedule(
@@ -141,7 +146,7 @@ export default async function signup(
   await updateDefaultSchedule(schedule.id || "0", ctx)
 
   if (!existingCompany) {
-    await createFactoryItems({ companyId: compId }, ctx)
+    await createFactoryItems({ companyId: compId, parentCompanyId: parentCompId }, ctx)
     // currency && (await provideTrail(user?.id, compId, currency))
 
     // Always keep factory job at last
