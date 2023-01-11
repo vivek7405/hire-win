@@ -32,7 +32,7 @@ import getParentCompany from "src/parent-companies/queries/getParentCompany"
 import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 import db from "db"
 import getCandidatePoolsWOPagination from "src/candidate-pools/queries/getCandidatePoolsWOPagination"
-import switchCompany from "src/auth/mutations/switchCompany"
+import updateCompanySession from "src/companies/mutations/updateCompanySession"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -226,7 +226,7 @@ export const Candidates = ({ slug, parentCompanyId }) => {
     endPage = count
   }
 
-  const [switchCompanyMutation] = useMutation(switchCompany)
+  const [updateCompanySessionMutation] = useMutation(updateCompanySession)
 
   return (
     <>
@@ -274,9 +274,7 @@ export const Candidates = ({ slug, parentCompanyId }) => {
             try {
               setOpenSwitchCompanyConfirm(false)
 
-              await switchCompanyMutation({
-                companyId: candidateToSwitchCompany?.job?.companyId || "0",
-              })
+              await updateCompanySessionMutation(candidateToSwitchCompany?.job?.companyId || "0")
 
               router.push(
                 Routes.SingleCandidatePage({

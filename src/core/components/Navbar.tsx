@@ -3,7 +3,7 @@ import { useSession } from "@blitzjs/auth"
 import { Routes } from "@blitzjs/next"
 import { useMutation, useQuery } from "@blitzjs/rpc"
 import { useRouter } from "next/router"
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useRef } from "react"
 import {
   CheckIcon,
   MenuIcon,
@@ -245,6 +245,13 @@ const NavbarContent = ({
       where: { userId: session?.userId || "0" },
     })
 
+    const [filteredCompanyUsers, setFilteredCompanyUsers] = useState(companyUsers)
+    const searchInput = useRef(null)
+
+    useEffect(() => {
+      ;(searchInput as any)?.current?.focus()
+    }, [filteredCompanyUsers])
+
     return (
       <div className="flex items-center space-x-2">
         <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
@@ -265,7 +272,7 @@ const NavbarContent = ({
                   if (companyId === "new_company") {
                     router.push(Routes.NewCompany())
                   } else {
-                    const cu = companyUsers?.find(
+                    const cu = filteredCompanyUsers?.find(
                       (cu) => cu.userId === user?.id && cu.companyId === companyId
                     )
                     setSelectedCompanyUser(cu!)
@@ -276,7 +283,57 @@ const NavbarContent = ({
                   }
                 }}
               >
-                {companyUsers?.map((cu) => {
+                <div className="w-full p-2 flex items-center">
+                  <input
+                    ref={searchInput}
+                    autoFocus={true}
+                    type="text"
+                    placeholder="Search Company..."
+                    className="w-full h-8 border rounded border-neutral-400 text-neutral-700 text-sm"
+                    onChange={(e) => {
+                      const searchString = e.target.value
+
+                      if (searchString?.trim()) {
+                        setFilteredCompanyUsers(
+                          companyUsers?.filter((cu) =>
+                            cu.company?.name
+                              ?.toLowerCase()
+                              ?.trim()
+                              ?.includes(searchString?.toLowerCase()?.trim())
+                          )
+                        )
+                      } else {
+                        setFilteredCompanyUsers([...companyUsers])
+                      }
+
+                      setTimeout(() => {
+                        ;(searchInput as any)?.current?.focus()
+                      })
+                    }}
+                  />
+                  <button
+                    className="text-theme-600 hover:text-theme-800 -ml-7"
+                    title="Add New Company"
+                    onClick={() => {
+                      router.push(Routes.NewCompany())
+                    }}
+                  >
+                    <PlusIcon className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {filteredCompanyUsers?.length === 0 && (
+                  <DropdownMenu.Item
+                    disabled={true}
+                    onSelect={(e) => {
+                      e.preventDefault()
+                    }}
+                    className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
+                  >
+                    No companies available
+                  </DropdownMenu.Item>
+                )}
+                {filteredCompanyUsers?.map((cu) => {
                   return (
                     <div key={cu.companyId}>
                       <DropdownMenu.RadioItem
