@@ -1,4 +1,4 @@
-import { useQuery } from "@blitzjs/rpc";
+import { useQuery } from "@blitzjs/rpc"
 import { LabeledTextField } from "src/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "src/core/components/LabeledTextAreaField"
 import { Form } from "src/core/components/Form"
@@ -79,12 +79,13 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
     }
   }
 
-  const getQuestionField = (question: ExtendedFormQuestion) => {
+  const getQuestionField = (question: ExtendedFormQuestion, autoFocus: boolean) => {
     switch (question.type) {
       case FormQuestionType.Single_line_text:
         return (
           <LabeledTextField
             key={question.id}
+            autoFocus={autoFocus}
             type="text"
             name={question.title}
             label={question.title}
@@ -272,12 +273,12 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           className="max-w-md mx-auto"
           isRounded={props.careersPage}
         >
-          {formQuestions.map((question) => {
+          {formQuestions.map((question, index) => {
             // Hide question only on careers page and not when adding candidate manually
             if ((props.careersPage || props.preview) && question.behaviour === "OFF") {
               return
             }
-            return getQuestionField(question as any)
+            return getQuestionField(question as any, index === 0)
           })}
         </Form>
       </div>
