@@ -41,6 +41,10 @@ export enum EmailTemplatePlaceholders {
   Company_Name = "Company_Name",
   Sender_Name = "Sender_Name",
   Interviewer_Name = "Interviewer_Name",
+  Job_Listing_Link = "Job_Listing_Link",
+  Careers_Page_Link = "Careers_Page_Link",
+  Job_Board_Link = "Job_Board_Link",
+  Parent_Company_Name = "Parent_Company_Name",
 }
 
 export enum PlanFrequency {

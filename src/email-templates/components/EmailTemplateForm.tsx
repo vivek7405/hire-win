@@ -16,20 +16,18 @@ export const EmailTemplateForm = ({
   onSubmit,
 }: EmailTemplateFormProps) => {
   return (
-    <>
-      <Form
-        submitText="Submit"
-        schema={EmailTemplateObj}
-        header={header}
-        subHeader={subHeader}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-      >
-        <LabeledTextField name="name" label="Name" placeholder="Template name" />
-        <LabeledTextField name="subject" label="Subject" placeholder="Email subject" />
-        <LabeledRichTextField name="body" label="Body" showTemplatePlaceholders={true} />
-      </Form>
-    </>
+    <Form
+      submitText="Submit"
+      schema={EmailTemplateObj}
+      header={header}
+      subHeader={subHeader}
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+    >
+      <LabeledTextField name="name" label="Name" placeholder="Template name" />
+      <LabeledTextField name="subject" label="Subject" placeholder="Email subject" />
+      <LabeledRichTextField name="body" label="Body" showTemplatePlaceholders={true} />
+    </Form>
   )
 }
 

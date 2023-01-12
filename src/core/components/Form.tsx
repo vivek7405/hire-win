@@ -74,9 +74,9 @@ export function Form<S extends z.ZodType<any, any>>({
           <div>
             <div className="flex items-center">
               {(header || subHeader) && (
-                <div className="w-3/4">
+                <div className="w-full">
                   {headerComponent || (
-                    <h2 className="text-lg font-medium text-gray-900 whitespace-nowrap">
+                    <h2 className="text-lg font-medium text-gray-900 whitespace-nowrap truncate">
                       {header}
                     </h2>
                   )}

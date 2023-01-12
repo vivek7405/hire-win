@@ -1,6 +1,6 @@
 import Guard from "src/guard/ability"
 import { checkPlan } from "src/companies/utils/checkPlan"
-import { Ctx } from "blitz";
+import { Ctx } from "blitz"
 import db, { Company, CompanyUser, Prisma, User } from "db"
 import { Plan, SubscriptionObject } from "types"
 import Stripe from "stripe"
@@ -9,10 +9,10 @@ import { checkSubscription } from "../utils/checkSubscription"
 interface GetCompanyUserInput extends Pick<Prisma.CompanyUserFindFirstArgs, "where"> {}
 
 async function getCompanyUser({ where }: GetCompanyUserInput, ctx: Ctx) {
-  const companyUser = (await db.companyUser.findFirst({
+  const companyUser = await db.companyUser.findFirst({
     where,
     include: { company: true, user: true },
-  })) as any
+  })
 
   // if (companyUser && companyUser.company) {
   //   // companyUser.currentPlan = checkPlan(companyUser.company)
@@ -25,11 +25,7 @@ async function getCompanyUser({ where }: GetCompanyUserInput, ctx: Ctx) {
 
   // if (!companyUser) throw new NotFoundError()
 
-  return companyUser as CompanyUser & {
-    user: User
-    company: Company
-    subscription: SubscriptionObject | null
-  }
+  return companyUser
 }
 
 export default getCompanyUser

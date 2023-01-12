@@ -1,4 +1,4 @@
-import { Ctx } from "blitz";
+import { Ctx } from "blitz"
 import db, { Prisma } from "db"
 
 interface GetCompanyInput extends Pick<Prisma.CompanyFindFirstArgs, "where"> {}
@@ -12,6 +12,7 @@ async function getCompany({ where }: GetCompanyInput, ctx: Ctx) {
           user: true,
         },
       },
+      parentCompany: true,
     },
   })
 

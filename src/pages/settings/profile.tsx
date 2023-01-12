@@ -20,6 +20,7 @@ import CompanyForm from "src/companies/components/CompanyForm"
 import updateCompany from "src/companies/mutations/updateCompany"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 import { Suspense } from "react"
+import ProfileSettingsLayout from "src/core/layouts/ProfileSettingsLayout"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -64,37 +65,38 @@ const UserSettingsProfilePage = ({
       <Breadcrumbs ignore={[{ breadcrumb: "Jobs", href: "/jobs" }]} />
       <Suspense fallback="Loading...">
         <UserSettingsLayout>
-          <UserForm
-            userId={user?.id}
-            header="Profile"
-            subHeader="Update your profile details"
-            initialValues={{
-              name: user?.name || "",
-              email: user?.email || "",
-              jobBoardName: user?.jobBoardName || "",
-              // logo: company?.logo,
-              // info: company?.info
-              //   ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
-              //   : EditorState.createEmpty(),
-              // website: company?.website || "",
-              // theme: company?.theme || "indigo",
-            }}
-            onSubmit={async (values) => {
-              const toastId = toast.loading(() => <span>Updating User</span>)
-              try {
-                await updateUserMutation({
-                  where: { id: user?.id },
-                  data: { ...values },
-                  initial: user!,
-                })
-                toast.success(() => <span>User Updated</span>, { id: toastId })
-              } catch (error) {
-                toast.error(
-                  "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                )
-              }
-            }}
-          />
+          <ProfileSettingsLayout>
+            <UserForm
+              userId={user?.id}
+              header="Profile"
+              subHeader="Update your profile details"
+              initialValues={{
+                name: user?.name || "",
+                email: user?.email || "",
+                // logo: company?.logo,
+                // info: company?.info
+                //   ? EditorState.createWithContent(convertFromRaw(company?.info || {}))
+                //   : EditorState.createEmpty(),
+                // website: company?.website || "",
+                // theme: company?.theme || "indigo",
+              }}
+              onSubmit={async (values) => {
+                const toastId = toast.loading(() => <span>Updating User</span>)
+                try {
+                  await updateUserMutation({
+                    where: { id: user?.id },
+                    data: { ...values },
+                    initial: user!,
+                  })
+                  toast.success(() => <span>User Updated</span>, { id: toastId })
+                } catch (error) {
+                  toast.error(
+                    "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                  )
+                }
+              }}
+            />
+          </ProfileSettingsLayout>
         </UserSettingsLayout>
       </Suspense>
     </AuthLayout>

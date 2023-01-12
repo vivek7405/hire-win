@@ -12,7 +12,7 @@ import path from "path"
 import getCurrentUserServer from "src/users/queries/getCurrentUserServer"
 import LogoBrand from "src/assets/LogoBrand"
 import getToken from "src/tokens/queries/getToken"
-import { CompanyUserRole } from "@prisma/client"
+import { CompanyUserRole, TokenType } from "@prisma/client"
 
 export const getServerSideProps = gSSP(async (context) => {
   path.resolve("next.config.js")
@@ -47,9 +47,9 @@ export const getServerSideProps = gSSP(async (context) => {
     }
 
     switch (tokenFromDB.type) {
-      case "CONFIRM_EMAIL":
+      case TokenType.CONFIRM_EMAIL:
         return { props: { email: tokenFromDB?.sentTo } }
-      case "INVITE_TO_COMPANY":
+      case TokenType.INVITE_TO_COMPANY:
         return {
           props: {
             email: tokenFromDB?.sentTo,

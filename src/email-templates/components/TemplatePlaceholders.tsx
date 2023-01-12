@@ -1,9 +1,14 @@
+import { useSession } from "@blitzjs/auth"
+import { useQuery } from "@blitzjs/rpc"
 import { EditorState, Modifier } from "draft-js"
-import { useState } from "react"
+import { Suspense, useEffect, useState } from "react"
+import getCompany from "src/companies/queries/getCompany"
 import { EmailTemplatePlaceholders } from "types"
 
-const TemplatePlaceholders = ({ editorState, onChange }) => {
+const TemplatePlaceholdersComponent = ({ editorState, onChange }) => {
   const [open, setOpen] = useState(false)
+  const session = useSession()
+  const [company] = useQuery(getCompany, { where: { id: session.companyId || "0" } })
 
   const addPlaceholder = (placeholder) => {
     const contentState = Modifier.replaceText(
@@ -15,16 +20,16 @@ const TemplatePlaceholders = ({ editorState, onChange }) => {
     onChange(EditorState.push(editorState, contentState, "insert-characters"))
   }
 
-  // const placeholderOptions = [
-  //   { key: "firstName", value: "{{firstName}}", text: "First Name" },
-  //   { key: "lastName", value: "{{lastName}}", text: "Last name" },
-  //   { key: "company", value: "{{company}}", text: "Company" },
-  //   { key: "address", value: "{{address}}", text: "Address" },
-  //   { key: "zip", value: "{{zip}}", text: "Zip" },
-  //   { key: "city", value: "{{city}}", text: "City" },
-  // ]
+  const isParent = company?.parentCompany?.name ? true : false
+  const companyPlaceholderItems = Object.keys(EmailTemplatePlaceholders)?.filter(
+    (placeholder) =>
+      placeholder !== EmailTemplatePlaceholders.Parent_Company_Name &&
+      placeholder !== EmailTemplatePlaceholders.Job_Board_Link
+  )
+  const parentCompanyPlaceholderItems = Object.keys(EmailTemplatePlaceholders)
+  const placeholderItems = isParent ? parentCompanyPlaceholderItems : companyPlaceholderItems
 
-  const listItems = Object.keys(EmailTemplatePlaceholders).map((item) => (
+  const listItems = placeholderItems.map((item) => (
     <li
       onClick={(e) => {
         e.preventDefault()
@@ -73,6 +78,14 @@ const TemplatePlaceholders = ({ editorState, onChange }) => {
         }
       `}</style>
     </>
+  )
+}
+
+const TemplatePlaceholders = ({ editorState, onChange }) => {
+  return (
+    <Suspense fallback="Loading...">
+      <TemplatePlaceholdersComponent editorState={editorState} onChange={onChange} />
+    </Suspense>
   )
 }
 

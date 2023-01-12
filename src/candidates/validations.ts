@@ -42,5 +42,6 @@ export const Candidate = z.object({
   rejected: z.boolean().optional(),
   files: z.array(CandidateFileObj).optional(),
   createdById: z.string().optional(),
+  visibleOnlyToParentMembers: z.boolean().optional(),
 })
 export type CandidateInputType = z.infer<typeof Candidate>

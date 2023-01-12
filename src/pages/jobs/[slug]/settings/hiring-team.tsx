@@ -13,7 +13,7 @@ import AuthLayout from "src/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "src/guard/ability"
 
-import InvitationForm from "src/jobs/components/InvitationForm"
+import JobInvitationForm from "src/jobs/components/JobInvitationForm"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 // import inviteToJob from "src/jobs/mutations/inviteToJob"
 import removeFromJob from "src/jobs/mutations/removeFromJob"
@@ -164,6 +164,8 @@ const JobSettingsHiringTeamPage = ({
   const [assignInterviewerToJobStageMutation] = useMutation(assignInterviewerToJobStage)
   const [assignInterviewDurationToJobStageMutation] = useMutation(assignInterviewDurationToJobStage)
 
+  const [memberToDelete, setMemberToDelete] = useState(null as any)
+
   const [jobData, setJobData] = useState(job)
 
   if (error) {
@@ -209,12 +211,11 @@ const JobSettingsHiringTeamPage = ({
                   setOpen={setOpenInvite}
                   noOverflow={true}
                 >
-                  <InvitationForm
+                  <JobInvitationForm
                     header="Add Team Member"
                     subHeader="Add an existing company user to this job"
                     submitText="Add"
                     jobId={job?.id || "0"}
-                    isJobInvitation={true}
                     initialValues={{ email: "" }}
                     onSubmit={async (values) => {
                       const toastId = toast.loading(() => <span>Inviting {values.email}</span>)
@@ -265,6 +266,40 @@ const JobSettingsHiringTeamPage = ({
                   }}
                 >
                   {upgradeConfirmMessage}
+                </Confirm>
+
+                <Confirm
+                  open={openConfirmDelete}
+                  setOpen={setOpenConfirmDelete}
+                  header={"Delete Member?"}
+                  onSuccess={async () => {
+                    if (!memberToDelete) {
+                      toast.error("No member selected to remove")
+                      return
+                    }
+
+                    const toastId = toast.loading(`Removing ${memberToDelete?.user?.email}`)
+                    try {
+                      await removeFromJobMutation({
+                        jobId: jobData?.id as string,
+                        userId: memberToDelete?.user?.id,
+                      })
+                      toast.success(`User removed`, {
+                        id: toastId,
+                      })
+                      router.reload()
+                    } catch (error) {
+                      toast.error(
+                        `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
+                        { id: toastId }
+                      )
+                    }
+
+                    setMemberToDelete(null)
+                  }}
+                >
+                  Are you sure you want to remove this user ({memberToDelete?.user?.name}) from the
+                  job?
                 </Confirm>
 
                 <button
@@ -384,38 +419,13 @@ const JobSettingsHiringTeamPage = ({
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-b border-gray-200">
                             {canUpdate && user?.id !== m.user.id && m.role !== "OWNER" && (
                               <>
-                                <Confirm
-                                  open={openConfirmDelete}
-                                  setOpen={setOpenConfirmDelete}
-                                  header={"Delete Member?"}
-                                  onSuccess={async () => {
-                                    const toastId = toast.loading(`Removing ${m.user.email}`)
-                                    try {
-                                      await removeFromJobMutation({
-                                        jobId: jobData?.id as string,
-                                        userId: m.user.id,
-                                      })
-                                      toast.success(`User removed`, {
-                                        id: toastId,
-                                      })
-                                      router.reload()
-                                    } catch (error) {
-                                      toast.error(
-                                        `Sorry, we had an unexpected error. Please try again. - ${error.toString()}`,
-                                        { id: toastId }
-                                      )
-                                    }
-                                  }}
-                                >
-                                  Are you sure you want to remove this user from the job?
-                                </Confirm>
-
                                 <button
                                   data-testid={`remove-${m.user.email}-fromJob`}
                                   title="Remove User"
                                   className="text-red-600 hover:text-red-800"
                                   onClick={async (e) => {
                                     e.preventDefault()
+                                    setMemberToDelete(m)
                                     setOpenConfirmDelete(true)
                                   }}
                                 >

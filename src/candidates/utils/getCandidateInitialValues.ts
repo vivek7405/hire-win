@@ -34,7 +34,7 @@ function getCandidateInitialValues(
     }
   })
 
-  return initialValues
+  return { ...initialValues, visibleOnlyToParentMembers: candidate?.visibleOnlyToParentMembers }
 }
 
 export default getCandidateInitialValues

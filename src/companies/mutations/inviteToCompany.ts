@@ -1,17 +1,25 @@
-import { generateToken, hash256 } from "@blitzjs/auth";
-import { Ctx } from "blitz";
+import { generateToken, hash256 } from "@blitzjs/auth"
+import { Ctx } from "blitz"
 import Guard from "src/guard/ability"
-import db, { CompanyUserRole } from "db"
+import db, { CompanyUserRole, ParentCompanyUserRole, TokenType } from "db"
 import { inviteToCompanyMailer } from "mailers/inviteToCompanyMailer"
 
 interface InviteToCompanyInput {
   companyId: string
   email: string
   companyUserRole: CompanyUserRole
+  parentCompanyId?: string
+  parentCompanyUserRole?: ParentCompanyUserRole
 }
 
 async function inviteToCompany(
-  { companyId, email, companyUserRole }: InviteToCompanyInput,
+  {
+    companyId,
+    email,
+    companyUserRole,
+    parentCompanyId,
+    parentCompanyUserRole,
+  }: InviteToCompanyInput,
   ctx: Ctx
 ) {
   ctx.session.$authorize()
@@ -21,7 +29,7 @@ async function inviteToCompany(
       userId: ctx.session.userId,
       companyId: companyId,
     },
-    include: {user: true}
+    include: { user: true },
   })
 
   const company = await db.company.findFirst({
@@ -43,16 +51,25 @@ async function inviteToCompany(
   await db.token.create({
     data: {
       userId: inviter.userId,
-      type: "INVITE_TO_COMPANY",
+      type: TokenType.INVITE_TO_COMPANY,
       expiresAt,
       hashedToken,
       sentTo: email,
       companyId: companyId || "0",
       companyUserRole,
+      parentCompanyId,
+      parentCompanyUserRole,
     },
   })
 
-  const buildEmail = await inviteToCompanyMailer({ fromEmail: inviter?.user?.email, fromName: inviter?.user?.name, toEmail: email, token, companyId, companyName: company?.name })
+  const buildEmail = await inviteToCompanyMailer({
+    fromEmail: inviter?.user?.email,
+    fromName: inviter?.user?.name,
+    toEmail: email,
+    token,
+    companyId,
+    companyName: company?.name,
+  })
 
   await buildEmail.send()
 

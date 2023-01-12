@@ -3,7 +3,7 @@ import { useSession } from "@blitzjs/auth"
 import { Routes } from "@blitzjs/next"
 import { useMutation, useQuery } from "@blitzjs/rpc"
 import { useRouter } from "next/router"
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useRef } from "react"
 import {
   CheckIcon,
   MenuIcon,
@@ -23,10 +23,11 @@ import Logo from "src/assets/Logo"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
 import getCompanyUsers from "src/companies/queries/getCompanyUsers"
 import updateCompanySession from "src/companies/mutations/updateCompanySession"
-import { CompanyUserRole, UserRole } from "@prisma/client"
+import { CompanyUserRole, ParentCompanyUserRole, UserRole } from "@prisma/client"
 import Confirm from "./Confirm"
 import canCreateNewCompany from "src/companies/queries/canCreateNewCompany"
 import getCurrentUserServer from "src/users/queries/getCurrentUserServer"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 
 type NavbarProps = {
   user?: Awaited<ReturnType<typeof getCurrentUserServer>> | null
@@ -51,6 +52,14 @@ const NavbarContent = ({
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
   })
+
+  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
+    where: {
+      parentCompanyId: companyUser?.company?.parentCompanyId || "0",
+      userId: session?.userId || "0",
+    },
+  })
+
   // const [canCreateCompany] = useQuery(canCreateNewCompany, null)
 
   const [selectedCompanyUser, setSelectedCompanyUser] = useState(companyUser)
@@ -60,8 +69,10 @@ const NavbarContent = ({
 
   const [logoutMutation] = useMutation(logout)
 
-  const isOwnerOrAdmin =
-    companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
+  const isCompanyOwnerOrAdmin = companyUser?.role !== CompanyUserRole.USER
+
+  const isParentCompanyOwnerOrAdmin =
+    parentCompanyUser && parentCompanyUser?.role !== ParentCompanyUserRole.USER
 
   const nav = [
     {
@@ -91,103 +102,37 @@ const NavbarContent = ({
       } as IntroStep,
     },
   ]
-  if (isOwnerOrAdmin) {
-    nav.push(
-      {
-        name: "Categories",
-        href: Routes.CategoriesHome().pathname,
-        focus: router.route.includes(Routes.CategoriesHome().pathname),
-        introStep: {
-          element: "#selectorCategoriesMenuStep",
-          title: "Categories",
-          intro: (
-            <span>
-              <p>
-                Categories are broadly the <b>departments in your company</b>, like IT, Marketing,
-                Engineering, etc.
-              </p>
-              <br />
-              <p>
-                The jobs are <b>listed by category</b> on careers page.
-              </p>
-              <br />
-              <p>
-                Candidates can <b>filter</b> the job openings <b>by categories</b>.
-              </p>
-            </span>
-          ),
-        },
+
+  if (isCompanyOwnerOrAdmin) {
+    nav.push({
+      name: "Categories",
+      href: Routes.CategoriesHome().pathname,
+      focus: router.route.includes(Routes.CategoriesHome().pathname),
+      introStep: {
+        element: "#selectorCategoriesMenuStep",
+        title: "Categories",
+        intro: (
+          <span>
+            <p>
+              Categories are broadly the <b>departments in your company</b>, like IT, Marketing,
+              Engineering, etc.
+            </p>
+            <br />
+            <p>
+              The jobs are <b>listed by category</b> on careers page.
+            </p>
+            <br />
+            <p>
+              Candidates can <b>filter</b> the job openings <b>by categories</b>.
+            </p>
+          </span>
+        ),
       },
-      // {
-      //   name: "Workflows",
-      //   href: Routes.WorkflowsHome().pathname,
-      //   focus:
-      //     router.route.includes(Routes.WorkflowsHome().pathname) ||
-      //     router.route.includes(Routes.StagesHome().pathname),
-      //   introStep: {
-      //     element: "#selectorWorkflowsMenuStep",
-      //     title: "Workflows",
-      //     intro: (
-      //       <span>
-      //         <p>
-      //           Workflows are the <b>interviewing stages</b>.
-      //         </p>
-      //         <br />
-      //         <p>
-      //           Typically a company has different workflows for different jobs. You may{" "}
-      //           <b>create and assign worklows to jobs</b> as per your requirement.
-      //         </p>
-      //       </span>
-      //     ),
-      //   },
-      // },
-      // {
-      //   name: "Forms",
-      //   href: Routes.FormsHome().pathname,
-      //   focus:
-      //     router.route.includes(Routes.FormsHome().pathname) ||
-      //     router.route.includes(Routes.QuestionsHome().pathname),
-      //   introStep: {
-      //     element: "#selectorFormsMenuStep",
-      //     title: "Forms",
-      //     intro: (
-      //       <span>
-      //         <p>
-      //           Forms are the <b>application forms through which the candidate applies to a job</b>.
-      //         </p>
-      //         <br />
-      //         <p>
-      //           Create and assign forms to jobs so that you have all the{" "}
-      //           <b>information you need from a candidate for a particular job</b>.
-      //         </p>
-      //       </span>
-      //     ),
-      //   },
-      // },
-      // {
-      //   name: "Score Cards",
-      //   href: Routes.ScoreCardsHome().pathname,
-      //   focus:
-      //     router.route.includes(Routes.ScoreCardsHome().pathname) ||
-      //     router.route.includes(Routes.CardQuestionsHome().pathname),
-      //   introStep: {
-      //     element: "#selectorScoreCardsMenuStep",
-      //     title: "Score Cards",
-      //     intro: (
-      //       <span>
-      //         <p>
-      //           Score cards are used by interviewers to{" "}
-      //           <b>rate the {`candidate's`} performance in a particular interview stage</b>.
-      //         </p>
-      //         <br />
-      //         <p>
-      //           Create score cards and{" "}
-      //           <b>assign them to the workflow (interviewing stages) while creating a job</b>.
-      //         </p>
-      //       </span>
-      //     ),
-      //   },
-      // },
+    })
+  }
+
+  if (isCompanyOwnerOrAdmin || isParentCompanyOwnerOrAdmin) {
+    nav.push(
       {
         name: "Email Templates",
         href: Routes.EmailTemplatesHome().pathname,
@@ -300,6 +245,13 @@ const NavbarContent = ({
       where: { userId: session?.userId || "0" },
     })
 
+    const [filteredCompanyUsers, setFilteredCompanyUsers] = useState(companyUsers)
+    const searchInput = useRef(null)
+
+    useEffect(() => {
+      ;(searchInput as any)?.current?.focus()
+    }, [filteredCompanyUsers])
+
     return (
       <div className="flex items-center space-x-2">
         <DropdownMenu.Root modal={false} open={companyOpen} onOpenChange={setCompanyOpen}>
@@ -311,59 +263,110 @@ const NavbarContent = ({
               {selectedCompanyUser?.company?.name}
             </div>
           </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+              <DropdownMenu.Arrow className="fill-current" />
+              <DropdownMenu.RadioGroup
+                value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
+                onValueChange={async (companyId) => {
+                  if (companyId === "new_company") {
+                    router.push(Routes.NewCompany())
+                  } else {
+                    const cu = filteredCompanyUsers?.find(
+                      (cu) => cu.userId === user?.id && cu.companyId === companyId
+                    )
+                    setSelectedCompanyUser(cu!)
+                    await updateCompanySessionMutation(companyId || "0")
+                    router.pathname === Routes.JobsHome().pathname
+                      ? router.reload()
+                      : router.push(Routes.JobsHome())
+                  }
+                }}
+              >
+                <div className="w-full p-2 flex items-center">
+                  <input
+                    ref={searchInput}
+                    autoFocus={true}
+                    type="text"
+                    placeholder="Search Company..."
+                    className="w-full h-8 border rounded border-neutral-400 text-neutral-700 text-sm"
+                    onChange={(e) => {
+                      const searchString = e.target.value
 
-          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-            <DropdownMenu.Arrow className="fill-current" offset={10} />
-            <DropdownMenu.RadioGroup
-              value={((selectedCompanyUser || companyUser)?.companyId || "0")?.toString()}
-              onValueChange={async (companyId) => {
-                if (companyId === "new_company") {
-                  router.push(Routes.NewCompany())
-                } else {
-                  const cu = companyUsers?.find(
-                    (cu) => cu.userId === user?.id && cu.companyId === companyId
-                  )
-                  setSelectedCompanyUser(cu!)
-                  await updateCompanySessionMutation(companyId || "0")
-                  router.pathname === Routes.JobsHome().pathname
-                    ? router.reload()
-                    : router.push(Routes.JobsHome())
-                }
-              }}
-            >
-              {companyUsers?.map((cu) => {
-                return (
-                  <div key={cu.companyId}>
-                    <DropdownMenu.RadioItem
-                      value={cu.company?.id?.toString()}
-                      className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
-                    >
-                      <DropdownMenu.ItemIndicator className="flex items-center">
-                        <CheckIcon className="w-4 h-4 absolute left-2" />
-                      </DropdownMenu.ItemIndicator>
-                      <div className="ml-2 flex flex-nowrap space-x-1 items-center">
-                        {/* <div className="flex">
+                      if (searchString?.trim()) {
+                        setFilteredCompanyUsers(
+                          companyUsers?.filter((cu) =>
+                            cu.company?.name
+                              ?.toLowerCase()
+                              ?.trim()
+                              ?.includes(searchString?.toLowerCase()?.trim())
+                          )
+                        )
+                      } else {
+                        setFilteredCompanyUsers([...companyUsers])
+                      }
+
+                      setTimeout(() => {
+                        ;(searchInput as any)?.current?.focus()
+                      })
+                    }}
+                  />
+                  <button
+                    className="text-theme-600 hover:text-theme-800 -ml-7"
+                    title="Add New Company"
+                    onClick={() => {
+                      router.push(Routes.NewCompany())
+                    }}
+                  >
+                    <PlusIcon className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {filteredCompanyUsers?.length === 0 && (
+                  <DropdownMenu.Item
+                    disabled={true}
+                    onSelect={(e) => {
+                      e.preventDefault()
+                    }}
+                    className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
+                  >
+                    No companies available
+                  </DropdownMenu.Item>
+                )}
+                {filteredCompanyUsers?.map((cu) => {
+                  return (
+                    <div key={cu.companyId}>
+                      <DropdownMenu.RadioItem
+                        value={cu.company?.id?.toString()}
+                        className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
+                      >
+                        <DropdownMenu.ItemIndicator className="flex items-center">
+                          <CheckIcon className="w-4 h-4 absolute left-2" />
+                        </DropdownMenu.ItemIndicator>
+                        <div className="ml-2 flex flex-nowrap space-x-1 items-center">
+                          {/* <div className="flex">
                           {cu.subscription && <BadgeCheckIcon width={18} height={18} />}
                           {!cu.subscription && <MinusCircleIcon width={18} height={18} />}
                         </div> */}
-                        <div>{cu.company?.name}</div>
-                        <div className="lowercase">({cu.role})</div>
-                      </div>
-                    </DropdownMenu.RadioItem>
+                          <div>{cu.company?.name}</div>
+                          <div className="lowercase">({cu.role})</div>
+                        </div>
+                      </DropdownMenu.RadioItem>
+                    </div>
+                  )
+                })}
+                <DropdownMenu.RadioItem
+                  value="new_company"
+                  className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
+                >
+                  <div className="ml-2 flex flex-nowrap space-x-1 items-center">
+                    <PlusIcon className="w-4 h-4 absolute left-2" />
+                    <div>Add New Company</div>
                   </div>
-                )
-              })}
-              <DropdownMenu.RadioItem
-                value="new_company"
-                className="text-left w-full rounded-md whitespace-nowrap cursor-pointer flex px-4 py-1 text-sm text-gray-700 hover:text-white hover:bg-theme-600 focus:outline-none focus-visible:text-white"
-              >
-                <div className="ml-2 flex flex-nowrap space-x-1 items-center">
-                  <PlusIcon className="w-4 h-4 absolute left-2" />
-                  <div>Add New Company</div>
-                </div>
-              </DropdownMenu.RadioItem>
-            </DropdownMenu.RadioGroup>
-          </DropdownMenu.Content>
+                </DropdownMenu.RadioItem>
+              </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
         </DropdownMenu.Root>
       </div>
     )
@@ -525,10 +528,10 @@ const NavbarContent = ({
                         {user?.name.charAt(0).toUpperCase()}
                       </div>
                     </DropdownMenu.Trigger>
-
-                    <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-                      <DropdownMenu.Arrow className="fill-current" offset={10} />
-                      {/* <DropdownMenu.Item
+                    <DropdownMenu.Portal>
+                      <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+                        <DropdownMenu.Arrow className="fill-current" />
+                        {/* <DropdownMenu.Item
                         onSelect={(e) => {
                           e.preventDefault()
                           // if (canCreateCompany) {
@@ -541,24 +544,25 @@ const NavbarContent = ({
                       >
                         Add Company
                       </DropdownMenu.Item> */}
-                      {dropDownNav.map((item, i) => {
-                        if (!item) return <></>
+                        {dropDownNav.map((item, i) => {
+                          if (!item) return <></>
 
-                        return (
-                          <DropdownMenu.Item
-                            key={i}
-                            data-testid={`${item.name}-navLink`}
-                            onSelect={(e) => {
-                              e.preventDefault()
-                              item.href.length ? router.push(item.href) : item.action!()
-                            }}
-                            className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
-                          >
-                            {item.name}
-                          </DropdownMenu.Item>
-                        )
-                      })}
-                    </DropdownMenu.Content>
+                          return (
+                            <DropdownMenu.Item
+                              key={i}
+                              data-testid={`${item.name}-navLink`}
+                              onSelect={(e) => {
+                                e.preventDefault()
+                                item.href.length ? router.push(item.href) : item.action!()
+                              }}
+                              className="text-left w-full whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                            >
+                              {item.name}
+                            </DropdownMenu.Item>
+                          )
+                        })}
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
                   </DropdownMenu.Root>
                 </div>
               </div>

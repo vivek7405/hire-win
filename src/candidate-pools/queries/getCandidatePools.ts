@@ -37,4 +37,5 @@ const getCandidatePools = resolver.pipe(
   }
 )
 
-export default Guard.authorize("readAll", "candidatePool", getCandidatePools)
+export default getCandidatePools
+// export default Guard.authorize("readAll", "candidatePool", getCandidatePools)

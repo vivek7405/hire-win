@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next"
 import { hash256 } from "@blitzjs/auth"
 import db from "db"
 import stripe from "src/core/utils/stripe"
-import { CompanyUserRole, UserRole } from "@prisma/client"
+import { CompanyUserRole, ParentCompanyUserRole, TokenType, UserRole } from "@prisma/client"
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default api(
@@ -11,7 +11,7 @@ export default api(
     // 1. Try to find this token in the database
     const hashedToken = hash256(req.query.token as string)
     const savedToken = await db.token.findFirst({
-      where: { hashedToken, type: "INVITE_TO_COMPANY" },
+      where: { hashedToken, type: TokenType.INVITE_TO_COMPANY },
       include: {
         user: {
           select: {
@@ -60,18 +60,28 @@ export default api(
         await db.companyUser.create({
           data: {
             role: savedToken.companyUserRole || CompanyUserRole.USER,
-            company: {
-              connect: {
-                id: savedToken.companyId || "0",
-              },
-            },
-            user: {
-              connect: {
-                id: existingUser.id,
-              },
-            },
+            companyId: savedToken.companyId || "0",
+            userId: existingUser.id || "0",
           },
         })
+      }
+
+      if (savedToken.parentCompanyId) {
+        const parentCompanyUserExists = await db.parentCompanyUser.findFirst({
+          where: {
+            parentCompanyId: savedToken.parentCompanyId || "0",
+            userId: existingUser.id || "0",
+          },
+        })
+        if (!parentCompanyUserExists) {
+          await db.parentCompanyUser.create({
+            data: {
+              role: savedToken.parentCompanyUserRole || ParentCompanyUserRole.USER,
+              parentCompanyId: savedToken.parentCompanyId || "0",
+              userId: existingUser.id || "0",
+            },
+          })
+        }
       }
 
       // 7. Delete token from database when done

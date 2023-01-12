@@ -175,6 +175,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
                     user={user as any}
                     setOpenConfirm={setOpenConfirm}
                     setInterviewToDelete={setInterviewToDelete}
+                    jobUser={jobUser}
                   />
                 </>
               )
@@ -196,6 +197,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
                     user={user as any}
                     setOpenConfirm={setOpenConfirm}
                     setInterviewToDelete={setInterviewToDelete}
+                    jobUser={jobUser}
                   />
                 </>
               )
@@ -217,6 +219,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
                     user={user as any}
                     setOpenConfirm={setOpenConfirm}
                     setInterviewToDelete={setInterviewToDelete}
+                    jobUser={jobUser}
                   />
                 </>
               )
@@ -234,6 +237,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
                     user={user as any}
                     setOpenConfirm={setOpenConfirm}
                     setInterviewToDelete={setInterviewToDelete}
+                    jobUser={jobUser}
                   />
                 </>
               )
@@ -259,6 +263,7 @@ type CandidateInterviewProps = {
   user: User & { jobUsers: JobUser[] }
   setOpenConfirm: any
   setInterviewToDelete: any
+  jobUser: Awaited<ReturnType<typeof getJobUser>>
 }
 const CandidateInterview = ({
   type,
@@ -266,6 +271,7 @@ const CandidateInterview = ({
   user,
   setOpenConfirm,
   setInterviewToDelete,
+  jobUser,
 }: CandidateInterviewProps) => {
   return (
     <div key={interview.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
@@ -276,7 +282,7 @@ const CandidateInterview = ({
           disabled={
             user?.id !== interview?.interviewerId &&
             user?.id !== interview?.organizerId &&
-            user?.jobUsers?.find((JobUser) => JobUser.jobId === interview?.jobId)?.role !== "OWNER"
+            jobUser?.role === JobUserRole.USER
           }
           onClick={() => {
             setOpenConfirm(true)

@@ -1,17 +1,9 @@
 import { Ctx } from "blitz"
 import db, { CandidateActivityType, User } from "db"
 
-export default async function removeCandidateFromPool(
-  { candidateId, candidatePoolSlug },
-  ctx: Ctx
-) {
+export default async function removeCandidateFromPool({ candidateId, poolId }, ctx: Ctx) {
   const updatedCandidatePool = await db.candidatePool.update({
-    where: {
-      companyId_slug: {
-        companyId: ctx.session.companyId || "0",
-        slug: candidatePoolSlug,
-      },
-    },
+    where: { id: poolId },
     data: {
       candidates: {
         disconnect: {
@@ -26,8 +18,8 @@ export default async function removeCandidateFromPool(
     loggedInUser = await db.user.findFirst({ where: { id: ctx?.session?.userId } })
   }
 
-  const candidatePool = await db.candidatePool.findFirst({
-    where: { slug: candidatePoolSlug },
+  const candidatePool = await db.candidatePool.findUnique({
+    where: { id: poolId },
   })
 
   const candidate = await db.candidate.findUnique({

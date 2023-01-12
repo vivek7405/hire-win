@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/router"
 import { useTable, useFilters, useGlobalFilter, usePagination } from "react-table"
 import "regenerator-runtime/runtime"
 import Debouncer from "src/core/utils/debouncer"
@@ -12,6 +12,7 @@ type PaginationProps = {
   endPage: number
   queryPageName?: string
   resultName?: string
+  hideIfSinglePage?: boolean
 }
 const Pagination = ({
   pageIndex: controlledPageIndex,
@@ -22,6 +23,7 @@ const Pagination = ({
   endPage,
   queryPageName,
   resultName,
+  hideIfSinglePage,
 }: PaginationProps) => {
   const router = useRouter()
 
@@ -57,7 +59,7 @@ const Pagination = ({
     })
   }
 
-  return (
+  return (hideIfSinglePage ? controlledHasPrevious || controlledHasNext : true) ? (
     <nav className="flex items-center justify-between py-6" aria-label="Pagination">
       <div>
         <p className="text-gray-700">
@@ -100,6 +102,8 @@ const Pagination = ({
         </div>
       )}
     </nav>
+  ) : (
+    <></>
   )
 }
 

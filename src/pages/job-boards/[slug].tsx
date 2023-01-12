@@ -42,11 +42,12 @@ import Stripe from "stripe"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
 import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 import { FREE_CANDIDATES_LIMIT, FREE_JOBS_LIMIT } from "src/plans/constants"
-import getUserOwnedCompanyJobs from "src/jobs/queries/getUserOwnedCompanyJobs"
+import getCompanyJobsByParentCompany from "src/jobs/queries/getCompanyJobsByParentCompany"
 import getAllUserOwnedCompanies from "src/companies/queries/getAllUserOwnedCompanies"
 import getJobBoardFilters from "src/jobs/queries/getJobBoardFilters"
 import JobFilters from "src/jobs/components/JobFilters"
 import JobPost from "src/jobs/components/JobPost"
+import db from "db"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -58,15 +59,20 @@ export const getServerSideProps = gSSP(async (context) => {
 
   // const user = await getCurrentUserServer({ ...context })
 
-  const user = await getUser(
-    {
-      where: { id: (context?.params?.userId as string) || "0" },
-    },
-    context.ctx
-  )
+  // const user = await getUser(
+  //   {
+  //     where: { id: (context?.params?.userId as string) || "0" },
+  //   },
+  //   context.ctx
+  // )
 
-  if (user) {
-    return { props: { user } }
+  const slug = context?.params?.slug as string
+  const parentCompany = await db.parentCompany.findFirst({
+    where: { slug },
+  })
+
+  if (parentCompany) {
+    return { props: { parentCompanyName: parentCompany?.name } }
   } else {
     return {
       redirect: {
@@ -85,7 +91,7 @@ const Jobs = ({}) => {
   // const [query, setQuery] = useState({})
   const [searchString, setSearchString] = useState((router.query.search as string) || '""')
 
-  const { embed, userId } = router.query
+  const { embed, slug } = router.query
 
   // const [theme, setTheme] = useState(company?.theme || "indigo")
   // useEffect(() => {
@@ -120,9 +126,11 @@ const Jobs = ({}) => {
 
   const [searchjobTitle, setSearchJobTitle] = useState("")
 
-  const [jobBoardFilters] = useQuery(getJobBoardFilters, { userId: (userId as string) || "0" })
+  const [jobBoardFilters] = useQuery(getJobBoardFilters, {
+    slug: (slug as string) || "0",
+  })
 
-  const [{ jobs, hasMore, count }] = usePaginatedQuery(getUserOwnedCompanyJobs, {
+  const [{ jobs, hasMore, count }] = usePaginatedQuery(getCompanyJobsByParentCompany, {
     skip: ITEMS_PER_PAGE * Number(tablePage),
     take: ITEMS_PER_PAGE,
     companyId,
@@ -133,7 +141,7 @@ const Jobs = ({}) => {
     jobCity,
     remoteOption,
     searchString,
-    userId: (userId as string) || "0",
+    slug: (slug as string) || "0",
   })
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
@@ -251,7 +259,9 @@ const Jobs = ({}) => {
   )
 }
 
-const CompanyJobBoard = ({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const ParentCompanyJobBoard = ({
+  parentCompanyName,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
   const { embed } = router.query
 
@@ -261,7 +271,7 @@ const CompanyJobBoard = ({ user }: InferGetServerSidePropsType<typeof getServerS
     </div>
   ) : (
     <div className="flex flex-col min-h-screen p-10">
-      <h3 className="text-2xl font-bold text-center top-0">{user?.jobBoardName || ""} Job Board</h3>
+      <h3 className="text-2xl font-bold text-center top-0">{parentCompanyName || ""} Job Board</h3>
 
       <div className="mb-auto">
         <Suspense fallback="Loading...">
@@ -284,4 +294,4 @@ const CompanyJobBoard = ({ user }: InferGetServerSidePropsType<typeof getServerS
   )
 }
 
-export default CompanyJobBoard
+export default ParentCompanyJobBoard

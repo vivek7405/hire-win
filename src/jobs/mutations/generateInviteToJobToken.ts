@@ -1,7 +1,7 @@
 import { generateToken, hash256 } from "@blitzjs/auth"
 import { Ctx } from "blitz"
 import Guard from "src/guard/ability"
-import db from "db"
+import db, { TokenType } from "db"
 
 interface GenerateTokenInput {
   jobId: string
@@ -26,7 +26,7 @@ async function generateInviteToJobToken({ jobId }: GenerateTokenInput, ctx: Ctx)
   const findPastPublicKey = await db.token.findFirst({
     where: {
       jobId: jobId,
-      type: "PUBLIC_KEY",
+      type: TokenType.PUBLIC_KEY,
     },
   })
 
@@ -39,7 +39,7 @@ async function generateInviteToJobToken({ jobId }: GenerateTokenInput, ctx: Ctx)
   if (!findPastPublicKey) {
     await db.token.create({
       data: {
-        type: "PUBLIC_KEY",
+        type: TokenType.PUBLIC_KEY,
         hashedToken: generatePublicToken,
         expiresAt,
         user: {
@@ -58,7 +58,7 @@ async function generateInviteToJobToken({ jobId }: GenerateTokenInput, ctx: Ctx)
 
   await db.token.create({
     data: {
-      type: "SECRET_KEY",
+      type: TokenType.SECRET_KEY,
       hashedToken: hash256(generatePrivateToken),
       lastFour: `${generatePrivateToken
         .split("")

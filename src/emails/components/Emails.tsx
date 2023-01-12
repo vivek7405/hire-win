@@ -1,7 +1,15 @@
 import { useSession } from "@blitzjs/auth"
 import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc"
-import { ChevronDownIcon, TrashIcon } from "@heroicons/react/outline"
-import { Candidate, Email, EmailTemplate, JobUser, JobUserRole, User } from "@prisma/client"
+import { ChevronDownIcon, ChevronRightIcon, TrashIcon } from "@heroicons/react/outline"
+import {
+  Candidate,
+  Email,
+  EmailTemplate,
+  JobUser,
+  JobUserRole,
+  ParentCompanyUserRole,
+  User,
+} from "@prisma/client"
 import Confirm from "src/core/components/Confirm"
 import Modal from "src/core/components/Modal"
 import moment from "moment"
@@ -22,12 +30,17 @@ import getStage from "src/stages/queries/getStage"
 import getCandidate from "src/candidates/queries/getCandidate"
 import getCompany from "src/companies/queries/getCompany"
 import getJobUser from "src/jobs/queries/getJobUser"
+import { useRouter } from "next/router"
+import { Routes } from "@blitzjs/next"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 
 interface ETValues {
   [key: string]: string
 }
 
 const Emails = ({ user, stageId, candidate }) => {
+  const router = useRouter()
   const session = useSession()
   const [openModal, setOpenModal] = useState(false)
   const [deleteEmailMutation] = useMutation(deleteEmail)
@@ -38,12 +51,35 @@ const Emails = ({ user, stageId, candidate }) => {
     candidateId: candidate?.id || "0",
     stageId,
   })
+
+  const [company] = useQuery(getCompany, {
+    where: { id: session?.companyId || "0" },
+  })
+
+  const [parentCompany] = useQuery(getParentCompany, {
+    where: { id: company?.parentCompanyId || "0" },
+  })
+
+  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
+    where: {
+      parentCompanyId: company?.parentCompanyId || "0",
+      userId: session?.userId || "0",
+    },
+  })
+
+  const isParentCompanyUser = (parentCompany?.name && !!parentCompanyUser) || false
+
   // const [stage] = useQuery(getStage, { where: { id: stageId || "0" } })
 
   const [sendEmailMutation] = useMutation(sendEmail)
   const [emailTemplatesOpen, setEmailTemplatesOpen] = useState(false)
   const [emailTemplates] = useQuery(getEmailTemplatesWOPagination, {
-    where: { companyId: session.companyId || "0" },
+    where: {
+      OR: [
+        { companyId: session.companyId || "0" },
+        { parentCompanyId: company?.parentCompanyId || "0" },
+      ],
+    },
   })
   const [selectedEmailTemplate, setSelectedEmailTemplate] = useState(null as any as EmailTemplate)
   // const interviewDetailId =
@@ -55,12 +91,6 @@ const Emails = ({ user, stageId, candidate }) => {
     stageId: stageId || "0",
   })
 
-  const [company] = useQuery(getCompany, {
-    where: {
-      id: session?.companyId || "0",
-    },
-  })
-
   const [jobUser] = useQuery(getJobUser, {
     where: {
       jobId: candidate?.jobId || "0",
@@ -69,6 +99,8 @@ const Emails = ({ user, stageId, candidate }) => {
   })
 
   const replaceEmailTemplatePlaceHolders = (body: JSON) => {
+    const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
+
     if (body) {
       let stringifiedBody = JSON.stringify(body)
 
@@ -93,6 +125,22 @@ const Emails = ({ user, stageId, candidate }) => {
           case EmailTemplatePlaceholders.Sender_Name:
             etValues[etPlaceholder] = user?.name
             break
+          case EmailTemplatePlaceholders.Job_Listing_Link:
+            etValues[
+              etPlaceholder
+            ] = `${origin}/${candidate?.job?.company?.slug}/${candidate?.job?.slug}`
+            break
+          case EmailTemplatePlaceholders.Careers_Page_Link:
+            etValues[etPlaceholder] = `${origin}/${candidate?.job?.company?.slug}`
+            break
+          case EmailTemplatePlaceholders.Parent_Company_Name:
+            etValues[etPlaceholder] = candidate?.job?.company?.parentCompany?.name
+            break
+          case EmailTemplatePlaceholders.Job_Board_Link:
+            etValues[
+              etPlaceholder
+            ] = `${origin}/job-boards/${candidate?.job?.company?.parentCompany?.slug}`
+            break
         }
       })
 
@@ -110,7 +158,7 @@ const Emails = ({ user, stageId, candidate }) => {
 
   return (
     <>
-      <Modal noOverflow={true} header="Send Email" open={openModal} setOpen={setOpenModal}>
+      <Modal header="Send Email" open={openModal} setOpen={setOpenModal}>
         <EmailForm
           disabled={emailToView ? true : false}
           header={`${emailToView ? "" : "Send "}Email to ${candidate?.name}`}
@@ -252,26 +300,92 @@ const Emails = ({ user, stageId, candidate }) => {
                   <ChevronDownIcon className="w-5 h-5" />
                 </button>
               </DropdownMenu.Trigger>
-
-              <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded top-1 absolute">
-                <DropdownMenu.Arrow className="fill-current" offset={10} />
-                {emailTemplates.map((et) => {
-                  return (
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+                  <DropdownMenu.Arrow className="fill-current" />
+                  {emailTemplates?.length === 0 && (
                     <DropdownMenu.Item
-                      key={et.id}
+                      disabled={true}
                       onSelect={(e) => {
                         e.preventDefault()
-                        setSelectedEmailTemplate(et)
-                        setEmailToView(null as any)
-                        setOpenModal(true)
                       }}
-                      className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                      className="opacity-50 cursor-not-allowed text-left w-full whitespace-nowrap block px-4 py-2 text-sm text-gray-700 focus:outline-none focus-visible:text-gray-900"
                     >
-                      {et.name}
+                      No templates available
                     </DropdownMenu.Item>
-                  )
-                })}
-              </DropdownMenu.Content>
+                  )}
+
+                  {/* Company Email Templates */}
+                  {emailTemplates
+                    ?.filter((et) => !et.parentCompanyId)
+                    ?.map((et) => {
+                      return (
+                        <DropdownMenu.Item
+                          key={et.id}
+                          onSelect={(e) => {
+                            e.preventDefault()
+                            setSelectedEmailTemplate(et)
+                            setEmailToView(null as any)
+                            setOpenModal(true)
+                          }}
+                          className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                        >
+                          {et.name}
+                        </DropdownMenu.Item>
+                      )
+                    })}
+
+                  {/* Parent Company Email Templates */}
+                  {isParentCompanyUser &&
+                    emailTemplates?.filter((et) => et.parentCompanyId)?.length > 0 && (
+                      <DropdownMenu.Sub>
+                        <DropdownMenu.SubTrigger className="flex items-center justify-center space-x-2 text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900">
+                          <div>Parent Company</div>
+                          <div>
+                            <ChevronRightIcon className="w-4 h-4" />
+                          </div>
+                        </DropdownMenu.SubTrigger>
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.SubContent className="w-auto bg-white text-white p-1 shadow-md rounded">
+                            {emailTemplates
+                              ?.filter((et) => et.parentCompanyId)
+                              ?.map((et) => {
+                                return (
+                                  <DropdownMenu.Item
+                                    key={et.id}
+                                    onSelect={(e) => {
+                                      e.preventDefault()
+                                      setSelectedEmailTemplate(et)
+                                      setEmailToView(null as any)
+                                      setOpenModal(true)
+                                    }}
+                                    className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                                  >
+                                    {et.name}
+                                  </DropdownMenu.Item>
+                                )
+                              })}
+                          </DropdownMenu.SubContent>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Sub>
+                    )}
+
+                  {jobUser?.role !== JobUserRole.USER && (
+                    <>
+                      <DropdownMenu.Separator className="bg-neutral-300 h-px" />
+                      <DropdownMenu.Item
+                        onSelect={(e) => {
+                          e.preventDefault()
+                          router.push(Routes.EmailTemplatesHome())
+                        }}
+                        className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                      >
+                        + Add New
+                      </DropdownMenu.Item>
+                    </>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
             </DropdownMenu.Root>
           </div>
         </div>
@@ -288,6 +402,7 @@ const Emails = ({ user, stageId, candidate }) => {
                   setEmailToDelete={setEmailToDelete}
                   setEmailToView={setEmailToView}
                   setOpenModal={setOpenModal}
+                  jobUser={jobUser}
                 />
               </>
             )
@@ -307,6 +422,7 @@ type CandidateEmailProps = {
   setEmailToDelete: any
   setEmailToView: any
   setOpenModal: any
+  jobUser: Awaited<ReturnType<typeof getJobUser>>
 }
 const CandidateEmail = ({
   email,
@@ -315,16 +431,13 @@ const CandidateEmail = ({
   setEmailToDelete,
   setEmailToView,
   setOpenModal,
+  jobUser,
 }: CandidateEmailProps) => {
   return (
     <div key={email.id} className="w-full p-3 bg-neutral-50 border-2 rounded">
       <button
         className="float-right disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled={
-          user?.id !== email?.senderId &&
-          user?.jobUsers?.find((jobUser) => jobUser.jobId === email?.candidate?.jobId)?.role !==
-            "OWNER"
-        }
+        disabled={user?.id !== email?.senderId && jobUser?.role !== JobUserRole.OWNER}
         onClick={() => {
           setOpenConfirm(true)
           setEmailToDelete(email)

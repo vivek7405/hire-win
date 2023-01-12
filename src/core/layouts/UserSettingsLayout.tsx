@@ -11,12 +11,14 @@ import {
   UserGroupIcon,
   OfficeBuildingIcon,
   UserCircleIcon,
+  LibraryIcon,
 } from "@heroicons/react/outline"
 import { ClockIcon } from "@heroicons/react/solid"
 import getUser from "src/users/queries/getUser"
 import getCompanyUser from "src/companies/queries/getCompanyUser"
-import { CompanyUserRole } from "@prisma/client"
+import { CompanyUserRole, ParentCompanyUserRole } from "@prisma/client"
 import { Routes } from "@blitzjs/next"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 
 type LayoutProps = {
   children: ReactNode
@@ -25,8 +27,16 @@ type LayoutProps = {
 const UserSettingsLayout = ({ children }: LayoutProps) => {
   const router = useRouter()
   const session = useSession()
+
   const [companyUser] = useQuery(getCompanyUser, {
     where: { userId: session.userId || "0", companyId: session.companyId || "0" },
+  })
+
+  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
+    where: {
+      userId: session.userId || "0",
+      parentCompanyId: companyUser?.company?.parentCompanyId || "0",
+    },
   })
 
   const subNavigation = [
@@ -34,42 +44,68 @@ const UserSettingsLayout = ({ children }: LayoutProps) => {
       ? {
           name: "Company",
           href: Routes.UserSettingsCompanyPage().pathname,
-          current: router.route === Routes.UserSettingsCompanyPage().pathname,
+          current:
+            router.route === Routes.UserSettingsCompanyPage().pathname ||
+            router.route === Routes.UserSettingsMembersPage().pathname,
           icon: OfficeBuildingIcon,
         }
       : null,
-    companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
+    parentCompanyUser &&
+    (parentCompanyUser?.parentCompany?.name
+      ? parentCompanyUser?.role !== ParentCompanyUserRole.USER
+      : parentCompanyUser?.role === ParentCompanyUserRole.OWNER)
       ? {
-          name: "Members",
-          href: Routes.UserSettingsMembersPage().pathname,
-          current: router.route === Routes.UserSettingsMembersPage().pathname,
-          icon: UserGroupIcon,
+          name: "Parent Company",
+          href: Routes.UserSettingsParentCompanyPage().pathname,
+          current:
+            router.route === Routes.UserSettingsParentCompanyPage().pathname ||
+            router.route === Routes.UserSettingsSubCompaniesPage().pathname ||
+            router.route === Routes.UserSettingsParentMembersPage().pathname,
+          icon: LibraryIcon,
         }
       : null,
+    // companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
+    //   ? {
+    //       name: "Members",
+    //       href: Routes.UserSettingsMembersPage().pathname,
+    //       current: router.route === Routes.UserSettingsMembersPage().pathname,
+    //       icon: UserGroupIcon,
+    //     }
+    //   : null,
     {
       name: "Profile",
       href: Routes.UserSettingsProfilePage().pathname,
-      current: router.route === Routes.UserSettingsProfilePage().pathname,
+      current:
+        router.route === Routes.UserSettingsProfilePage().pathname ||
+        router.route === Routes.UserSettingsSecurityPage().pathname,
       icon: UserCircleIcon,
     },
+    // {
+    //   name: "Security",
+    //   href: Routes.UserSettingsSecurityPage().pathname,
+    //   current: router.route === Routes.UserSettingsSecurityPage().pathname,
+    //   icon: KeyIcon,
+    // },
     {
-      name: "Security",
-      href: Routes.UserSettingsSecurityPage().pathname,
-      current: router.route === Routes.UserSettingsSecurityPage().pathname,
-      icon: KeyIcon,
-    },
-    {
-      name: "Availabilities",
+      name: "Scheduling",
       href: Routes.UserSettingsAvailabilitiesPage().pathname,
-      current: router.route === Routes.UserSettingsAvailabilitiesPage().pathname,
+      current:
+        router.route === Routes.UserSettingsAvailabilitiesPage().pathname ||
+        router.route === Routes.UserSettingsCalendarsPage().pathname,
       icon: ClockIcon,
     },
-    {
-      name: "Calendars",
-      href: Routes.UserSettingsCalendarsPage().pathname,
-      current: router.route === Routes.UserSettingsCalendarsPage().pathname,
-      icon: CalendarIcon,
-    },
+    // {
+    //   name: "Availabilities",
+    //   href: Routes.UserSettingsAvailabilitiesPage().pathname,
+    //   current: router.route === Routes.UserSettingsAvailabilitiesPage().pathname,
+    //   icon: ClockIcon,
+    // },
+    // {
+    //   name: "Calendars",
+    //   href: Routes.UserSettingsCalendarsPage().pathname,
+    //   current: router.route === Routes.UserSettingsCalendarsPage().pathname,
+    //   icon: CalendarIcon,
+    // },
     companyUser?.role === CompanyUserRole.OWNER
       ? {
           name: "Billing",

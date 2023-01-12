@@ -1,4 +1,4 @@
-import { useQuery } from "@blitzjs/rpc";
+import { useQuery } from "@blitzjs/rpc"
 import { LabeledTextField } from "src/core/components/LabeledTextField"
 import { LabeledTextAreaField } from "src/core/components/LabeledTextAreaField"
 import { Form } from "src/core/components/Form"
@@ -16,6 +16,10 @@ import getFormQuestionsWOPaginationWOAbility from "src/form-questions/queries/ge
 import { ExtendedFormQuestion } from "types"
 import { AttachmentZodObj } from "../validations"
 import getJobApplicationFormQuestions from "src/form-questions/queries/getJobApplicationFormQuestions"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
+import getJob from "src/jobs/queries/getJob"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
+import { useSession } from "@blitzjs/auth"
 
 type ApplicationFormProps = {
   onSuccess?: () => void
@@ -33,6 +37,15 @@ type ApplicationFormProps = {
 export const ApplicationForm = (props: ApplicationFormProps) => {
   const [formQuestions] = useQuery(getJobApplicationFormQuestions, {
     where: { jobId: props.jobId },
+  })
+
+  const session = useSession()
+  const [job] = useQuery(getJob, { where: { id: props.jobId || "0" } })
+  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
+    where: {
+      parentCompanyId: job?.company?.parentCompanyId || "0",
+      userId: session?.userId || "0",
+    },
   })
 
   // const formQuestions = props.formQuestions || queryFormQuestions
@@ -79,12 +92,13 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
     }
   }
 
-  const getQuestionField = (question: ExtendedFormQuestion) => {
+  const getQuestionField = (question: ExtendedFormQuestion, autoFocus: boolean) => {
     switch (question.type) {
       case FormQuestionType.Single_line_text:
         return (
           <LabeledTextField
             key={question.id}
+            autoFocus={autoFocus}
             type="text"
             name={question.title}
             label={question.title}
@@ -254,7 +268,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
   formQuestions.forEach((fq) => {
     validationObj = { ...validationObj, ...getValidationObj(fq as any) }
   })
-  let zodObj = z.object(validationObj)
+  let zodObj = z.object({ ...validationObj, visibleOnlyToParentMembers: z.boolean().optional() })
 
   return (
     <>
@@ -272,13 +286,23 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           className="max-w-md mx-auto"
           isRounded={props.careersPage}
         >
-          {formQuestions.map((question) => {
+          {formQuestions.map((question, index) => {
             // Hide question only on careers page and not when adding candidate manually
             if ((props.careersPage || props.preview) && question.behaviour === "OFF") {
               return
             }
-            return getQuestionField(question as any)
+            return getQuestionField(question as any, index === 0)
           })}
+
+          {!props.careersPage &&
+            !props.preview &&
+            !!parentCompanyUser?.parentCompany?.name &&
+            parentCompanyUser && (
+              <CheckboxField
+                name="visibleOnlyToParentMembers"
+                label="Visible only to parent members"
+              />
+            )}
         </Form>
       </div>
     </>

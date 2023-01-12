@@ -5,7 +5,7 @@ import db from "db"
 import { Signup } from "src/auth/validations"
 import slugify from "slugify"
 import { findFreeSlug } from "src/core/utils/findFreeSlug"
-import { CompanyUserRole, UserRole } from "@prisma/client"
+import { CompanyUserRole, ParentCompanyUserRole, UserRole } from "@prisma/client"
 import { initialSchedule } from "src/schedules/constants"
 import addCalendar from "src/calendars/mutations/addCalendar"
 import addSchedule from "src/schedules/mutations/addSchedule"
@@ -79,13 +79,21 @@ export default async function signup(
             //   slug: newSlug,
             // },
             connectOrCreate: {
+              where: {
+                id: existingCompany?.id || "0",
+              },
               create: {
                 name: companyName || "NA",
                 slug: newSlug,
                 info: initialInfo,
-              },
-              where: {
-                id: existingCompany?.id || "0",
+                parentCompany: {
+                  connectOrCreate: {
+                    where: {
+                      id: existingCompany?.parentCompanyId || "0",
+                    },
+                    create: {},
+                  },
+                },
               },
             },
           },
@@ -101,8 +109,29 @@ export default async function signup(
     },
   })
 
+  if (!existingCompany) {
+    await db.company.update({
+      where: { slug: newSlug },
+      data: { createdById: user?.id },
+    })
+
+    await db.parentCompanyUser.create({
+      data: {
+        role: ParentCompanyUserRole.OWNER,
+        parentCompanyId:
+          (user.companies && (user.companies[0]?.company?.parentCompanyId || "0")) || "0",
+        userId: user?.id,
+      },
+    })
+  }
+
   const compId =
     existingCompany?.id || (user.companies && (user.companies[0]?.companyId || "0")) || "0"
+
+  const parentCompId =
+    existingCompany?.parentCompanyId ||
+    (user.companies && (user.companies[0]?.company?.parentCompanyId || "0")) ||
+    "0"
 
   await ctx.session.$create({ userId: user.id, role: user.role as UserRole, companyId: compId })
 
@@ -117,7 +146,7 @@ export default async function signup(
   await updateDefaultSchedule(schedule.id || "0", ctx)
 
   if (!existingCompany) {
-    await createFactoryItems({ companyId: compId }, ctx)
+    await createFactoryItems({ companyId: compId, parentCompanyId: parentCompId }, ctx)
     // currency && (await provideTrail(user?.id, compId, currency))
 
     // Always keep factory job at last

@@ -14,6 +14,8 @@ export const CompanyObj = z.object({
   theme: z.string().optional(),
   stripeSubscriptionId: z.string().optional(),
   timezone: z.string().optional(),
+  parentCompanyId: z.string().optional(),
+  createdById: z.string().optional(),
 })
 
 export type CompanyInputType = z.infer<typeof CompanyObj>

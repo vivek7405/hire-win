@@ -13,7 +13,6 @@ import AuthLayout from "src/core/layouts/AuthLayout"
 import toast from "react-hot-toast"
 import Guard from "src/guard/ability"
 
-import InvitationForm from "src/jobs/components/InvitationForm"
 import Breadcrumbs from "src/core/components/Breadcrumbs"
 import inviteToJob from "src/jobs/mutations/inviteToJob"
 import removeFromJob from "src/jobs/mutations/removeFromJob"

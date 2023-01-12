@@ -396,12 +396,14 @@ const Jobs = ({
                   )}
                 </Menu.Item>
               )}
-              <Menu.Item>
+              {/* <Menu.Item>
                 {({ active }) => (
                   <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
                     <Link
                       prefetch={true}
-                      href={Routes.CompanyJobBoard({ userId: user?.id || "0" })}
+                      href={Routes.ParentCompanyJobBoard({
+                        parentCompanyId: company?.parentCompanyId || "0",
+                      })}
                       passHref
                     >
                       <a
@@ -430,7 +432,7 @@ const Jobs = ({
                     />
                   </a>
                 )}
-              </Menu.Item>
+              </Menu.Item> */}
             </div>
             {/* <div className="py-1">
               <Menu.Item>
