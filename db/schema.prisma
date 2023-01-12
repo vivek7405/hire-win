@@ -225,7 +225,8 @@ model ParentCompany {
   name String?
   slug String? @unique
 
-  autoAddUsersToCompanies Boolean @default(true)
+  autoAddUsersToCompanies                 Boolean @default(true)
+  newCandidatesVisibleOnlyToParentMembers Boolean @default(false)
 
   users     ParentCompanyUser[]
   companies Company[]
@@ -653,7 +654,8 @@ model Candidate {
 
   candidatePools CandidatePool[]
 
-  rejected Boolean @default(false)
+  rejected                   Boolean @default(false)
+  visibleOnlyToParentMembers Boolean @default(false)
 
   activities         CandidateActivity[]
   candidateUserNotes CandidateUserNote[]

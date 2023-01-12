@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/router"
 import { useTable, useFilters, useGlobalFilter, usePagination } from "react-table"
 import "regenerator-runtime/runtime"
 import Debouncer from "src/core/utils/debouncer"
@@ -108,7 +108,13 @@ const Table = ({
             {page.map((row, i) => {
               prepareRow(row)
               return (
-                <tr className="bg-white" {...row.getRowProps()} key={i}>
+                <tr
+                  className={`bg-white ${
+                    row?.original?.visibleOnlyToParentMembers ? "opacity-50" : ""
+                  }`}
+                  {...row.getRowProps()}
+                  key={i}
+                >
                   {row.cells.map((cell, i) => {
                     return (
                       <td

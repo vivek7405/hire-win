@@ -149,6 +149,7 @@ const CandidateSettingsPage = ({
                       value: typeof val === "string" ? val : JSON.stringify(val),
                     }
                   }) || ([] as any),
+                visibleOnlyToParentMembers: values.visibleOnlyToParentMembers,
               },
             })
             toast.success(() => <span>Candidate Updated</span>, { id: toastId })

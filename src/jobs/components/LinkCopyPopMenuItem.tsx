@@ -6,7 +6,7 @@ type LinkCopyPopMenuItemProps = {
   companySlug?: string
   jobSlug?: string
   userId?: string
-  active: boolean
+  active?: boolean
   label: string
 }
 const LinkCopyPopMenuItem = ({

@@ -42,6 +42,7 @@ import {
   FormQuestionType,
   User,
   FormQuestionOption,
+  ParentCompanyUserRole,
 } from "@prisma/client"
 
 import getJobWithGuard from "src/jobs/queries/getJobWithGuard"
@@ -66,10 +67,15 @@ import {
   ArchiveIcon,
   ArrowRightIcon,
   BanIcon,
+  CheckCircleIcon,
   CheckIcon,
   CogIcon,
+  DotsCircleHorizontalIcon,
   DotsVerticalIcon,
   ExternalLinkIcon,
+  EyeIcon,
+  EyeOffIcon,
+  MinusCircleIcon,
   RefreshIcon,
   TableIcon,
   ViewBoardsIcon,
@@ -98,6 +104,11 @@ import getUserJobCategoriesByViewType from "src/categories/queries/getUserJobCat
 import setJobArchived from "src/jobs/mutations/setJobArchived"
 import getJob from "src/jobs/queries/getJob"
 import getJobUser from "src/jobs/queries/getJobUser"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
+import setCandidateVisibleParent from "src/candidates/mutations/setCandidateVisibleParent"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import setAllCandidatesVisibleParent from "src/candidates/mutations/setAllCandidatesVisibleParent"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -193,12 +204,45 @@ export const getServerSideProps = gSSP(async (context) => {
 
       const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
 
+      const jobUser = await getJobUser(
+        {
+          where: {
+            jobId: job?.id || "0",
+            userId: context?.ctx?.session?.userId || "0",
+          },
+        },
+        context.ctx
+      )
+
+      if (!jobUser) {
+        return {
+          props: {
+            error: {
+              statusCode: 403,
+              message: "You don't have permission",
+            },
+          },
+        }
+      }
+
+      const parentCompanyUser = await getParentCompanyUser(
+        {
+          where: {
+            parentCompanyId: companyUser?.company?.parentCompanyId || "0",
+            userId: context?.ctx?.session?.userId || "0",
+          },
+        },
+        context.ctx
+      )
+
       return {
         props: {
           user,
           company: companyUser.company,
           canUpdate: canUpdate,
           job,
+          jobUser,
+          parentCompanyUser,
           isCandidateLimitAvailable,
           activePlanName,
         } as any,
@@ -232,9 +276,9 @@ const CandidateActions = ({
   candidate,
   job,
   jobUser,
+  parentCompanyUser,
   setCandidateToEdit,
   setOpenModal,
-  viewRejected,
   setCandidateToReject,
   setOpenCandidateRejectConfirm,
   setCandidateToMove,
@@ -276,7 +320,7 @@ const CandidateActions = ({
           <span>
             <button
               className="float-right text-red-600 hover:text-red-800"
-              title={viewRejected ? "Restore Candidate" : "Reject Candidate"}
+              title={candidate?.rejected ? "Restore Candidate" : "Reject Candidate"}
               type="button"
               onClick={(e) => {
                 e.preventDefault()
@@ -284,10 +328,14 @@ const CandidateActions = ({
                 setOpenCandidateRejectConfirm(true)
               }}
             >
-              {viewRejected ? <RefreshIcon className="w-5 h-5" /> : <BanIcon className="w-5 h-5" />}
+              {candidate?.rejected ? (
+                <RefreshIcon className="w-5 h-5" />
+              ) : (
+                <BanIcon className="w-5 h-5" />
+              )}
             </button>
           </span>
-          {!viewRejected && (
+          {!candidate?.rejected && (
             <span>
               <button
                 className="float-right text-theme-600 hover:text-theme-800 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -310,11 +358,139 @@ const CandidateActions = ({
   )
 }
 
-const getBoard = (
+function CandidatePopMenu({
+  jobUser,
+  parentCompanyUser,
+  setCandidateToEdit,
+  setOpenModal,
+  candidate,
+  setCandidateToReject,
+  setOpenCandidateRejectConfirm,
+  // candidatePopMenuOpen,
+  // setCandidatePopMenuOpen,
+  setCandidateToMove,
+  setOpenCandidateMoveConfirm,
+}) {
+  const [candidatePopMenuOpen, setCandidatePopMenuOpen] = useState(false)
+  const [setCandidateVisibleParentMutation] = useMutation(setCandidateVisibleParent)
+
+  return jobUser?.role !== JobUserRole.USER ? (
+    <>
+      <DropdownMenu.Root
+        modal={false}
+        open={candidatePopMenuOpen}
+        onOpenChange={setCandidatePopMenuOpen}
+      >
+        <DropdownMenu.Trigger className="disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-r-sm flex justify-center items-center focus:outline-none">
+          <button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
+            <DotsVerticalIcon className="h-4" aria-hidden="true" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+            <DropdownMenu.Arrow className="fill-current" />
+
+            {jobUser?.role !== JobUserRole.USER && (
+              <>
+                <DropdownMenu.Item
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    setCandidateToEdit(candidate)
+                    setOpenModal(true)
+                  }}
+                  className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                >
+                  <span className="flex items-center space-x-2 whitespace-nowrap">
+                    <PencilIcon className="w-4 h-4 text-theme-600" />
+                    <span>Edit Candidate</span>
+                  </span>
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    setCandidateToReject(candidate)
+                    setOpenCandidateRejectConfirm(true)
+                  }}
+                  className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                >
+                  {candidate?.rejected ? (
+                    <span className="flex items-center space-x-2 whitespace-nowrap">
+                      <RefreshIcon className="w-4 h-4 text-red-600" />
+                      <span>Restore Candidate</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center space-x-2 whitespace-nowrap">
+                      <BanIcon className="w-4 h-4 text-red-600" />
+                      <span>Reject Candidate</span>
+                    </span>
+                  )}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    setCandidateToMove(candidate)
+                    setOpenCandidateMoveConfirm(true)
+                  }}
+                  className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                >
+                  <span className="flex items-center space-x-2 whitespace-nowrap">
+                    <ArrowRightIcon className="w-4 h-4 text-theme-600" />
+                    <span>Move to next stage</span>
+                  </span>
+                </DropdownMenu.Item>
+              </>
+            )}
+
+            {!!parentCompanyUser?.parentCompany?.name && parentCompanyUser && (
+              <>
+                <DropdownMenu.Separator className="h-px w-full bg-neutral-200" />
+
+                <DropdownMenu.Item
+                  onSelect={async (e) => {
+                    e.preventDefault()
+
+                    const toastId = toast.loading("Setting Candidate Visibility")
+
+                    try {
+                      await setCandidateVisibleParentMutation({
+                        where: { id: candidate?.id || "0" },
+                        visibleOnlyToParentMembers: !candidate?.visibleOnlyToParentMembers ?? false,
+                      })
+
+                      await invalidateQuery(getCandidates)
+
+                      toast.success("Candidate visibility changed", { id: toastId })
+                    } catch (error) {
+                      toast.error("Something went wrong", { id: toastId })
+                    }
+                  }}
+                  className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                >
+                  <span className="flex items-center space-x-2 whitespace-nowrap">
+                    <CheckIcon
+                      className={`w-4 h-4 text-theme-600 ${
+                        candidate?.visibleOnlyToParentMembers ? "" : "invisible"
+                      }`}
+                    />
+                    <span>Visible only to Parent Members</span>
+                  </span>
+                </DropdownMenu.Item>
+              </>
+            )}
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
+    </>
+  ) : (
+    <></>
+  )
+}
+
+const getBoard = ({
   job,
   jobUser,
+  parentCompanyUser,
   candidates,
-  viewRejected,
   setCandidateToReject,
   setOpenCandidateRejectConfirm,
   setCandidateToMove,
@@ -322,8 +498,8 @@ const getBoard = (
   enableDrag,
   setCandidateToEdit,
   setOpenModal,
-  session
-) => {
+  session,
+}) => {
   return {
     columns: job?.stages?.map((stage) => {
       return {
@@ -338,7 +514,7 @@ const getBoard = (
               description: c.email,
               isDragDisabled: !enableDrag,
               renderContent: (
-                <div>
+                <div className={c.visibleOnlyToParentMembers ? "opacity-50" : ""}>
                   <div className="flex items-center justify-between">
                     <Link
                       legacyBehavior
@@ -359,6 +535,18 @@ const getBoard = (
                         {c.name}
                       </a>
                     </Link>
+                    <CandidatePopMenu
+                      key={c.id}
+                      jobUser={jobUser}
+                      parentCompanyUser={parentCompanyUser}
+                      setCandidateToEdit={setCandidateToEdit}
+                      candidate={c}
+                      setOpenModal={setOpenModal}
+                      setCandidateToReject={setCandidateToReject}
+                      setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
+                      setCandidateToMove={setCandidateToMove}
+                      setOpenCandidateMoveConfirm={setOpenCandidateMoveConfirm}
+                    />
                   </div>
 
                   <div className="border-b-2 my-2 border-gray-100 w-full"></div>
@@ -372,13 +560,13 @@ const getBoard = (
                     candidate={c}
                     job={job}
                     jobUser={jobUser}
+                    parentCompanyUser={parentCompanyUser}
                     setCandidateToEdit={setCandidateToEdit}
                     setCandidateToMove={setCandidateToMove}
                     setCandidateToReject={setCandidateToReject}
                     setOpenCandidateMoveConfirm={setOpenCandidateMoveConfirm}
                     setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
                     setOpenModal={setOpenModal}
-                    viewRejected={viewRejected}
                   />
 
                   <div className="border-b-2 my-2 border-gray-100 w-full"></div>
@@ -419,6 +607,7 @@ type CandidateProps = {
   //     })
   //   | undefined
   jobUser: Awaited<ReturnType<typeof getJobUser>>
+  parentCompanyUser: Awaited<ReturnType<typeof getParentCompanyUser>>
   isTable: boolean
   viewRejected: boolean
   enableDrag: boolean
@@ -462,6 +651,8 @@ const Candidates = (props: CandidateProps) => {
     where: {
       jobId: props.job?.id,
       rejected: props.viewRejected ? true : false,
+      visibleOnlyToParentMembers:
+        !!props.parentCompanyUser?.parentCompany?.name && props.parentCompanyUser ? {} : false,
       ...query,
     },
     skip: ITEMS_PER_PAGE * Number(tablePage),
@@ -496,7 +687,8 @@ const Candidates = (props: CandidateProps) => {
     }
   }
 
-  const userForTable = props.jobUser
+  const jobUserForTable = props.jobUser
+  const parentCompanyUserForTable = props.parentCompanyUser
   const setCandidateToEditForTable = props.setCandidateToEdit
   const setOpenModalForTable = props.setOpenModal
   const viewRejectedForTable = props.viewRejected
@@ -507,6 +699,30 @@ const Candidates = (props: CandidateProps) => {
     Cell?: (props) => any
   }
   let columns: ColumnType[] = [
+    {
+      Header: "",
+      accessor: "candidate-pop-menu",
+      Cell: (props) => {
+        const candidate = props.cell.row.original
+
+        return (
+          <div className="w-1">
+            <CandidatePopMenu
+              key={candidate?.id}
+              candidate={candidate}
+              jobUser={jobUserForTable}
+              parentCompanyUser={parentCompanyUserForTable}
+              setCandidateToEdit={setCandidateToEditForTable}
+              setCandidateToReject={setCandidateToReject}
+              setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
+              setOpenModal={setOpenModalForTable}
+              setCandidateToMove={setCandidateToMove}
+              setOpenCandidateMoveConfirm={setOpenCandidateMoveConfirm}
+            />
+          </div>
+        )
+      },
+    },
     {
       Header: "Name",
       accessor: "name",
@@ -548,14 +764,14 @@ const Candidates = (props: CandidateProps) => {
               key={candidate.id}
               candidate={candidate}
               job={job}
-              jobUser={props.jobUser}
+              jobUser={jobUserForTable}
+              parentCompanyUser={parentCompanyUserForTable}
               setCandidateToEdit={setCandidateToEditForTable}
               setCandidateToMove={setCandidateToMove}
               setCandidateToReject={setCandidateToReject}
               setOpenCandidateMoveConfirm={setOpenCandidateMoveConfirm}
               setOpenCandidateRejectConfirm={setOpenCandidateRejectConfirm}
               setOpenModal={setOpenModalForTable}
-              viewRejected={viewRejectedForTable}
             />
           </div>
         )
@@ -682,37 +898,37 @@ const Candidates = (props: CandidateProps) => {
   // })
 
   const [board, setBoard] = useState(
-    getBoard(
-      props.job,
-      props.jobUser,
+    getBoard({
+      job: props.job,
+      jobUser: props.jobUser,
+      parentCompanyUser: props.parentCompanyUser,
       candidates,
-      props.viewRejected,
       setCandidateToReject,
       setOpenCandidateRejectConfirm,
       setCandidateToMove,
       setOpenCandidateMoveConfirm,
-      props.enableDrag,
-      props.setCandidateToEdit,
-      props.setOpenModal,
-      props.session
-    ) as KanbanBoardType
+      enableDrag: props.enableDrag,
+      setCandidateToEdit: props.setCandidateToEdit,
+      setOpenModal: props.setOpenModal,
+      session: props.session,
+    }) as KanbanBoardType
   )
   useEffect(() => {
     setBoard(
-      getBoard(
-        props.job,
-        props.jobUser,
+      getBoard({
+        job: props.job,
+        jobUser: props.jobUser,
+        parentCompanyUser: props.parentCompanyUser,
         candidates,
-        props.viewRejected,
         setCandidateToReject,
         setOpenCandidateRejectConfirm,
         setCandidateToMove,
         setOpenCandidateMoveConfirm,
-        props.enableDrag,
-        props.setCandidateToEdit,
-        props.setOpenModal,
-        props.session
-      )
+        enableDrag: props.enableDrag,
+        setCandidateToEdit: props.setCandidateToEdit,
+        setOpenModal: props.setOpenModal,
+        session: props.session,
+      })
     )
   }, [
     props.job,
@@ -904,6 +1120,8 @@ const SingleJobPage = ({
   user,
   company,
   job,
+  jobUser,
+  parentCompanyUser,
   error,
   canUpdate,
   isCandidateLimitAvailable,
@@ -926,6 +1144,8 @@ const SingleJobPage = ({
           canUpdate={canUpdate as any}
           isCandidateLimitAvailable={isCandidateLimitAvailable}
           activePlanName={activePlanName}
+          jobUser={jobUser}
+          parentCompanyUser={parentCompanyUser}
         />
       </Suspense>
     </AuthLayout>
@@ -936,13 +1156,15 @@ const SingleJobPageContent = ({
   user,
   company,
   job,
+  jobUser,
+  parentCompanyUser,
   error,
   canUpdate,
   isCandidateLimitAvailable,
   activePlanName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [isTable, setTable] = useState(false)
-  const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
+  // const [canCreateCandidate] = useQuery(canCreateNewCandidate, { jobId: job?.id || "0" })
   const router = useRouter()
   const [viewRejected, setViewRejected] = useState(false)
   const [enableDrag, setEnableDrag] = useState(true)
@@ -961,6 +1183,10 @@ const SingleJobPageContent = ({
   const [createCandidateMutation] = useMutation(createCandidate)
   const [updateCandidateMutation] = useMutation(updateCandidate)
 
+  // const [parentCompany] = useQuery(getParentCompany, {
+  //   where: { id: company?.parentCompanyId || "0" },
+  // })
+
   const [openUpgradeConfirm, setOpenUpgradeConfirm] = useState(false)
   const [upgradeConfirmHeader, setUpgradeConfirmHeader] = useState("Upgrade to recruiter plan")
   const [upgradeConfirmMessage, setUpgradeConfirmMessage] = useState(
@@ -972,86 +1198,37 @@ const SingleJobPageContent = ({
   const [openJobArchiveConfirm, setOpenJobArchiveConfirm] = useState(false)
   const [jobToArchive, setJobToArchive] = useState(null as any)
 
-  const [jobUser] = useQuery(getJobUser, {
-    where: {
-      jobId: job?.id || "0",
-      userId: user?.id || "0",
-    },
-  })
+  // const [jobUser] = useQuery(getJobUser, {
+  //   where: {
+  //     jobId: job?.id || "0",
+  //     userId: user?.id || "0",
+  //   },
+  // })
 
   function PopMenu() {
-    return (
-      <Menu as="div" className="relative inline-block text-left">
-        <div>
-          <Menu.Button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
-            <DotsVerticalIcon className="h-6" aria-hidden="true" />
-          </Menu.Button>
-        </div>
+    const [popMenuOpen, setPopMenuOpen] = useState(false)
+    const [setAllCandidatesVisibleParentMutation] = useMutation(setAllCandidatesVisibleParent)
 
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
-          <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setViewRejected(!viewRejected)
-                    }}
-                  >
-                    {viewRejected ? (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <RefreshIcon className="w-5 h-5 text-theme-600" />
-                        <span>View Active Candidates</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <BanIcon className="w-5 h-5 text-red-600" />
-                        <span>View Rejected Candidates</span>
-                      </span>
-                    )}
-                  </a>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setTable(!isTable)
-                    }}
-                  >
-                    {isTable ? (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <ViewBoardsIcon className="w-5 h-5 text-theme-600" />
-                        <span>Switch to Board View</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <TableIcon className="w-5 h-5 text-theme-600" />
-                        <span>Switch to Table View</span>
-                      </span>
-                    )}
-                  </a>
-                )}
-              </Menu.Item>
-              {jobUser?.role !== JobUserRole.USER && (
+    return (
+      <>
+        {/* <Menu as="div" className="relative inline-block text-left">
+          <div>
+            <Menu.Button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
+              <DotsVerticalIcon className="h-6" aria-hidden="true" />
+            </Menu.Button>
+          </div>
+
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div className="py-1">
                 <Menu.Item>
                   {({ active }) => (
                     <a
@@ -1061,144 +1238,510 @@ const SingleJobPageContent = ({
                       )}
                       onClick={(e) => {
                         e.preventDefault()
-
-                        // Check for the job limit when the job is being restored
-                        if (job?.archived) {
-                          if (activePlanName === PlanName.FREE) {
-                            if (activeJobsCount >= FREE_JOBS_LIMIT) {
-                              alert(
-                                `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                              )
-                              return
-                            }
-                          }
-                          // else if (activePlanName === PlanName.LIFETIME_SET1) {
-                          //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
-                          //     alert(
-                          //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                          //     )
-                          //     return
-                          //   }
-                          // }
-                        }
-
-                        setJobToArchive(job)
-                        setOpenJobArchiveConfirm(true)
+                        setViewRejected(!viewRejected)
                       }}
                     >
-                      {job?.archived ? (
+                      {viewRejected ? (
                         <span className="flex items-center space-x-2 whitespace-nowrap">
                           <RefreshIcon className="w-5 h-5 text-theme-600" />
-                          <span>Restore Job</span>
+                          <span>View Active Candidates</span>
                         </span>
                       ) : (
-                        <span className="flex items-center space-x-2">
-                          <ArchiveIcon className="w-5 h-5 text-red-600" />
-                          <span>Archive Job</span>
+                        <span className="flex items-center space-x-2 whitespace-nowrap">
+                          <BanIcon className="w-5 h-5 text-red-600" />
+                          <span>View Rejected Candidates</span>
                         </span>
                       )}
                     </a>
                   )}
                 </Menu.Item>
-              )}
-              {/* <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setEnableDrag(!enableDrag)
-                      toast.success(enableDrag ? "Card drag disabled" : "Card drag enabled")
-                    }}
-                  >
-                    {enableDrag ? (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <XIcon className="w-5 h-5 text-theme-600" />
-                        <span>Disable Card Drag</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <CheckIcon className="w-5 h-5 text-theme-600" />
-                        <span>Enable Card Drag</span>
-                      </span>
-                    )}
-                  </a>
-                )}
-              </Menu.Item> */}
-            </div>
-            <div className="py-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
-                    <Link
-                      prefetch={true}
-                      href={Routes.JobDescriptionPage({
-                        companySlug: job?.company?.slug,
-                        jobSlug: job?.slug,
-                      })}
-                      passHref
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setTable(!isTable)
+                      }}
                     >
+                      {isTable ? (
+                        <span className="flex items-center space-x-2 whitespace-nowrap">
+                          <ViewBoardsIcon className="w-5 h-5 text-theme-600" />
+                          <span>Switch to Board View</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center space-x-2 whitespace-nowrap">
+                          <TableIcon className="w-5 h-5 text-theme-600" />
+                          <span>Switch to Table View</span>
+                        </span>
+                      )}
+                    </a>
+                  )}
+                </Menu.Item>
+                {jobUser?.role !== JobUserRole.USER && (
+                  <Menu.Item>
+                    {({ active }) => (
                       <a
-                        target="_blank"
-                        rel="noreferrer"
                         className={classNames(
                           active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                          "block px-4 py-2 text-sm",
-                          "flex items-center space-x-2 cursor-pointer"
+                          "block px-4 py-2 text-sm cursor-pointer"
                         )}
+                        onClick={(e) => {
+                          e.preventDefault()
+
+                          // Check for the job limit when the job is being restored
+                          if (job?.archived) {
+                            if (activePlanName === PlanName.FREE) {
+                              if (activeJobsCount >= FREE_JOBS_LIMIT) {
+                                alert(
+                                  `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                                )
+                                return
+                              }
+                            }
+                            // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                            //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
+                            //     alert(
+                            //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                            //     )
+                            //     return
+                            //   }
+                            // }
+                          }
+
+                          setJobToArchive(job)
+                          setOpenJobArchiveConfirm(true)
+                        }}
                       >
-                        <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
-                        <span>View Job Listing</span>
+                        {job?.archived ? (
+                          <span className="flex items-center space-x-2 whitespace-nowrap">
+                            <RefreshIcon className="w-5 h-5 text-theme-600" />
+                            <span>Restore Job</span>
+                          </span>
+                        ) : (
+                          <span className="flex items-center space-x-2">
+                            <ArchiveIcon className="w-5 h-5 text-red-600" />
+                            <span>Archive Job</span>
+                          </span>
+                        )}
                       </a>
-                    </Link>
-                  </a>
+                    )}
+                  </Menu.Item>
                 )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
-                    <LinkCopyPopMenuItem
-                      companySlug={company?.slug || "0"}
-                      jobSlug={job?.slug || "0"}
-                      active={active}
-                      label="Copy Job Post Link"
-                    />
-                  </a>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
-                    <Link
-                      prefetch={true}
-                      href={
-                        jobUser?.role !== JobUserRole.USER
-                          ? Routes.JobSettingsPage({ slug: job?.slug! })
-                          : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
-                      }
-                      passHref
+              </div>
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                      }}
                     >
-                      <div
-                        className={classNames(
-                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                          "block px-4 py-2 text-sm",
-                          "flex items-center space-x-2 cursor-pointer"
-                        )}
+                      <span className="flex items-center space-x-2">
+                        <EyeOffIcon className="w-5 h-5 text-theme-600" />
+                        <span>Make candidates visible only to parent members</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                      }}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <EyeIcon className="w-5 h-5 text-theme-600" />
+                        <span>Make candidates visible to everyone</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                      }}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <CheckCircleIcon className="w-5 h-5 text-theme-600" />
+                        <span>View all candidates</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                      }}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <MinusCircleIcon className="w-5 h-5 text-theme-600" />
+                        <span>View candidates visible only to parent members</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
+                      }}
+                    >
+                      <span className="flex items-center space-x-2">
+                        <DotsCircleHorizontalIcon className="w-5 h-5 text-theme-600" />
+                        <span>View candidates visible to everyone</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}
+                    >
+                      <Link
+                        prefetch={true}
+                        href={Routes.JobDescriptionPage({
+                          companySlug: job?.company?.slug,
+                          jobSlug: job?.slug,
+                        })}
+                        passHref
                       >
-                        <CogIcon className="w-5 h-5 text-neutral-500" />
-                        <span>Go to Job Settings</span>
-                      </div>
-                    </Link>
-                  </a>
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          className={classNames(
+                            active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                            "block px-4 py-2 text-sm",
+                            "flex items-center space-x-2 cursor-pointer"
+                          )}
+                        >
+                          <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
+                          <span>View Job Listing</span>
+                        </a>
+                      </Link>
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}
+                    >
+                      <LinkCopyPopMenuItem
+                        companySlug={company?.slug || "0"}
+                        jobSlug={job?.slug || "0"}
+                        active={active}
+                        label="Copy Job Post Link"
+                      />
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}
+                    >
+                      <Link
+                        prefetch={true}
+                        href={
+                          jobUser?.role !== JobUserRole.USER
+                            ? Routes.JobSettingsPage({ slug: job?.slug! })
+                            : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
+                        }
+                        passHref
+                      >
+                        <div
+                          className={classNames(
+                            active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                            "block px-4 py-2 text-sm",
+                            "flex items-center space-x-2 cursor-pointer"
+                          )}
+                        >
+                          <CogIcon className="w-5 h-5 text-neutral-500" />
+                          <span>Go to Job Settings</span>
+                        </div>
+                      </Link>
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+            </Menu.Items>
+          </Transition>
+        </Menu> */}
+        <DropdownMenu.Root modal={false} open={popMenuOpen} onOpenChange={setPopMenuOpen}>
+          <DropdownMenu.Trigger className="disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-r-sm flex justify-center items-center focus:outline-none">
+            <button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
+              <DotsVerticalIcon className="h-6" aria-hidden="true" />
+            </button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content className="w-auto bg-white text-white p-1 shadow-md rounded">
+              <DropdownMenu.Arrow className="fill-current" />
+
+              <DropdownMenu.Item
+                onSelect={(e) => {
+                  e.preventDefault()
+                  setViewRejected(!viewRejected)
+                }}
+                className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+              >
+                {viewRejected ? (
+                  <span className="flex items-center space-x-2 whitespace-nowrap">
+                    <RefreshIcon className="w-5 h-5 text-theme-600" />
+                    <span>View Active Candidates</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center space-x-2 whitespace-nowrap">
+                    <BanIcon className="w-5 h-5 text-red-600" />
+                    <span>View Rejected Candidates</span>
+                  </span>
                 )}
-              </Menu.Item>
-            </div>
-          </Menu.Items>
-        </Transition>
-      </Menu>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onSelect={(e) => {
+                  e.preventDefault()
+                  setTable(!isTable)
+                }}
+                className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+              >
+                {isTable ? (
+                  <span className="flex items-center space-x-2 whitespace-nowrap">
+                    <ViewBoardsIcon className="w-5 h-5 text-theme-600" />
+                    <span>Switch to Board View</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center space-x-2 whitespace-nowrap">
+                    <TableIcon className="w-5 h-5 text-theme-600" />
+                    <span>Switch to Table View</span>
+                  </span>
+                )}
+              </DropdownMenu.Item>
+              {jobUser?.role !== JobUserRole.USER && (
+                <DropdownMenu.Item
+                  onSelect={(e) => {
+                    e.preventDefault()
+
+                    // Check for the job limit when the job is being restored
+                    if (job?.archived) {
+                      if (activePlanName === PlanName.FREE) {
+                        if (activeJobsCount >= FREE_JOBS_LIMIT) {
+                          alert(
+                            `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                          )
+                          return
+                        }
+                      }
+                      // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                      //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
+                      //     alert(
+                      //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                      //     )
+                      //     return
+                      //   }
+                      // }
+                    }
+
+                    setJobToArchive(job)
+                    setOpenJobArchiveConfirm(true)
+                  }}
+                  className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                >
+                  {job?.archived ? (
+                    <span className="flex items-center space-x-2 whitespace-nowrap">
+                      <RefreshIcon className="w-5 h-5 text-theme-600" />
+                      <span>Restore Job</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center space-x-2">
+                      <ArchiveIcon className="w-5 h-5 text-red-600" />
+                      <span>Archive Job</span>
+                    </span>
+                  )}
+                </DropdownMenu.Item>
+              )}
+
+              {!!parentCompanyUser?.parentCompany?.name && parentCompanyUser && (
+                <>
+                  <DropdownMenu.Separator className="h-px w-full bg-neutral-200" />
+
+                  <DropdownMenu.Item
+                    onSelect={async (e) => {
+                      e.preventDefault()
+
+                      if (
+                        confirm(
+                          "Are you sure you want to make all the candidates visible only to parents?"
+                        )
+                      ) {
+                        const toastId = toast.loading("Updating candidates visibility")
+
+                        try {
+                          await setAllCandidatesVisibleParentMutation({
+                            where: {
+                              jobId: job?.id || "0",
+                            },
+                            visibleOnlyToParentMembers: true,
+                          })
+
+                          await invalidateQuery(getCandidates)
+
+                          toast.success("Candidates now visible only to parents", { id: toastId })
+                        } catch (error) {
+                          toast.error("Something went wrong", { id: toastId })
+                        }
+                      }
+                    }}
+                    className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                  >
+                    <span className="flex items-center space-x-2">
+                      <EyeOffIcon className="w-5 h-5 text-yellow-600" />
+                      <span>Make candidates visible only to parents</span>
+                    </span>
+                  </DropdownMenu.Item>
+
+                  <DropdownMenu.Item
+                    onSelect={async (e) => {
+                      e.preventDefault()
+
+                      if (
+                        confirm("Are you sure you want to make the candidates visible to everyone?")
+                      ) {
+                        const toastId = toast.loading("Updating candidates visibility")
+
+                        try {
+                          await setAllCandidatesVisibleParentMutation({
+                            where: {
+                              jobId: job?.id || "0",
+                            },
+                            visibleOnlyToParentMembers: false,
+                          })
+
+                          await invalidateQuery(getCandidates)
+
+                          toast.success("Candidates now visible to everyone", { id: toastId })
+                        } catch (error) {
+                          toast.error("Something went wrong", { id: toastId })
+                        }
+                      }
+                    }}
+                    className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+                  >
+                    <span className="flex items-center space-x-2">
+                      <EyeIcon className="w-5 h-5 text-yellow-600" />
+                      <span>Make candidates visible to everyone</span>
+                    </span>
+                  </DropdownMenu.Item>
+                </>
+              )}
+
+              <DropdownMenu.Separator className="h-px w-full bg-neutral-200" />
+
+              <DropdownMenu.Item
+                onSelect={async (e) => {
+                  e.preventDefault()
+                }}
+                className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+              >
+                <Link
+                  prefetch={true}
+                  href={Routes.JobDescriptionPage({
+                    companySlug: job?.company?.slug,
+                    jobSlug: job?.slug,
+                  })}
+                  passHref
+                >
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    className={classNames(
+                      "block text-sm",
+                      "flex items-center space-x-2 cursor-pointer",
+                      "px-4 py-2"
+                    )}
+                  >
+                    <ExternalLinkIcon className="w-5 h-5 text-neutral-500" />
+                    <span>View Job Listing</span>
+                  </a>
+                </Link>
+              </DropdownMenu.Item>
+
+              <DropdownMenu.Item
+                onSelect={async (e) => {
+                  e.preventDefault()
+                }}
+                className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+              >
+                <LinkCopyPopMenuItem
+                  companySlug={company?.slug || "0"}
+                  jobSlug={job?.slug || "0"}
+                  label="Copy Job Post Link"
+                />
+              </DropdownMenu.Item>
+
+              <DropdownMenu.Item
+                onSelect={async (e) => {
+                  e.preventDefault()
+                }}
+                className="text-left w-auto max-w-xs truncate whitespace-nowrap cursor-pointer block text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:text-gray-900"
+              >
+                <Link
+                  prefetch={true}
+                  href={
+                    jobUser?.role !== JobUserRole.USER
+                      ? Routes.JobSettingsPage({ slug: job?.slug! })
+                      : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
+                  }
+                  passHref
+                >
+                  <div
+                    className={classNames(
+                      "block px-4 py-2 text-sm",
+                      "flex items-center space-x-2 cursor-pointer"
+                    )}
+                  >
+                    <CogIcon className="w-5 h-5 text-neutral-500" />
+                    <span>Go to Job Settings</span>
+                  </div>
+                </Link>
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
+      </>
     )
   }
 
@@ -1428,7 +1971,16 @@ const SingleJobPageContent = ({
           subHeader=""
           jobId={job?.id || "0"}
           preview={false}
-          initialValues={candidateToEdit ? getCandidateInitialValues(candidateToEdit) : {}}
+          initialValues={
+            candidateToEdit
+              ? getCandidateInitialValues(candidateToEdit)
+              : !!parentCompanyUser?.parentCompany?.name && parentCompanyUser
+              ? {
+                  visibleOnlyToParentMembers:
+                    parentCompanyUser?.parentCompany?.newCandidatesVisibleOnlyToParentMembers,
+                }
+              : {}
+          }
           onSubmit={async (values) => {
             const toastId = toast.loading(`${candidateToEdit ? "Updating" : "Creating"} Candidate`)
             try {
@@ -1452,6 +2004,7 @@ const SingleJobPageContent = ({
                           }
                         }) as any) || ([] as any),
                       createdById: user?.id,
+                      visibleOnlyToParentMembers: values.visibleOnlyToParentMembers,
                     },
                   })
                 : await createCandidateMutation({
@@ -1469,6 +2022,7 @@ const SingleJobPageContent = ({
                         }
                       }) || [],
                     createdById: user?.id,
+                    visibleOnlyToParentMembers: values.visibleOnlyToParentMembers,
                   })
               toast.success(`Candidate ${candidateToEdit ? "updated" : "created"}`, { id: toastId })
               invalidateQuery(getCandidates)
@@ -1590,6 +2144,7 @@ const SingleJobPageContent = ({
         <Candidates
           job={job as any}
           jobUser={jobUser}
+          parentCompanyUser={parentCompanyUser}
           isTable={isTable}
           viewRejected={viewRejected}
           enableDrag={jobUser?.role === JobUserRole.USER ? false : enableDrag}

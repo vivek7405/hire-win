@@ -9,7 +9,8 @@ import getCandidateInterviewer from "../queries/getCandidateInterviewer"
 
 // Candidate can be created without authentication
 async function createCandidate(data: CandidateInputType, ctx: Ctx) {
-  const { name, email, resume, answers, jobId, source, createdById } = Candidate.parse(data)
+  const { name, email, resume, answers, jobId, source, createdById, visibleOnlyToParentMembers } =
+    Candidate.parse(data)
 
   // const slug = slugify(name, { strict: true, lower: true })
   // const newSlug = await findFreeSlug(
@@ -17,20 +18,39 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
   //   async (e) => await db.candidate.findFirst({ where: { slug: e, jobId } })
   // )
 
-  const jobUser = await db.jobUser.findFirst({
-    where: { jobId },
-    include: {
-      job: {
-        include: {
-          // workflow: { include: { stages: { include: { stage: true } } } },
-          stages: true,
-        },
-      },
-    },
+  // const jobUser = await db.jobUser.findFirst({
+  //   where: { jobId },
+  //   include: {
+  //     job: {
+  //       include: {
+  //         // workflow: { include: { stages: { include: { stage: true } } } },
+  //         stages: true,
+  //       },
+  //     },
+  //   },
+  // })
+
+  const job = await db.job.findUnique({
+    where: { id: jobId || "0" },
+    include: { stages: true },
   })
-  const defaultStage = jobUser?.job?.stages?.find(
+
+  const defaultStage = job?.stages?.find(
     (stage) => stage.jobId === jobId && stage.name === "Sourced"
   )
+
+  const company = await db.company.findFirst({
+    where: { id: job?.companyId || "0" },
+    include: { parentCompany: true },
+  })
+
+  const parentCompanyUser = await db.parentCompanyUser.findFirst({
+    where: {
+      parentCompanyId: company?.parentCompanyId || "0",
+      userId: ctx?.session?.userId || "0",
+    },
+    include: { parentCompany: true },
+  })
 
   let createCandidateData = {
     name,
@@ -48,6 +68,12 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
     source,
     stageId: defaultStage?.id,
     createdById,
+    visibleOnlyToParentMembers:
+      visibleOnlyToParentMembers ??
+      ((!!parentCompanyUser?.parentCompany?.name &&
+        parentCompanyUser &&
+        company?.parentCompany?.newCandidatesVisibleOnlyToParentMembers) ||
+        false),
   }
 
   const existingCandidate = await db.candidate.findUnique({
@@ -107,6 +133,7 @@ async function createCandidate(data: CandidateInputType, ctx: Ctx) {
         }
       }),
     },
+    visibleOnlyToParentMembers: visibleOnlyToParentMembers ?? false,
   }
 
   if (resume) {

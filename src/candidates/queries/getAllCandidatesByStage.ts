@@ -6,8 +6,26 @@ type GetAllCandidatesInputType = {
   rejected: boolean
 }
 async function getAllCandidatesByStage({ stageId, rejected }: GetAllCandidatesInputType, ctx: Ctx) {
+  const stage = await db.stage.findUnique({
+    where: { id: stageId || "0" },
+    include: { job: { include: { company: true } } },
+  })
+
+  const parentCompanyUser = await db.parentCompanyUser.findFirst({
+    where: {
+      parentCompanyId: stage?.job?.company?.parentCompanyId,
+      userId: ctx?.session?.userId || "0",
+    },
+    include: { parentCompany: true },
+  })
+
   const stageCandidates = db.candidate.findMany({
-    where: { stageId, rejected },
+    where: {
+      stageId,
+      rejected,
+      visibleOnlyToParentMembers:
+        !!parentCompanyUser?.parentCompany?.name && parentCompanyUser ? {} : false,
+    },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -17,6 +35,7 @@ async function getAllCandidatesByStage({ stageId, rejected }: GetAllCandidatesIn
       stage: { select: { name: true } },
       scores: { select: { rating: true } },
       job: { select: { slug: true } },
+      visibleOnlyToParentMembers: true,
     },
   })
 

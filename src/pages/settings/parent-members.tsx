@@ -42,6 +42,7 @@ import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompan
 import UpgradeMessage from "src/plans/components/UpgradeMessage"
 import UserSettingsLayout from "src/core/layouts/UserSettingsLayout"
 import updateAutoAddMembers from "src/parent-companies/mutations/updateAutoAddMembers"
+import updateNewCandidatesVisibility from "src/parent-companies/mutations/updateNewCandidatesVisibility"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -144,6 +145,7 @@ const UserSettingsParentMembersPage = ({
   })
 
   const [updateAutoAddMembersMutation] = useMutation(updateAutoAddMembers)
+  const [updateNewCandidatesVisibilityMutation] = useMutation(updateNewCandidatesVisibility)
 
   if (error) {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
@@ -352,6 +354,43 @@ const UserSettingsParentMembersPage = ({
                       Auto add all parent company members as admins to newly created companies
                     </label>
                   </div>
+
+                  <div className="flex items-center space-x-2 text-neutral-700 mt-4">
+                    <input
+                      id="new-candidates-visibility-checkbox"
+                      type="checkbox"
+                      checked={parentCompany?.newCandidatesVisibleOnlyToParentMembers || false}
+                      className="border rounded"
+                      onChange={async (e) => {
+                        const isVisibleOnlyToParents = e.target.checked
+                        const toastId = toast.loading("Updating candidates visibility")
+
+                        try {
+                          await updateNewCandidatesVisibilityMutation({
+                            parentCompanyId,
+                            newCandidatesVisibleOnlyToParentMembers: isVisibleOnlyToParents,
+                          })
+
+                          await invalidateQuery(getParentCompany)
+
+                          toast.success(
+                            isVisibleOnlyToParents
+                              ? "New Candidates will now be visible only to parents by default"
+                              : "New Candidates will now be visible to everyone by default",
+                            {
+                              id: toastId,
+                            }
+                          )
+                        } catch (error) {
+                          toast.error(`Something went wrong - ${error.toString()}`, { id: toastId })
+                        }
+                      }}
+                    />
+                    <label htmlFor="new-candidates-visibility-checkbox">
+                      Make new candidates visible only to Parent Members by default
+                    </label>
+                  </div>
+
                   <table className="table min-w-full border border-gray-200 mt-6">
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>

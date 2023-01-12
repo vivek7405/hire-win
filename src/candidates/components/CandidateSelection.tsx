@@ -100,8 +100,8 @@ const Candidates = ({
               }
             }}
             key={candidate.id}
-            className={`${
-              selectedCandidateEmail === candidate.email ? "bg-neutral-200" : ""
+            className={`${selectedCandidateEmail === candidate.email ? "bg-neutral-200" : ""} ${
+              candidate?.visibleOnlyToParentMembers ? "opacity-50" : ""
             } px-3 py-1 flex items-center text-neutral-600 cursor-pointer rounded hover:bg-neutral-300 m-1`}
           >
             <div className="w-full flex items-center">

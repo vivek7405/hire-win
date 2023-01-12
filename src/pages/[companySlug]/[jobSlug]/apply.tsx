@@ -3,7 +3,7 @@ import Head from "next/head"
 import Link from "next/link"
 import Image from "next/image"
 import { getSession } from "@blitzjs/auth"
-import { usePaginatedQuery, useMutation } from "@blitzjs/rpc"
+import { usePaginatedQuery, useMutation, useQuery } from "@blitzjs/rpc"
 import { useRouter } from "next/router"
 import { Routes, ErrorComponent } from "@blitzjs/next"
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next"
@@ -29,6 +29,7 @@ import { checkPlan } from "src/companies/utils/checkPlan"
 import getCompany from "src/companies/queries/getCompany"
 import Guard from "src/guard/ability"
 import { checkSubscription } from "src/companies/utils/checkSubscription"
+import getParentCompany from "src/parent-companies/queries/getParentCompany"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)

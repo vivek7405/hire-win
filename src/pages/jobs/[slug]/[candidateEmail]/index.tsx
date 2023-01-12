@@ -117,6 +117,8 @@ import getJobUser from "src/jobs/queries/getJobUser"
 import getCompany from "src/companies/queries/getCompany"
 import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 import getParentCompany from "src/parent-companies/queries/getParentCompany"
+import setCandidateVisibleParent from "src/candidates/mutations/setCandidateVisibleParent"
+import getCandidates from "src/candidates/queries/getCandidates"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -184,6 +186,27 @@ export const getServerSideProps = gSSP(async (context) => {
           },
           context.ctx
         )
+
+        const parentCompanyUser = await getParentCompanyUser(
+          {
+            where: {
+              parentCompanyId: job?.company?.parentCompanyId || "0",
+              userId: user?.id || "0",
+            },
+          },
+          context?.ctx
+        )
+
+        if (!parentCompanyUser && candidate?.visibleOnlyToParentMembers) {
+          return {
+            props: {
+              error: {
+                statusCode: 403,
+                message: "You don't have permission",
+              },
+            },
+          }
+        }
 
         return {
           props: {
@@ -779,8 +802,8 @@ const SingleCandidatePageContent = ({
 
   const candidateNameHeader = (
     <h3
-      className={`font-bold text-5xl ${
-        candidate?.rejected ? "text-red-600" : "text-theme-600"
+      className={`font-bold text-5xl ${candidate?.rejected ? "text-red-600" : "text-theme-600"} ${
+        candidate?.visibleOnlyToParentMembers ? "opacity-50" : ""
       } capitalize`}
     >
       {getFirstWordIfLessThan(candidate?.name, 10)}
@@ -823,6 +846,8 @@ const SingleCandidatePageContent = ({
   )
 
   function PopMenu() {
+    const [setCandidateVisibleParentMutation] = useMutation(setCandidateVisibleParent)
+
     return (
       <Menu as="div" className="relative inline-block text-left">
         <div>
@@ -885,6 +910,50 @@ const SingleCandidatePageContent = ({
                       <span className="flex items-center space-x-2">
                         <PencilAltIcon className="w-5 h-5 text-theme-600" />
                         <span>Edit Candidate</span>
+                      </span>
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+            )}
+            {!!parentCompanyUser?.parentCompany?.name && parentCompanyUser && (
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={async (e) => {
+                        e.preventDefault()
+
+                        const toastId = toast.loading("Setting Candidate Visibility")
+
+                        try {
+                          await setCandidateVisibleParentMutation({
+                            where: { id: candidate?.id || "0" },
+                            visibleOnlyToParentMembers:
+                              !candidate?.visibleOnlyToParentMembers ?? false,
+                          })
+
+                          await invalidateQuery(getCandidate)
+                          await invalidateQuery(getAllCandidatesByStage)
+                          invalidateQuery(getCandidates)
+
+                          toast.success("Candidate visibility changed", { id: toastId })
+                        } catch (error) {
+                          toast.error("Something went wrong", { id: toastId })
+                        }
+                      }}
+                    >
+                      <span className="flex items-center space-x-2 whitespace-nowrap">
+                        <CheckIcon
+                          className={`w-5 h-5 text-theme-600 ${
+                            candidate?.visibleOnlyToParentMembers ? "" : "invisible"
+                          }`}
+                        />
+                        <span>Visible only to Parents</span>
                       </span>
                     </a>
                   )}
@@ -1279,6 +1348,14 @@ const SingleCandidatePageContent = ({
           subHeader=""
           jobId={jobId || "0"}
           preview={false}
+          initialValues={
+            !!parentCompanyUser?.parentCompany?.name && parentCompanyUser
+              ? {
+                  visibleOnlyToParentMembers:
+                    parentCompanyUser?.parentCompany?.newCandidatesVisibleOnlyToParentMembers,
+                }
+              : {}
+          }
           onSubmit={async (values) => {
             const toastId = toast.loading("Creating new Candidate")
             try {
@@ -1296,6 +1373,7 @@ const SingleCandidatePageContent = ({
                       value: typeof val === "string" ? val : JSON.stringify(val),
                     }
                   }) || [],
+                visibleOnlyToParentMembers: values.visibleOnlyToParentMembers,
               })
               await invalidateQuery(getJobStages)
               await invalidateQuery(getAllCandidatesByStage)
@@ -1347,6 +1425,7 @@ const SingleCandidatePageContent = ({
                         value: typeof val === "string" ? val : JSON.stringify(val),
                       }
                     }) as any) || ([] as any),
+                  visibleOnlyToParentMembers: values.visibleOnlyToParentMembers,
                 },
               })
               toast.success(`Candidate updated`, { id: toastId })
