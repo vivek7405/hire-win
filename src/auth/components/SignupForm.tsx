@@ -107,7 +107,7 @@ export const SignupForm = (props: SignupFormProps) => {
           <LabeledTextField
             name="companyName"
             label="Company Name"
-            placeholder="Make it as short as possible, eg. Acme instead of Acme Inc."
+            placeholder="Company for which you are actually hiring"
             testid="signupCompanyName"
           />
         )}
