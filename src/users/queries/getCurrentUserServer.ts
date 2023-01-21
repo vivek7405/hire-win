@@ -8,6 +8,7 @@ const getCurrentUserServer = async ({ req, res }: Parameters<GetServerSideProps>
   if (session.userId) {
     const user = await db.user.findFirst({
       where: { id: session.userId },
+      include: { referredByAffiliate: true },
       // include: {
       //   companies: {
       //     include: {

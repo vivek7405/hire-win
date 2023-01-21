@@ -25,6 +25,8 @@ import {
   XIcon,
 } from "@heroicons/react/outline"
 import { useRouter } from "next/router"
+import getCookie from "src/core/utils/getCookie"
+import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")

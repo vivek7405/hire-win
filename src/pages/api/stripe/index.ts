@@ -60,7 +60,9 @@ export default async (req, res) => {
         id: session.metadata.userId || "0",
       },
       data: {
-        stripeCurrentPeriodEnd: moment.unix(subscription.current_period_end)?.utc()?.toDate(),
+        stripeCurrentPeriodEnd: subscription.current_period_end
+          ? moment.unix(subscription.current_period_end)?.utc()?.toDate()
+          : null,
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: session.customer,
         stripePriceId: subscription.items.data[0]?.price.id,
