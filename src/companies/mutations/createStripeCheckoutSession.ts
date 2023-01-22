@@ -48,7 +48,9 @@ async function createStripeCheckoutSession(
 
   // Promotion codes & discounts can't be applied together
   // Provide discounts to referred users else allow applying promotion codes
-  if (user?.referredByAffiliateId) {
+  // Apply coupon only to new customers who are making the payment for the first time
+  // Check if paying for the first time by checking user.stripeCustomerId
+  if (user?.referredByAffiliateId && !user?.stripeCustomerId) {
     stripeSubscriptionObject["discounts"] = [
       {
         coupon: process.env.REFERRAL_DISCOUNT_COUPON_ID || undefined,

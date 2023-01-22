@@ -277,7 +277,8 @@ export default function Refer() {
                           </p>
                           <p className="mt-7">
                             Provide your bank account details to{" "}
-                            <span className="font-bold">billing@hire.win</span> in order to get paid.
+                            <span className="font-bold">billing@hire.win</span> in order to get
+                            paid.
                           </p>
                         </div>
                       </>

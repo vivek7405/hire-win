@@ -97,7 +97,7 @@ const Plans = ({ user }) => {
                 <p className="mt-2 text-sm text-neutral-600">
                   Rounded off to your local currency if available
                 </p>
-                {user?.referredByAffiliate && (
+                {user?.referredByAffiliate && !user?.stripeCustomerId && (
                   <div className="mt-5 text-sm font-bold text-neutral-600">
                     <p className="text-2xl text-theme-500 font-extrabold tracking-tight">
                       -10% referral discount for 1 Year
