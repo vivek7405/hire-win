@@ -2,16 +2,56 @@ import { invalidateQuery, useMutation, useQuery } from "@blitzjs/rpc"
 import { ClipboardCopyIcon } from "@heroicons/react/outline"
 import { Affiliate } from "@prisma/client"
 import moment from "moment"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import toast from "react-hot-toast"
 import createAffiliate from "src/affiliates/mutations/createAffiliate"
 import updateAffiliate from "src/affiliates/mutations/updateAffiliate"
 import getAffiliate from "src/affiliates/queries/getAffiliate"
+import getEarnings from "src/affiliates/queries/getEarnings"
 import { AffiliateObj } from "src/affiliates/validations"
 import Form from "src/core/components/Form"
 import LabeledTextField from "src/core/components/LabeledTextField"
 import LandingLayout from "src/core/layouts/LandingLayout"
 import { z } from "zod"
+
+type TotalEarningsTillNowParamsType = {
+  affiliate: Affiliate
+}
+function TotalEarningsTillNow({ affiliate }: TotalEarningsTillNowParamsType) {
+  const [totalEarnings] = useQuery(getEarnings, {
+    affiliateId: affiliate?.id || "0",
+    invoiceIdsNotToCalculate: [],
+    invoiceIdsToCalculate: null,
+  })
+
+  return <>{totalEarnings}</>
+}
+
+type DueAmountParamsType = {
+  affiliate: Affiliate
+}
+function DueAmount({ affiliate }: DueAmountParamsType) {
+  const [dueAmount] = useQuery(getEarnings, {
+    affiliateId: affiliate?.id || "0",
+    invoiceIdsNotToCalculate: affiliate?.invoiceIdsPaid,
+    invoiceIdsToCalculate: null,
+  })
+
+  return <>{dueAmount}</>
+}
+
+type PaidAmountParamsType = {
+  affiliate: Affiliate
+}
+function PaidAmount({ affiliate }: PaidAmountParamsType) {
+  const [paidAmount] = useQuery(getEarnings, {
+    affiliateId: affiliate?.id || "0",
+    invoiceIdsNotToCalculate: [],
+    invoiceIdsToCalculate: affiliate?.invoiceIdsPaid,
+  })
+
+  return <>{paidAmount}</>
+}
 
 export default function Refer() {
   const [email, setEmail] = useState(null as string | null)
@@ -215,6 +255,26 @@ export default function Refer() {
                               })}
                             </tbody>
                           </table>
+                        </div>
+                        <div className="mt-5 flex flex-col items-center justify-center">
+                          <p className="font-bold">
+                            Total Earnings till now:{" "}
+                            <Suspense fallback="Loading...">
+                              ₹<TotalEarningsTillNow affiliate={affiliate} />
+                            </Suspense>
+                          </p>
+                          <p className="font-bold mt-2">
+                            Amount already Paid:{" "}
+                            <Suspense fallback="Loading...">
+                              ₹<PaidAmount affiliate={affiliate} />
+                            </Suspense>
+                          </p>
+                          <p className="font-bold mt-2">
+                            Amount Due:{" "}
+                            <Suspense fallback="Loading...">
+                              ₹<DueAmount affiliate={affiliate} />
+                            </Suspense>
+                          </p>
                         </div>
                       </>
                     ) : (

@@ -83,6 +83,7 @@ model Affiliate {
   email String  @unique
 
   referredUsers User[]
+  invoiceIdsPaid String[]
 }
 
 model Coupon {
