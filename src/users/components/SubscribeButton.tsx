@@ -21,14 +21,14 @@ export default function SubscribeButton({
   type: "new" | "update"
   testid?: string
 }) {
-  const [createStripeSessionMutation] = useMutation(createStripeCheckoutSession)
+  const [createStripeCheckoutSessionMutation] = useMutation(createStripeCheckoutSession)
   const [updateStripeSubscriptionMutation] = useMutation(updateStripeSubscription)
   const router = useRouter()
   const session = useSession()
 
   const createSubscription = async () => {
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!)
-    const sessionId = await createStripeSessionMutation({
+    const sessionId = await createStripeCheckoutSessionMutation({
       priceId,
       userId: session?.userId || "0",
       quantity,

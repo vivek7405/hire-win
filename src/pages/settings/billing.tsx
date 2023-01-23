@@ -94,9 +94,18 @@ const Plans = ({ user }) => {
                   </span>
                   <span className="ml-1 text-lg text-gray-400">/month</span>
                 </p>
-                <p className="mt-2 text-xs text-neutral-600">
+                <p className="mt-2 text-sm text-neutral-600">
                   Rounded off to your local currency if available
                 </p>
+                {user?.referredByAffiliate && !user?.stripeCustomerId && (
+                  <div className="mt-5 text-sm font-bold text-neutral-600">
+                    <p className="text-2xl text-theme-500 font-extrabold tracking-tight">
+                      -10% referral discount for 1 Year
+                    </p>
+                    <p>Since you have been referred by {user?.referredByAffiliate?.name},</p>
+                    <p>you shall get a 10% referral discount for 1 Year!</p>
+                  </div>
+                )}
                 {/* {plan.frequency === PlanFrequency.YEARLY && (
                   <p className="mt-4 flex items-baseline text-gray-900">
                     <span className="text-xl text-theme-500 font-extrabold tracking-tight whitespace-nowrap">

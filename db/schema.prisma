@@ -69,6 +69,21 @@ model User {
   stripeCurrentPeriodEnd DateTime?
   stripeTrialStart       DateTime?
   stripeTrialEnd         DateTime?
+
+  referredByAffiliate   Affiliate? @relation(fields: [referredByAffiliateId], references: [id])
+  referredByAffiliateId String?
+}
+
+model Affiliate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name  String?
+  email String  @unique
+
+  referredUsers User[]
+  invoiceIdsPaid String[]
 }
 
 model Coupon {

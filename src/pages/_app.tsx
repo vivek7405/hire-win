@@ -16,6 +16,7 @@ import { IdProvider } from "@radix-ui/react-id"
 // import LoginPage from "src/auth/pages/login"
 import { AuthenticationError, AuthorizationError } from "blitz"
 import LoginPage from "./auth/login"
+import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
 
 const progress = new ProgressBar({
   size: 2,
@@ -43,6 +44,14 @@ export default withBlitz(function App({ Component, pageProps }: AppProps) {
       router.events.off("routeChangeComplete", handleRouteChange)
     }
   }, [router.events])
+
+  useEffect(() => {
+    const referrerId = router.query.via
+    if (referrerId) {
+      const domain = process.env.NODE_ENV === "production" ? "hire.win" : "localhost"
+      document.cookie = `${REFERRER_ID_COOKIE_NAME}=${referrerId};max-age=5260000;domain=${domain}`
+    }
+  })
 
   return (
     <Suspense fallback="Loading...">

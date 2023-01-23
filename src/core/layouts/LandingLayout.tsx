@@ -176,7 +176,14 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   <li className="mr-3">
                     <Link href={Routes.Pricing()}>
                       <a className="font-medium cursor-pointer hover:underline py-2 px-4">
-                        Pricing
+                        Pricing & Features
+                      </a>
+                    </Link>
+                  </li>
+                  <li className="mr-3">
+                    <Link href={Routes.Refer()}>
+                      <a className="font-medium cursor-pointer hover:underline py-2 px-4">
+                        Refer & Earn
                       </a>
                     </Link>
                   </li>

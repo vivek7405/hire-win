@@ -1,13 +1,21 @@
-import { useMutation } from "@blitzjs/rpc";
+import { useMutation } from "@blitzjs/rpc"
 import updateFirstSignup from "src/users/mutations/updateFirstSignup"
 import { useEffect } from "react"
+import getCookie from "src/core/utils/getCookie"
+import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
+import assignAffiliateToUser from "src/affiliates/mutations/assignAffiliateToUser"
 
 const SignupWelcome = ({ setOpenModal, userName, userId }) => {
   const [updateFirstSignupMutation] = useMutation(updateFirstSignup)
+  const [assignAffiliateToUserMutation] = useMutation(assignAffiliateToUser)
 
   useEffect(() => {
     try {
       updateFirstSignupMutation({ userId, isFirstSignup: false })
+      const referrerId = getCookie(REFERRER_ID_COOKIE_NAME)
+      if (referrerId) {
+        assignAffiliateToUserMutation({ userId, affiliateId: referrerId })
+      }
     } catch (e) {}
   }, [])
 
