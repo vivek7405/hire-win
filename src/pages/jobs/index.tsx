@@ -94,6 +94,7 @@ import { FREE_JOBS_LIMIT } from "src/plans/constants"
 import { z } from "zod"
 import getActiveJobsCount from "src/jobs/queries/getActiveJobsCount"
 import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
+import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -155,9 +156,20 @@ export const getServerSideProps = gSSP(async (context) => {
 
     const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
 
+    const parentCompanyUser = await getParentCompanyUser(
+      {
+        where: {
+          parentCompanyId: companyUser?.company?.parentCompanyId || "0",
+          userId: context?.ctx?.session?.userId || "0",
+        },
+      },
+      context.ctx
+    )
+
     return {
       props: {
         user,
+        parentCompanyUser,
         companyUserRole: companyUser.role,
         company: companyUser.company,
         companyUsersLength: companyUsers?.length || 0,
@@ -225,6 +237,7 @@ const CategoryFilterButtons = ({
 
 const Jobs = ({
   // user,
+  parentCompanyUser,
   company,
   // subscription,
   // setOpenConfirm,
@@ -539,6 +552,8 @@ const Jobs = ({
     searchString,
     viewType,
     categoryId: selectedCategoryId,
+    visibleOnlyToParentMembers:
+      !!parentCompanyUser?.parentCompany?.name && parentCompanyUser ? {} : false,
   })
 
   let startPage = tablePage * ITEMS_PER_PAGE + 1
@@ -1240,6 +1255,7 @@ const Jobs = ({
 
 const JobsHome = ({
   user,
+  parentCompanyUser,
   companyUserRole,
   company,
   canCreate,
@@ -1297,6 +1313,7 @@ const JobsHome = ({
         <Jobs
           // viewType={viewType}
           // user={user}
+          parentCompanyUser={parentCompanyUser}
           company={company}
           // subscription={subscription}
           // setOpenConfirm={setOpenConfirm}

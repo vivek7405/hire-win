@@ -14,10 +14,12 @@ async function getUserJobsByViewTypeAndCategory(
     viewType,
     categoryId,
     searchString,
+    visibleOnlyToParentMembers,
   }: GetJobsInput & {
     searchString: string
     viewType: JobViewType
     categoryId: string | null
+    visibleOnlyToParentMembers: any
   },
   ctx: Ctx
 ) {
@@ -62,7 +64,7 @@ async function getUserJobsByViewTypeAndCategory(
           job: {
             include: {
               category: true,
-              candidates: true,
+              candidates: { where: { visibleOnlyToParentMembers } },
               stages: true,
               createdBy: true,
               company: true,
