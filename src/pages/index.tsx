@@ -220,7 +220,7 @@ export default function Home() {
       <div className="h-full">
         <section className="text-center px-4">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-black">
-            The Most Simple, Reasonable, Yet Powerful Hiring Solution
+            The Most Simple, Yet Powerful Hiring Solution
           </h1>
           <p className="mt-2 text-gray-800 text-base md:text-xl lg:text-2xl">
             The simplest way to list jobs, receive applicants and conduct interviews!
