@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/router"
 import "regenerator-runtime/runtime"
 import Debouncer from "src/core/utils/debouncer"
 import Pagination from "./Pagination"
@@ -30,6 +30,7 @@ type KanbanBoardProps = {
   noPagination?: boolean
   noSearch?: boolean
   resultName?: string
+  showCount?: boolean
 }
 
 function pickPropOut(object, prop) {
@@ -79,6 +80,7 @@ const KanbanBoard = ({
   noPagination,
   noSearch,
   resultName,
+  showCount,
 }: KanbanBoardProps) => {
   const router = useRouter()
 
@@ -185,8 +187,8 @@ const KanbanBoard = ({
                             <h1 className="pb-2.5 font-semibold focus:outline-none">
                               {column.title?.length > 25
                                 ? `${column.title?.substring(0, 25)}...`
-                                : column.title}{" "}
-                              ({column.cards.length})
+                                : column.title}
+                              {showCount && `${" "}(${column.cards.length})`}
                             </h1>
                           </div>
                           <DroppableColumn key={column.id} droppableId={column.id}>

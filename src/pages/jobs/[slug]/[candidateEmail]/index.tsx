@@ -2159,7 +2159,33 @@ const SingleCandidatePageContent = ({
                 </div>
                 <div className="flex items-center justify-center mt-5 mx-5">
                   <Suspense
-                    fallback={<div className="flex items-center justify-center">Loading...</div>}
+                    fallback={
+                      <div className="flex items-center justify-center space-x-2">
+                        <label className="text-neutral-600">Evaluator / Interviewer:</label>
+                        <select
+                          className="border border-gray-300 px-2 py-1 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed truncate pr-7"
+                          placeholder={`Interviewer for ${selectedStage?.name}`}
+                          disabled={true}
+                        >
+                          <option>Loading...</option>
+                        </select>
+                        {jobUser?.role !== JobUserRole.USER && (
+                          <Link
+                            legacyBehavior
+                            href={Routes.JobSettingsHiringTeamPage({
+                              slug: candidate?.job?.slug || "0",
+                            })}
+                          >
+                            <a
+                              title="Go to Hiring Team settings - Add/Edit/Assign Evaluators"
+                              className="text-theme-600 hover:text-theme-800"
+                            >
+                              <CogIcon className="w-5 h-5" />
+                            </a>
+                          </Link>
+                        )}
+                      </div>
+                    }
                   >
                     <StageEvaluator candidate={candidate} stage={selectedStage} />
                   </Suspense>

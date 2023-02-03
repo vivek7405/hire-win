@@ -358,8 +358,8 @@ export default function Home() {
               className="text-xl lg:text-2xl text-black font-bold hover:underline flex items-center justify-center space-x-2"
             >
               <span>
-                You get a pre-built Interview Kit that can be fully customized. Click to read its
-                significance
+                You get a pre-built Tracker & Interview Kit that can be fully customized. Click to
+                read its significance
               </span>
               <ArrowNarrowRightIcon className="hidden md:block w-7 h-7" />
             </a>
