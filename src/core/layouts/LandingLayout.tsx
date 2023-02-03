@@ -217,17 +217,13 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                 It only takes 1 minute!
               </h2>
 
-              <div className="w-full text-center pt-4">
+              <div className="w-full text-center pt-1">
                 <div className="mt-1">
-                  <span className="text-xl lg:text-2xl text-neutral-600">
-                    Get started with the most{" "}
-                    <span className="font-semibold italic">
-                      Simple Yet Powerful Hiring Solution
-                    </span>
-                    .
+                  <span className="text-2xl xl:text-3xl text-neutral-600">
+                    Get started with hiring, now...
                   </span>
                 </div>
-                <div className="mt-12 mb-6">
+                <div className="mt-10 mb-4">
                   {/* Uncomment this and comment the line below it once you want to provide signup */}
                   {/* <Link href={Routes.Home()} legacyBehavior> */}
                   <Link href={Routes.OldSignupPage()} legacyBehavior>

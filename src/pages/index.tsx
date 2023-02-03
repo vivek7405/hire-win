@@ -228,6 +228,11 @@ export default function Home() {
           <p className="mt-8 text-gray-800 text-sm md:text-lg lg:text-xl italic">
             Traditionally, an Applicant Tracking System (ATS)
           </p>
+          <p className="mt-2 text-gray-800 text-sm md:text-lg italic">
+            Everyone including <span className="font-semibold">Small to Big Companies</span>,{" "}
+            <span className="font-semibold">Staffing Agencies</span> &{" "}
+            <span className="font-semibold">Freelance Recruiters</span> shall fit in well!
+          </p>
 
           <div className="w-full flex items-center justify-center my-8">
             <a
@@ -350,7 +355,56 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-8 mb-4 w-full flex items-center justify-center">
+          <section id="careers-page" className="mx-3 sm:mx-10 mt-10">
+            <h1 className="text-center font-bold text-xl lg:text-2xl">
+              You get an instant Careers Page with{" "}
+              <span className="bg-yellow-200 rounded-tl-xl rounded-br-xl px-1">
+                customizable theme color
+              </span>
+              :
+            </h1>
+            {/* <iframe
+            title="Job Posts"
+            width="850"
+            height="500"
+            src="http://localhost:3000/acme-inc?embed=true"
+          ></iframe> */}
+            <div className="mt-4 w-full h-screen rounded-lg drop-shadow-lg">
+              <div className="w-full h-8 space-x-2 px-3 rounded-t-lg bg-neutral-100 flex justify-start items-center drop-shadow-sm shadow-sm">
+                <span className="w-3 h-3 rounded-full bg-red-400"></span>
+                <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
+                <span className="w-3 h-3 rounded-full bg-green-400"></span>
+                <span className="flex-1"></span>
+                <a
+                  title="Open in new tab"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={
+                    process.env.NODE_ENV === "production"
+                      ? "https://hire.win/acme-inc"
+                      : "http://localhost:3000/acme-inc"
+                  }
+                  className="text-sm text-neutral-600 hover:underline font-semibold flex items-center justify-center space-x-2"
+                >
+                  <span>Open in new tab</span>
+                  <ExternalLinkIcon className="w-4 h-4" />
+                </a>
+              </div>
+              <div className="bg-white border-t-0 w-full h-full rounded-b-lg">
+                <iframe
+                  src={
+                    process.env.NODE_ENV === "production"
+                      ? "https://hire.win/acme-inc"
+                      : "http://localhost:3000/acme-inc"
+                  }
+                  title="Careers Page"
+                  className="w-full h-full rounded-b-lg"
+                ></iframe>
+              </div>
+            </div>
+          </section>
+
+          <div className="mt-16 mb-4 w-full flex items-center justify-center">
             <a
               target="_blank"
               rel="referrer"
@@ -358,8 +412,8 @@ export default function Home() {
               className="text-xl lg:text-2xl text-black font-bold hover:underline flex items-center justify-center space-x-2"
             >
               <span>
-                You get a pre-built Tracker & Interview Kit that can be fully customized. Click to
-                read its significance
+                You get a fully customisable Applicant Tracker & Interview Kit. Click to read its
+                significance
               </span>
               <ArrowNarrowRightIcon className="hidden md:block w-7 h-7" />
             </a>
@@ -401,56 +455,187 @@ export default function Home() {
               objectFit="contain"
             />
           </div>
-        </section>
 
-        <section id="careers-page" className="mx-3 sm:mx-10 mt-10">
-          <h1 className="text-center font-bold text-xl lg:text-2xl">
-            You get an instant Careers Page with{" "}
-            <span className="bg-yellow-200 rounded-tl-xl rounded-br-xl px-1">
-              customizable theme color
+          <div className="mt-8 mb-4 w-full flex items-center justify-center">
+            <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
+              You get lightning fast 1-click interview scheduling:
             </span>
-            :
-          </h1>
-          {/* <iframe
-            title="Job Posts"
-            width="850"
-            height="500"
-            src="http://localhost:3000/acme-inc?embed=true"
-          ></iframe> */}
-          <div className="mt-4 w-full h-screen rounded-lg drop-shadow-lg">
-            <div className="w-full h-8 space-x-2 px-3 rounded-t-lg bg-neutral-100 flex justify-start items-center drop-shadow-sm shadow-sm">
-              <span className="w-3 h-3 rounded-full bg-red-400"></span>
-              <span className="w-3 h-3 rounded-full bg-yellow-400"></span>
-              <span className="w-3 h-3 rounded-full bg-green-400"></span>
-              <span className="flex-1"></span>
-              <a
-                title="Open in new tab"
-                target="_blank"
-                rel="noopener noreferrer"
-                href={
-                  process.env.NODE_ENV === "production"
-                    ? "https://hire.win/acme-inc"
-                    : "http://localhost:3000/acme-inc"
-                }
-                className="text-sm text-neutral-600 hover:underline font-semibold flex items-center justify-center space-x-2"
-              >
-                <span>Open in new tab</span>
-                <ExternalLinkIcon className="w-4 h-4" />
-              </a>
-            </div>
-            <div className="bg-white border-t-0 w-full h-full rounded-b-lg">
-              <iframe
-                src={
-                  process.env.NODE_ENV === "production"
-                    ? "https://hire.win/acme-inc"
-                    : "http://localhost:3000/acme-inc"
-                }
-                title="Careers Page"
-                className="w-full h-full rounded-b-lg"
-              ></iframe>
-            </div>
+          </div>
+
+          <div className="w-full block sm:hidden md:hidden lg:hidden mobileInterviewSchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/interview-scheduling-demo.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:block md:hidden lg:hidden smInterviewSchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/interview-scheduling-demo.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:block lg:hidden mdInterviewSchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/interview-scheduling-demo.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:hidden lg:block lgInterviewSchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/interview-scheduling-demo.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+
+          <div className="mt-8 mb-4 w-full flex items-center justify-center">
+            <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
+              Add multiple companies and easily switch between them:
+            </span>
+          </div>
+
+          <div className="w-full block sm:hidden md:hidden lg:hidden mobileCompSwitchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-switch.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:block md:hidden lg:hidden smCompSwitchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-switch.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:block lg:hidden mdCompSwitchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-switch.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:hidden lg:block lgCompSwitchHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-switch.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+
+          <div className="mt-8 mb-4 w-full flex items-center justify-center">
+            <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
+              Collaborating with team has never been so easier:
+            </span>
+          </div>
+
+          <div className="w-full block sm:hidden md:hidden lg:hidden mobileCompMembersHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-members.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:block md:hidden lg:hidden smCompMembersHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-members.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:block lg:hidden mdCompMembersHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-members.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:hidden lg:block lgCompMembersHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/company-members.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+
+          <div className="mt-8 mb-4 w-full flex items-center justify-center">
+            <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
+              Keep your team in the loop:
+            </span>
+          </div>
+
+          <div className="w-full block sm:hidden md:hidden lg:hidden mobileCommentsHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/comments.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:block md:hidden lg:hidden smCommentsHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/comments.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:block lg:hidden mdCommentsHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/comments.webp"
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full hidden sm:hidden md:hidden lg:block lgCommentsHeight relative">
+            <Image
+              priority={true}
+              alt="job"
+              src="/landing-screenshots/comments.webp"
+              layout="fill"
+              objectFit="contain"
+            />
           </div>
         </section>
+      </div>
+
+      <div className="mt-16 w-full flex items-center justify-center">
+        <Link href={Routes.Pricing()}>
+          <a className="hover:underline text-center text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
+            And a lot more features... click to read them all, along with our pricing!
+          </a>
+        </Link>
       </div>
 
       <style jsx>{`
@@ -464,6 +649,58 @@ export default function Home() {
           height: 400px;
         }
         .lgCandidateHeight {
+          height: 600px;
+        }
+
+        .mobileInterviewSchHeight {
+          height: 300px;
+        }
+        .smInterviewSchHeight {
+          height: 400px;
+        }
+        .mdInterviewSchHeight {
+          height: 500px;
+        }
+        .lgInterviewSchHeight {
+          height: 600px;
+        }
+
+        .mobileCompSwitchHeight {
+          height: 300px;
+        }
+        .smCompSwitchHeight {
+          height: 300px;
+        }
+        .mdCompSwitchHeight {
+          height: 300px;
+        }
+        .lgCompSwitchHeight {
+          height: 300px;
+        }
+
+        .mobileCompMembersHeight {
+          height: 200px;
+        }
+        .smCompMembersHeight {
+          height: 200px;
+        }
+        .mdCompMembersHeight {
+          height: 300px;
+        }
+        .lgCompMembersHeight {
+          height: 300px;
+        }
+
+        .mobileCommentsHeight {
+          height: 500px;
+        }
+        .smCommentsHeight {
+          height: 500px;
+        }
+        .mdCommentsHeight {
+          height: 600px;
+        }
+        .lgCommentsHeight {
           height: 600px;
         }
 
