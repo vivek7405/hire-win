@@ -326,7 +326,8 @@ input[type="text"],
 input[type="email"],
 input[type="number"],
 input[type="date"],
-textarea, select {
+textarea,
+select {
   @apply focus:!outline-none focus:!border-transparent focus-visible:!ring-2 focus-visible:!ring-theme-500;
 }
 

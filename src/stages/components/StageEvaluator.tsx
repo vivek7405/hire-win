@@ -9,6 +9,7 @@ import setCandidateInterviewer from "src/candidates/mutations/setCandidateInterv
 import getCandidate from "src/candidates/queries/getCandidate"
 import getCandidateInterviewer from "src/candidates/queries/getCandidateInterviewer"
 import getJobMembers from "src/jobs/queries/getJobMembers"
+import getJobUser from "src/jobs/queries/getJobUser"
 
 type CandidateType = Awaited<ReturnType<typeof getCandidate>>
 
@@ -25,6 +26,10 @@ const StageEvaluator = ({ candidate, stage }: StageEvaluatorInput) => {
   })
 
   const [jobUsers] = useQuery(getJobMembers, { where: { id: candidate.jobId } })
+  const [jobUser] = useQuery(getJobUser, {
+    where: { jobId: candidate.jobId || "0", userId: session.userId || "0" },
+  })
+
   const [setCandidateInterviewerMutation] = useMutation(setCandidateInterviewer)
 
   return (
@@ -35,10 +40,7 @@ const StageEvaluator = ({ candidate, stage }: StageEvaluatorInput) => {
           className="border border-gray-300 px-2 py-1 block w-32 sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed truncate pr-7"
           name="interviewerId"
           placeholder={`Interviewer for ${stage?.name}`}
-          disabled={
-            jobUsers?.users?.find((jobUser) => jobUser.userId === session.userId)?.role ===
-            JobUserRole.USER
-          }
+          disabled={jobUser?.role === JobUserRole.USER}
           value={selectedStageInterviewer?.id?.toString()}
           onChange={async (e) => {
             const selectedInterviewerId = e.target.value
@@ -63,18 +65,15 @@ const StageEvaluator = ({ candidate, stage }: StageEvaluatorInput) => {
             }
           }}
         >
-          {jobUsers?.users.map((jobUser) => {
+          {jobUsers?.users.map((ju) => {
             return (
-              <option key={jobUser?.userId?.toString()!} value={jobUser?.userId?.toString()!}>
-                {jobUser?.user?.name!}
+              <option key={ju?.userId?.toString()!} value={ju?.userId?.toString()!}>
+                {ju?.user?.name!}
               </option>
             )
           })}
         </select>
-        {!(
-          jobUsers?.users?.find((jobUser) => jobUser.userId === session.userId)?.role ===
-          JobUserRole.USER
-        ) && (
+        {jobUser?.role !== JobUserRole.USER && (
           <Link
             legacyBehavior
             href={Routes.JobSettingsHiringTeamPage({

@@ -1095,6 +1095,7 @@ const Candidates = (props: CandidateProps) => {
           startPage={startPage}
           endPage={endPage}
           noSearch={true}
+          showCount={true}
           resultName={props.viewRejected ? "rejected candidate" : "candidate"}
         />
       )}
