@@ -17,6 +17,7 @@ import { IdProvider } from "@radix-ui/react-id"
 import { AuthenticationError, AuthorizationError } from "blitz"
 import LoginPage from "./auth/login"
 import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
+import Script from "next/script"
 
 const progress = new ProgressBar({
   size: 2,
@@ -34,9 +35,6 @@ export default withBlitz(function App({ Component, pageProps }: AppProps) {
 
   const handleRouteChange = (url) => {
     ;(window as any).gtag("config", "G-W4VZMRWMTR", {
-      page_path: url,
-    })
-    ;(window as any).gtag("config", "UA-235671572-1", {
       page_path: url,
     })
   }
@@ -63,6 +61,17 @@ export default withBlitz(function App({ Component, pageProps }: AppProps) {
         resetKeys={[router.asPath]}
         onReset={useQueryErrorResetBoundary().reset}
       >
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=UA-235671572-1"
+          strategy="afterInteractive"
+        ></Script>
+        <Script strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-235671572-1');`}
+        </Script>
         <IdProvider>
           <Component {...pageProps} />
           <Toaster
