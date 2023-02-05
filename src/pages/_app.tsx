@@ -36,6 +36,9 @@ export default withBlitz(function App({ Component, pageProps }: AppProps) {
     ;(window as any).gtag("config", "G-W4VZMRWMTR", {
       page_path: url,
     })
+    ;(window as any).gtag("config", "UA-235671572-1", {
+      page_path: url,
+    })
   }
 
   useEffect(() => {
