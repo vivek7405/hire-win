@@ -180,11 +180,16 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                       </a>
                     </Link>
                   </li>
-                  <li className="mr-3">
+                  {/* <li className="mr-3">
                     <Link href={Routes.Refer()}>
                       <a className="font-medium cursor-pointer hover:underline py-2 px-4">
                         Refer & Earn
                       </a>
+                    </Link>
+                  </li> */}
+                  <li className="mr-3">
+                    <Link href={Routes.Blog()}>
+                      <a className="font-medium cursor-pointer hover:underline py-2 px-4">Blog</a>
                     </Link>
                   </li>
                   <li className="mr-3">
@@ -219,8 +224,8 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
 
               <div className="w-full text-center pt-1">
                 <div className="mt-1">
-                  <span className="text-2xl xl:text-3xl text-neutral-600">
-                    Get started with hiring, now...
+                  <span className="text-2xl text-neutral-600">
+                    Get an Instant Careers Page along with Applicant Tracking!
                   </span>
                 </div>
                 <div className="mt-10 mb-4">
