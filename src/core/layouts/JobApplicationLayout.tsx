@@ -25,7 +25,7 @@ function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
     title: job?.title,
-    description: draftToHtml(job?.description),
+    description: job?.description,
     identifier: {
       "@type": "PropertyValue",
       name: company?.name,
@@ -39,6 +39,10 @@ function getGoogleJobPostingStructuredData(job: ExtendedJob, company: Company) {
       name: company?.name,
       sameAs: company?.website,
       logo: (company?.logo as AttachmentObject)?.location,
+    },
+    applicantLocationRequirements: {
+      "@type": "Country",
+      name: job?.country,
     },
     jobLocation: {
       "@type": "Place",
