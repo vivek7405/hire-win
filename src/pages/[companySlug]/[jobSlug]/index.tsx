@@ -125,7 +125,11 @@ const JobDescriptionPage = ({
   }
 
   return (
-    <JobApplicationLayout company={company!} job={job!}>
+    <JobApplicationLayout
+      company={company!}
+      job={job!}
+      addGoogleJobPostingScript={job?.postToGoogle || false}
+    >
       <Suspense fallback="Loading...">
         <button
           type="button"
