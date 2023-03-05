@@ -5,6 +5,8 @@ import toast from "react-hot-toast"
 export interface CheckboxFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   name: string
   label: string
+  subLabel?: string
+  subLabel2?: string
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
   testid?: string
   onChange?: any
@@ -12,7 +14,7 @@ export interface CheckboxFieldProps extends PropsWithoutRef<JSX.IntrinsicElement
 }
 
 export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
-  ({ label, outerProps, name, ...props }, ref) => {
+  ({ label, subLabel, subLabel2, outerProps, name, ...props }, ref) => {
     const {
       register,
       control,
@@ -55,7 +57,7 @@ export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
                   // {...register(`${name}` as const)}
                   {...props}
                   data-testid={`${props.testid && `${props.testid}-`}input`}
-                  className="align-middle text-theme-600 border border-gray-300 px-2 py-2 block sm:text-sm rounded focus:ring-theme-500"
+                  className="align-middle text-theme-600 border border-gray-300 px-2 py-2 block sm:text-sm rounded focus:ring-theme-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   onChange={(e) => {
                     onChange(e)
                     props.onChange && props.onChange(e.currentTarget.checked)
@@ -73,6 +75,10 @@ export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(
           >
             {label} {props.showAsterisk && "*"}
           </label>
+        </div>
+        <div className="mt-1">
+          {subLabel && <label className="block text-xs text-gray-600">{subLabel}</label>}
+          {subLabel2 && <label className="block text-xs text-gray-600">{subLabel2}</label>}
         </div>
       </div>
     )
