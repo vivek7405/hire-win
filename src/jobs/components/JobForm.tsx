@@ -13,7 +13,7 @@ import ApplicationForm from "../../candidates/components/ApplicationForm"
 import toast from "react-hot-toast"
 import getFormQuestionsWOPaginationWOAbility from "src/form-questions/queries/getJobApplicationFormQuestions"
 import MultiStepForm from "src/core/components/MultiStepForm"
-import { FormStep } from "types"
+import { FormStep, PlanName } from "types"
 import { z } from "zod"
 import { ArrowSmDownIcon } from "@heroicons/react/outline"
 import { useFormContext } from "react-hook-form"
@@ -21,6 +21,7 @@ import getCategoriesWOPaginationWOAbility from "src/categories/queries/getCatego
 import getSalaryIntervalFromSalaryType from "../utils/getSalaryIntervalFromSalaryType"
 import Form from "src/core/components/Form"
 import LabeledQuillEditor from "src/core/components/LabeledQuillEditor"
+import UpgradeMessage from "src/plans/components/UpgradeMessage"
 
 type JobFormProps = {
   onSuccess?: () => void
@@ -34,6 +35,7 @@ type JobFormProps = {
   // form?: Form // Need to be provided while editing the form
   jobId?: string // Need to be provided while editing the form
   companyId: string
+  activePlanName: PlanName
 }
 export const JobForm = (props: JobFormProps) => {
   const [categories] = useQuery(getCategoriesWOPaginationWOAbility, {
@@ -161,7 +163,19 @@ export const JobForm = (props: JobFormProps) => {
           </div> */}
 
           {/* <CheckboxField name="remote" label="Remote Job" testid="jobRemote" /> */}
-          {/* <CheckboxField name="postToGoogle" label="Post to Google Jobs" testid="postToGoogle" /> */}
+          <CheckboxField
+            name="postToGoogle"
+            disabled={props.activePlanName === PlanName.FREE}
+            label="Post to Google Jobs"
+            subLabel="Fill in all the job details in all sections"
+            subLabel2="Wait for Google to pick the job (~ 1 week)"
+            testid="postToGoogle"
+          />
+          {props.activePlanName === PlanName.FREE && (
+            <div className="mt-2">
+              <UpgradeMessage message="Upgrade to Post to Google Jobs" />
+            </div>
+          )}
         </div>
 
         <div

@@ -18,6 +18,7 @@ import JobSettingsLayout from "src/core/layouts/JobSettingsLayout"
 import moment from "moment"
 import JobForm from "src/jobs/components/JobForm"
 import { AuthorizationError } from "blitz"
+import getCurrentCompanyOwnerActivePlan from "src/plans/queries/getCurrentCompanyOwnerActivePlan"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -62,11 +63,14 @@ export const getServerSideProps = gSSP(async (context) => {
           { ...context.ctx }
         )
 
+        const activePlanName = await getCurrentCompanyOwnerActivePlan({}, context.ctx)
+
         return {
           props: {
             user: user,
             job: job,
             canUpdate,
+            activePlanName,
           } as any,
         }
       } else {
@@ -107,6 +111,7 @@ export const getServerSideProps = gSSP(async (context) => {
 const JobSettingsPage = ({
   user,
   job,
+  activePlanName,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter()
@@ -127,9 +132,10 @@ const JobSettingsPage = ({
             category={job?.category!}
             // workflow={job?.workflow!}
             // form={job?.form!}
+            activePlanName={activePlanName}
             jobId={job?.id}
             header="Job Details"
-            subHeader="Job details shall be displayed on Careers Page job listing"
+            subHeader="Recommended to fill all the details"
             initialValues={{
               title: job?.title,
               country: job?.country,
