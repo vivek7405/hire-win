@@ -118,6 +118,10 @@ export default function Pricing({}) {
                     <div>No</div>
                   </li>
                   <li className="py-3">
+                    <div className="text-neutral-600">Google Jobs Integration</div>
+                    <div>No</div>
+                  </li>
+                  <li className="py-3">
                     <div className="text-neutral-600">Interview Scheduling</div>
                     <div>No</div>
                   </li>
@@ -216,6 +220,10 @@ export default function Pricing({}) {
                   </li>
                   <li className="py-3">
                     <div className="text-neutral-600">Application Form Customisation</div>
+                    <div>Yes</div>
+                  </li>
+                  <li className="py-3">
+                    <div className="text-neutral-600">Google Jobs Integration</div>
                     <div>Yes</div>
                   </li>
                   <li className="py-3">
