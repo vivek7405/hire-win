@@ -60,7 +60,7 @@ export default function BlogPost({ post }: InputType) {
             </div>
             <div className="prose prose-sm md:prose-base lg:prose-lg prose-stone">
               <ReactMarkdown className="text-center">
-                {`_${moment(post.date, "DD-MM-YYYY")
+                {`_${moment(post.date, "MM-DD-YYYY")
                   .toDate()
                   .toString()
                   ?.split(" ")

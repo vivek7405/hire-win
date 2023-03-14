@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://localhost:3000/blog</id>
     <title>Hire.win Blog | RSS Feed</title>
-    <updated>2023-02-07T13:10:16.883Z</updated>
+    <updated>2023-03-14T17:13:42.339Z</updated>
     <generator>Feed for Node.js</generator>
     <link rel="alternate" href="http://localhost:3000/blog"/>
     <link rel="self" href="http://localhost:3000/blog/atom.xml"/>
@@ -10,17 +10,24 @@
     <icon>http://localhost:3000/favicon.ico</icon>
     <rights>Copyright ©2023 hire.win - All rights reserved</rights>
     <entry>
-        <title type="html"><![CDATA[Why use an Interview Kit?]]></title>
-        <id>http://localhost:3000/blog/why-use-interview-kit</id>
-        <link href="http://localhost:3000/blog/why-use-interview-kit"/>
-        <updated>2022-12-11T18:30:00.000Z</updated>
-        <summary type="html"><![CDATA[Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.]]></summary>
+        <title type="html"><![CDATA[How to use an Applicant Tracking System for Hiring]]></title>
+        <id>http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring</id>
+        <link href="http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring"/>
+        <updated>2023-03-13T18:30:00.000Z</updated>
+        <summary type="html"><![CDATA[One of the most common tools used by recruiters is an Applicant Tracking System (ATS), which helps to streamline the recruiting process and make it more efficient. In this blog post, we'll provide some tips on how to use an ATS for hiring.]]></summary>
     </entry>
     <entry>
         <title type="html"><![CDATA[Why use a Careers Page builder?]]></title>
         <id>http://localhost:3000/blog/why-use-careers-page-builder</id>
         <link href="http://localhost:3000/blog/why-use-careers-page-builder"/>
-        <updated>2023-07-01T18:30:00.000Z</updated>
+        <updated>2023-02-06T18:30:00.000Z</updated>
         <summary type="html"><![CDATA[Creating a standout careers page is crucial for attracting top talent to your organization. A well-designed careers page serves as an online representation of your company culture and values, and is often the first point of contact for potential candidates.]]></summary>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Why use an Interview Kit?]]></title>
+        <id>http://localhost:3000/blog/why-use-interview-kit</id>
+        <link href="http://localhost:3000/blog/why-use-interview-kit"/>
+        <updated>2022-12-11T18:30:00.000Z</updated>
+        <summary type="html"><![CDATA[Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.]]></summary>
     </entry>
 </feed>

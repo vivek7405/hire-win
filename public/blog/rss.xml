@@ -4,10 +4,26 @@
         <title>Hire.win Blog | RSS Feed</title>
         <link>http://localhost:3000/blog</link>
         <description>Don't just hire, Hire better!</description>
-        <lastBuildDate>Tue, 07 Feb 2023 13:10:16 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 14 Mar 2023 17:13:42 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
         <copyright>Copyright ©2023 hire.win - All rights reserved</copyright>
+        <item>
+            <title><![CDATA[How to use an Applicant Tracking System for Hiring]]></title>
+            <link>http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring</link>
+            <guid>http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring</guid>
+            <pubDate>Mon, 13 Mar 2023 18:30:00 GMT</pubDate>
+            <description><![CDATA[One of the most common tools used by recruiters is an Applicant Tracking System (ATS), which helps to streamline the recruiting process and make it more efficient. In this blog post, we'll provide some tips on how to use an ATS for hiring.]]></description>
+            <enclosure url="https://s3.us-east-2.amazonaws.com/hire.win/Applicant-tracking-system.jpg" length="0" type="image/jpg"/>
+        </item>
+        <item>
+            <title><![CDATA[Why use a Careers Page builder?]]></title>
+            <link>http://localhost:3000/blog/why-use-careers-page-builder</link>
+            <guid>http://localhost:3000/blog/why-use-careers-page-builder</guid>
+            <pubDate>Mon, 06 Feb 2023 18:30:00 GMT</pubDate>
+            <description><![CDATA[Creating a standout careers page is crucial for attracting top talent to your organization. A well-designed careers page serves as an online representation of your company culture and values, and is often the first point of contact for potential candidates.]]></description>
+            <enclosure url="https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots/Careers+Page.png" length="0" type="image/png"/>
+        </item>
         <item>
             <title><![CDATA[Why use an Interview Kit?]]></title>
             <link>http://localhost:3000/blog/why-use-interview-kit</link>
@@ -15,14 +31,6 @@
             <pubDate>Sun, 11 Dec 2022 18:30:00 GMT</pubDate>
             <description><![CDATA[Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.]]></description>
             <enclosure url="https://www.glassdoor.com/employers/app/uploads/sites/2/2021/05/GoogleDrive_640X469_How-to-Improve-Your-Interview-Process-02.png" length="0" type="image/png"/>
-        </item>
-        <item>
-            <title><![CDATA[Why use a Careers Page builder?]]></title>
-            <link>http://localhost:3000/blog/why-use-careers-page-builder</link>
-            <guid>http://localhost:3000/blog/why-use-careers-page-builder</guid>
-            <pubDate>Sat, 01 Jul 2023 18:30:00 GMT</pubDate>
-            <description><![CDATA[Creating a standout careers page is crucial for attracting top talent to your organization. A well-designed careers page serves as an online representation of your company culture and values, and is often the first point of contact for potential candidates.]]></description>
-            <enclosure url="https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots/Careers+Page.png" length="0" type="image/png"/>
         </item>
     </channel>
 </rss>
