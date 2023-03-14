@@ -6,12 +6,12 @@
     "description": "Don't just hire, Hire better!",
     "items": [
         {
-            "id": "http://localhost:3000/blog/why-use-interview-kit",
-            "url": "http://localhost:3000/blog/why-use-interview-kit",
-            "title": "Why use an Interview Kit?",
-            "summary": "Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.",
-            "image": "https://www.glassdoor.com/employers/app/uploads/sites/2/2021/05/GoogleDrive_640X469_How-to-Improve-Your-Interview-Process-02.png",
-            "date_modified": "2022-12-11T18:30:00.000Z"
+            "id": "http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring",
+            "url": "http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring",
+            "title": "How to use an Applicant Tracking System for Hiring",
+            "summary": "One of the most common tools used by recruiters is an Applicant Tracking System (ATS), which helps to streamline the recruiting process and make it more efficient. In this blog post, we'll provide some tips on how to use an ATS for hiring.",
+            "image": "https://s3.us-east-2.amazonaws.com/hire.win/Applicant-tracking-system.jpg",
+            "date_modified": "2023-03-13T18:30:00.000Z"
         },
         {
             "id": "http://localhost:3000/blog/why-use-careers-page-builder",
@@ -19,7 +19,15 @@
             "title": "Why use a Careers Page builder?",
             "summary": "Creating a standout careers page is crucial for attracting top talent to your organization. A well-designed careers page serves as an online representation of your company culture and values, and is often the first point of contact for potential candidates.",
             "image": "https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots/Careers+Page.png",
-            "date_modified": "2023-07-01T18:30:00.000Z"
+            "date_modified": "2023-02-06T18:30:00.000Z"
+        },
+        {
+            "id": "http://localhost:3000/blog/why-use-interview-kit",
+            "url": "http://localhost:3000/blog/why-use-interview-kit",
+            "title": "Why use an Interview Kit?",
+            "summary": "Creating an interviewing kit creates a standardized approach to the interviewing process. Having that consistency offers many benefits for the company and the candidates.",
+            "image": "https://www.glassdoor.com/employers/app/uploads/sites/2/2021/05/GoogleDrive_640X469_How-to-Improve-Your-Interview-Process-02.png",
+            "date_modified": "2022-12-11T18:30:00.000Z"
         }
     ]
 }

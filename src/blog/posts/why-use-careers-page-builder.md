@@ -1,6 +1,6 @@
 ---
 title: "Why use a Careers Page builder?"
-date: "07-02-2023"
+date: "02-07-2023"
 image: "https://s3.us-east-2.amazonaws.com/hire.win/landing-screenshots/Careers+Page.png"
 excerpt: "Creating a standout careers page is crucial for attracting top talent to your organization. A well-designed careers page serves as an online representation of your company culture and values, and is often the first point of contact for potential candidates."
 keywords:

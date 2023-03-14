@@ -2,6 +2,7 @@ import fs from "fs"
 import path from "path"
 import matter from "gray-matter"
 import { BlogPostInputType } from "../validations"
+import moment from "moment"
 
 const postsDirectory = path.join(process.cwd(), "src/blog/posts")
 
@@ -32,7 +33,7 @@ export function getAllBlogPosts() {
   })
   // Sort posts by date
   return allPostsData.sort((a, b) => {
-    if ((a?.date || "") < (b?.date || "")) {
+    if (a.date && b.date && moment(a.date).diff(b.date) < 0) {
       return 1
     } else {
       return -1

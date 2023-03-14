@@ -32,7 +32,7 @@ export default function Blog({ allPostsData }) {
                     {image && <img className="w-full rounded-t" src={image} />}
                     <div className="p-5">
                       <p className="text-sm italic">
-                        {moment(date, "DD-MM-YYYY")
+                        {moment(date, "MM-DD-YYYY")
                           .toDate()
                           .toString()
                           ?.split(" ")
