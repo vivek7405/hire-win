@@ -94,7 +94,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
   ]
 
   return (
-    <div className="bg-gray-100">
+    <div className="bg-white">
       <JobSettingsBreadcrumbs job={job!} />
       <div className="flex flex-col lg:flex-row mt-6 lg:space-x-4">
         <div className="mb-6 lg:mb-0 w-full lg:w-1/5">
@@ -115,7 +115,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
                     data-testid={`${item.name}-jobSettingsLink`}
                     className={`${
                       item.current
-                        ? "bg-gray-50 text-theme-600 hover:bg-white"
+                        ? "bg-gray-100 text-theme-600"
                         : "text-gray-900 hover:text-gray-900 hover:bg-gray-50"
                     } group px-3 py-2 flex items-center text-sm font-medium`}
                   >

@@ -136,7 +136,7 @@ const Interviews = ({ user, stageId, candidate, activePlanName }) => {
         <div className="flex items-center mt-6">
           <div className="font-bold text-lg w-full">Interviews</div>
           <button
-            className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+            className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
             disabled={
               // selectedWorkflowStage?.interviewDetails?.find(
               //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id

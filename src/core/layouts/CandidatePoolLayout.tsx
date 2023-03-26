@@ -119,7 +119,7 @@ const CandidatePoolLayout = ({ children }: LayoutProps) => {
           data-testid={`${item.name}-userSettingsLink`}
           className={`${
             item.current
-              ? "bg-gray-50 text-theme-600 hover:bg-white"
+              ? "bg-gray-100 text-theme-600"
               : "text-gray-900 hover:text-gray-900 hover:bg-gray-50"
           } group px-3 py-2 flex items-center justify-between text-sm font-medium`}
         >
@@ -131,7 +131,7 @@ const CandidatePoolLayout = ({ children }: LayoutProps) => {
   }
 
   return (
-    <div className="bg-gray-100 flex flex-col mt-6 md:flex-row md:space-x-4 lg:flex-row lg:space-x-4">
+    <div className="bg-white flex flex-col mt-6 md:flex-row md:space-x-4 lg:flex-row lg:space-x-4">
       <div className="w-full mb-6 md:mb-0 lg:mb-0 md:w-1/5 lg:w-1/5">
         {subNavigation?.filter((navItem) => navItem.isParent)?.length > 0 ? (
           <>

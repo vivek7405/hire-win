@@ -181,7 +181,7 @@ const KanbanBoard = ({
                             minHeight: "28px",
                             ...columnProvided.draggableProps.style,
                           }}
-                          className="p-4 bg-neutral-100 border-2 border-gray-300 rounded m-2 focus:outline-none h-full inline-block align-top"
+                          className="p-4 bg-white border border-neutral-400 rounded-lg m-2 focus:outline-none h-full inline-block align-top"
                         >
                           <div {...columnProvided.dragHandleProps}>
                             <h1 className="pb-2.5 font-semibold focus:outline-none">
@@ -209,7 +209,7 @@ const KanbanBoard = ({
                                       >
                                         <div className="inline-block whitespace-normal">
                                           <div
-                                            className={`box-border w-60 rounded bg-white border-2 border-gray-200 p-2.5 mb-2 ${
+                                            className={`box-border w-60 rounded bg-white border border-gray-300 p-2.5 mb-2 ${
                                               isDragging ? "shadow-md" : ""
                                             }`}
                                           >

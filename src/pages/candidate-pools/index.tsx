@@ -296,7 +296,7 @@ const CandidatePools = ({
 
       <div>
         <button
-          className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+          className="float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 whitespace-nowrap"
           onClick={(e) => {
             e.preventDefault()
             setCandidatePoolToEdit(null)

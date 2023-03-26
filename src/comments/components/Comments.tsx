@@ -29,7 +29,7 @@ const Comments = ({ user, stageId, candidate }) => {
         <div className="flex items-center">
           <div className="font-bold text-lg w-full">Comments</div>
           <button
-            className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+            className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
             disabled={showNewText}
             onClick={() => {
               setShowNewText(true)

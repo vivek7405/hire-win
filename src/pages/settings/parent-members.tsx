@@ -317,7 +317,7 @@ const UserSettingsParentMembersPage = ({
                       // }
                     }}
                     data-testid={`open-inviteUser-modal`}
-                    className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+                    className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
                   >
                     Add Member
                   </button>

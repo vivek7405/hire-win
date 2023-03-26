@@ -21,6 +21,8 @@ export interface FormProps<S extends z.ZodType<any, any>>
   noFormatting?: boolean
   isSubmitTop?: boolean
   isRounded?: boolean
+  noPadding?: boolean
+  noPaddingTop?: boolean
 }
 
 interface OnSubmitResult {
@@ -39,6 +41,8 @@ export function Form<S extends z.ZodType<any, any>>({
   headerComponent,
   subHeader,
   noFormatting,
+  noPadding,
+  noPaddingTop,
   isSubmitTop,
   isRounded,
   ...props
@@ -68,7 +72,11 @@ export function Form<S extends z.ZodType<any, any>>({
       >
         <div
           className={
-            !noFormatting ? `bg-white py-6 px-4 sm:p-6 ${isRounded ? "rounded-lg" : ""}` : ``
+            !noFormatting
+              ? `bg-white py-6 px-4 ${noPadding ? "md:p-0" : "md:p-6"} ${
+                  noPaddingTop ? "md:py-0 md:pb-6" : ""
+                } ${isRounded ? "rounded-lg" : ""}`
+              : ``
           }
         >
           <div>
@@ -92,7 +100,7 @@ export function Form<S extends z.ZodType<any, any>>({
                       data-testid={`${props.testid && `${props.testid}-`}submitButton`}
                       className={`${submitHidden && "hidden"} ${
                         submitDisabled && "disabled:opacity-50 cursor-not-allowed"
-                      } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700`}
+                      } text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700`}
                     >
                       {submitText}
                     </button>
@@ -112,7 +120,7 @@ export function Form<S extends z.ZodType<any, any>>({
                   data-testid={`${props.testid && `${props.testid}-`}submitButton`}
                   className={`${submitHidden && "hidden"} ${
                     submitDisabled && "disabled:opacity-50 cursor-not-allowed"
-                  } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700`}
+                  } text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700`}
                 >
                   {submitText}
                 </button>

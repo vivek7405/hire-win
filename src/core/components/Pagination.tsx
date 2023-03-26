@@ -84,7 +84,7 @@ const Pagination = ({
           <button
             className={`${
               !controlledHasPrevious && "disabled:opacity-50 cursor-not-allowed"
-            } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700`}
+            } text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700`}
             disabled={!controlledHasPrevious}
             onClick={() => goToPreviousPage()}
           >
@@ -93,7 +93,7 @@ const Pagination = ({
           <button
             className={`${
               !controlledHasNext && "disabled:opacity-50 cursor-not-allowed"
-            } ml-3 text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700`}
+            } ml-3 text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700`}
             disabled={!controlledHasNext}
             onClick={() => goToNextPage()}
           >

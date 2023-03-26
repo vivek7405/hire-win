@@ -174,7 +174,7 @@ const Categories = () => {
 
       <div>
         <button
-          className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+          className="float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 whitespace-nowrap"
           onClick={(e) => {
             e.preventDefault()
             setCategoryToEdit(null as any)
@@ -274,7 +274,7 @@ const CategoriesHome = ({ user }: InferGetServerSidePropsType<typeof getServerSi
   return (
     <AuthLayout title="Hire.win | Categories" user={user}>
       {/* <Link legacyBehavior prefetch={true} href={Routes.NewCategory()} passHref>
-        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+        <a className="float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700">
           New Category
         </a>
       </Link> */}
