@@ -235,7 +235,7 @@ const Emails = ({ user, stageId, candidate }) => {
         <div className="flex items-center">
           <div className="font-bold text-lg w-full">Emails</div>
           {/* <button
-            className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+            className="disabled:opacity-50 disabled:cursor-not-allowed flex-end text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
             disabled={
               selectedWorkflowStage?.interviewDetails?.find(
                 (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
@@ -253,7 +253,7 @@ const Emails = ({ user, stageId, candidate }) => {
           </button> */}
           <div className="float-right cursor-pointer flex justify-center">
             <button
-              className="disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l-sm"
+              className="disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 px-3 py-2 ml-6 hover:bg-theme-700 rounded-l"
               disabled={
                 // selectedWorkflowStage?.interviewDetails?.find(
                 //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id
@@ -277,7 +277,7 @@ const Emails = ({ user, stageId, candidate }) => {
               onOpenChange={setEmailTemplatesOpen}
             >
               <DropdownMenu.Trigger
-                className="disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none"
+                className="disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r flex justify-center items-center focus:outline-none"
                 disabled={
                   // selectedWorkflowStage?.interviewDetails?.find(
                   //   (int) => int.jobId === candidate?.jobId && int.interviewerId === user?.id

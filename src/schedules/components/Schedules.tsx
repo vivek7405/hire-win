@@ -301,7 +301,7 @@ const Schedules = ({ user }) => {
           )}
 
           <button
-            className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+            className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 whitespace-nowrap"
             onClick={(e) => {
               e.preventDefault()
               setScheduleToEdit(null)
@@ -313,14 +313,17 @@ const Schedules = ({ user }) => {
         </div>
       </div>
 
-      {schedules.map((s) => {
-        return (
-          <Card isFull={true} key={s.id}>
-            <div className="space-y-2">
-              <div className="w-full relative">
-                <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                  <div className="pr-12 md:px-12 lg:px-12 text-neutral-700 truncate">{s.name}</div>
-                  {/* <a
+      <div className="flex flex-col space-y-2 mt-2">
+        {schedules.map((s) => {
+          return (
+            <Card isFull={true} key={s.id}>
+              <div className="space-y-2">
+                <div className="w-full relative">
+                  <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
+                    <div className="pr-12 md:px-12 lg:px-12 text-neutral-700 truncate">
+                      {s.name}
+                    </div>
+                    {/* <a
                     className="cursor-pointer text-theme-600 hover:text-theme-800 pr-6 md:px-6 lg:px-6 truncate"
                     onClick={() => {
                       setScheduleToEdit(s)
@@ -329,64 +332,65 @@ const Schedules = ({ user }) => {
                   >
                     {s.name}
                   </a> */}
-                </div>
-                <div className="absolute top-0.5 right-0">
-                  <button
-                    id={"delete-" + s.name}
-                    className="float-right text-red-600 hover:text-red-800"
-                    title="Delete Schedule"
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setScheduleToDelete(s)
-                      setOpenConfirm(true)
-                    }}
-                  >
-                    <TrashIcon className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="absolute top-0.5 right-6">
-                  <button
-                    id={"edit-" + s.id}
-                    className="float-right text-indigo-600 hover:text-indigo-800"
-                    title="Edit Candidate Pool"
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setScheduleToEdit(s)
-                      setOpenAddSchedule(true)
-                    }}
-                  >
-                    <PencilIcon className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-              <div className="border-b-2 border-gray-50 w-full"></div>
-              <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
-                Timezone: {s.timezone}
-              </div>
-              <div className="hidden lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
-                {s.dailySchedules?.map((ds) => {
-                  return (
-                    <div
-                      key={ds.id}
-                      className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
+                  </div>
+                  <div className="absolute top-0.5 right-0">
+                    <button
+                      id={"delete-" + s.name}
+                      className="float-right text-red-600 hover:text-red-800"
+                      title="Delete Schedule"
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setScheduleToDelete(s)
+                        setOpenConfirm(true)
+                      }}
                     >
-                      <div className="capitalize overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                        {ds.day}
-                        <br />
-                        {ds.startTime === ds.endTime
-                          ? "Not available"
-                          : ds.startTime + " - " + ds.endTime}
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="absolute top-0.5 right-6">
+                    <button
+                      id={"edit-" + s.id}
+                      className="float-right text-indigo-600 hover:text-indigo-800"
+                      title="Edit Candidate Pool"
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setScheduleToEdit(s)
+                        setOpenAddSchedule(true)
+                      }}
+                    >
+                      <PencilIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="border-b border-gray-100 w-full"></div>
+                <div className="text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                  Timezone: {s.timezone}
+                </div>
+                <div className="hidden lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+                  {s.dailySchedules?.map((ds) => {
+                    return (
+                      <div
+                        key={ds.id}
+                        className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center"
+                      >
+                        <div className="capitalize overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
+                          {ds.day}
+                          <br />
+                          {ds.startTime === ds.endTime
+                            ? "Not available"
+                            : ds.startTime + " - " + ds.endTime}
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          </Card>
-        )
-      })}
+            </Card>
+          )
+        })}
+      </div>
     </>
   )
 }

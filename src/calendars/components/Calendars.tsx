@@ -222,7 +222,7 @@ const Calendars = ({ user }: CalendarProps) => {
           )}
 
           <button
-            className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 whitespace-nowrap"
+            className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 whitespace-nowrap"
             onClick={() => {
               setShowAddCalendarModal(true)
             }}
@@ -234,7 +234,7 @@ const Calendars = ({ user }: CalendarProps) => {
       {/* <br /> */}
       {/* <Table columns={columns} data={calendarEntries} noPagination={true} resultName="calendar" /> */}
       {filteredCalendarEntries?.length > 0 ? (
-        <div className="flex flex-wrap justify-center">
+        <div className="flex flex-wrap justify-center mt-4">
           {filteredCalendarEntries?.map((cal) => {
             let calType = cal.type.includes("Caldav") ? "Caldav" : cal.type
             calType = calType.includes("Google") ? "Google" : calType

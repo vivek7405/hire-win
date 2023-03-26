@@ -70,7 +70,7 @@ const PDFViewer = (props: PDFViewerProps) => {
         </div>
 
         <div className="w-full flex justify-center">
-          <div className="overflow-auto w-full">
+          <div className="overflow-auto w-full border-y">
             <SizeMe refreshMode="debounce" noPlaceholder={true}>
               {({ size }) => {
                 console.log(size)

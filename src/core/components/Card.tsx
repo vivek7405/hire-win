@@ -7,18 +7,20 @@ type CardProps = {
   title?: string
   description?: string
   noMarginY?: boolean
+  onClick?: any
 }
 
-export const Card = ({ children, isFull, title, description, noMarginY }: CardProps) => {
+export const Card = ({ children, isFull, title, description, noMarginY, onClick }: CardProps) => {
   return (
     <>
       <div
-        className={`${noMarginY ? "my-0" : "my-2"} md:mx-2 lg:mx-2 w-full ${
-          isFull ? "!mx-0 md:w-full lg:w-full" : "md:w-60 lg:w-60"
-        }`}
+        onClick={onClick}
+        className={`${noMarginY ? "my-0" : "my-2"} ${
+          onClick ? "cursor-pointer" : "cursor-default"
+        } md:mx-2 lg:mx-2 w-full ${isFull ? "!mx-0 md:w-full lg:w-full" : "md:w-60 lg:w-60"}`}
       >
         <div className="inline-block whitespace-normal w-full">
-          <div className={`box-border w-full rounded bg-white border-2 border-gray-200 p-2.5`}>
+          <div className={`box-border w-full rounded-lg bg-white border border-neutral-300 p-2.5`}>
             {title && description ? (
               <div>
                 <span>

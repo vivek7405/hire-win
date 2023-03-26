@@ -549,12 +549,12 @@ const getBoard = ({
                     />
                   </div>
 
-                  <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                  <div className="border-b my-2 border-gray-200 w-full"></div>
                   <div className="flex items-center text-neutral-700">
                     <p className="truncate">{c.email}</p>
                   </div>
 
-                  <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                  <div className="border-b my-2 border-gray-200 w-full"></div>
                   <CandidateActions
                     key={c.id}
                     candidate={c}
@@ -569,7 +569,7 @@ const getBoard = ({
                     setOpenModal={setOpenModal}
                   />
 
-                  <div className="border-b-2 my-2 border-gray-100 w-full"></div>
+                  <div className="border-b my-2 border-gray-200 w-full"></div>
                   <div className="flex items-center justify-between">
                     <div className="text-xs text-neutral-700">
                       {moment(c.job?.createdAt).fromNow()}{" "}
@@ -1872,7 +1872,7 @@ const SingleJobPageContent = ({
     <button
       className={`${
         jobUser?.role === JobUserRole.USER ? "hidden" : "block"
-      } text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap`}
+      } text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap`}
       // disabled={jobUser?.role === JobUserRole.USER}
       onClick={(e) => {
         e.preventDefault()

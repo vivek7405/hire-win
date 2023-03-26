@@ -576,7 +576,7 @@ const JobSettingsApplicationFormPage = ({
     <AuthLayout title="Hire.win | Application Form" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
-          <div className="space-y-6">
+          <div className="space-y-6 px-4 py-6 md:p-0">
             <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
               <div className="sm:mr-5">
                 <h2 className="text-lg leading-6 font-medium text-gray-900">
@@ -663,7 +663,7 @@ const JobSettingsApplicationFormPage = ({
                   setOpenAddNewQuestion(true)
                 }}
                 data-testid={`open-addQuestion-modal`}
-                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
               >
                 Add New Question
               </button>

@@ -425,7 +425,7 @@ export const Stages = ({
           )
         })}
       </div>
-      <div className="w-full flex items-center justify-center">
+      <div className="w-full flex items-center justify-center px-4 md:p-0">
         <div className="w-full md:w-5/6 lg:w-4/5 p-3 border-2 border-theme-400 rounded">
           <Cards
             noSearch={true}
@@ -530,7 +530,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
     <AuthLayout title="Hire.win | Hiring Stages" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
-          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
+          <div className="px-4 mt-6 md:p-0 md:mt-0 flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
             <div className="sm:mr-5">
               <h2 className="text-lg leading-6 font-medium text-gray-900">Stages & Score Cards</h2>
               <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
@@ -597,7 +597,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                 setOpenAddNewStage(true)
               }}
               data-testid={`open-addStage-modal`}
-              className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+              className="float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
             >
               Add New Stage
             </button>

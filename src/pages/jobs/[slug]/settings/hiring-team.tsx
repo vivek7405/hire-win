@@ -182,8 +182,8 @@ const JobSettingsHiringTeamPage = ({
     <AuthLayout title="Hire.win | Hiring Team" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={jobData!}>
-          <div className="bg-white mt-5 md:mt-0 md:col-span-2">
-            <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
+          <div className="bg-white md:mt-0 md:col-span-2">
+            <div className="px-4 py-6 md:p-0 md:flex md:flex-col">
               <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
                 <div>
                   <h2 className="text-lg leading-6 font-medium text-gray-900">Hiring Team</h2>
@@ -332,7 +332,7 @@ const JobSettingsHiringTeamPage = ({
                     // }
                   }}
                   data-testid={`open-inviteUser-modal`}
-                  className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700"
+                  className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
                 >
                   Add Member
                 </button>

@@ -59,6 +59,7 @@ export const JobForm = (props: JobFormProps) => {
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
         isSubmitTop={true}
+        noPadding={true}
       >
         <div className="overflow-auto flex justify-between whitespace-nowrap items-start space-x-4">
           {steps.map((stp, index) => {

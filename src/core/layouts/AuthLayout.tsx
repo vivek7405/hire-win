@@ -35,7 +35,7 @@ const AuthLayout = ({
         <title>{title || "hire-win"}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen">
         {!hideNavbar && (
           <Suspense fallback="Loading...">
             <Navbar
@@ -49,7 +49,7 @@ const AuthLayout = ({
           <div
             className={`${
               isMax8xl ? "max-w-8xl" : "max-w-7xl"
-            } mx-auto py-6 px-4 md:px-8 lg:px-8 bg-gray-100`}
+            } mx-auto py-6 px-4 md:px-8 lg:px-8`}
           >
             <Suspense fallback="Loading...">{children}</Suspense>
           </div>

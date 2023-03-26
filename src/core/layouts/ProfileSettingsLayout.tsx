@@ -47,8 +47,8 @@ const ProfileSettingsLayout = ({ children }: LayoutProps) => {
                 data-testid={`${item.name}-userSettingsLink`}
                 className={`${
                   item.current
-                    ? "bg-white text-theme-600"
-                    : "bg-gray-50 text-gray-900 hover:text-gray-900 hover:bg-white"
+                    ? "bg-gray-100 text-theme-600"
+                    : "bg-gray-50 text-gray-900 hover:text-gray-900 hover:bg-gray-100"
                 } group px-3 py-2 flex items-center text-sm font-medium w-full`}
               >
                 <item.icon

@@ -1078,7 +1078,7 @@ const SingleCandidatePageContent = ({
     return jobUser?.role !== JobUserRole.USER ? (
       <div className="cursor-pointer flex justify-center">
         <button
-          className="text-white bg-theme-600 px-4 py-2 hover:bg-theme-700 rounded-l-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          className="text-white bg-theme-600 px-4 py-2 hover:bg-theme-700 rounded-l disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
           onClick={async (e) => {
             e.preventDefault()
 
@@ -1102,7 +1102,7 @@ const SingleCandidatePageContent = ({
             : candidate?.job?.stages[candidate?.stage?.order || 0]?.name}
         </button>
         <DropdownMenu.Root modal={false} open={stagesOpen} onOpenChange={setStagesOpen}>
-          <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r-sm flex justify-center items-center focus:outline-none">
+          <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 p-1 hover:bg-theme-700 rounded-r flex justify-center items-center focus:outline-none">
             <button className="flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
               <ChevronDownIcon className="w-5 h-5" />
             </button>
@@ -1220,7 +1220,7 @@ const SingleCandidatePageContent = ({
         open={candidatePoolsOpen}
         onOpenChange={setCandidatePoolsOpen}
       >
-        <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 hover:bg-theme-700 rounded-sm flex justify-center items-center focus:outline-none">
+        <DropdownMenu.Trigger className="float-right disabled:opacity-50 disabled:cursor-not-allowed text-white bg-theme-600 hover:bg-theme-700 rounded flex justify-center items-center focus:outline-none">
           <button className="flex pl-4 pr-3 py-2 justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
             Pools <ChevronDownIcon className="w-5 h-5 ml-1" />
           </button>
@@ -2074,6 +2074,7 @@ const SingleCandidatePageContent = ({
                 ))}
               {candidateDetailToggleView === CandidateDetailToggleView.Notes && (
                 <Form
+                  noPaddingTop={true}
                   key={
                     candidate?.candidateUserNotes &&
                     (candidate?.candidateUserNotes?.length || 0) > 0

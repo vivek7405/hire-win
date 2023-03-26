@@ -181,7 +181,7 @@ const UserSettingsBillingPage = ({
                 )}
                 <div className="bg-white md:col-span-2">
                   <div className="sm:overflow-hidden">
-                    <div className="px-4 py-5 md:p-6 md:flex md:flex-col">
+                    <div className="px-4 py-5 md:p-0 md:flex md:flex-col">
                       {/* {!(
                       subscription?.status === SubscriptionStatus.ACTIVE ||
                       subscription?.status === SubscriptionStatus.TRIALING

@@ -189,7 +189,7 @@ const Cards = ({
                       >
                         <div className="inline-block whitespace-normal w-full">
                           <div
-                            className={`box-border w-full rounded bg-white border-2 border-gray-200 p-2.5 ${
+                            className={`box-border w-full rounded bg-white border border-gray-300 p-2.5 ${
                               isDragging ? "shadow-md" : ""
                             }`}
                           >

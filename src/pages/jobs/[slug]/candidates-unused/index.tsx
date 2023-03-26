@@ -318,7 +318,7 @@
 //       <Breadcrumbs ignore={[{ href: "/jobs", breadcrumb: "Jobs" }]} />
 //       <br />
 //       <Link legacyBehavior prefetch={true} href={Routes.NewCandidateUnused({ slug: job?.slug! })} passHref>
-//         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700">
+//         <a className="float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700">
 //           New Candidate
 //         </a>
 //       </Link>

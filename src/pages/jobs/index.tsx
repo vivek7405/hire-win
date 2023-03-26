@@ -307,7 +307,7 @@ const Jobs = ({
   const newJobButton = (
     <button
       // disabled={viewType === JobViewType.Archived}
-      className="text-white bg-theme-600 px-4 py-2 rounded-sm hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+      className="text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
       onClick={(e) => {
         e.preventDefault()
         // if (canCreate) {
@@ -579,7 +579,7 @@ const Jobs = ({
     return (
       <Menu as="div" className="relative inline-block text-left">
         <div>
-          <Menu.Button className="flex items-center text-theme-600 hover:text-gray-800 outline-none">
+          <Menu.Button className="flex items-center text-theme-600 hover:text-theme-800 rounded-lg outline-none">
             <DotsVerticalIcon className="h-6" aria-hidden="true" />
           </Menu.Button>
         </div>
@@ -1052,7 +1052,7 @@ const Jobs = ({
           </div>
         ))}
 
-      {jobUsers?.length > 0 && (
+      {/* {jobUsers?.length > 0 && (
         <Suspense
           fallback={
             <div className="flex space-x-2 w-full overflow-auto flex-nowrap">
@@ -1078,9 +1078,10 @@ const Jobs = ({
             searchString={searchString}
           />
         </Suspense>
-      )}
+      )} */}
 
-      <div className="space-y-5 mt-5">
+      {/* <div className="space-y-5 mt-5"> */}
+      <div className="space-y-5">
         {jobUsers
           .map((jobUser) => {
             return {
@@ -1151,7 +1152,7 @@ const Jobs = ({
                       <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 items-center justify-center">
                         <a
                           title="Job Settings"
-                          className="cursor-pointer text-theme-600 hover:text-theme-800"
+                          className="cursor-pointer text-theme-600 hover:text-theme-800 rounded-lg"
                           onClick={(e) => {
                             e.preventDefault()
                             // if (job.hasByPassedPlanLimit) {
@@ -1174,7 +1175,7 @@ const Jobs = ({
                     </div>
 
                     <div className="py-2 md:py-0 lg:py-0 md:pb-4 lg:pb-4">
-                      <div className="text-lg text-neutral-500 font-semibold flex md:justify-center lg:justify-center">
+                      <div className="text-lg text-neutral-600 font-semibold flex md:justify-center lg:justify-center">
                         {job?.candidates?.length}{" "}
                         {job?.candidates?.length === 1 ? "candidate" : "candidates"}
                       </div>
@@ -1198,12 +1199,12 @@ const Jobs = ({
                           return (
                             <div
                               key={stage.id}
-                              className="shadow drop-shadow overflow-auto p-1 m-1 rounded-lg border-2 border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
+                              className="shadow drop-shadow overflow-auto p-1 m-1 rounded-lg border border-neutral-300 bg-white w-32 flex flex-col items-center justify-center"
                             >
-                              <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center truncate">
+                              <div className="overflow-hidden text-sm text-neutral-600 font-semibold whitespace-nowrap w-full text-center truncate">
                                 {stage?.name}
                               </div>
-                              <div className="text-neutral-500">
+                              <div className="text-neutral-600">
                                 {job?.candidates?.filter((c) => c.stageId === stage.id)?.length}
                               </div>
                             </div>
@@ -1214,7 +1215,7 @@ const Jobs = ({
 
                     <div className="pt-4 flex flex-wrap md:items-center md:justify-center lg:items-center lg:justify-center">
                       {(job?.city || job?.state || job?.country) && (
-                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        <span className="inline-block border-2 rounded-full px-3 py-1 text-sm font-semibold text-neutral-600 mr-2 mb-2">
                           {job?.city && <span>{job?.city},&nbsp;</span>}
                           {job?.state && job?.country && (
                             <span>
@@ -1228,17 +1229,17 @@ const Jobs = ({
                         </span>
                       )}
                       {job?.category && (
-                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        <span className="inline-block border-2 rounded-full px-3 py-1 text-sm font-semibold text-neutral-600 mr-2 mb-2">
                           {job.category?.name}
                         </span>
                       )}
                       {job?.jobType && (
-                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        <span className="inline-block border-2 rounded-full px-3 py-1 text-sm font-semibold text-neutral-600 mr-2 mb-2">
                           {titleCase(job.jobType?.replaceAll("_", " "))}
                         </span>
                       )}
                       {job?.remoteOption !== RemoteOption.No_Remote && (
-                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        <span className="inline-block border-2 rounded-full px-3 py-1 text-sm font-semibold text-neutral-600 mr-2 mb-2">
                           {job?.remoteOption?.replaceAll("_", " ")}
                         </span>
                       )}
