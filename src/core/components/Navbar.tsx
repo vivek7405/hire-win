@@ -54,7 +54,7 @@ const NavbarContent = ({
     {
       where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
     },
-    { refetchOnWindowFocus: false, refetchOnMount: false }
+    { refetchOnMount: false }
   )
 
   const [parentCompanyUser] = useQuery(
@@ -65,7 +65,7 @@ const NavbarContent = ({
         userId: session?.userId || "0",
       },
     },
-    { refetchOnWindowFocus: false, refetchOnMount: false }
+    { refetchOnMount: false }
   )
 
   // const [canCreateCompany] = useQuery(canCreateNewCompany, null)
@@ -254,7 +254,7 @@ const NavbarContent = ({
       {
         where: { userId: session?.userId || "0" },
       },
-      { refetchOnWindowFocus: false, refetchOnMount: false }
+      { refetchOnMount: false }
     )
 
     const [filteredCompanyUsers, setFilteredCompanyUsers] = useState(companyUsers)
