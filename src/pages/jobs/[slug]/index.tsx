@@ -572,7 +572,7 @@ const getBoard = ({
                   <div className="border-b my-2 border-gray-200 w-full"></div>
                   <div className="flex items-center justify-between">
                     <div className="text-xs text-neutral-700">
-                      {moment(c.job?.createdAt).fromNow()}{" "}
+                      {moment(c?.createdAt).fromNow()}{" "}
                       {c.source === CandidateSource.Manual ? (
                         <span>
                           by{" "}
