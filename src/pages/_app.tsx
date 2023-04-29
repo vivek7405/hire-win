@@ -18,6 +18,9 @@ import { AuthenticationError, AuthorizationError } from "blitz"
 import LoginPage from "./auth/login"
 import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
 import Script from "next/script"
+import { appWithI18Next, useSyncLanguage } from "ni18n"
+import { ni18nConfig } from "ni18n.config"
+import { useTranslation } from "react-i18next"
 
 const progress = new ProgressBar({
   size: 2,
@@ -30,61 +33,67 @@ Router.events.on("routeChangeStart", progress.start)
 Router.events.on("routeChangeComplete", progress.finish)
 Router.events.on("routeChangeError", progress.finish)
 
-export default withBlitz(function App({ Component, pageProps }: AppProps) {
-  const router = useRouter()
+export default appWithI18Next(
+  withBlitz(function App({ Component, pageProps }: AppProps) {
+    const router = useRouter()
 
-  const handleRouteChange = (url) => {
-    ;(window as any).gtag("config", "G-W4VZMRWMTR", {
-      page_path: url,
+    const locale = typeof window !== "undefined" && window.localStorage.getItem("MY_LANGUAGE")
+    useSyncLanguage(locale || "en")
+
+    const handleRouteChange = (url) => {
+      ;(window as any).gtag("config", "G-W4VZMRWMTR", {
+        page_path: url,
+      })
+    }
+
+    useEffect(() => {
+      router.events.on("routeChangeComplete", handleRouteChange)
+      return () => {
+        router.events.off("routeChangeComplete", handleRouteChange)
+      }
+    }, [router.events])
+
+    useEffect(() => {
+      const referrerId = router.query.via
+      if (referrerId) {
+        const domain = process.env.NODE_ENV === "production" ? "hire.win" : "localhost"
+        document.cookie = `${REFERRER_ID_COOKIE_NAME}=${referrerId};max-age=5260000;domain=${domain}`
+      }
     })
-  }
 
-  useEffect(() => {
-    router.events.on("routeChangeComplete", handleRouteChange)
-    return () => {
-      router.events.off("routeChangeComplete", handleRouteChange)
-    }
-  }, [router.events])
-
-  useEffect(() => {
-    const referrerId = router.query.via
-    if (referrerId) {
-      const domain = process.env.NODE_ENV === "production" ? "hire.win" : "localhost"
-      document.cookie = `${REFERRER_ID_COOKIE_NAME}=${referrerId};max-age=5260000;domain=${domain}`
-    }
-  })
-
-  return (
-    <Suspense fallback="Loading...">
-      <ErrorBoundary
-        FallbackComponent={RootErrorFallback}
-        resetKeys={[router.asPath]}
-        onReset={useQueryErrorResetBoundary().reset}
-      >
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=UA-235671572-1"
-          strategy="afterInteractive"
-        ></Script>
-        <Script strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
+    return (
+      <Suspense fallback="Loading...">
+        <ErrorBoundary
+          FallbackComponent={RootErrorFallback}
+          resetKeys={[router.asPath]}
+          onReset={useQueryErrorResetBoundary().reset}
+        >
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=UA-235671572-1"
+            strategy="afterInteractive"
+          ></Script>
+          <Script strategy="afterInteractive">
+            {`window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'UA-235671572-1');`}
-        </Script>
-        <IdProvider>
-          <Component {...pageProps} />
-          <Toaster
-            position="bottom-right"
-            toastOptions={{
-              duration: 5000,
-            }}
-          />
-        </IdProvider>
-      </ErrorBoundary>
-    </Suspense>
-  )
-})
+          </Script>
+          <IdProvider>
+            <Component {...pageProps} />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                duration: 5000,
+              }}
+            />
+          </IdProvider>
+        </ErrorBoundary>
+      </Suspense>
+    )
+  }),
+  ni18nConfig
+)
 
 function RootErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
   if (error instanceof AuthenticationError) {

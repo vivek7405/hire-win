@@ -4,7 +4,7 @@
         <title>Hire.win Blog | RSS Feed</title>
         <link>http://localhost:3000/blog</link>
         <description>Don't just hire, Hire better!</description>
-        <lastBuildDate>Tue, 14 Mar 2023 17:13:42 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 28 Apr 2023 18:15:57 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
         <copyright>Copyright ©2023 hire.win - All rights reserved</copyright>

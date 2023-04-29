@@ -1,0 +1,44 @@
+{
+  "landing": {
+    "simple_yet_powerful": "De meest eenvoudige, maar krachtige wervingsoplossing",
+    "simplest_way": "De eenvoudigste manier om vacatures te plaatsen, sollicitanten te ontvangen en sollicitatiegesprekken te voeren!",
+    "traditionally_ats": "Traditioneel een Applicant Tracking System (ATS)",
+    "everyone_fit_in": {
+      "everyone_including": "Iedereen, inclusief",
+      "small_to_big": "Kleine tot grote bedrijven, uitzendbureaus en freelance recruiters",
+      "fit_well": "zal er goed in passen!"
+    },
+    "enter_email": "Voer uw e-mailadres in",
+    "sign_up_free": "Schrijf je gratis in!",
+    "sign_up_google": "Meld u aan met Google",
+    "instant_careers_page": {
+      "you_get": "Je krijgt direct een carrièrepagina met",
+      "customizable_theme": "aanpasbare themakleur"
+    },
+    "fully_customisable_kit": "U krijgt een volledig aanpasbare Applicant Tracker & Interview Kit. Klik om de betekenis ervan te lezen",
+    "interview_scheduling": "Je krijgt razendsnelle 1-klik interviewplanning:",
+    "multiple_companies": "Voeg meerdere bedrijven toe en schakel eenvoudig tussen deze bedrijven:",
+    "team_collaboration": "Samenwerken met een team was nog nooit zo eenvoudig:",
+    "team_in_loop": "Houd je team op de hoogte:",
+    "lot_more_features": "En nog veel meer functies... klik om ze allemaal te lezen, samen met onze prijzen!",
+    "layout": {
+      "one_minute": "Het duurt maar 1 minuut!",
+      "get_instant": "Ontvang een Instant Carrièrepagina samen met het volgen van sollicitanten!",
+      "sign_up_free": "Gratis inschrijven!",
+      "live_careers_page_example": "Bekijk voorbeeld van live carrièrepagina",
+      "navbar": {
+        "pricing_features": "Prijzen en functies",
+        "blog": "bloggen",
+        "sign_up_free": "Schrijf je gratis in",
+        "login": "Log in"
+      },
+      "footer": {
+        "terms": "VOORWAARDEN",
+        "privacy": "PRIVACY",
+        "cookies": "KOEKJES",
+        "all_rights_reserved": "Alle rechten voorbehouden",
+        "enjoy_day": "Geniet van de rest van je"
+      }
+    }
+  }
+}

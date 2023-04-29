@@ -27,6 +27,8 @@ import {
 import { useRouter } from "next/router"
 import getCookie from "src/core/utils/getCookie"
 import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
+import { useTranslation } from "react-i18next"
+import i18next from "i18next"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
@@ -215,23 +217,55 @@ export default function Home() {
 
   const router = useRouter()
 
+  const { t } = useTranslation()
+
   return (
     <LandingLayout>
       <div className="h-full">
         <section className="text-center px-4">
+          <select
+            className="rounded-full border-2"
+            value={localStorage.getItem("MY_LANGUAGE") || "en"}
+            onChange={async (e) => {
+              const lang = e.target.value || "en"
+              localStorage.setItem("MY_LANGUAGE", lang)
+              // i18next.changeLanguage(lang).then((t) => {
+              //   t("key") // -> same as i18next.t
+              // })
+              router.reload()
+            }}
+          >
+            <option value="en">English</option>
+            <option value="nl">Dutch</option>
+          </select>
+
+          <br />
+          <br />
+
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-black">
-            The Most Simple, Yet Powerful Hiring Solution
+            {/* The Most Simple, Yet Powerful Hiring Solution */}
+            {t("landing.simple_yet_powerful")}
           </h1>
           <p className="mt-2 text-gray-800 text-base md:text-xl lg:text-2xl">
-            The simplest way to list jobs, receive applicants and conduct interviews!
+            {/* The simplest way to list jobs, receive applicants and conduct interviews! */}
+            {t("landing.simplest_way")}
           </p>
           <p className="mt-8 text-gray-800 text-sm md:text-lg lg:text-xl italic">
-            Traditionally, an Applicant Tracking System (ATS)
+            {/* Traditionally, an Applicant Tracking System (ATS) */}
+            {t("landing.traditionally_ats")}
           </p>
           <p className="mt-2 text-gray-800 text-sm md:text-lg italic">
-            Everyone including <span className="font-semibold">Small to Big Companies</span>,{" "}
+            {/* Everyone including <span className="font-semibold">Small to Big Companies</span>,{" "}
             <span className="font-semibold">Staffing Agencies</span> &{" "}
-            <span className="font-semibold">Freelance Recruiters</span> shall fit in well!
+            <span className="font-semibold">Freelance Recruiters</span> shall fit in well! */}
+            {t("landing.everyone_fit_in.everyone_including")}{" "}
+            <span className="font-semibold">{t("landing.everyone_fit_in.small_to_big")}</span>,{" "}
+            {t("landing.everyone_fit_in.fit_well")}
+            {/* "everyone_fit_in": {
+              "everyone_including": "Iedereen inclusief",
+              "small_to_big": "Kleine tot grote bedrijven, uitzendbureaus en freelance recruiters",
+              "fit_well": "zal er goed bij passen!"
+            } */}
           </p>
 
           <div className="w-full flex items-center justify-center my-8">
@@ -324,7 +358,8 @@ export default function Home() {
                       type="email"
                       required={true}
                       className="w-full h-full rounded-l border-fuchsia-600"
-                      placeholder="Enter your email"
+                      // placeholder="Enter your email"
+                      placeholder={t("landing.enter_email") as string}
                       value={email}
                       onChange={(e) => {
                         setEmail(e?.target?.value || "")
@@ -334,7 +369,10 @@ export default function Home() {
                       type="submit"
                       className="w-fit h-full rounded-r text-white text-lg bg-fuchsia-600 hover:bg-fuchsia-700 px-3 py-1"
                     >
-                      <span className="whitespace-nowrap text-sm sm:text-base">Sign up free!</span>
+                      <span className="whitespace-nowrap text-sm sm:text-base">
+                        {/* Sign up free! */}
+                        {t("landing.sign_up_free")}
+                      </span>
                     </button>
                   </div>
                 </Form>
@@ -347,7 +385,10 @@ export default function Home() {
                   <button className="w-full px-4 py-1 rounded bg-white text-neutral-600 border border-gray-300 hover:bg-gray-50 mt-4 h-10">
                     <div className="flex items-center justify-between">
                       <Image height={20} width={20} src="/GoogleLogo.png" />
-                      <span className="w-full text-center">Sign up with Google</span>
+                      <span className="w-full text-center">
+                        {/* Sign up with Google */}
+                        {t("landing.sign_up_google")}
+                      </span>
                     </div>
                   </button>
                 </a>
@@ -357,9 +398,11 @@ export default function Home() {
 
           <section id="careers-page" className="mx-3 sm:mx-10 mt-10">
             <h1 className="text-center font-bold text-xl lg:text-2xl">
-              You get an instant Careers Page with{" "}
+              {/* You get an instant Careers Page with{" "} */}
+              {t("landing.instant_careers_page.you_get")}{" "}
               <span className="bg-yellow-200 rounded-tl-xl rounded-br-xl px-1">
-                customizable theme color
+                {/* customizable theme color */}
+                {t("landing.instant_careers_page.customizable_theme")}
               </span>
               :
             </h1>
@@ -412,8 +455,9 @@ export default function Home() {
               className="text-xl lg:text-2xl text-black font-bold hover:underline flex items-center justify-center space-x-2"
             >
               <span>
-                You get a fully customisable Applicant Tracker & Interview Kit. Click to read its
-                significance
+                {/* You get a fully customisable Applicant Tracker & Interview Kit. Click to read its
+                significance */}
+                {t("landing.fully_customisable_kit")}
               </span>
               <ArrowNarrowRightIcon className="hidden md:block w-7 h-7" />
             </a>
@@ -458,7 +502,8 @@ export default function Home() {
 
           <div className="mt-8 mb-4 w-full flex items-center justify-center">
             <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
-              You get lightning fast 1-click interview scheduling:
+              {/* You get lightning fast 1-click interview scheduling: */}
+              {t("landing.interview_scheduling")}
             </span>
           </div>
 
@@ -501,7 +546,8 @@ export default function Home() {
 
           <div className="mt-8 mb-4 w-full flex items-center justify-center">
             <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
-              Add multiple companies and easily switch between them:
+              {/* Add multiple companies and easily switch between them: */}
+              {t("landing.multiple_companies")}
             </span>
           </div>
 
@@ -544,7 +590,8 @@ export default function Home() {
 
           <div className="mt-8 mb-4 w-full flex items-center justify-center">
             <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
-              Collaborating with team has never been so easier:
+              {/* Collaborating with team has never been so easier: */}
+              {t("landing.team_collaboration")}
             </span>
           </div>
 
@@ -587,7 +634,8 @@ export default function Home() {
 
           <div className="mt-8 mb-4 w-full flex items-center justify-center">
             <span className="text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
-              Keep your team in the loop:
+              {/* Keep your team in the loop: */}
+              {t("landing.team_in_loop")}
             </span>
           </div>
 
@@ -633,7 +681,8 @@ export default function Home() {
       <div className="mt-16 w-full flex items-center justify-center">
         <Link href={Routes.Pricing()}>
           <a className="hover:underline text-center text-xl lg:text-2xl text-black font-bold flex items-center justify-center space-x-2">
-            And a lot more features... click to read them all, along with our pricing!
+            {/* And a lot more features... click to read them all, along with our pricing! */}
+            {t("landing.lot_more_features")}
           </a>
         </Link>
       </div>

@@ -1,0 +1,44 @@
+{
+  "landing": {
+    "simple_yet_powerful": "The Most Simple, Yet Powerful Hiring Solution",
+    "simplest_way": "The simplest way to list jobs, receive applicants and conduct interviews!",
+    "traditionally_ats": "Traditionally, an Applicant Tracking System (ATS)",
+    "everyone_fit_in": {
+      "everyone_including": "Everyone including",
+      "small_to_big": "Small to Big Companies, Staffing Agencies & Freelance Recruiters",
+      "fit_well": "shall fit in well!"
+    },
+    "enter_email": "Enter your email",
+    "sign_up_free": "Sign up free!",
+    "sign_up_google": "Sign up with Google",
+    "instant_careers_page": {
+      "you_get": "You get an instant Careers Page with",
+      "customizable_theme": "customizable theme color"
+    },
+    "fully_customisable_kit": "You get a fully customisable Applicant Tracker & Interview Kit. Click to read its significance",
+    "interview_scheduling": "You get lightning fast 1-click interview scheduling:",
+    "multiple_companies": "Add multiple companies and easily switch between them:",
+    "team_collaboration": "Collaborating with team has never been so easier:",
+    "team_in_loop": "Keep your team in the loop:",
+    "lot_more_features": "And a lot more features... click to read them all, along with our pricing!",
+    "layout": {
+      "one_minute": "It only takes 1 minute!",
+      "get_instant": "Get an Instant Careers Page along with Applicant Tracking!",
+      "sign_up_free": "Sign up for Free!",
+      "live_careers_page_example": "View Live Careers Page Example",
+      "navbar": {
+        "pricing_features": "Pricing & Features",
+        "blog": "Blog",
+        "sign_up_free": "Sign up free",
+        "login": "Login"
+      },
+      "footer": {
+        "terms": "TERMS",
+        "privacy": "PRIVACY",
+        "cookies": "COOKIES",
+        "all_rights_reserved": "All rights reserved",
+        "enjoy_day": "Enjoy the rest of your"
+      }
+    }
+  }
+}

@@ -9,6 +9,8 @@ import LogoBrand from "src/assets/LogoBrand"
 import moment from "moment"
 import { ExternalLinkIcon } from "@heroicons/react/outline"
 import Script from "next/script"
+import { useTranslation } from "react-i18next"
+import { useRouter } from "next/router"
 
 type LayoutProps = {
   title?: string
@@ -51,6 +53,9 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
     return false
   }
 
+  const { t } = useTranslation()
+
+  const router = useRouter()
   return (
     <>
       <Script
@@ -176,7 +181,8 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   <li className="mr-3">
                     <Link href={Routes.Pricing()}>
                       <a className="font-medium cursor-pointer hover:underline py-2 px-4">
-                        Pricing & Features
+                        {/* Pricing & Features */}
+                        {t("landing.layout.navbar.pricing_features")}
                       </a>
                     </Link>
                   </li>
@@ -189,13 +195,17 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   </li> */}
                   <li className="mr-3">
                     <Link href={Routes.Blog()}>
-                      <a className="font-medium cursor-pointer hover:underline py-2 px-4">Blog</a>
+                      <a className="font-medium cursor-pointer hover:underline py-2 px-4">
+                        {/* Blog */}
+                        {t("landing.layout.navbar.blog")}
+                      </a>
                     </Link>
                   </li>
                   <li className="mr-3">
                     <Link href={Routes.OldSignupPage()}>
                       <a className="font-medium cursor-pointer hover:underline py-2 px-4">
-                        Sign up free
+                        {/* Sign up free */}
+                        {t("landing.layout.navbar.sign_up_free")}
                       </a>
                     </Link>
                   </li>
@@ -206,7 +216,8 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                       id="navAction"
                       className="bg-gradient-to-br from-fuchsia-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold text-lg rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
                     >
-                      Login
+                      {/* Login */}
+                      {t("landing.layout.navbar.login")}
                     </button>
                   </a>
                 </Link>
@@ -219,13 +230,15 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
           <section id="call-to-action" className="bg-white py-8 px-4 mt-20">
             <div className="text-neutral-800">
               <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
-                It only takes 1 minute!
+                {/* It only takes 1 minute! */}
+                {t("landing.layout.one_minute")}
               </h2>
 
               <div className="w-full text-center pt-1">
                 <div className="mt-1">
                   <span className="text-2xl text-neutral-600">
-                    Get an Instant Careers Page along with Applicant Tracking!
+                    {/* Get an Instant Careers Page along with Applicant Tracking! */}
+                    {t("landing.layout.get_instant")}
                   </span>
                 </div>
                 <div className="mt-10 mb-4">
@@ -234,7 +247,10 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   <Link href={Routes.OldSignupPage()} legacyBehavior>
                     <a>
                       <button className="bg-gradient-to-br from-fuchsia-400 via-purple-500 to-indigo-600 text-white shadow-lg hover:underline rounded py-3 lg:py-4 px-8 w-fit">
-                        <span className="font-extrabold text-xl">Sign up for Free!</span>
+                        <span className="font-extrabold text-xl">
+                          {/* Sign up for Free! */}
+                          {t("landing.layout.sign_up_free")}
+                        </span>
                       </button>
                     </a>
                   </Link>
@@ -250,7 +266,10 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                         target="_blank"
                         className="text-indigo-600 hover:underline flex items-center justify-center space-x-1"
                       >
-                        <span>View Live Careers Page Example</span>
+                        <span>
+                          {/* View Live Careers Page Example */}
+                          {t("landing.layout.live_careers_page_example")}
+                        </span>
                         <ExternalLinkIcon className="w-5 h-5" />
                       </a>
                     </Link>
@@ -280,22 +299,33 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
 
                 <div className="flex space-x-4 font-bold">
                   <Link prefetch={true} href={Routes.Terms()} legacyBehavior>
-                    <a className="hover:underline">TERMS</a>
+                    <a className="hover:underline">
+                      {/* TERMS */}
+                      {t("landing.layout.footer.terms")}
+                    </a>
                   </Link>
                   <Link prefetch={true} href={Routes.Privacy()} legacyBehavior>
-                    <a className="hover:underline">PRIVACY</a>
+                    <a className="hover:underline">
+                      {/* PRIVACY */}
+                      {t("landing.layout.footer.privacy")}
+                    </a>
                   </Link>
                   <Link prefetch={true} href={Routes.Cookies()} legacyBehavior>
-                    <a className="hover:underline">COOKIES</a>
+                    <a className="hover:underline">
+                      {/* COOKIES */}
+                      {t("landing.layout.footer.cookies")}
+                    </a>
                   </Link>
                 </div>
 
                 <div className="italic text-center">
-                  Copyright ©2022 hire.win - All rights reserved
+                  {/* Copyright ©2022 hire.win - All rights reserved */}
+                  Copyright ©2022 hire.win - {t("landing.layout.footer.all_rights_reserved")}
                 </div>
 
                 <div className="italic text-center">
-                  Enjoy the rest of your {moment().format("dddd")}!
+                  {/* Enjoy the rest of your {moment().format("dddd")}! */}
+                  {t("landing.layout.footer.enjoy_day")} {moment().format("dddd")}!
                 </div>
 
                 {/* <div className="flex-1">
