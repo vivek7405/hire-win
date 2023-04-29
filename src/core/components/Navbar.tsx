@@ -49,16 +49,24 @@ const NavbarContent = ({
   const router = useRouter()
   const session = useSession()
   // const [openConfirm, setOpenConfirm] = useState(false)
-  const [companyUser] = useQuery(getCompanyUser, {
-    where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
-  })
-
-  const [parentCompanyUser] = useQuery(getParentCompanyUser, {
-    where: {
-      parentCompanyId: companyUser?.company?.parentCompanyId || "0",
-      userId: session?.userId || "0",
+  const [companyUser] = useQuery(
+    getCompanyUser,
+    {
+      where: { userId: session?.userId || "0", companyId: session?.companyId || "0" },
     },
-  })
+    { refetchOnWindowFocus: false }
+  )
+
+  const [parentCompanyUser] = useQuery(
+    getParentCompanyUser,
+    {
+      where: {
+        parentCompanyId: companyUser?.company?.parentCompanyId || "0",
+        userId: session?.userId || "0",
+      },
+    },
+    { refetchOnWindowFocus: false }
+  )
 
   // const [canCreateCompany] = useQuery(canCreateNewCompany, null)
 
@@ -241,9 +249,13 @@ const NavbarContent = ({
   const [updateCompanySessionMutation] = useMutation(updateCompanySession)
 
   const CompanySelectDropdown = ({ companyOpen, setCompanyOpen }) => {
-    const [companyUsers] = useQuery(getCompanyUsers, {
-      where: { userId: session?.userId || "0" },
-    })
+    const [companyUsers] = useQuery(
+      getCompanyUsers,
+      {
+        where: { userId: session?.userId || "0" },
+      },
+      { refetchOnWindowFocus: false }
+    )
 
     const [filteredCompanyUsers, setFilteredCompanyUsers] = useState(companyUsers)
     const searchInput = useRef(null)
