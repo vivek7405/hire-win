@@ -1205,7 +1205,11 @@ const Jobs = ({
                                 {stage?.name}
                               </div>
                               <div className="text-neutral-600">
-                                {job?.candidates?.filter((c) => c.stageId === stage.id)?.length}
+                                {
+                                  job?.candidates?.filter(
+                                    (c) => c.stageId === stage.id && !c.rejected
+                                  )?.length
+                                }
                               </div>
                             </div>
                           )
