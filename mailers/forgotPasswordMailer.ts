@@ -19,12 +19,11 @@ export function forgotPasswordMailer({ to, token }: ResetPasswordMailer) {
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
-    from: "noreply@hire.win",
+    from: "Hire.win <noreply@hire.win>",
     to,
     subject: "Your Password Reset Instructions",
     html: `
-      <h1>Reset Your Password</h1>
-      <h3>NOTE: You must set up a production email integration in mailers/forgotPasswordMailer.ts</h3>
+      <h1>Reset Your Hire.win Password</h1>
 
       <a href="${resetUrl}">
         Click here to set a new password
