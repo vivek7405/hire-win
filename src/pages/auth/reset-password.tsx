@@ -49,12 +49,12 @@ const ResetPasswordPage: BlitzPage = () => {
               initialValues={{
                 password: "",
                 passwordConfirmation: "",
-                token: query.token as string,
+                // token: query.token as string,
               }}
               className="space-y-6"
               onSubmit={async (values) => {
                 try {
-                  await resetPasswordMutation(values)
+                  await resetPasswordMutation({ ...values, token: query.token as string })
                 } catch (error) {
                   if (error.name === "ResetPasswordError") {
                     toast.error(error.message)
