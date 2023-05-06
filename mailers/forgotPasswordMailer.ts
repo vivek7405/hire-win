@@ -15,7 +15,7 @@ type ResetPasswordMailer = {
 export function forgotPasswordMailer({ to, token }: ResetPasswordMailer) {
   // In production, set NEXT_PUBLIC_APP_URL to your production server origin
   const origin = process.env.NEXT_PUBLIC_APP_URL || process.env.BLITZ_DEV_SERVER_ORIGIN
-  const resetUrl = `${origin}/reset-password?token=${token}`
+  const resetUrl = `${origin}/auth/reset-password?token=${token}`
   const postmarkServerClient = process.env.POSTMARK_TOKEN || null
 
   const msg = {
