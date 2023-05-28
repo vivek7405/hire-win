@@ -166,6 +166,16 @@ export const getServerSideProps = gSSP(async (context) => {
       context.ctx
     )
 
+    if (user?.isFirstSignup) {
+      return {
+        redirect: {
+          destination: Routes.Welcome().pathname,
+          permanent: false,
+        },
+        props: {},
+      }
+    }
+
     return {
       props: {
         user,
@@ -1270,10 +1280,10 @@ const JobsHome = ({
   const router = useRouter()
 
   // used useEffect for setting openWelcomeModal to avoid Hydration error
-  const [openWelcomeModal, setOpenWelcomeModal] = useState(false)
-  useEffect(() => {
-    setOpenWelcomeModal(user?.isFirstSignup || false)
-  }, [user?.isFirstSignup])
+  // const [openWelcomeModal, setOpenWelcomeModal] = useState(false)
+  // useEffect(() => {
+  //   setOpenWelcomeModal(user?.isFirstSignup || false)
+  // }, [user?.isFirstSignup])
 
   // used useEffect for setting couponRedeemed to avoid Hydration error
   const [couponRedeemed, setCouponRedeemed] = useState(false)
@@ -1306,13 +1316,13 @@ const JobsHome = ({
         />
       )}
 
-      <Modal header="" open={openWelcomeModal} setOpen={setOpenWelcomeModal}>
+      {/* <Modal header="" open={openWelcomeModal} setOpen={setOpenWelcomeModal}>
         <SignupWelcome
           setOpenModal={setOpenWelcomeModal}
           userName={user?.name || ""}
           userId={user?.id}
         />
-      </Modal>
+      </Modal> */}
 
       <Suspense fallback={<p className="pt-7">Loading...</p>}>
         <Jobs
