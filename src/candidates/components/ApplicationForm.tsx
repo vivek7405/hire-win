@@ -283,7 +283,7 @@ export const ApplicationForm = (props: ApplicationFormProps) => {
           testid="applicationForm"
           header={props.header}
           subHeader={props.subHeader}
-          className="max-w-md mx-auto"
+          className="max-w-md mx-auto px-2"
           isRounded={props.careersPage}
         >
           {formQuestions.map((question, index) => {
