@@ -1,14 +1,14 @@
 ---
 title: "How to use an Applicant Tracking System for Hiring"
 date: "03-14-2023"
-image: "https://s3.us-east-2.amazonaws.com/hire.win/Applicant-tracking-system.jpg"
+image: "https://s3.us-east-2.amazonaws.com/hire.win/blog-images/Applicant-tracking-system.jpg"
 excerpt: "One of the most common tools used by recruiters is an Applicant Tracking System (ATS), which helps to streamline the recruiting process and make it more efficient. In this blog post, we'll provide some tips on how to use an ATS for hiring."
 keywords: ["applicant tracking system", "ats", "hiring", "recruiting"]
 ---
 
 In today's competitive job market, it's important for recruiters to use effective tools to manage the hiring process. One of the most common tools used by recruiters is an Applicant Tracking System (ATS), which helps to streamline the recruiting process and make it more efficient. In this blog post, we'll provide some tips on how to use an ATS for hiring.
 
-![How ATS Works](https://s3.us-east-2.amazonaws.com/hire.win/how-ats-work.png)
+![How ATS Works](https://s3.us-east-2.amazonaws.com/hire.win/blog-images/how-ats-work.png)
 
 #### Understand the ATS
 

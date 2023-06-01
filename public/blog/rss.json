@@ -6,11 +6,19 @@
     "description": "Don't just hire, Hire better!",
     "items": [
         {
+            "id": "http://localhost:3000/blog/benefits-of-ats-over-excel",
+            "url": "http://localhost:3000/blog/benefits-of-ats-over-excel",
+            "title": "The Benefits of Using an ATS over Excel Sheets for Hiring",
+            "summary": "In this blog, we will explore the numerous benefits of using an ATS over Excel sheets, highlighting how it enhances efficiency, saves time, improves collaboration, and ultimately leads to successful hiring outcomes.",
+            "image": "https://s3.us-east-2.amazonaws.com/hire.win/blog-images/Excel-harms-hiring.png",
+            "date_modified": "2023-06-01T18:30:00.000Z"
+        },
+        {
             "id": "http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring",
             "url": "http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring",
             "title": "How to use an Applicant Tracking System for Hiring",
             "summary": "One of the most common tools used by recruiters is an Applicant Tracking System (ATS), which helps to streamline the recruiting process and make it more efficient. In this blog post, we'll provide some tips on how to use an ATS for hiring.",
-            "image": "https://s3.us-east-2.amazonaws.com/hire.win/Applicant-tracking-system.jpg",
+            "image": "https://s3.us-east-2.amazonaws.com/hire.win/blog-images/Applicant-tracking-system.jpg",
             "date_modified": "2023-03-13T18:30:00.000Z"
         },
         {

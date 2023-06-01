@@ -4,17 +4,25 @@
         <title>Hire.win Blog | RSS Feed</title>
         <link>http://localhost:3000/blog</link>
         <description>Don't just hire, Hire better!</description>
-        <lastBuildDate>Tue, 14 Mar 2023 17:13:42 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 01 Jun 2023 20:23:20 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>Feed for Node.js</generator>
         <copyright>Copyright ©2023 hire.win - All rights reserved</copyright>
+        <item>
+            <title><![CDATA[The Benefits of Using an ATS over Excel Sheets for Hiring]]></title>
+            <link>http://localhost:3000/blog/benefits-of-ats-over-excel</link>
+            <guid>http://localhost:3000/blog/benefits-of-ats-over-excel</guid>
+            <pubDate>Thu, 01 Jun 2023 18:30:00 GMT</pubDate>
+            <description><![CDATA[In this blog, we will explore the numerous benefits of using an ATS over Excel sheets, highlighting how it enhances efficiency, saves time, improves collaboration, and ultimately leads to successful hiring outcomes.]]></description>
+            <enclosure url="https://s3.us-east-2.amazonaws.com/hire.win/blog-images/Excel-harms-hiring.png" length="0" type="image/png"/>
+        </item>
         <item>
             <title><![CDATA[How to use an Applicant Tracking System for Hiring]]></title>
             <link>http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring</link>
             <guid>http://localhost:3000/blog/how-to-use-an-applicant-tracking-system-for-hiring</guid>
             <pubDate>Mon, 13 Mar 2023 18:30:00 GMT</pubDate>
             <description><![CDATA[One of the most common tools used by recruiters is an Applicant Tracking System (ATS), which helps to streamline the recruiting process and make it more efficient. In this blog post, we'll provide some tips on how to use an ATS for hiring.]]></description>
-            <enclosure url="https://s3.us-east-2.amazonaws.com/hire.win/Applicant-tracking-system.jpg" length="0" type="image/jpg"/>
+            <enclosure url="https://s3.us-east-2.amazonaws.com/hire.win/blog-images/Applicant-tracking-system.jpg" length="0" type="image/jpg"/>
         </item>
         <item>
             <title><![CDATA[Why use a Careers Page builder?]]></title>
