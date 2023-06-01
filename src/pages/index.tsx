@@ -225,9 +225,9 @@ export default function Home() {
           <p className="mt-2 text-gray-800 text-base md:text-xl lg:text-2xl">
             The simplest way to list jobs, receive applicants and conduct interviews!
           </p>
-          <p className="mt-8 text-gray-800 text-sm md:text-lg lg:text-xl italic">
+          <h2 className="mt-8 text-gray-800 text-sm md:text-lg lg:text-xl italic">
             Traditionally, an Applicant Tracking System (ATS)
-          </p>
+          </h2>
           <p className="mt-2 text-gray-800 text-sm md:text-lg italic">
             Everyone including <span className="font-semibold">Small to Big Companies</span>,{" "}
             <span className="font-semibold">Staffing Agencies</span> &{" "}

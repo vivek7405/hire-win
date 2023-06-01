@@ -58,7 +58,9 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         src="https://embed.tawk.to/6364c8c8b0d6371309cd3d09/1gh0r0k2g"
       />
       <Head>
-        <title>{title || "Hire.win | Simple Yet Powerful Hiring Solution"}</title>
+        <title>
+          {title || "Applicant Tracking Software | Simple Yet Powerful Hiring Solution - Hire.win "}
+        </title>
         <link rel="icon" href="/favicon.ico" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -67,16 +69,18 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         <meta property="og:image" content="/logo-whitebg.png" key="ogimage" />
         <meta
           property="og:title"
-          content={title || "Hire.win | Simple Yet Powerful Hiring Solution"}
+          content={
+            title || "Applicant Tracking Software | Simple Yet Powerful Hiring Solution - Hire.win "
+          }
           key="ogtitle"
         />
         <meta
           name="description"
-          content="The simpler, more affordable hiring solution for your next job opening"
+          content="More than an applicant tracking software, Hire.win is a hiring software solution. Hire better with the simpler, more affordable hiring solution."
         ></meta>
         <meta
           property="og:description"
-          content="The simpler, more affordable hiring solution for your next job opening"
+          content="More than an applicant tracking software, Hire.win is a hiring software solution. Hire better with the simpler, more affordable hiring solution."
           key="ogdesc"
         />
       </Head>
