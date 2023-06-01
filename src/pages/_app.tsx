@@ -18,6 +18,7 @@ import { AuthenticationError, AuthorizationError } from "blitz"
 import LoginPage from "./auth/login"
 import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
 import Script from "next/script"
+import Head from "next/head"
 
 const progress = new ProgressBar({
   size: 2,
@@ -55,34 +56,39 @@ export default withBlitz(function App({ Component, pageProps }: AppProps) {
   })
 
   return (
-    <Suspense fallback="Loading...">
-      <ErrorBoundary
-        FallbackComponent={RootErrorFallback}
-        resetKeys={[router.asPath]}
-        onReset={useQueryErrorResetBoundary().reset}
-      >
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=UA-235671572-1"
-          strategy="afterInteractive"
-        ></Script>
-        <Script strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
+    <>
+      <Head>
+        <link rel="canonical" href="https://hire.win/" />
+      </Head>
+      <Suspense fallback="Loading...">
+        <ErrorBoundary
+          FallbackComponent={RootErrorFallback}
+          resetKeys={[router.asPath]}
+          onReset={useQueryErrorResetBoundary().reset}
+        >
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=UA-235671572-1"
+            strategy="afterInteractive"
+          ></Script>
+          <Script strategy="afterInteractive">
+            {`window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'UA-235671572-1');`}
-        </Script>
-        <IdProvider>
-          <Component {...pageProps} />
-          <Toaster
-            position="bottom-right"
-            toastOptions={{
-              duration: 5000,
-            }}
-          />
-        </IdProvider>
-      </ErrorBoundary>
-    </Suspense>
+          </Script>
+          <IdProvider>
+            <Component {...pageProps} />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                duration: 5000,
+              }}
+            />
+          </IdProvider>
+        </ErrorBoundary>
+      </Suspense>
+    </>
   )
 })
 

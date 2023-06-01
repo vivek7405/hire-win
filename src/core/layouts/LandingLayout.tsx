@@ -222,15 +222,16 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
 
           <section id="call-to-action" className="bg-white py-8 px-4 mt-20">
             <div className="text-neutral-800">
-              <h2 className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
+              <p className="w-full my-2 text-4xl lg:text-5xl font-black leading-tight text-center text-neutral-800">
                 It only takes 1 minute!
-              </h2>
+              </p>
 
               <div className="w-full text-center pt-1">
                 <div className="mt-1">
-                  <span className="text-2xl text-neutral-600">
-                    Get an Instant Careers Page along with Applicant Tracking!
-                  </span>
+                  <p className="text-2xl text-neutral-600">
+                    Streamline your hiring process, now!
+                    {/* Get an Instant Careers Page along with Applicant Tracking! */}
+                  </p>
                 </div>
                 <div className="mt-10 mb-4">
                   {/* Uncomment this and comment the line below it once you want to provide signup */}
@@ -295,7 +296,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                 </div>
 
                 <div className="italic text-center">
-                  Copyright ©2022 hire.win - All rights reserved
+                  Copyright ©2023 hire.win - All rights reserved
                 </div>
 
                 <div className="italic text-center">

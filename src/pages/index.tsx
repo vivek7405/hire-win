@@ -356,13 +356,13 @@ export default function Home() {
           </div>
 
           <section id="careers-page" className="mx-3 sm:mx-10 mt-10">
-            <h1 className="text-center font-bold text-xl lg:text-2xl">
+            <p className="text-center font-bold text-xl lg:text-2xl">
               You get an instant Careers Page with{" "}
               <span className="bg-yellow-200 rounded-tl-xl rounded-br-xl px-1">
                 customizable theme color
               </span>
               :
-            </h1>
+            </p>
             {/* <iframe
             title="Job Posts"
             width="850"
