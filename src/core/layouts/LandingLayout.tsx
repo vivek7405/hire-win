@@ -69,18 +69,16 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
         <meta property="og:image" content="/logo-whitebg.png" key="ogimage" />
         <meta
           property="og:title"
-          content={
-            title || "Applicant Tracking Software | Simple Yet Powerful Hiring Solution - Hire.win "
-          }
+          content={title || "Applicant Tracking and Recruiting Software | Hire.win"}
           key="ogtitle"
         />
         <meta
           name="description"
-          content="More than an applicant tracking software, Hire.win is a hiring software solution. Hire better with the simpler, more affordable hiring solution."
+          content="Discover the power of Hire.win applicant tracking and recruiting software. Streamline your hiring process, find top talent, and make smarter hiring decisions."
         ></meta>
         <meta
           property="og:description"
-          content="More than an applicant tracking software, Hire.win is a hiring software solution. Hire better with the simpler, more affordable hiring solution."
+          content="Discover the power of Hire.win applicant tracking and recruiting software. Streamline your hiring process, find top talent, and make smarter hiring decisions."
           key="ogdesc"
         />
       </Head>
