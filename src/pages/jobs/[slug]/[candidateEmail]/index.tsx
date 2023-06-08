@@ -5,7 +5,15 @@ import { getAntiCSRFToken, getSession, useSession } from "@blitzjs/auth"
 import { Routes, ErrorComponent } from "@blitzjs/next"
 import { useMutation, useQuery, invalidateQuery } from "@blitzjs/rpc"
 import { InferGetServerSidePropsType, GetServerSidePropsContext } from "next"
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react"
+import React, {
+  Suspense,
+  createRef,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import path from "path"
 import Guard from "src/guard/ability"
 import getCurrentUserServer from "src/users/queries/getCurrentUserServer"
@@ -44,6 +52,7 @@ import {
   ChatIcon,
   CheckIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
   ChevronRightIcon,
   ClockIcon,
   CogIcon,
@@ -119,6 +128,7 @@ import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyU
 import getParentCompany from "src/parent-companies/queries/getParentCompany"
 import setCandidateVisibleParent from "src/candidates/mutations/setCandidateVisibleParent"
 import getCandidates from "src/candidates/queries/getCandidates"
+import { useIsOverflow } from "src/core/hooks/useIsOverflow"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -1336,6 +1346,78 @@ const SingleCandidatePageContent = ({
     )
   }
 
+  const stagesDivScrollRef = useRef(null as any)
+
+  const isStagesDivOverflowInitial = useIsOverflow(
+    stagesDivScrollRef,
+    (isOverflow) => {
+      setIsStagesDivOverflow(isOverflow)
+    },
+    true
+  )
+  const [isStagesDivOverflow, setIsStagesDivOverflow] = useState(
+    isStagesDivOverflowInitial as boolean | undefined
+  )
+
+  const [scrollX, setscrollX] = useState(0) // For detecting start scroll postion
+  const [scrolEnd, setScrolEnd] = useState(false) // For detecting end of scrolling
+
+  const scrollStagesDiv = (scrollOffset) => {
+    stagesDivScrollRef.current.scrollLeft += scrollOffset
+
+    setscrollX(scrollX + scrollOffset) // Updates the latest scrolled postion
+
+    //For checking if the scroll has ended
+    if (
+      Math.floor(stagesDivScrollRef.current.scrollWidth - stagesDivScrollRef.current.scrollLeft) <=
+      stagesDivScrollRef.current.offsetWidth
+    ) {
+      setScrolEnd(true)
+    } else {
+      setScrolEnd(false)
+    }
+  }
+
+  const scrollCheck = () => {
+    setscrollX(stagesDivScrollRef.current.scrollLeft)
+    if (
+      Math.floor(stagesDivScrollRef.current.scrollWidth - stagesDivScrollRef.current.scrollLeft) <=
+      stagesDivScrollRef.current.offsetWidth
+    ) {
+      setScrolEnd(true)
+    } else {
+      setScrolEnd(false)
+    }
+  }
+
+  useEffect(() => {
+    //Check width of the scrollings
+    if (
+      stagesDivScrollRef.current &&
+      stagesDivScrollRef?.current?.scrollWidth === stagesDivScrollRef?.current?.offsetWidth
+    ) {
+      setScrolEnd(true)
+    } else {
+      setScrolEnd(false)
+    }
+    return () => {}
+  }, [stagesDivScrollRef?.current?.scrollWidth, stagesDivScrollRef?.current?.offsetWidth])
+
+  const stageSelectorRefs = useRef([] as any)
+  useEffect(() => {
+    console.log()
+    const selectedStageIndex = candidate?.job?.stages?.findIndex(
+      (stg) => stg.id === selectedStage?.id
+    )
+    if (stageSelectorRefs?.current?.length > 0 && isStagesDivOverflow) {
+      stageSelectorRefs?.current[selectedStageIndex]?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      })
+    }
+  }, [selectedStage, isStagesDivOverflow])
+
   return (
     <>
       <Modal
@@ -2133,30 +2215,55 @@ const SingleCandidatePageContent = ({
               className={`w-full bg-white max-h-screen overflow-auto border-8 shadow-md shadow-theme-400 border-theme-400 rounded-3xl sticky top-0`}
             >
               <div className="w-full h-full rounded-2xl">
-                <div className="z-10 flex w-full max-w-full overflow-auto bg-theme-50 justify-between sticky top-0">
-                  {candidate?.job?.stages?.map((stage, index) => {
-                    return (
-                      <div
-                        key={`${stage?.name}${index}`}
-                        className={`${index > 0 ? "border-l-2 rounded-bl-md" : ""} ${
-                          index < (candidate?.job?.stages?.length || 0) - 1
-                            ? "border-r-2 rounded-br-md"
-                            : ""
-                        } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:bg-theme-200 cursor-pointer ${
-                          selectedStage?.id === stage.id ? "!bg-theme-500 !text-white" : ""
-                        } whitespace-nowrap`}
-                        onClick={() => {
-                          changeSelectedStage(stage)
-                          invalidateQuery(getCandidateInterviewsByStage)
-                          // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
-                        }}
-                      >
-                        {stage?.name?.length > 20
-                          ? `${stage?.name?.substring(0, 20)}...`
-                          : stage?.name}
-                      </div>
-                    )
-                  })}
+                <div className="z-10 sticky top-0 flex">
+                  {isStagesDivOverflow && scrollX !== 0 && (
+                    <button
+                      onClick={() => {
+                        scrollStagesDiv(-50)
+                      }}
+                    >
+                      <ChevronLeftIcon className="w-5 h-5" />
+                    </button>
+                  )}
+                  <div
+                    onScroll={scrollCheck}
+                    ref={stagesDivScrollRef}
+                    className="flex w-full max-w-full overflow-auto bg-theme-50 justify-between"
+                  >
+                    {candidate?.job?.stages?.map((stage, index) => {
+                      return (
+                        <div
+                          ref={(el) => (stageSelectorRefs.current[index] = el)}
+                          key={`${stage?.name}${index}`}
+                          className={`${index > 0 ? "border-l-2 rounded-bl-md" : ""} ${
+                            index < (candidate?.job?.stages?.length || 0) - 1
+                              ? "border-r-2 rounded-br-md"
+                              : ""
+                          } border-b-2 border-theme-400 p-1 bg-theme-50 min-w-fit overflow-clip hover:bg-theme-200 cursor-pointer ${
+                            selectedStage?.id === stage.id ? "!bg-theme-500 !text-white" : ""
+                          } whitespace-nowrap`}
+                          onClick={() => {
+                            changeSelectedStage(stage)
+                            invalidateQuery(getCandidateInterviewsByStage)
+                            // setScoreCardId(candidate?.job?.scoreCards?.find(sc => sc.workflowStageId === ws.id)?.scoreCardId || "")
+                          }}
+                        >
+                          {stage?.name?.length > 20
+                            ? `${stage?.name?.substring(0, 20)}...`
+                            : stage?.name}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {isStagesDivOverflow && !scrolEnd && (
+                    <button
+                      onClick={() => {
+                        scrollStagesDiv(50)
+                      }}
+                    >
+                      <ChevronRightIcon className="w-5 h-5" />
+                    </button>
+                  )}
                 </div>
                 <div className="flex items-center justify-center mt-5 mx-5">
                   <Suspense
