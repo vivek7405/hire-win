@@ -3,6 +3,9 @@ import { useTable, useFilters, useGlobalFilter, usePagination } from "react-tabl
 import "regenerator-runtime/runtime"
 import Debouncer from "src/core/utils/debouncer"
 import Pagination from "./Pagination"
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/outline"
+import { useEffect, useRef, useState } from "react"
+import { useIsOverflow } from "../hooks/useIsOverflow"
 
 type TableProps = {
   columns: any
@@ -69,6 +72,58 @@ const Table = ({
     return debouncer.execute(e)
   }
 
+  const scrollRef = useRef(null as any)
+
+  const isDivOverflowInitial = useIsOverflow(
+    scrollRef,
+    (isOverflow) => {
+      setIsDivOverflow(isOverflow)
+    },
+    true
+  )
+  const [isDivOverflow, setIsDivOverflow] = useState(isDivOverflowInitial as boolean | undefined)
+
+  const [scrollX, setScrollX] = useState(0) // For detecting start scroll postion
+  const [scrollEnd, setScrollEnd] = useState(false) // For detecting end of scrolling
+
+  const scrollDiv = (scrollOffset) => {
+    scrollRef.current.scrollLeft += scrollOffset
+
+    setScrollX(scrollX + scrollOffset) // Updates the latest scrolled postion
+
+    //For checking if the scroll has ended
+    if (
+      Math.floor(scrollRef.current.scrollWidth - scrollRef.current.scrollLeft) <=
+      scrollRef.current.offsetWidth
+    ) {
+      setScrollEnd(true)
+    } else {
+      setScrollEnd(false)
+    }
+  }
+
+  const scrollCheck = () => {
+    setScrollX(scrollRef.current.scrollLeft)
+    if (
+      Math.floor(scrollRef.current.scrollWidth - scrollRef.current.scrollLeft) <=
+      scrollRef.current.offsetWidth
+    ) {
+      setScrollEnd(true)
+    } else {
+      setScrollEnd(false)
+    }
+  }
+
+  useEffect(() => {
+    //Check width of the scrollings
+    if (scrollRef.current && scrollRef?.current?.scrollWidth === scrollRef?.current?.offsetWidth) {
+      setScrollEnd(true)
+    } else {
+      setScrollEnd(false)
+    }
+    return () => {}
+  }, [scrollRef?.current?.scrollWidth, scrollRef?.current?.offsetWidth])
+
   return (
     <div>
       {!noSearch && (
@@ -87,7 +142,35 @@ const Table = ({
         </div>
       )}
 
-      <div className="flex flex-col overflow-x-auto overflow-y-hidden">
+      <div className="w-full hidden sm:flex items-center justify-between mb-3">
+        {isDivOverflow && (
+          <button
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={scrollX <= 0}
+            onClick={() => {
+              scrollDiv(-200)
+            }}
+          >
+            <ChevronLeftIcon className="w-6 h-6 bg-black text-white" />
+          </button>
+        )}
+        {isDivOverflow && (
+          <button
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={scrollEnd}
+            onClick={() => {
+              scrollDiv(200)
+            }}
+          >
+            <ChevronRightIcon className="w-6 h-6 bg-black text-white" />
+          </button>
+        )}
+      </div>
+      <div
+        ref={scrollRef}
+        onScroll={scrollCheck}
+        className="flex flex-col overflow-x-auto overflow-y-hidden"
+      >
         <table className="table min-w-full border border-gray-200" {...getTableProps()}>
           <thead className="border-b border-gray-200">
             {headerGroups.map((headerGroup, i) => (

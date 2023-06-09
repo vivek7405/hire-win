@@ -1359,34 +1359,34 @@ const SingleCandidatePageContent = ({
     isStagesDivOverflowInitial as boolean | undefined
   )
 
-  const [scrollX, setscrollX] = useState(0) // For detecting start scroll postion
-  const [scrolEnd, setScrolEnd] = useState(false) // For detecting end of scrolling
+  const [scrollX, setScrollX] = useState(0) // For detecting start scroll postion
+  const [scrollEnd, setScrollEnd] = useState(false) // For detecting end of scrolling
 
   const scrollStagesDiv = (scrollOffset) => {
     stagesDivScrollRef.current.scrollLeft += scrollOffset
 
-    setscrollX(scrollX + scrollOffset) // Updates the latest scrolled postion
+    setScrollX(scrollX + scrollOffset) // Updates the latest scrolled postion
 
     //For checking if the scroll has ended
     if (
       Math.floor(stagesDivScrollRef.current.scrollWidth - stagesDivScrollRef.current.scrollLeft) <=
       stagesDivScrollRef.current.offsetWidth
     ) {
-      setScrolEnd(true)
+      setScrollEnd(true)
     } else {
-      setScrolEnd(false)
+      setScrollEnd(false)
     }
   }
 
   const scrollCheck = () => {
-    setscrollX(stagesDivScrollRef.current.scrollLeft)
+    setScrollX(stagesDivScrollRef.current.scrollLeft)
     if (
       Math.floor(stagesDivScrollRef.current.scrollWidth - stagesDivScrollRef.current.scrollLeft) <=
       stagesDivScrollRef.current.offsetWidth
     ) {
-      setScrolEnd(true)
+      setScrollEnd(true)
     } else {
-      setScrolEnd(false)
+      setScrollEnd(false)
     }
   }
 
@@ -1396,9 +1396,9 @@ const SingleCandidatePageContent = ({
       stagesDivScrollRef.current &&
       stagesDivScrollRef?.current?.scrollWidth === stagesDivScrollRef?.current?.offsetWidth
     ) {
-      setScrolEnd(true)
+      setScrollEnd(true)
     } else {
-      setScrolEnd(false)
+      setScrollEnd(false)
     }
     return () => {}
   }, [stagesDivScrollRef?.current?.scrollWidth, stagesDivScrollRef?.current?.offsetWidth])
@@ -2255,7 +2255,7 @@ const SingleCandidatePageContent = ({
                       )
                     })}
                   </div>
-                  {isStagesDivOverflow && !scrolEnd && (
+                  {isStagesDivOverflow && !scrollEnd && (
                     <button
                       onClick={() => {
                         scrollStagesDiv(50)

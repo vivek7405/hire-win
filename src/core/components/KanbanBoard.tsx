@@ -12,7 +12,9 @@ import {
   DraggableProvidedDragHandleProps,
   DragDropContext,
 } from "react-beautiful-dnd"
-import { forwardRef } from "react"
+import { forwardRef, useEffect, useRef, useState } from "react"
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/outline"
+import { useIsOverflow } from "../hooks/useIsOverflow"
 
 type KanbanBoardProps = {
   board: KanbanBoardType
@@ -125,6 +127,58 @@ const KanbanBoard = ({
     if (!col) mutateCardDropDB(source, destination, draggableId)
   }
 
+  const scrollRef = useRef(null as any)
+
+  const isDivOverflowInitial = useIsOverflow(
+    scrollRef,
+    (isOverflow) => {
+      setIsDivOverflow(isOverflow)
+    },
+    true
+  )
+  const [isDivOverflow, setIsDivOverflow] = useState(isDivOverflowInitial as boolean | undefined)
+
+  const [scrollX, setScrollX] = useState(0) // For detecting start scroll postion
+  const [scrollEnd, setScrollEnd] = useState(false) // For detecting end of scrolling
+
+  const scrollDiv = (scrollOffset) => {
+    scrollRef.current.scrollLeft += scrollOffset
+
+    setScrollX(scrollX + scrollOffset) // Updates the latest scrolled postion
+
+    //For checking if the scroll has ended
+    if (
+      Math.floor(scrollRef.current.scrollWidth - scrollRef.current.scrollLeft) <=
+      scrollRef.current.offsetWidth
+    ) {
+      setScrollEnd(true)
+    } else {
+      setScrollEnd(false)
+    }
+  }
+
+  const scrollCheck = () => {
+    setScrollX(scrollRef.current.scrollLeft)
+    if (
+      Math.floor(scrollRef.current.scrollWidth - scrollRef.current.scrollLeft) <=
+      scrollRef.current.offsetWidth
+    ) {
+      setScrollEnd(true)
+    } else {
+      setScrollEnd(false)
+    }
+  }
+
+  useEffect(() => {
+    //Check width of the scrollings
+    if (scrollRef.current && scrollRef?.current?.scrollWidth === scrollRef?.current?.offsetWidth) {
+      setScrollEnd(true)
+    } else {
+      setScrollEnd(false)
+    }
+    return () => {}
+  }, [scrollRef?.current?.scrollWidth, scrollRef?.current?.offsetWidth])
+
   return (
     <div>
       {!noSearch && (
@@ -156,8 +210,36 @@ const KanbanBoard = ({
       )}
 
       <div>
+        <div className="w-full hidden sm:flex items-center justify-between">
+          {isDivOverflow && (
+            <button
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={scrollX <= 0}
+              onClick={() => {
+                scrollDiv(-200)
+              }}
+            >
+              <ChevronLeftIcon className="w-6 h-6 bg-black text-white" />
+            </button>
+          )}
+          {isDivOverflow && (
+            <button
+              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={scrollEnd}
+              onClick={() => {
+                scrollDiv(200)
+              }}
+            >
+              <ChevronRightIcon className="w-6 h-6 bg-black text-white" />
+            </button>
+          )}
+        </div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="overflow-y-hidden flex items-start p-1">
+          <div
+            ref={scrollRef}
+            onScroll={scrollCheck}
+            className="overflow-y-hidden flex items-start py-1"
+          >
             <DroppableBoard droppableId="board-droppable" direction="horizontal" type="BOARD">
               {board?.columns?.map((column, index) => {
                 return (
