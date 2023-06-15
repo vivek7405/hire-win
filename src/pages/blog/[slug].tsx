@@ -8,6 +8,7 @@ import { Routes } from "@blitzjs/next"
 import moment from "moment"
 import Head from "next/head"
 import { BlogPostInputType } from "src/blog/validations"
+import rehypeRaw from "rehype-raw"
 
 export async function getStaticPaths() {
   // Call an external API endpoint to get posts
@@ -69,7 +70,7 @@ export default function BlogPost({ post }: InputType) {
               </ReactMarkdown>
               <ReactMarkdown className="text-center block lg:hidden">{`## ${post.title}`}</ReactMarkdown>
               <ReactMarkdown className="text-center hidden lg:block">{`# ${post.title}`}</ReactMarkdown>
-              <ReactMarkdown>{post.content || ""}</ReactMarkdown>
+              <ReactMarkdown rehypePlugins={[rehypeRaw]}>{post.content || ""}</ReactMarkdown>
             </div>
           </div>
         </div>

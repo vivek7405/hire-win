@@ -57,9 +57,9 @@ export default withBlitz(function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      <Head>
+      {/* <Head>
         <link rel="canonical" href="https://hire.win/" />
-      </Head>
+      </Head> */}
       <Suspense fallback="Loading...">
         <ErrorBoundary
           FallbackComponent={RootErrorFallback}

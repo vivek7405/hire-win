@@ -106,6 +106,7 @@
     "react-select": "5.2.1",
     "react-sizeme": "3.0.2",
     "react-table": "7.7.0",
+    "rehype-raw": "6.1.1",
     "request": "2.88.2",
     "secure-e2ee": "0.4.0",
     "sharp": "0.30.7",
