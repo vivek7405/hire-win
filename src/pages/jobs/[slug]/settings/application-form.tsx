@@ -416,7 +416,7 @@ export const JobApplicationForm = ({
             }
             await removeFormQuestionFromJobMutation({
               jobId: formQuestionToRemove.jobId,
-              order: formQuestionToRemove.order,
+              formQuestionId: formQuestionToRemove.id,
             })
             invalidateQuery(getJobApplicationFormQuestions)
             toast.success(() => <span>Question removed - {formQuestionToRemove?.title}</span>, {
