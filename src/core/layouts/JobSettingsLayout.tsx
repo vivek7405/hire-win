@@ -50,7 +50,7 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
       : null,
     jobUser?.role !== JobUserRole.USER
       ? {
-          name: "Stages & Score Cards",
+          name: "Hiring Stages",
           href: `/jobs/${job?.slug}/settings/stages`,
           current:
             router.route === `/jobs/[slug]/settings/stages` ||

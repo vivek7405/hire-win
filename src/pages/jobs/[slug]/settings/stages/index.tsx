@@ -549,7 +549,7 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                 Add and re-order hiring stages for this job
               </h4>
               <h4 className="text-xs sm:text-sm text-gray-700">
-                Click on the settings icon to configure Interviewers, Score card & other settings
+                Click on the settings icon to configure Interviewers, Score cards & other settings
               </h4>
               {activePlanName === PlanName.FREE && (
                 <div className="mt-2">
