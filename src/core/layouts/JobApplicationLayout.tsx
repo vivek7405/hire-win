@@ -206,10 +206,11 @@ const JobApplicationLayout = ({
                   <div className="flex flex-nowrap items-center justify-center space-x-2">
                     <CashIcon className="w-5 h-5 text-neutral-700" />
                     <span>
-                      {job?.currency && getSymbolFromCurrency(job?.currency)}
-                      {job?.minSalary > 0 && job?.minSalary}
+                      {job?.minSalary > 0 &&
+                        `${job?.currency && getSymbolFromCurrency(job?.currency)}${job?.minSalary}`}
                       {job?.minSalary > 0 && job?.maxSalary > 0 && " - "}
-                      {job?.maxSalary > 0 && job?.maxSalary}
+                      {job?.maxSalary > 0 &&
+                        `${job?.currency && getSymbolFromCurrency(job?.currency)}${job?.maxSalary}`}
                       {` ${getSalaryIntervalFromSalaryType(job?.salaryType)?.toLowerCase()}`}
                     </span>
                   </div>

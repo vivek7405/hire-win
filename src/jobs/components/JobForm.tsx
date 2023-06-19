@@ -54,7 +54,7 @@ export const JobForm = (props: JobFormProps) => {
       <Form
         header={props.header}
         subHeader={props.subHeader}
-        submitText="Submit"
+        submitText="Save"
         schema={Job}
         initialValues={props.initialValues}
         onSubmit={props.onSubmit}
@@ -320,7 +320,7 @@ export const JobForm = (props: JobFormProps) => {
               min="0"
               name="maxSalary"
               label="Maximum Salary"
-              subLabel="Provide mim salary and leave max salary blank if you want to display fixed salary"
+              subLabel="Provide min salary and leave max salary blank if you want to display fixed salary"
               placeholder="Maximum salary for this job"
             />
           </div>
@@ -328,7 +328,7 @@ export const JobForm = (props: JobFormProps) => {
           <div className="w-full md:w-1/3 lg:w-1/3">
             <LabeledReactSelectField
               name="salaryType"
-              label="Salary Type"
+              label="Salary Interval"
               placeholder="Hourly, Weekly, etc."
               defaultValue={Object.keys(SalaryType).find((type) => type === SalaryType.YEAR)}
               options={Object.keys(SalaryType).map((salaryType) => {

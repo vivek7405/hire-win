@@ -55,10 +55,15 @@ const JobPost = ({ job, embed, companySlug, isJobBoard }) => {
                   <div className="pt-2 pb-4">
                     {job?.showSalary && (job?.minSalary > 0 || job?.maxSalary > 0) && (
                       <p className="text-gray-500 text-sm">
-                        {job?.currency && getSymbolFromCurrency(job?.currency)}
-                        {job?.minSalary > 0 && job?.minSalary}
+                        {job?.minSalary > 0 &&
+                          `${job?.currency && getSymbolFromCurrency(job?.currency)}${
+                            job?.minSalary
+                          }`}
                         {job?.minSalary > 0 && job?.maxSalary > 0 && " - "}
-                        {job?.maxSalary > 0 && job?.maxSalary}
+                        {job?.maxSalary > 0 &&
+                          `${job?.currency && getSymbolFromCurrency(job?.currency)}${
+                            job?.maxSalary
+                          }`}
                         {` ${getSalaryIntervalFromSalaryType(job?.salaryType)?.toLowerCase()}`}
                       </p>
                     )}

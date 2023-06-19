@@ -95,6 +95,8 @@ import { z } from "zod"
 import getActiveJobsCount from "src/jobs/queries/getActiveJobsCount"
 import LinkCopyPopMenuItem from "src/jobs/components/LinkCopyPopMenuItem"
 import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
+import getSymbolFromCurrency from "currency-symbol-map"
+import getSalaryIntervalFromSalaryType from "src/jobs/utils/getSalaryIntervalFromSalaryType"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -1264,6 +1266,21 @@ const Jobs = ({
                           {job?.remoteOption?.replaceAll("_", " ")}
                         </span>
                       )}
+                      {(jobUser?.role !== JobUserRole.USER || job?.showSalary) &&
+                        (job?.minSalary > 0 || job?.maxSalary > 0) && (
+                          <span className="inline-block border-2 rounded-full px-3 py-1 text-sm font-semibold text-neutral-600 mr-2 mb-2">
+                            {job?.minSalary > 0 &&
+                              `${job?.currency && getSymbolFromCurrency(job?.currency)}${
+                                job?.minSalary
+                              }`}
+                            {job?.minSalary > 0 && job?.maxSalary > 0 && " - "}
+                            {job?.maxSalary > 0 &&
+                              `${job?.currency && getSymbolFromCurrency(job?.currency)}${
+                                job?.maxSalary
+                              }`}
+                            {` ${getSalaryIntervalFromSalaryType(job?.salaryType)?.toLowerCase()}`}
+                          </span>
+                        )}
                     </div>
                   </div>
                 </Card>
