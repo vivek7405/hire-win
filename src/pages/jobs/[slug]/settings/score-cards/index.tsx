@@ -243,7 +243,7 @@ const ScoreCards = ({ jobId, jobSlug }) => {
                       <Link
                         legacyBehavior
                         prefetch={true}
-                        href={Routes.JobSettingsSingleScoreCardPage({
+                        href={Routes.ScoreCardSettingsPage({
                           slug: jobSlug,
                           stageSlug: stage.slug,
                         })}

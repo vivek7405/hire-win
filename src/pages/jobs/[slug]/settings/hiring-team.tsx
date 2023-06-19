@@ -441,7 +441,7 @@ const JobSettingsHiringTeamPage = ({
                 </table>
               </div>
 
-              <div className="overflow-auto">
+              {/* <div className="overflow-auto">
                 <div className="mt-10 mb-6 w-full">
                   <h3 className="font-semibold text-lg flex justify-center">
                     Interview Duration & Evaluators (Interviewers)
@@ -453,13 +453,6 @@ const JobSettingsHiringTeamPage = ({
                   </p>
                   <div className="flex flex-col space-y-20 md:flex-row md:space-y-0 lg:flex-row lg:space-y-0 mt-6 items-center md:justify-center lg:justify-center">
                     {jobData?.stages?.map((stage, index) => {
-                      // const existingInterviewDetail = stage.interviewDetails?.find(
-                      //   (int) => int.stageId === stage.id && int.jobId === jobData.id
-                      // )
-                      // const existingInterviewer: User | null | undefined = jobData?.users?.find(
-                      //   (member) => member?.userId === existingInterviewDetail?.interviewerId
-                      // )?.user
-
                       return (
                         <div
                           key={stage.id}
@@ -550,151 +543,23 @@ const JobSettingsHiringTeamPage = ({
                               }
                             }}
                           >
-                            {
-                              // !stage.interviewerId ? (
-                              jobData?.users?.map((member) => {
-                                return (
-                                  <option
-                                    key={member?.userId?.toString()!}
-                                    value={member?.userId?.toString()!}
-                                  >
-                                    {member?.user?.name!}
-                                  </option>
-                                )
-                              })
-                              // ) : (
-                              //   <option
-                              //     key={(stage.interviewer as User | null | undefined)?.id?.toString()!}
-                              //     value={
-                              //       (stage.interviewer as User | null | undefined)?.id?.toString()!
-                              //     }
-                              //   >
-                              //     {(stage.interviewer as User | null | undefined)?.name!}
-                              //   </option>
-                              // )
-                            }
+                            {jobData?.users?.map((member) => {
+                              return (
+                                <option
+                                  key={member?.userId?.toString()!}
+                                  value={member?.userId?.toString()!}
+                                >
+                                  {member?.user?.name!}
+                                </option>
+                              )
+                            })}
                           </select>
                         </div>
                       )
                     })}
                   </div>
-
-                  {/* <div className="mt-5 w-full flex flex-col md:flex-row lg:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-2 lg:space-y-0 lg:space-x-2">
-                  {jobData?.workflow?.stages?.map((ws, index) => {
-                      const existingInterviewDetail = ws.interviewDetails?.find(
-                        (int) => int.workflowStageId === ws.id && int.jobId === jobData.id
-                      )
-                      const existingInterviewer: User | null | undefined = jobData?.users?.find(
-                        (member) => member?.userId === existingInterviewDetail?.interviewerId
-                      )?.user
-
-                      return (
-                        <div key={ws.id}>
-                          <div className="overflow-auto p-1 rounded-lg border-2 border-neutral-300 bg-neutral-50 w-32 flex flex-col items-center justify-center">
-                            <div className="overflow-hidden text-sm text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
-                              {ws.stage?.name}
-                            </div>
-                          </div>
-
-                          <div className="w-32 my-2 flex flex-col items-center justify-center">
-                            <ArrowSmDownIcon className="h-6 w-auto text-neutral-500" />
-                          </div>
-
-                          <div className="w-32 flex flex-col items-center justify-center">
-                            <select
-                              className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
-                              name={`timeIntervals.${index}.intervalId`}
-                              placeholder={`Time interval for ${ws.stage?.name}`}
-                              // disabled={existingInterviewDetail && !existingInterviewer}
-                              defaultValue="30"
-                            >
-                              <option value="15">15 minutes</option>
-                              <option value="30">30 minutes</option>
-                              <option value="45">45 minutes</option>
-                              <option value="60">60 minutes</option>
-                            </select>
-                          </div>
-
-                          <div className="w-32 my-2 flex flex-col items-center justify-center">
-                            <ArrowSmDownIcon className="h-6 w-auto text-neutral-500" />
-                          </div>
-
-                          <div className="w-32 flex flex-col items-center justify-center">
-                            <select
-                              className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded"
-                              name={`interviewers.${index}.interviewerId`}
-                              placeholder={`Interviewer for ${ws.stage?.name}`}
-                              disabled={existingInterviewDetail && !existingInterviewer}
-                              defaultValue={
-                                existingInterviewDetail?.interviewerId?.toString() ||
-                                jobData?.users
-                                  ?.find((member) => member?.role === "OWNER")
-                                  ?.userId?.toString()
-                              }
-                              onChange={async (e) => {
-                                const selectedInterviewerId = e.target.value
-                                const toastId = toast.loading(() => (
-                                  <span>Updating Interviewer</span>
-                                ))
-                                try {
-                                  const assignedInterviewer =
-                                    await assignInterviewerToJobStageMutation({
-                                      jobId: jobData?.id,
-                                      workflowStageId: ws.id,
-                                      interviewerId: parseInt(selectedInterviewerId || "0"),
-                                    })
-                                  if (existingInterviewDetail && assignedInterviewer) {
-                                    existingInterviewDetail.interviewerId =
-                                      assignedInterviewer.interviewerId
-                                    setJobData(jobData)
-                                  }
-
-                                  toast.success(() => <span>Interviewer assigned to stage</span>, {
-                                    id: toastId,
-                                  })
-                                } catch (error) {
-                                  toast.error(
-                                    "Sorry, we had an unexpected error. Please try again. - " +
-                                      error.toString()
-                                  )
-                                }
-                              }}
-                            >
-                              {!existingInterviewDetail || existingInterviewer ? (
-                                jobData?.users?.map((member) => {
-                                  return (
-                                    <option
-                                      key={member?.userId?.toString()!}
-                                      value={member?.userId?.toString()!}
-                                    >
-                                      {member?.user?.name!}
-                                    </option>
-                                  )
-                                })
-                              ) : (
-                                <option
-                                  key={
-                                    (
-                                      existingInterviewer as User | null | undefined
-                                    )?.id?.toString()!
-                                  }
-                                  value={
-                                    (
-                                      existingInterviewer as User | null | undefined
-                                    )?.id?.toString()!
-                                  }
-                                >
-                                  {(existingInterviewer as User | null | undefined)?.email!}
-                                </option>
-                              )}
-                            </select>
-                          </div>
-                        </div>
-                      )
-                    })}
-                </div> */}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </JobSettingsLayout>

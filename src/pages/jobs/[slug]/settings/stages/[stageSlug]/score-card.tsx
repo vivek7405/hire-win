@@ -49,6 +49,7 @@ import getStage from "src/stages/queries/getStage"
 import { AuthorizationError } from "blitz"
 import { PencilIcon } from "@heroicons/react/solid"
 import getJobUser from "src/jobs/queries/getJobUser"
+import StageSettingsLayout from "src/core/layouts/StageSettingsLayout"
 
 export const getServerSideProps = gSSP(async (context) => {
   // Ensure these files are not eliminated by trace-based tree-shaking (like Vercel)
@@ -369,7 +370,7 @@ export const CardQuestions = ({
 
   return (
     <>
-      <div className="flex mb-2">
+      {/* <div className="flex mb-2">
         <input
           placeholder="Search"
           type="text"
@@ -379,7 +380,7 @@ export const CardQuestions = ({
             execDebouncer(e)
           }}
         />
-      </div>
+      </div> */}
       <Confirm
         open={openConfirm}
         setOpen={setOpenConfirm}
@@ -398,6 +399,7 @@ export const CardQuestions = ({
             }
             await removeCardQuestionFromScoreCardMutation({
               stageId: scoreCardQuestionToRemove.stageId,
+              scoreCardQuestionId: scoreCardQuestionToRemove.id,
               slug: scoreCardQuestionToRemove.slug,
             })
             invalidateQuery(getScoreCardQuestions)
@@ -522,7 +524,7 @@ export const CardQuestions = ({
   )
 }
 
-const JobSettingsSingleScoreCardPage = ({
+const ScoreCardSettingsPage = ({
   user,
   job,
   stage,
@@ -549,191 +551,94 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
     <AuthLayout title="Hire.win | Score Card" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
-          <div className="px-4 py-6 md:p-0 space-y-6 w-full">
-            {/* <br className="block md:hidden lg:hidden" /> */}
-            <Link legacyBehavior href={Routes.JobSettingsStagesPage({ slug: job?.slug || "0" })}>
-              <a className="w-fit flex items-center space-x-2 text-neutral-600 hover:text-black">
-                <ArrowLeftIcon className="w-5 h-5" />
-                <div>Stages Config</div>
-              </a>
-            </Link>
-            <div className="text-left sm:text-center text-neutral-700 text-xl font-medium">
-              Score Card Config for stage {'"'}
-              {stage?.name}
-              {'"'}
-            </div>
-            {/* {canUpdate && ( */}
-            <div className="space-y-6">
-              <div className="flex flex-col space-y-6 md:space-y-0 lg:space-y-0 md:flex-row lg:flex-row md:float-right lg:float-right md:space-x-5 lg:space-x-5">
-                {/* <div className="space-x-8 flex flex-row justify-center">
-              <Modal header="Preview ScoreCard" open={openPreviewScoreCard} setOpen={setOpenPreviewScoreCard}>
-                <ScoreCard
-                  header="Job Application ScoreCard"
-                  subHeader="Preview"
-                  scoreCardId={scoreCard?.id!}
-                  preview={true}
-                  onSubmit={async (values) => {
-                    toast.error("Can't submit the scoreCard in preview mode")
-                  }}
-                />
-              </Modal>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  setOpenPreviewScoreCard(true)
-                }}
-                data-testid={`open-previewScoreCard-modal`}
-                className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
-              >
-                Preview ScoreCard
-              </button>
-
-              <Link legacyBehavior prefetch={true} href={Routes.CardQuestionsHome()} passHref>
-                <a className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800">
-                  Question Pool
-                </a>
-              </Link>
-
-              <Link legacyBehavior
-                prefetch={true}
-                href={Routes.ScoreCardSettingsPage({ slug: scoreCard?.slug! })}
-                passHref
-              >
-                <a
-                  className="whitespace-nowrap underline text-theme-600 py-2 hover:text-theme-800"
-                  data-testid={`${scoreCard?.name && `${scoreCard?.name}-`}settingsLink`}
-                >
-                  Score Card Settings
-                </a>
-              </Link>
-            </div> */}
-
-                <div className="flex flex-row justify-between space-x-3">
-                  {/* <Modal
-                header="Add Questions from Pool"
-                open={openAddExistingCardQuestions}
-                setOpen={setOpenAddExistingCardQuestions}
-                noOverflow={true}
-              >
-                <AddExistingCardQuestionsForm
-                  schema={ScoreCardQuestions}
-                  user={user}
-                  companyId={session.companyId || "0"}
-                  scoreCardId={scoreCard?.id!}
-                  onSubmit={async (values) => {
-                    const toastId = toast.loading(() => <span>Adding CardQuestion(s)</span>)
-                    try {
-                      await addExistingScoreCardQuestionsMutation({
-                        scoreCardId: scoreCard?.id as string,
-                        cardQuestionIds: values.cardQuestionIds,
-                      })
-                      invalidateQuery(getScoreCardQuestions)
-                      toast.success(() => <span>CardQuestion(s) added</span>, {
-                        id: toastId,
-                      })
-                    } catch (error) {
-                      toast.error(
-                        "Sorry, we had an unexpected error. Please try again. - " +
-                          error.toString(),
-                        { id: toastId }
-                      )
-                    }
-                    setOpenAddExistingCardQuestions(false)
-                  }}
-                />
-              </Modal>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  setOpenAddExistingCardQuestions(true)
-                }}
-                data-testid={`open-addCardQuestion-modal`}
-                className="md:float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
-              >
-                Add Questions from Pool
-              </button> */}
-
-                  <Modal
-                    header="Add New Question"
-                    open={openAddNewCardQuestion}
-                    setOpen={setOpenAddNewCardQuestion}
-                  >
-                    <CardQuestionForm
-                      editmode={scoreCardQuestionToEdit ? true : false}
-                      header={`${scoreCardQuestionToEdit ? "Update" : "Add New"} Question`}
-                      subHeader="Enter Question details"
-                      initialValues={
-                        scoreCardQuestionToEdit ? { title: scoreCardQuestionToEdit?.title } : {}
-                      }
-                      onSubmit={async (values) => {
-                        const isEdit = scoreCardQuestionToEdit ? true : false
-
-                        const toastId = toast.loading(
-                          isEdit ? "Updating Question" : "Adding New Question"
-                        )
-                        try {
-                          isEdit
-                            ? await updateScoreCardQuestionNameMutation({
-                                where: { id: scoreCardQuestionToEdit?.id },
-                                data: { ...values },
-                                initial: scoreCardQuestionToEdit!,
-                              })
-                            : await addNewCardQuestionToScoreCardMutation({
-                                stageId: stage?.id || "0",
-                                ...values,
-                              })
-                          invalidateQuery(getScoreCardQuestions)
-                          invalidateQuery(getStage)
-                          toast.success(
-                            isEdit
-                              ? "Question updated successfully"
-                              : "Question added successfully",
-                            {
-                              id: toastId,
-                            }
-                          )
-                          setScoreCardQuestionToEdit(null)
-                          setOpenAddNewCardQuestion(false)
-                        } catch (error) {
-                          toast.error(
-                            `Failed to ${
-                              isEdit ? "update" : "add new"
-                            } template - ${error.toString()}`,
-                            { id: toastId }
-                          )
-                        }
-                      }}
-                      // onSubmit={async (values) => {
-                      //   const toastId = toast.loading(() => <span>Adding Question</span>)
-                      //   try {
-                      //     await addNewCardQuestionToScoreCardMutation({
-                      //       ...values,
-                      //       scoreCardId: scoreCard?.id as string,
-                      //     })
-                      //     toast.success(() => <span>Question added</span>, {
-                      //       id: toastId,
-                      //     })
-                      //     router.reload()
-                      //   } catch (error) {
-                      //     toast.error(
-                      //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
-                      //     )
-                      //   }
-                      // }}
-                    />
-                  </Modal>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setScoreCardQuestionToEdit(null)
-                      setOpenAddNewCardQuestion(true)
-                    }}
-                    data-testid={`open-addCardQuestion-modal`}
-                    className="md:float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
-                  >
-                    Add New Question
-                  </button>
+          <StageSettingsLayout jobSlug={job?.slug} stageSlug={stage?.slug}>
+            <div className="my-6 md:mx-6">
+              <div className="mb-6 md:p-0 md:mt-0 flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center">
+                <div className="sm:mr-5">
+                  <h2 className="text-lg leading-6 font-medium text-gray-900">Score Card Config</h2>
+                  <h4 className="text-xs sm:text-sm text-gray-700">
+                    The questions configured here shall appear on the score card
+                  </h4>
+                  <h4 className="text-xs sm:text-sm text-gray-700">For stage {stage?.name}</h4>
                 </div>
+                <Modal
+                  header="Add New Question"
+                  open={openAddNewCardQuestion}
+                  setOpen={setOpenAddNewCardQuestion}
+                >
+                  <CardQuestionForm
+                    editmode={scoreCardQuestionToEdit ? true : false}
+                    header={`${scoreCardQuestionToEdit ? "Update" : "Add New"} Question`}
+                    subHeader="Enter Question details"
+                    initialValues={
+                      scoreCardQuestionToEdit ? { title: scoreCardQuestionToEdit?.title } : {}
+                    }
+                    onSubmit={async (values) => {
+                      const isEdit = scoreCardQuestionToEdit ? true : false
+
+                      const toastId = toast.loading(
+                        isEdit ? "Updating Question" : "Adding New Question"
+                      )
+                      try {
+                        isEdit
+                          ? await updateScoreCardQuestionNameMutation({
+                              where: { id: scoreCardQuestionToEdit?.id },
+                              data: { ...values },
+                              initial: scoreCardQuestionToEdit!,
+                            })
+                          : await addNewCardQuestionToScoreCardMutation({
+                              stageId: stage?.id || "0",
+                              ...values,
+                            })
+                        invalidateQuery(getScoreCardQuestions)
+                        invalidateQuery(getStage)
+                        toast.success(
+                          isEdit ? "Question updated successfully" : "Question added successfully",
+                          {
+                            id: toastId,
+                          }
+                        )
+                        setScoreCardQuestionToEdit(null)
+                        setOpenAddNewCardQuestion(false)
+                      } catch (error) {
+                        toast.error(
+                          `Failed to ${
+                            isEdit ? "update" : "add new"
+                          } template - ${error.toString()}`,
+                          { id: toastId }
+                        )
+                      }
+                    }}
+                    // onSubmit={async (values) => {
+                    //   const toastId = toast.loading(() => <span>Adding Question</span>)
+                    //   try {
+                    //     await addNewCardQuestionToScoreCardMutation({
+                    //       ...values,
+                    //       scoreCardId: scoreCard?.id as string,
+                    //     })
+                    //     toast.success(() => <span>Question added</span>, {
+                    //       id: toastId,
+                    //     })
+                    //     router.reload()
+                    //   } catch (error) {
+                    //     toast.error(
+                    //       "Sorry, we had an unexpected error. Please try again. - " + error.toString()
+                    //     )
+                    //   }
+                    // }}
+                  />
+                </Modal>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setScoreCardQuestionToEdit(null)
+                    setOpenAddNewCardQuestion(true)
+                  }}
+                  data-testid={`open-addStage-modal`}
+                  className="float-right text-white bg-theme-600 px-4 py-2 rounded hover:bg-theme-700"
+                >
+                  Add New Question
+                </button>
               </div>
 
               <Suspense fallback={<p className="pt-3">Loading...</p>}>
@@ -746,12 +651,11 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                 />
               </Suspense>
             </div>
-            {/* )} */}
-          </div>
+          </StageSettingsLayout>
         </JobSettingsLayout>
       </Suspense>
     </AuthLayout>
   )
 }
 
-export default JobSettingsSingleScoreCardPage
+export default ScoreCardSettingsPage

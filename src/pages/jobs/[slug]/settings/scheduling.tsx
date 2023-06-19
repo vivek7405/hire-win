@@ -134,9 +134,9 @@ export const getServerSideProps = gSSP(async (context) => {
 const ScheduleCalendarAssignment = ({ job, user, stages, header, noStagesMsg }) => {
   const [assignScheduleToJobStageMutation] = useMutation(assignScheduleToJobStage)
   const [assignCalendarToJobStageMutation] = useMutation(assignCalendarToJobStage)
-  const [schedules] = useQuery(getSchedulesWOPagination, { where: { userId: user?.id } })
   const [calendars] = useQuery(getCalendars, { where: { userId: user?.id } })
   const [defaultCalendar] = useQuery(getDefaultCalendarByUser, null)
+  const [schedules] = useQuery(getSchedulesWOPagination, { where: { userId: user?.id } })
   const [defaultSchedule] = useQuery(getDefaultScheduleByUser, null)
 
   return (

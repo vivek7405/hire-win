@@ -20,7 +20,7 @@ import Modal from "src/core/components/Modal"
 import Table from "src/core/components/Table"
 import toast from "react-hot-toast"
 
-import { CreditCardIcon, StarIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
+import { CogIcon, StarIcon, TrashIcon, XIcon } from "@heroicons/react/outline"
 import { CardType, DragDirection, ExtendedStage, PlanName, ShiftDirection } from "types"
 import shiftJobStage from "src/stages/mutations/shiftJobStage"
 import Confirm from "src/core/components/Confirm"
@@ -222,14 +222,12 @@ export const Stages = ({
           <>
             <div className="space-y-2">
               <div className="w-full relative">
-                <div className="text-lg font-bold flex md:justify-center lg:justify:center items-center">
-                  <div className="pr-20 md:px-20 lg:px-20 text-neutral-700 truncate">
-                    {stage.name}
-                  </div>
+                <div className="text-lg font-bold flex items-center">
+                  <div className="pr-20 text-neutral-700 truncate">{stage.name}</div>
                   {/* <Link
                     legacyBehavior
                     prefetch={true}
-                    href={Routes.JobSettingsSingleScoreCardPage({
+                    href={Routes.StageSettingsPage({
                       slug: jobSlug,
                       stageSlug: stage.slug,
                     })}
@@ -247,24 +245,24 @@ export const Stages = ({
                   <button
                     id={"edit-" + stage.id}
                     className="float-right text-indigo-600 hover:text-indigo-800"
-                    title="Configure Score Card"
+                    title="Stage Settings"
                     type="button"
                     onClick={(e) => {
                       e.preventDefault()
                       router.push(
-                        Routes.JobSettingsSingleScoreCardPage({
+                        Routes.StageSettingsPage({
                           slug: jobSlug,
                           stageSlug: stage.slug,
                         })
                       )
                     }}
                   >
-                    <CreditCardIcon className="w-5 h-5" />
+                    <CogIcon className="w-5 h-5" />
                   </button>
                 </div>
                 {stage.allowEdit && (
                   <>
-                    <div className="absolute top-0.5 right-6">
+                    {/* <div className="absolute top-0.5 right-6">
                       <button
                         id={"edit-" + stage.id}
                         className="float-right text-indigo-600 hover:text-indigo-800"
@@ -278,8 +276,8 @@ export const Stages = ({
                       >
                         <PencilIcon className="w-5 h-5" />
                       </button>
-                    </div>
-                    <div className="absolute top-0.5 right-12">
+                    </div> */}
+                    <div className="absolute top-0.5 right-7">
                       <button
                         className="float-right text-red-600 hover:text-red-800"
                         title="Delete Stage"
@@ -306,7 +304,7 @@ export const Stages = ({
                 )}
               </div>
 
-              <div className="hidden md:block lg:block border-b-2 border-gray-50 w-full"></div>
+              {/* <div className="hidden md:block lg:block border-b-2 border-gray-50 w-full"></div>
               <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
                 {stage.scoreCardQuestions
                   // ?.sort((a, b) => {
@@ -324,13 +322,27 @@ export const Stages = ({
                       </div>
                     )
                   })}
-              </div>
+              </div> */}
 
-              <div className="hidden md:block lg:block border-b-2 border-gray-50 w-full"></div>
-              <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
-                <div className="text-neutral-500 font-semibold flex">
+              <div className="border-b-2 border-gray-50 w-full"></div>
+              <div className="flex mt-2 items-center space-x-2">
+                <div className="text-neutral-600 text-sm flex">
                   {stage?.candidates?.length}{" "}
                   {stage?.candidates?.length === 1 ? "Candidate" : "Candidates"}
+                </div>
+              </div>
+
+              {/* <div className="border-b-2 border-gray-50 w-full"></div> */}
+              <div className="flex mt-2 items-center space-x-2">
+                <div className="text-neutral-600 text-sm flex">
+                  Interviewer: {stage?.interviewer?.name}
+                </div>
+              </div>
+
+              {/* <div className="border-b-2 border-gray-50 w-full"></div> */}
+              <div className="flex mt-2 items-center space-x-2">
+                <div className="text-neutral-600 text-sm flex">
+                  Duration: {stage?.duration} Minutes
                 </div>
               </div>
             </div>
@@ -408,7 +420,7 @@ export const Stages = ({
         Upgrade to recruiter plan for customising hiring stages.
       </Confirm>
 
-      <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
+      {/* <div className="hidden md:flex lg:flex mt-2 items-center md:justify-center lg:justify-center space-x-2">
         {data?.map((stage) => {
           return (
             <div
@@ -418,15 +430,13 @@ export const Stages = ({
               <div className="overflow-hidden text-neutral-500 font-semibold whitespace-nowrap w-full text-center">
                 {stage?.name}
               </div>
-              {/* <div className="text-neutral-600">
-                {job?.candidates?.filter((c) => c.workflowStageId === ws.id)?.length}
-              </div> */}
             </div>
           )
         })}
-      </div>
+      </div> */}
+
       <div className="w-full flex items-center justify-center px-4 md:p-0">
-        <div className="w-full md:w-5/6 lg:w-4/5 p-3 border-2 border-theme-400 rounded">
+        <div className="w-full md:w-3/4 lg:w-2/3 p-3 border-2 border-theme-400 rounded">
           <Cards
             noSearch={true}
             cards={cards}
@@ -526,18 +536,20 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
     return <ErrorComponent statusCode={error.statusCode} title={error.message} />
   }
 
+  console.log(job?.users)
+
   return (
     <AuthLayout title="Hire.win | Hiring Stages" user={user}>
       <Suspense fallback="Loading...">
         <JobSettingsLayout job={job!}>
           <div className="px-4 mt-6 md:p-0 md:mt-0 flex flex-col space-y-4 sm:flex-row sm:space-y-0 justify-between sm:items-center mb-6">
             <div className="sm:mr-5">
-              <h2 className="text-lg leading-6 font-medium text-gray-900">Stages & Score Cards</h2>
+              <h2 className="text-lg leading-6 font-medium text-gray-900">Hiring Stages</h2>
               <h4 className="text-xs sm:text-sm text-gray-700 mt-1">
                 Add and re-order hiring stages for this job
               </h4>
               <h4 className="text-xs sm:text-sm text-gray-700">
-                Click on the card icon to configure stage score card
+                Click on the settings icon to configure Interviewers, Score card & other settings
               </h4>
               {activePlanName === PlanName.FREE && (
                 <div className="mt-2">
@@ -545,11 +557,22 @@ InferGetServerSidePropsType<typeof getServerSideProps>) => {
                 </div>
               )}
             </div>
-            <Modal header="Add New Stage" open={openAddNewStage} setOpen={setOpenAddNewStage}>
+            <Modal
+              noOverflow={true}
+              header="Add New Stage"
+              open={openAddNewStage}
+              setOpen={setOpenAddNewStage}
+            >
               <StageForm
+                jobId={job?.id}
                 header={`${stageToEdit ? "Update" : "Add New"} Stage`}
                 subHeader=""
-                initialValues={stageToEdit ? { name: stageToEdit?.name } : {}}
+                initialValues={{
+                  name: stageToEdit ? stageToEdit?.name : "",
+                  interviewerId:
+                    session.userId || job?.users?.find((u) => u.role === JobUserRole.OWNER)?.userId,
+                  duration: "15",
+                }}
                 onSubmit={async (values) => {
                   if (activePlanName === PlanName.FREE) {
                     setStageToEdit(null as any)

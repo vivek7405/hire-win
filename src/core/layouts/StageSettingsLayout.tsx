@@ -15,22 +15,23 @@ import {
 } from "@heroicons/react/outline"
 import { ClockIcon } from "@heroicons/react/solid"
 import getUser from "src/users/queries/getUser"
-import getCompanyUser from "src/companies/queries/getCompanyUser"
-import { CompanyUserRole, ParentCompanyUserRole } from "@prisma/client"
 import { Routes } from "@blitzjs/next"
+import getCompanyUser from "src/companies/queries/getCompanyUser"
 import getParentCompanyUser from "src/parent-companies/queries/getParentCompanyUser"
 
 type LayoutProps = {
   children: ReactNode
+  stageSlug: string
+  jobSlug: string
 }
 
-const CompanySettingsLayout = ({ children }: LayoutProps) => {
+const StageSettingsLayout = ({ children, stageSlug, jobSlug }: LayoutProps) => {
   const router = useRouter()
-  const session = useSession()
+  // const session = useSession()
 
-  const [companyUser] = useQuery(getCompanyUser, {
-    where: { userId: session.userId || "0", companyId: session.companyId || "0" },
-  })
+  // const [companyUser] = useQuery(getCompanyUser, {
+  //   where: { userId: session.userId || "0", companyId: session.companyId || "0" },
+  // })
 
   // const [parentCompanyUser] = useQuery(getParentCompanyUser, {
   //   where: {
@@ -41,19 +42,24 @@ const CompanySettingsLayout = ({ children }: LayoutProps) => {
 
   const subNavigation = [
     {
-      name: "Details",
-      href: Routes.UserSettingsCompanyPage().pathname,
-      current: router.route === Routes.UserSettingsCompanyPage().pathname,
-      icon: OfficeBuildingIcon,
+      name: "Stage Settings",
+      href: Routes.StageSettingsPage({ slug: jobSlug, stageSlug: stageSlug })
+        .pathname?.replaceAll("[stageSlug]", stageSlug)
+        ?.replaceAll("[slug]", jobSlug),
+      current:
+        router.route === Routes.StageSettingsPage({ slug: jobSlug, stageSlug: stageSlug }).pathname,
+      icon: CogIcon,
     },
-    companyUser?.role === CompanyUserRole.OWNER || companyUser?.role === CompanyUserRole.ADMIN
-      ? {
-          name: "Members",
-          href: Routes.UserSettingsMembersPage().pathname,
-          current: router.route === Routes.UserSettingsMembersPage().pathname,
-          icon: UserGroupIcon,
-        }
-      : null,
+    {
+      name: "Score Card Config",
+      href: Routes.ScoreCardSettingsPage({ slug: jobSlug, stageSlug: stageSlug })
+        .pathname?.replaceAll("[stageSlug]", stageSlug)
+        ?.replaceAll("[slug]", jobSlug),
+      current:
+        router.route ===
+        Routes.ScoreCardSettingsPage({ slug: jobSlug, stageSlug: stageSlug }).pathname,
+      icon: CreditCardIcon,
+    },
   ]
 
   return (
@@ -72,7 +78,6 @@ const CompanySettingsLayout = ({ children }: LayoutProps) => {
               legacyBehavior
             >
               <a
-                data-testid={`${item.name}-userSettingsLink`}
                 className={`${
                   item.current
                     ? "bg-gray-100 text-theme-600"
@@ -95,4 +100,4 @@ const CompanySettingsLayout = ({ children }: LayoutProps) => {
   )
 }
 
-export default CompanySettingsLayout
+export default StageSettingsLayout

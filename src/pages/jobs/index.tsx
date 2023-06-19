@@ -604,128 +604,130 @@ const Jobs = ({
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                    onClick={async (e) => {
-                      e.preventDefault()
-                      const toastId = toast.loading(() => (
-                        <span>
-                          <b>
-                            {job.hidden ? "Showing" : "Hiding"} job {job?.title}{" "}
-                            {job.hidden ? "on" : "from"} Careers Page
-                          </b>
-                        </span>
-                      ))
+            {jobUser?.role !== JobUserRole.USER && (
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={async (e) => {
+                        e.preventDefault()
+                        const toastId = toast.loading(() => (
+                          <span>
+                            <b>
+                              {job.hidden ? "Showing" : "Hiding"} job {job?.title}{" "}
+                              {job.hidden ? "on" : "from"} Careers Page
+                            </b>
+                          </span>
+                        ))
 
-                      try {
-                        await setJobHiddenMutation({
-                          where: {
-                            id: job?.id,
-                          },
-                          hidden: !job.hidden,
-                        })
+                        try {
+                          await setJobHiddenMutation({
+                            where: {
+                              id: job?.id,
+                            },
+                            hidden: !job.hidden,
+                          })
 
-                        invalidateQuery(getUserJobsByViewTypeAndCategory)
+                          invalidateQuery(getUserJobsByViewTypeAndCategory)
 
-                        toast.success(
-                          () => (
-                            <span>
-                              <b>
-                                {job?.title} job is now {job.hidden ? "showing on" : "hidden from"}{" "}
-                                careers page
-                              </b>
-                            </span>
-                          ),
-                          { id: toastId }
-                        )
-                      } catch (error) {
-                        toast.error(
-                          "Sorry, we had an unexpected error. Please try again. - " +
-                            error.toString(),
-                          {
-                            id: toastId,
-                          }
-                        )
-                      }
-                    }}
-                  >
-                    {job?.hidden ? (
-                      <span className="flex items-center space-x-2">
-                        <EyeIcon className="w-5 h-5 text-theme-600" />
-                        <span className="whitespace-nowrap">Show on Careers Page</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center space-x-2">
-                        <EyeOffIcon className="w-5 h-5 text-red-600" />
-                        <span className="whitespace-nowrap">Hide from Careers Page</span>
-                      </span>
-                    )}
-                  </a>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm cursor-pointer"
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault()
-
-                      // Check for the job limit when the job is being restored
-                      if (job?.archived) {
-                        if (activePlanName === PlanName.FREE) {
-                          if (activeJobsCount >= FREE_JOBS_LIMIT) {
-                            setConfirmHeader("Upgrade to lifetime plan")
-                            setConfirmMessage(
-                              `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                            )
-                            setCancelButtonText("Ok")
-                            setHideConfirmButton(true)
-                            setOpenConfirm(true)
-                            return
-                          }
+                          toast.success(
+                            () => (
+                              <span>
+                                <b>
+                                  {job?.title} job is now{" "}
+                                  {job.hidden ? "showing on" : "hidden from"} careers page
+                                </b>
+                              </span>
+                            ),
+                            { id: toastId }
+                          )
+                        } catch (error) {
+                          toast.error(
+                            "Sorry, we had an unexpected error. Please try again. - " +
+                              error.toString(),
+                            {
+                              id: toastId,
+                            }
+                          )
                         }
-                        // else if (activePlanName === PlanName.LIFETIME_SET1) {
-                        //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
-                        //     setConfirmHeader("Reached Job Limit!")
-                        //     setConfirmMessage(
-                        //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
-                        //     )
-                        //     setCancelButtonText("Ok")
-                        //     setHideConfirmButton(true)
-                        //     setOpenConfirm(true)
-                        //     return
-                        //   }
-                        // }
-                      }
+                      }}
+                    >
+                      {job?.hidden ? (
+                        <span className="flex items-center space-x-2">
+                          <EyeIcon className="w-5 h-5 text-theme-600" />
+                          <span className="whitespace-nowrap">Show on Careers Page</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center space-x-2">
+                          <EyeOffIcon className="w-5 h-5 text-red-600" />
+                          <span className="whitespace-nowrap">Hide from Careers Page</span>
+                        </span>
+                      )}
+                    </a>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(
+                        active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                        "block px-4 py-2 text-sm cursor-pointer"
+                      )}
+                      onClick={(e) => {
+                        e.preventDefault()
 
-                      setJobToArchive(job)
-                      setOpenJobArchiveConfirm(true)
-                    }}
-                  >
-                    {job?.archived ? (
-                      <span className="flex items-center space-x-2 whitespace-nowrap">
-                        <RefreshIcon className="w-5 h-5 text-theme-600" />
-                        <span>Restore Job</span>
-                      </span>
-                    ) : (
-                      <span className="flex items-center space-x-2">
-                        <ArchiveIcon className="w-5 h-5 text-red-600" />
-                        <span>Archive Job</span>
-                      </span>
-                    )}
-                  </a>
-                )}
-              </Menu.Item>
-            </div>
+                        // Check for the job limit when the job is being restored
+                        if (job?.archived) {
+                          if (activePlanName === PlanName.FREE) {
+                            if (activeJobsCount >= FREE_JOBS_LIMIT) {
+                              setConfirmHeader("Upgrade to lifetime plan")
+                              setConfirmMessage(
+                                `The free plan allows upto ${FREE_JOBS_LIMIT} active jobs. Since this job already has ${FREE_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                              )
+                              setCancelButtonText("Ok")
+                              setHideConfirmButton(true)
+                              setOpenConfirm(true)
+                              return
+                            }
+                          }
+                          // else if (activePlanName === PlanName.LIFETIME_SET1) {
+                          //   if (activeJobsCount >= LIFETIME_SET1_JOBS_LIMIT) {
+                          //     setConfirmHeader("Reached Job Limit!")
+                          //     setConfirmMessage(
+                          //       `The lifetime plan allows upto ${LIFETIME_SET1_JOBS_LIMIT} active jobs. Since this job already has ${LIFETIME_SET1_JOBS_LIMIT} active jobs, you can't restore an archived job.`
+                          //     )
+                          //     setCancelButtonText("Ok")
+                          //     setHideConfirmButton(true)
+                          //     setOpenConfirm(true)
+                          //     return
+                          //   }
+                          // }
+                        }
+
+                        setJobToArchive(job)
+                        setOpenJobArchiveConfirm(true)
+                      }}
+                    >
+                      {job?.archived ? (
+                        <span className="flex items-center space-x-2 whitespace-nowrap">
+                          <RefreshIcon className="w-5 h-5 text-theme-600" />
+                          <span>Restore Job</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center space-x-2">
+                          <ArchiveIcon className="w-5 h-5 text-red-600" />
+                          <span>Archive Job</span>
+                        </span>
+                      )}
+                    </a>
+                  )}
+                </Menu.Item>
+              </div>
+            )}
             <div className="py-1">
               <Menu.Item>
                 {({ active }) => (
@@ -766,32 +768,36 @@ const Jobs = ({
                   </a>
                 )}
               </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}>
-                    <Link
-                      prefetch={true}
-                      href={
-                        jobUser?.role !== JobUserRole.USER
-                          ? Routes.JobSettingsPage({ slug: job?.slug! })
-                          : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
-                      }
-                      passHref
+              {jobUser?.role !== JobUserRole.USER && (
+                <Menu.Item>
+                  {({ active }) => (
+                    <a
+                      className={classNames(active ? "bg-gray-100 text-gray-900" : "text-gray-700")}
                     >
-                      <div
-                        className={classNames(
-                          active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                          "block px-4 py-2 text-sm",
-                          "flex items-center space-x-2 cursor-pointer"
-                        )}
+                      <Link
+                        prefetch={true}
+                        href={
+                          jobUser?.role !== JobUserRole.USER
+                            ? Routes.JobSettingsPage({ slug: job?.slug! })
+                            : Routes.JobSettingsSchedulingPage({ slug: job?.slug! })
+                        }
+                        passHref
                       >
-                        <CogIcon className="w-5 h-5 text-neutral-500" />
-                        <span>Go to Job Settings</span>
-                      </div>
-                    </Link>
-                  </a>
-                )}
-              </Menu.Item>
+                        <div
+                          className={classNames(
+                            active ? "bg-gray-100 text-gray-900" : "text-gray-700",
+                            "block px-4 py-2 text-sm",
+                            "flex items-center space-x-2 cursor-pointer"
+                          )}
+                        >
+                          <CogIcon className="w-5 h-5 text-neutral-500" />
+                          <span>Go to Job Settings</span>
+                        </div>
+                      </Link>
+                    </a>
+                  )}
+                </Menu.Item>
+              )}
             </div>
           </Menu.Items>
         </Transition>
@@ -1177,10 +1183,11 @@ const Jobs = ({
                             // }
                           }}
                         >
-                          <CogIcon className="h-6 w-6" />
+                          {jobUser?.role !== JobUserRole.USER && <CogIcon className="h-6 w-6" />}
                         </a>
 
-                        {jobUser.canUpdate && <PopMenu job={job} jobUser={jobUser} />}
+                        {/* {jobUser.canUpdate && <PopMenu job={job} jobUser={jobUser} />} */}
+                        <PopMenu job={job} jobUser={jobUser} />
                       </div>
                     </div>
 

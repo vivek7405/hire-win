@@ -9,7 +9,7 @@ import shiftJobStage from "./shiftJobStage"
 async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { jobId, name } = StageObj.parse(data)
+  const { jobId, name, interviewerId, duration } = StageObj.parse(data)
   const user = await db.user.findFirst({
     where: { id: ctx.session.userId || "0" },
     include: { defaultCalendars: true, defaultSchedules: true },
@@ -37,8 +37,8 @@ async function addNewStageToJob(data: StageInputType, ctx: Ctx) {
       name,
       order,
       slug,
-      interviewerId: ctx.session.userId,
-      duration: 30,
+      interviewerId: interviewerId || ctx.session.userId,
+      duration: parseInt(duration || "15") || 15,
       createdById: ctx.session.userId,
     },
   })

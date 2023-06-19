@@ -6,6 +6,8 @@ export const StageObj = z.object({
   slug: z.string().optional(),
   order: z.number().optional(),
   jobId: z.string().optional(),
+  interviewerId: z.string().optional(),
+  duration: z.string().optional(),
   allowEdit: z.boolean().optional(),
 })
 

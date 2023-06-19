@@ -77,13 +77,13 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
           canView: true,
         }
       : null,
-    {
-      name: "Scheduling",
-      href: `/jobs/${job?.slug}/settings/scheduling`,
-      current: router.route === `/jobs/[slug]/settings/scheduling`,
-      icon: ClockIcon,
-      canView: true,
-    },
+    // {
+    //   name: "Scheduling",
+    //   href: `/jobs/${job?.slug}/settings/scheduling`,
+    //   current: router.route === `/jobs/[slug]/settings/scheduling`,
+    //   icon: ClockIcon,
+    //   canView: true,
+    // },
     // {
     //   name: "API Keys",
     //   href: `/jobs/${job?.slug}/settings/keys`,

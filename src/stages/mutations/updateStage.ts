@@ -13,7 +13,7 @@ type UpdateStageInput = Pick<Prisma.StageUpdateArgs, "where" | "data"> & {
 async function updateStage({ where, data }: UpdateStageInput, ctx: Ctx) {
   ctx.session.$authorize()
 
-  const { name } = StageObj.parse(data)
+  const { name, interviewerId, duration } = StageObj.parse(data)
 
   const slug = slugify(name, { strict: true, lower: true })
 
@@ -22,6 +22,8 @@ async function updateStage({ where, data }: UpdateStageInput, ctx: Ctx) {
     data: {
       name,
       slug,
+      interviewerId,
+      duration: parseInt(duration || "15"),
     },
   })
 

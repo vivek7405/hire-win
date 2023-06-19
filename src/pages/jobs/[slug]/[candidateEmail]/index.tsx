@@ -2344,7 +2344,7 @@ const SingleCandidatePageContent = ({
                             </h2>
                             <Link
                               legacyBehavior
-                              href={Routes.JobSettingsSingleScoreCardPage({
+                              href={Routes.ScoreCardSettingsPage({
                                 slug: candidate?.job?.slug || "0",
                                 stageSlug: selectedStage?.slug || "0",
                               })}
