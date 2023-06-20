@@ -43,7 +43,7 @@ export const CompanyForm = (props: CompanyFormProps) => {
             label="Company Name"
             subLabel="Company for which you are actually hiring"
             subLabel2="It may or may not be your own company"
-            placeholder="Short company name"
+            placeholder="Short company name (Eg. Acme)"
             showAsterisk={true}
           />
 
@@ -52,8 +52,9 @@ export const CompanyForm = (props: CompanyFormProps) => {
               <LabeledTextField
                 type="text"
                 name="website"
-                label="Website"
-                placeholder="This shall be used to navigate to your website from careers page"
+                label="Website Address"
+                subLabel="This shall be used to navigate to your website from careers page"
+                placeholder="https://acmeinc.com"
                 testid="userUpdateWebsite"
               />
 

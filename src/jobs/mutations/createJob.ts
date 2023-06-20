@@ -219,7 +219,7 @@ async function createJob(data: JobInputType, ctx: Ctx) {
         allowBehaviourEdit: true,
         title: "LinkedIn Profile",
         slug: "linkedin-profile",
-        placeholder: "linkedin.com/in/john-doe",
+        placeholder: "https://linkedin.com/in/john-doe",
         type: FormQuestionType.URL,
         acceptedFiles: "",
         createdById: ctx.session.userId || "0",
