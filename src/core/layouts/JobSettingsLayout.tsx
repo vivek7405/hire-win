@@ -7,6 +7,7 @@ import {
   ClockIcon,
   CollectionIcon,
   DatabaseIcon,
+  DocumentTextIcon,
   HomeIcon,
   IdentificationIcon,
   StarIcon,
@@ -32,10 +33,19 @@ const JobSettingsLayout = ({ job, children }: LayoutProps) => {
   const subNavigation = [
     jobUser?.role !== JobUserRole.USER
       ? {
-          name: "Details",
+          name: "Job Details",
           href: `/jobs/${job?.slug}/settings`,
           current: router.route === `/jobs/[slug]/settings`,
           icon: DatabaseIcon,
+          canView: true,
+        }
+      : null,
+    jobUser?.role !== JobUserRole.USER
+      ? {
+          name: "Job Description",
+          href: `/jobs/${job?.slug}/settings/job-description`,
+          current: router.route === `/jobs/[slug]/settings/job-description`,
+          icon: DocumentTextIcon,
           canView: true,
         }
       : null,

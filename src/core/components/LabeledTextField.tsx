@@ -54,7 +54,7 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             className="border border-gray-300 px-2 py-2 block w-full sm:text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
             onChange={(e) => {
               try {
-                setValue(name, e.target.value)
+                setValue(name, e.target.value, { shouldDirty: true })
                 props.onChange && props.onChange(e)
               } catch (e) {
                 console.log(`Some error occurred while setting input field value for - ${name}`)

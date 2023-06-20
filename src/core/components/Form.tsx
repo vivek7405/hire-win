@@ -1,7 +1,9 @@
-import { ReactNode, PropsWithoutRef } from "react"
+import { ReactNode, PropsWithoutRef, useEffect, useCallback } from "react"
 import { FormProvider, useForm, UseFormProps } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { Router, useRouter } from "next/router"
+import useWarnIfUnsavedChanges from "../hooks/useWarnIfUnsavedChanges"
 
 export interface FormProps<S extends z.ZodType<any, any>>
   extends Omit<PropsWithoutRef<JSX.IntrinsicElements["form"]>, "onSubmit"> {
@@ -23,6 +25,7 @@ export interface FormProps<S extends z.ZodType<any, any>>
   isRounded?: boolean
   noPadding?: boolean
   noPaddingTop?: boolean
+  unsavedChangesWarning?: boolean
 }
 
 interface OnSubmitResult {
@@ -45,6 +48,7 @@ export function Form<S extends z.ZodType<any, any>>({
   noPaddingTop,
   isSubmitTop,
   isRounded,
+  unsavedChangesWarning,
   ...props
 }: FormProps<S>) {
   const ctx = useForm<z.infer<S>>({
@@ -53,11 +57,23 @@ export function Form<S extends z.ZodType<any, any>>({
     defaultValues: initialValues,
   })
 
+  useWarnIfUnsavedChanges(ctx.formState.isDirty, () => {
+    if (unsavedChangesWarning) {
+      return confirm(
+        "Warning! You have unsaved changes. Press cancel and save your changes, or press OK to continue without saving."
+      )
+    } else {
+      return true
+    }
+  })
+
   return (
     <FormProvider {...ctx}>
       <form
         data-testid={`${props.testid && `${props.testid}-`}form`}
         onSubmit={ctx.handleSubmit(async (values) => {
+          ctx.reset({}, { keepValues: true, keepIsValid: true })
+
           const result = (await onSubmit(values)) || {}
 
           for (const [key, value] of Object.entries(result)) {

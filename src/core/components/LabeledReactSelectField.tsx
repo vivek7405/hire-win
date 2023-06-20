@@ -87,9 +87,10 @@ export const LabeledReactSelectField = forwardRef<HTMLSelectElement, LabeledReac
                           name,
                           selection.map((s) => {
                             return s.value
-                          })
+                          }),
+                          { shouldDirty: true }
                         )
-                      : setValue(name, selection.value)
+                      : setValue(name, selection.value, { shouldDirty: true })
 
                     props.onChange &&
                       props.onChange(

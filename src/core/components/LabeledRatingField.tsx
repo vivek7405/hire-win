@@ -46,7 +46,7 @@ export const LabeledRatingField = forwardRef<HTMLInputElement, LabeledRatingFiel
 
     useEffect(() => {
       if (name && value) {
-        setValue(name, value)
+        setValue(name, value, { shouldDirty: true })
       }
     }, [name, value, setValue])
 

@@ -38,7 +38,7 @@ export const LabeledToggleSwitch = forwardRef<HTMLInputElement, LabeledToggleSwi
     }, [errors, name])
 
     useEffect(() => {
-      setValue(name, !!props.value)
+      setValue(name, !!props.value, { shouldDirty: true })
     }, [setValue, name, props.value])
 
     return (

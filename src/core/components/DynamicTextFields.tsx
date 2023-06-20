@@ -43,7 +43,7 @@ export const DynamicTextFields = forwardRef<HTMLInputElement, DynamicTextFieldsP
 
     function updateFieldValues(values) {
       setfieldValues(values)
-      setValue(name, values)
+      setValue(name, values, { shouldDirty: true })
     }
 
     return (

@@ -32,10 +32,11 @@ export const CompanyForm = (props: CompanyFormProps) => {
         <Form
           header={props.header}
           subHeader={props.subHeader}
-          submitText="Submit"
+          submitText="Save"
           schema={CompanyObj}
           initialValues={props.initialValues}
           onSubmit={props.onSubmit}
+          unsavedChangesWarning={true}
           className="max-w-xl mx-auto"
         >
           <LabeledTextField

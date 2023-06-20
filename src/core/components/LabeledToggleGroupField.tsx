@@ -40,7 +40,7 @@ export const LabeledToggleGroupField = forwardRef<HTMLInputElement, LabeledToggl
 
     useEffect(() => {
       if (props.value) {
-        setValue(name, props.value)
+        setValue(name, props.value, { shouldDirty: true })
       }
     }, [setValue, name, props.value])
 

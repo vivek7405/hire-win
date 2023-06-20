@@ -76,7 +76,8 @@ export const ThemePickerField = forwardRef<HTMLInputElement, ThemePickerFieldPro
                         setValue(
                           name,
                           nearestThemeColorObj?.name?.replace("-600", "") ||
-                            getThemeFromColorValue(defaultColorValue)
+                            getThemeFromColorValue(defaultColorValue),
+                          { shouldDirty: true }
                         )
                       }}
                     />

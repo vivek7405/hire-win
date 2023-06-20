@@ -291,7 +291,7 @@ const Step4Salary = () => {
 //             workflowStageId: scoreCardJobWorkflowStage?.workflowStageId || ws.id || "",
 //           }
 //         }) || []
-//     setValue("scoreCards", scoreCardsValue)
+//     setValue("scoreCards", scoreCardsValue, { shouldDirty: true })
 //   }, [selectedWorkflowId, workflows, setValue, getValues, defaultScoreCard, props.jobId])
 
 //   return (

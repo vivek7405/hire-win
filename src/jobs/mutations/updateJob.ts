@@ -17,7 +17,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
   const {
     id,
     title,
-    description,
+    // description,
     categoryId,
     // workflowId,
     // formId,
@@ -52,7 +52,7 @@ async function updateJob({ where, data, initial }: UpdateJobInput, ctx: Ctx) {
     data: {
       title,
       slug: initial.title !== title ? newSlug : initial.slug,
-      description,
+      // description,
       categoryId: categoryId || null,
       // workflowId: workflowId || null,
       // formId: formId || null,

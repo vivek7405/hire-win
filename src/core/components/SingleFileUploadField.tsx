@@ -87,7 +87,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
               key: resp.data?.Key,
               location: resp.data?.Location,
             },
-            { shouldValidate: true }
+            { shouldValidate: true, shouldDirty: true }
           )
         }
 
@@ -132,7 +132,7 @@ export const SingleFileUploadField = React.forwardRef<HTMLInputElement, SingleFi
         },
       }
       await axios.post(url, file, config)
-      setValue(`${name}` as const, {}, { shouldValidate: false })
+      setValue(`${name}` as const, {}, { shouldValidate: false, shouldDirty: true })
       props.onSubmit && handleSubmit(props.onSubmit)()
 
       setIsRemoving(false)
