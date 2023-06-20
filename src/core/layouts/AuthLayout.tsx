@@ -27,10 +27,10 @@ const AuthLayout = ({
 }: LayoutProps) => {
   return (
     <>
-      <Script
+      {/* <Script
         strategy="lazyOnload"
         src="https://embed.tawk.to/6364c8c8b0d6371309cd3d09/1gh0r0k2g"
-      />
+      /> */}
       <Head>
         <title>{title || "hire-win"}</title>
         <link rel="icon" href="/favicon.ico" />
@@ -47,9 +47,7 @@ const AuthLayout = ({
         )}
         <main>
           <div
-            className={`${
-              isMax8xl ? "max-w-8xl" : "max-w-7xl"
-            } mx-auto py-6 px-4 md:px-8 lg:px-8`}
+            className={`${isMax8xl ? "max-w-8xl" : "max-w-7xl"} mx-auto py-6 px-4 md:px-8 lg:px-8`}
           >
             <Suspense fallback="Loading...">{children}</Suspense>
           </div>
