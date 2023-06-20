@@ -291,6 +291,7 @@ const CandidateActions = ({
         onSubmit={async () => {
           return
         }}
+        title="This rating is Read Only"
       >
         <LabeledRatingField
           name="candidateAverageRating"

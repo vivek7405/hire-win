@@ -827,6 +827,7 @@ const SingleCandidatePageContent = ({
         return
       }}
       key={candidate.id}
+      title="This rating is Read Only"
     >
       <LabeledRatingField
         name="candidateAverageRating"
