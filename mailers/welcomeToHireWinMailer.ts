@@ -46,7 +46,7 @@ export async function welcomeToHireWinMailer({
           if (process.env.NODE_ENV === "production") {
             // send the production email
             client.sendEmailWithTemplate({
-              From: `Vivek at Hire.win <support@hire.win>`,
+              From: `Hire.win <support@hire.win>`,
               To: toEmail,
               TemplateAlias: "welcome",
               TemplateModel: {
@@ -71,7 +71,7 @@ export async function welcomeToHireWinMailer({
             let subject = replaceForLocal(template?.Subject, toName, careersPageUrl)
             let html = replaceForLocal(template?.HtmlBody, toName, careersPageUrl)
             const msg = {
-              from: `Vivek at Hire.win <support@hire.win>`,
+              from: `Hire.win <support@hire.win>`,
               to: toEmail,
               subject: subject || "",
               html: html || "",
@@ -81,7 +81,7 @@ export async function welcomeToHireWinMailer({
           }
         } else {
           const msg = {
-            from: `Vivek at Hire.win <support@hire.win>`,
+            from: `Hire.win <support@hire.win>`,
             to: toEmail,
             subject: "",
             html: "",
