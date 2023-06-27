@@ -206,7 +206,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
                   <a>
                     <button
                       id="navAction"
-                      className="bg-gradient-to-br from-fuchsia-600 to-indigo-700 mx-auto lg:mx-0 hover:underline text-white font-extrabold text-lg rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
+                      className="bg-gradient-to-br from-fuchsia-500 to-indigo-600 mx-auto lg:mx-0 hover:underline text-white font-extrabold text-lg rounded mt-4 lg:mt-0 py-3 px-8 shadow opacity-75"
                       // className="px-4 py-2 rounded bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
                     >
                       Login
@@ -227,7 +227,7 @@ const LandingLayout = ({ title, children }: LayoutProps) => {
 
               <div className="w-full text-center pt-1">
                 <div className="mt-1">
-                  <p className="text-2xl text-neutral-600">
+                  <p className="px-6 text-lg lg:text-2xl text-neutral-600">
                     Create a careers page for your company, publish job openings & manage
                     applicants!
                     {/* Streamline your hiring process, now! */}

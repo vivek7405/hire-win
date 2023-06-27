@@ -433,8 +433,7 @@ export default function Home() {
             />
           </div>
 
-          <br />
-          <section className="rounded-xl bg-black text-white lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center">
+          <section className="mt-10 rounded-md bg-black text-white lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center">
             <div>
               <h2 className="text-3xl bg-left-bottom bg-no-repeat pb-8 px-16 mb-8 bg-underline2 bg-100%">
                 All the essentials you need
@@ -445,7 +444,7 @@ export default function Home() {
                 <div className="border-2 rounded-full bg-gray-100 text-black h-12 w-12 flex justify-center items-center mb-3">
                   1
                 </div>
-                <h3 className="font-montserrat font-medium text-xl mb-2">Instant Careers Page</h3>
+                <h3 className="font-medium text-xl mb-2">Instant Careers Page</h3>
                 <p className="text-center font-montserrat">
                   Get an instant customisable careers page and list your job openings
                 </p>
@@ -454,7 +453,7 @@ export default function Home() {
                 <div className="border-2 rounded-full bg-gray-100 text-black h-12 w-12 flex justify-center items-center mb-3">
                   2
                 </div>
-                <h3 className="font-montserrat font-medium text-xl mb-2">Applicant Tracking</h3>
+                <h3 className="font-medium text-xl mb-2">Applicant Tracking</h3>
                 <p className="text-center font-montserrat">
                   Track applicants across Hiring Stages that can be customised
                 </p>
@@ -463,7 +462,7 @@ export default function Home() {
                 <div className="border-2 rounded-full bg-gray-100 text-black h-12 w-12 flex justify-center items-center mb-3">
                   3
                 </div>
-                <h3 className="font-montserrat font-medium text-xl mb-2">Team Collaboration</h3>
+                <h3 className="font-medium text-xl mb-2">Team Collaboration</h3>
                 <p className="text-center font-montserrat">
                   Collaborate with your team and make important hiring decisions
                 </p>
@@ -471,8 +470,7 @@ export default function Home() {
             </div>
           </section>
 
-          <br />
-          <section className="rounded-xl w-full bg-gray-50 flex items-center justify-center p-10">
+          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/2">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileInterviewSchHeight relative">
@@ -517,30 +515,41 @@ export default function Home() {
                   You get lightning fast 1-click interview scheduling:
                 </p>
                 <p className="mt-5 text-justify">
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text.
+                  With Hire.win, you don't just get an Instant Careers Page Builder, but you get all
+                  the supporting tools to manage the applicants once they apply using your
+                  personalised careers page! Interview Scheduling is one important tool which helps
+                  schedule interviews quickly and efficiently.
+                </p>
+                <p className="mt-5 text-justify">
+                  Just ask your team members to connect their work calendars, Google or Outlook and
+                  then their availabilities shall be shown while scheduling interviews with them.
+                  Select a slot that is available and there you go, a meeting link invite shall be
+                  sent to everyone involved in the interview along with the Candidate and the
+                  Interviewer!
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="mt-10 rounded-xl w-full bg-gray-50 flex items-center justify-center p-10">
+          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/2">
                 <p className="text-xl font-bold flex items-center justify-center">
                   Add multiple companies and easily switch between them:
                 </p>
                 <p className="mt-5 text-justify">
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text.
+                  With Hire.win's flat monthly price of $29/month for the Recruiter Plan, you get
+                  incredible features like creating as many companies as you want! Now, this is a
+                  deal breaker for Recruiting Agencies & Freelance Recruiters as they deal with
+                  multiple companies at once and need a way to separate their data for those
+                  companies.
+                </p>
+                <p className="mt-5 text-justify">
+                  The benefit for recruiting agencies & freelance recruiters is that you get a job
+                  post link where candidates may apply, your internal hiring team can collaborate
+                  with the company's hiring team, and multiple other things you can't just do with
+                  Excel Sheets like Candidate File Uploads and an Activity Timeline of the
+                  Candidate, that too at just $29/month!
                 </p>
               </div>
               <div className="w-full lg:w-1/2">
@@ -580,6 +589,59 @@ export default function Home() {
                     objectFit="contain"
                   />
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-7 rounded-md lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center bg-gradient-to-r from-fuchsia-100 via-purple-100 to-indigo-200">
+            <div>
+              <h2 className="text-3xl font-bold bg-left-bottom bg-no-repeat pb-8 px-16 mb-8 bg-underline3 bg-100%">
+                Why Use Hire.win?
+              </h2>
+            </div>
+            <div className="px-6 flex flex-col md:grid md:grid-cols-2 md:grid-rows-2 gap-12">
+              <div className="max-w-lg">
+                <DatabaseIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
+                <h3 className="font-semibold text-2xl text-left">
+                  Your data stays with you forever
+                </h3>
+                <p className="text-justify">
+                  When you use an applicant tracking and recruiting software, your data stays with
+                  you forever. All the candidates that you have come across won't be lost and can be
+                  very useful for closing future hires.
+                </p>
+              </div>
+
+              <div className="max-w-lg">
+                <ShareIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
+                <h3 className="font-semibold text-2xl text-left">Control the data you share</h3>
+                <p className="text-justify">
+                  Share only the information you want to share with your team or even external
+                  recruiters. You are in control of your data!
+                </p>
+              </div>
+
+              <div className="max-w-lg">
+                <ChatIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
+                <h3 className="font-semibold text-2xl text-left">
+                  Communicate within the platform
+                </h3>
+                <p className="text-justify">
+                  Whether it is communicating internally with your team or communicating with the
+                  candidate, you do it all within the platform without ever leaving it.
+                </p>
+              </div>
+
+              <div className="max-w-lg">
+                <EyeIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
+                <h3 className="font-semibold text-2xl text-left">
+                  All the information at a glance
+                </h3>
+                <p className="text-justify">
+                  When you use an Applicant Tracking System and Recruiting Software, all the
+                  information regarding your company's hiring is at one place and not scattered
+                  across various tools.
+                </p>
               </div>
             </div>
           </section>
@@ -626,7 +688,7 @@ export default function Home() {
             />
           </div> */}
 
-          <section className="mt-10 rounded-xl w-full bg-gray-50 flex items-center justify-center p-10">
+          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-2/3">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileCompMembersHeight relative">
@@ -668,31 +730,26 @@ export default function Home() {
               </div>
               <div className="w-full lg:w-1/3">
                 <p className="text-xl font-bold flex items-center justify-center">
-                  Collaborating with team has never been so easier:
+                  Effortlessly collaborate with your team:
                 </p>
                 <p className="mt-5 text-justify">
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text.
+                  Team collaboration is very important while making important Hiring Decisions.
+                  Hire.win allows you to invite as many internal or external team members as you
+                  need. Pay $29/month flat for our Recruiter Plan and invite your entire Hiring
+                  Team. We don't charge you on per user basis as most other recruiting softwares do!
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="mt-10 rounded-xl w-full bg-gray-50 flex items-center justify-center p-10">
+          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/3">
                 <p className="text-xl font-bold flex items-center justify-center">Jobs Overview:</p>
                 <p className="mt-5 text-justify">
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text.
+                  View all your jobs at a glance and know how many candidates are active across your
+                  Hiring Stages. The Jobs Overview page helps hiring managers prioritise work by
+                  having information about all the jobs at a glance on one single page!
                 </p>
               </div>
               <div className="w-full lg:w-2/3">
@@ -736,7 +793,49 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-10 rounded-xl w-full bg-gray-50 flex items-center justify-center p-10">
+          <section className="mt-10 rounded-md bg-black text-white lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center">
+            <div>
+              <h2 className="text-3xl bg-left-bottom bg-no-repeat pb-8 px-16 mb-8 bg-underline2 bg-100%">
+                How to create your Instant Careers Page?
+              </h2>
+            </div>
+            <div className="flex flex-col md:flex-row">
+              <div className="flex-1 flex flex-col items-center my-4">
+                <div className="border-2 rounded-full bg-gray-100 text-black h-12 w-12 flex justify-center items-center mb-3">
+                  1
+                </div>
+                <h3 className="font-medium text-xl mb-2">Sign Up</h3>
+                <p className="text-center">
+                  Your careers page will be instantly live after Sign Up!
+                </p>
+              </div>
+              <div className="flex-1 mx-8 flex flex-col items-center my-4">
+                <div className="border-2 rounded-full bg-gray-100 text-black h-12 w-12 flex justify-center items-center mb-3">
+                  2
+                </div>
+                <h3 className="font-medium text-xl mb-2">Create Job</h3>
+                <p className="text-center font-montserrat">
+                  Just enter a Job Title to create new job!
+                </p>
+              </div>
+              <div className="flex-1 mx-8 flex flex-col items-center my-4">
+                <div className="border-2 rounded-full bg-gray-100 text-black h-12 w-12 flex justify-center items-center mb-3">
+                  3
+                </div>
+                <h3 className="font-medium text-xl mb-2">Copy Job Post Link</h3>
+                <p className="text-center">Copy the Job Post link and keep it handy.</p>
+              </div>
+              <div className="flex-1 mx-8 flex flex-col items-center my-4">
+                <div className="border-2 rounded-full bg-gray-100 text-black h-12 w-12 flex justify-center items-center mb-3">
+                  4
+                </div>
+                <h3 className="font-medium text-xl mb-2">Share your Job Post</h3>
+                <p className="text-center">Share your job post & start receiving applicants.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-2/3">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileCompMembersHeight relative">
@@ -779,12 +878,9 @@ export default function Home() {
               <div className="w-full lg:w-1/3">
                 <p className="text-xl font-bold flex items-center justify-center">Board View:</p>
                 <p className="mt-5 text-justify">
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text.
+                  Need to quickly review the candidates across Hiring Stages? Use the Board View
+                  from 3 different views that we provide including Table View, Candidate View &
+                  Board View!
                 </p>
               </div>
             </div>
@@ -832,7 +928,7 @@ export default function Home() {
             />
           </div> */}
 
-          <section className="mt-10 rounded-xl w-full bg-gray-50 flex items-center justify-center p-10">
+          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/2">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileCommentsHeight relative">
@@ -877,82 +973,27 @@ export default function Home() {
                   Keep your team in the loop:
                 </p>
                 <p className="mt-5 text-justify">
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text. This is a sample text. This is a sample text.
-                  This is a sample text. This is a sample text. This is a sample text. This is a
-                  sample text. This is a sample text.
+                  Add comments and hear back from the hiring team about what they think about a
+                  particular candidate. Let the entire Hiring Team stay in the loop!
+                </p>
+                <p className="mt-5 text-justify">
+                  You can also see exactly what happened in each stage by switching between Scores,
+                  Interviews, Comments & Emails for a particular stage.
                 </p>
               </div>
             </div>
           </section>
 
-          <br />
-          <section className="rounded-xl lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center bg-gray-50">
-            <div>
-              <h2 className="text-3xl font-bold bg-left-bottom bg-no-repeat pb-8 px-16 mb-8 bg-underline3 bg-100%">
-                Why Use Hire.win?
-              </h2>
-            </div>
-            <div className="flex flex-col md:grid md:grid-cols-2 md:grid-rows-2 gap-12">
-              <div className="max-w-lg">
-                <DatabaseIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
-                <h3 className="font-semibold text-2xl text-left">
-                  Your data stays with you forever
-                </h3>
-                <p className="text-justify">
-                  When you use an applicant tracking and recruiting software, your data stays with
-                  you forever. All the candidates that you have come across won't be lost and can be
-                  very useful for closing future hires.
-                </p>
-              </div>
-
-              <div className="max-w-lg">
-                <ShareIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
-                <h3 className="font-semibold text-2xl text-left">Control the data you share</h3>
-                <p className="text-justify">
-                  Share only the information you want to share with your team or even external
-                  recruiters. You are in control of your data!
-                </p>
-              </div>
-
-              <div className="max-w-lg">
-                <ChatIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
-                <h3 className="font-semibold text-2xl text-left">
-                  Communicate within the platform
-                </h3>
-                <p className="text-justify">
-                  Whether it is communicating internally with your team or communicating with the
-                  candidate, you do it all within the platform without ever leaving it.
-                </p>
-              </div>
-
-              <div className="max-w-lg">
-                <EyeIcon className="mb-5 border border-gray-400 rounded-lg p-1 w-10 h-10" />
-                <h3 className="font-semibold text-2xl text-left">
-                  All the information at a glance
-                </h3>
-                <p className="text-justify">
-                  When you use an Applicant Tracking System and Recruiting Software, all the
-                  information regarding your company's hiring is at one place and not scattered
-                  across various tools.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <br />
-          <section className="rounded-t-xl lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center bg-gray-50 -mb-20">
+          <section className="mt-7 rounded-t-xl md:px-0 lg:px-12 xl:px-36 px-4 py-14 flex flex-col items-center bg-white md:-mb-20">
             <div>
               <h2 className="font-bold text-3xl bg-left-bottom bg-no-repeat px-16 bg-underline4 bg-100%">
                 Who is Hire.win for?
               </h2>
             </div>
             <div className="flex w-full flex-col md:flex-row">
-              <div className="flex-1 flex flex-col mx-6 shadow-2xl relative bg-gray-100 rounded-2xl py-5 px-8 my-8 md:top-24">
+              <div className="flex-1 flex flex-col mx-6 shadow-2xl relative border bg-gradient-to-br from-indigo-50 to-fuchsia-50 rounded-2xl py-5 px-8 my-8 md:top-24">
                 <h3 className="font-pt-serif font-bold text-2xl mb-4">Companies</h3>
-                {/* <div className="font-montserrat font-bold text-2xl mb-4">
+                {/* <div className="font-bold text-2xl mb-4">
                   $25
                   <span className="font-normal text-base"> / month</span>
                 </div> */}
@@ -978,9 +1019,9 @@ export default function Home() {
                 </button> */}
               </div>
 
-              <div className="flex-1 flex flex-col mx-6 shadow-2xl relative bg-gray-100 rounded-2xl py-5 px-8 my-8 md:top-12">
+              <div className="flex-1 flex flex-col mx-6 shadow-2xl relative border bg-gradient-to-b from-indigo-50 to-fuchsia-50 rounded-2xl py-5 px-8 my-8 md:top-12">
                 <h3 className="font-pt-serif font-bold text-2xl mb-4">Staffing Agencies</h3>
-                {/* <div className="font-montserrat font-bold text-2xl mb-4">
+                {/* <div className="font-bold text-2xl mb-4">
                   $40
                   <span className="font-normal text-base"> / month</span>
                 </div> */}
@@ -1006,9 +1047,9 @@ export default function Home() {
                 </button> */}
               </div>
 
-              <div className="flex-1 flex flex-col mx-6 shadow-2xl relative bg-gray-100 rounded-2xl py-5 px-8 my-8 md:top-24">
+              <div className="flex-1 flex flex-col mx-6 shadow-2xl relative border bg-gradient-to-bl from-indigo-50 to-fuchsia-50 rounded-2xl py-5 px-8 my-8 md:top-24">
                 <h3 className="font-pt-serif font-bold text-2xl mb-4">Freelance Recruiters</h3>
-                {/* <div className="font-montserrat font-bold text-2xl mb-4">
+                {/* <div className="font-bold text-2xl mb-4">
                   $50
                   <span className="font-normal text-base"> / month</span>
                 </div> */}
@@ -1060,12 +1101,10 @@ export default function Home() {
 
             <div className="w-full py-4">
               <div className="flex justify-between items-center">
-                <div className="font-montserrat font-medium mr-auto">
-                  Where can I get this HTML template?
-                </div>
+                <div className="font-medium mr-auto">Where can I get this HTML template?</div>
                 <ChevronRightIcon className="w-6 h-6" />
               </div>
-              <div className="mt-4 text-left font-montserrat text-sm font-extralight pb-4 hidden">
+              <div className="mt-4 text-left text-sm font-extralight pb-4 hidden">
                 You can download it on Gumroad.com
               </div>
             </div>
@@ -1073,12 +1112,10 @@ export default function Home() {
 
             <div className="w-full py-4">
               <div className="flex justify-between items-center">
-                <div className="font-montserrat font-medium mr-auto">
-                  Is this HTML template free?
-                </div>
+                <div className="font-medium mr-auto">Is this HTML template free?</div>
                 <ChevronRightIcon className="w-6 h-6" />
               </div>
-              <div className="mt-4 text-left font-montserrat text-sm font-extralight pb-4 hidden">
+              <div className="mt-4 text-left text-sm font-extralight pb-4 hidden">
                 Yes! For you it is free.
               </div>
             </div>
@@ -1086,10 +1123,10 @@ export default function Home() {
 
             <div className="w-full py-4">
               <div className="flex justify-between items-center">
-                <div className="font-montserrat font-medium mr-auto">Am I awesome?</div>
+                <div className="font-medium mr-auto">Am I awesome?</div>
                 <ChevronRightIcon className="w-6 h-6" />
               </div>
-              <div className="mt-4 text-left font-montserrat text-sm font-extralight pb-4 hidden">
+              <div className="mt-4 text-left text-sm font-extralight pb-4 hidden">
                 Yes! No doubt about it.
               </div>
             </div>
