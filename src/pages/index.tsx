@@ -338,7 +338,7 @@ export default function Home() {
             <p className="text-center font-semibold text-lg lg:text-xl">
               You get an instant Careers Page with{" "}
               {/* <span className="bg-yellow-200 rounded-tl-xl rounded-br-xl px-1"> */}
-              customizable theme color
+              multiple customisation options including theme color
               {/* </span> */}:
             </p>
             {/* <iframe
@@ -382,7 +382,17 @@ export default function Home() {
             </div>
           </section>
 
-          <div className="mt-20 mb-4 w-full flex items-center justify-center">
+          <section className="mx-3 sm:mx-10 mt-20">
+            <div className="italic text-lg text-neutral-700">Used by companies big and small:</div>
+            <div className="p-10 flex flex-col md:flex-row items-center justify-center gap-16 flex-wrap">
+              <img className="h-7" src="landing-screenshots/handle-delivery-logo.png" />
+              <img className="h-10" src="landing-screenshots/arthentic-logo.webp" />
+              <img className="h-10" src="landing-screenshots/digital-expert-logo.webp" />
+              <img className="h-10" src="landing-screenshots/exxonmobil-logo.png" />
+            </div>
+          </section>
+
+          <div className="mt-10 mb-4 w-full flex items-center justify-center">
             {/* <a
               target="_blank"
               rel="referrer"
@@ -433,7 +443,7 @@ export default function Home() {
             />
           </div>
 
-          <section className="mt-10 rounded-md bg-black text-white lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center">
+          <section className="mt-10 rounded-xl bg-black text-white lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center">
             <div>
               <h2 className="text-3xl bg-left-bottom bg-no-repeat pb-8 px-16 mb-8 bg-underline2 bg-100%">
                 All the essentials you need
@@ -470,7 +480,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
+          <section className="mt-7 rounded-xl w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/2">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileInterviewSchHeight relative">
@@ -531,7 +541,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
+          <section className="mt-7 rounded-xl w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/2">
                 <p className="text-xl font-bold flex items-center justify-center">
@@ -593,7 +603,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-7 rounded-md lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center bg-gradient-to-r from-fuchsia-100 via-purple-100 to-indigo-200">
+          <section className="mt-7 rounded-xl lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center bg-gradient-to-r from-fuchsia-100 via-purple-100 to-indigo-200">
             <div>
               <h2 className="text-3xl font-bold bg-left-bottom bg-no-repeat pb-8 px-16 mb-8 bg-underline3 bg-100%">
                 Why Use Hire.win?
@@ -688,7 +698,7 @@ export default function Home() {
             />
           </div> */}
 
-          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
+          <section className="mt-7 rounded-xl w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-2/3">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileCompMembersHeight relative">
@@ -742,7 +752,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
+          <section className="mt-7 rounded-xl w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/3">
                 <p className="text-xl font-bold flex items-center justify-center">Jobs Overview:</p>
@@ -793,10 +803,10 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-10 rounded-md bg-black text-white lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center">
+          <section className="mt-10 rounded-xl bg-black text-white lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center">
             <div>
               <h2 className="text-3xl bg-left-bottom bg-no-repeat pb-8 px-16 mb-8 bg-underline2 bg-100%">
-                How to create your Instant Careers Page?
+                How to create an Instant Careers Page?
               </h2>
             </div>
             <div className="flex flex-col md:flex-row">
@@ -835,7 +845,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
+          <section className="mt-7 rounded-xl w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-2/3">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileCompMembersHeight relative">
@@ -928,7 +938,7 @@ export default function Home() {
             />
           </div> */}
 
-          <section className="mt-7 rounded-md w-full bg-white flex items-center justify-center p-10">
+          <section className="mt-7 rounded-xl w-full bg-white flex items-center justify-center p-10">
             <div className="w-full flex flex-col-reverse space-y-reverse space-y-10 lg:flex-row lg:space-x-10 lg:space-y-0 items-center justify-center">
               <div className="w-full lg:w-1/2">
                 <div className="w-full block sm:hidden md:hidden lg:hidden mobileCommentsHeight relative">
@@ -1101,36 +1111,76 @@ export default function Home() {
 
             <div className="w-full py-4">
               <div className="flex justify-between items-center">
-                <div className="font-medium mr-auto">Where can I get this HTML template?</div>
-                <ChevronRightIcon className="w-6 h-6" />
+                <div className="font-medium mr-auto">
+                  Can I customise my Careers Page created with Hire.win?
+                </div>
+                {/* <ChevronRightIcon className="w-6 h-6" /> */}
               </div>
-              <div className="mt-4 text-left text-sm font-extralight pb-4 hidden">
-                You can download it on Gumroad.com
-              </div>
-            </div>
-            <hr className="w-full bg-white" />
-
-            <div className="w-full py-4">
-              <div className="flex justify-between items-center">
-                <div className="font-medium mr-auto">Is this HTML template free?</div>
-                <ChevronRightIcon className="w-6 h-6" />
-              </div>
-              <div className="mt-4 text-left text-sm font-extralight pb-4 hidden">
-                Yes! For you it is free.
+              <div className="mt-4 text-left text-sm font-extralight pb-4">
+                Yes, you can personalise your careers page using Hire.win, by including your company
+                logo, company description, changing the theme to match your branding and customising
+                the job application form.
               </div>
             </div>
             <hr className="w-full bg-white" />
 
             <div className="w-full py-4">
               <div className="flex justify-between items-center">
-                <div className="font-medium mr-auto">Am I awesome?</div>
-                <ChevronRightIcon className="w-6 h-6" />
+                <div className="font-medium mr-auto">
+                  Is Hire.win a Careers Page Builder or an Applicant Tracking System?
+                </div>
+                {/* <ChevronRightIcon className="w-6 h-6" /> */}
               </div>
-              <div className="mt-4 text-left text-sm font-extralight pb-4 hidden">
-                Yes! No doubt about it.
+              <div className="mt-4 text-left text-sm font-extralight pb-4">
+                Hire.win is primarily an Instant Careers Page provider which also gives you a
+                powerful Applicant Tracking Dashboard to track and interview the applicants along
+                with your entire Hiring Team.
               </div>
             </div>
             <hr className="w-full bg-white" />
+
+            <div className="w-full py-4">
+              <div className="flex justify-between items-center">
+                <div className="font-medium mr-auto">Does Hire.win have a Free Plan?</div>
+                {/* <ChevronRightIcon className="w-6 h-6" /> */}
+              </div>
+              <div className="mt-4 text-left text-sm font-extralight pb-4">
+                Yes! Hire.win's free plan offers you 3 active jobs on your careers page and
+                essential applicant tracking features.
+              </div>
+            </div>
+            <hr className="w-full bg-white" />
+
+            <div className="w-full py-4">
+              <div className="flex justify-between items-center">
+                <div className="font-medium mr-auto">
+                  What is the meaning of Flat Pricing model that Hire.win offers?
+                </div>
+                {/* <ChevronRightIcon className="w-6 h-6" /> */}
+              </div>
+              <div className="mt-4 text-left text-sm font-extralight pb-4">
+                Flat pricing model means, Hire.win doesn't charge you on per job or per user basis.
+                You just pay the flat monthly fee and you get unlimited access to all the features
+                where you can create unlimited jobs, unlimited companies and onboard unlimited
+                Hiring Team Members.
+              </div>
+            </div>
+            <hr className="w-full bg-white" />
+
+            <div className="w-full py-4">
+              <div className="flex justify-between items-center">
+                <div className="font-medium mr-auto">
+                  How is Hire.win useful for staffing agencies and freelance recruiters?
+                </div>
+                {/* <ChevronRightIcon className="w-6 h-6" /> */}
+              </div>
+              <div className="mt-4 text-left text-sm font-extralight pb-4">
+                Staffing agencies and freelance recruiters mostly deal with multiple companies.
+                That's where Hire.win comes to help as it provides a flat pricing model where
+                recruiters can create unlimited companies and unlimited jobs even while paying a
+                flat monthly fee!
+              </div>
+            </div>
           </section>
 
           {/* <div className="mt-8 mb-4 w-full flex items-center justify-center">
