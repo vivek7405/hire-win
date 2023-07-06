@@ -34,6 +34,7 @@ import {
 import { useRouter } from "next/router"
 import getCookie from "src/core/utils/getCookie"
 import { REFERRER_ID_COOKIE_NAME } from "src/core/constants"
+import LabeledRatingField from "src/core/components/LabeledRatingField"
 
 // export const getServerSideProps = async (context: GetServerSidePropsContext) => {
 //   path.resolve("next.config.js")
@@ -382,17 +383,92 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mx-3 sm:mx-10 mt-20">
-            <div className="italic text-lg text-neutral-700">Used by companies big and small:</div>
-            <div className="p-10 flex flex-col md:flex-row items-center justify-center gap-16 flex-wrap">
+          {/* <section className="mx-3 sm:mx-10 mt-28"> */}
+          <section className="mx-3 sm:mx-10 mt-28 rounded-xl lg:px-48 md:px-12 px-4 py-14 flex flex-col items-center bg-gradient-to-r from-fuchsia-100 via-purple-100 to-indigo-200">
+            <div className="mb-5 italic text-lg text-neutral-700">
+              Used by companies big and small:
+            </div>
+
+            <div className="mb-5 p-10 flex flex-col md:flex-row items-center justify-center gap-16 flex-wrap">
               <img className="h-7" src="landing-screenshots/handle-delivery-logo.png" />
               <img className="h-10" src="landing-screenshots/arthentic-logo.webp" />
               <img className="h-10" src="landing-screenshots/digital-expert-logo.webp" />
               <img className="h-10" src="landing-screenshots/exxonmobil-logo.png" />
             </div>
+
+            <div className="flex flex-col md:flex-row items-center justify-center gap-10">
+              <div className="max-w-xs flex flex-col">
+                <Form
+                  noFormatting={true}
+                  onSubmit={async () => {
+                    return
+                  }}
+                >
+                  <div className="w-full flex items-center justify-center">
+                    <LabeledRatingField
+                      name="customerReview1"
+                      ratingClass={`!flex items-center`}
+                      height={4}
+                      color="yellow"
+                      value={5}
+                      disabled={true}
+                      allowCursorWhenDisabled={true}
+                    />
+                  </div>
+                </Form>
+                <p className="italic">"Best Careers Page money can buy"</p>
+                <p className="text-neutral-800 text-sm">- Handle Delivery</p>
+              </div>
+
+              <div className="max-w-xs flex flex-col">
+                <Form
+                  noFormatting={true}
+                  onSubmit={async () => {
+                    return
+                  }}
+                >
+                  <div className="w-full flex items-center justify-center">
+                    <LabeledRatingField
+                      name="customerReview1"
+                      ratingClass={`!flex items-center`}
+                      height={4}
+                      color="yellow"
+                      value={5}
+                      disabled={true}
+                      allowCursorWhenDisabled={true}
+                    />
+                  </div>
+                </Form>
+                <p className="italic">"Truly value for money ATS"</p>
+                <p className="text-neutral-800 text-sm">- People Tree Recruitment</p>
+              </div>
+
+              <div className="max-w-xs flex flex-col">
+                <Form
+                  noFormatting={true}
+                  onSubmit={async () => {
+                    return
+                  }}
+                >
+                  <div className="w-full flex items-center justify-center">
+                    <LabeledRatingField
+                      name="customerReview1"
+                      ratingClass={`!flex items-center`}
+                      height={4}
+                      color="yellow"
+                      value={5}
+                      disabled={true}
+                      allowCursorWhenDisabled={true}
+                    />
+                  </div>
+                </Form>
+                <p className="italic">"Look no further than Hire.win"</p>
+                <p className="text-neutral-800 text-sm">- ExxonMobil</p>
+              </div>
+            </div>
           </section>
 
-          <div className="mt-10 mb-4 w-full flex items-center justify-center">
+          <div className="mt-20 mb-4 w-full flex items-center justify-center">
             {/* <a
               target="_blank"
               rel="referrer"
