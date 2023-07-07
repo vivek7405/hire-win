@@ -417,7 +417,7 @@ export default function Home() {
                   </div>
                 </Form>
                 <p className="italic">"Best Careers Page money can buy"</p>
-                <p className="text-neutral-800 text-sm">- Handle Delivery</p>
+                <p className="text-neutral-800 text-sm">- Arthentic</p>
               </div>
 
               <div className="max-w-xs flex flex-col">
